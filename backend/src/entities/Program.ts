@@ -47,8 +47,34 @@ export class Program {
     @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
     price_one_time!: number | null;
 
+    @Column({
+        type: 'enum',
+        enum: ['online', 'offline_1on1', 'offline_group', 'hybrid'],
+        default: 'online'
+    })
+    training_format!: 'online' | 'offline_1on1' | 'offline_group' | 'hybrid';
+
+    @Column({ type: 'jsonb', nullable: true })
+    included_features!: string[] | null;
+
+    @Column({
+        type: 'enum',
+        enum: ['lump_sum', 'monthly', 'per_session'],
+        default: 'monthly'
+    })
+    pricing_type!: 'lump_sum' | 'monthly' | 'per_session';
+
+    @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+    price_per_session!: number | null;
+
+    @Column({ type: 'jsonb', nullable: true })
+    training_goals!: string[] | null;
+
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    prerequisites!: string | null;
+
     @Column({ type: 'varchar', length: 500, nullable: true })
-    thumbnail_url!: string | null;
+    cover_image_url!: string | null;
 
     @Column({ type: 'boolean', default: false })
     is_published!: boolean;
