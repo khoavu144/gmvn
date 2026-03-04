@@ -25,6 +25,7 @@ import type { User, TrainerExperience, TrainerGallery, TrainerFAQ } from '../typ
 import { ImageCropperModal } from '../components/ImageCropperModal';
 import { uploadService } from '../services/uploadService';
 import CreatableSelect from 'react-select/creatable';
+import { VIETNAM_PROVINCES } from '../utils/provinces';
 
 // ── Schemas ────────────────────────────────────────────────────────────────
 const profileSchema = z.object({
@@ -851,7 +852,12 @@ export default function Profile() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-200">
                                 <div>
                                     <label className="form-label">Địa điểm hoạt động (Tỉnh/Thành)</label>
-                                    <input type="text" {...regProfile('location')} placeholder="Hà Nội, TP. Hồ Chí Minh..." className="form-input" />
+                                    <select {...regProfile('location')} className="form-input">
+                                        <option value="">-- Chọn tỉnh/thành --</option>
+                                        {VIETNAM_PROVINCES.map(p => (
+                                            <option key={p} value={p}>{p}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div>
                                     <label className="form-label">Số điện thoại liên hệ (Tuỳ chọn)</label>
@@ -875,19 +881,74 @@ export default function Profile() {
                         <div className="card">
                             <h2 className="card-header border-none pb-0 mb-2">Chứng chỉ & Bằng cấp</h2>
                             <p className="text-xs text-gray-500 mb-4">
-                                Khai báo dưới dạng Array JSON. Cấu trúc yêu cầu: <code className="ml-1 px-1 py-0.5 bg-gray-100 border border-gray-200 rounded">{`[{"name":"...", "issuer":"...", "year": 2024, "url": "..."}]`}</code>
+                                Tải lên hình ảnh chứng chỉ của bạn (những ảnh đã tải lên sẽ lưu và hiển thị trên hồ sơ public).
                             </p>
-                            <textarea rows={6} {...regProfile('certifications_json')}
-                                placeholder='[
-  {
-    "name": "NASM CPT",
-    "issuer": "NASM",
-    "year": 2020,
-    "url": "https://url.to/cert"
-  }
-]'
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xs text-sm font-mono text-gray-800 focus:outline-none focus:border-black resize-vertical" />
-                            {certsError && <p className="form-helper text-red-600 font-medium">{certsError}</p>}
+                            <input type="hidden" {...regProfile('certifications_json')} />
+                            {certsError && <p className="form-helper text-red-600 font-medium mb-2">{certsError}</p>}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {(() => {
+                                    let certsArr: any[] = [];
+                                    try {
+                                        const val = watchProfile('certifications_json');
+                                        if (val) certsArr = JSON.parse(val);
+                                        if (!Array.isArray(certsArr)) certsArr = [];
+                                    } catch (e) {
+                                        certsArr = [];
+                                    }
+                                    return certsArr.map((cert, index) => (
+                                        <div key={index} className="relative group border border-gray-200 rounded-sm overflow-hidden aspect-video bg-gray-50">
+                                            <img src={cert.url} alt={cert.name || 'Chứng chỉ'} className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newArr = [...certsArr];
+                                                    newArr.splice(index, 1);
+                                                    setProfileValue('certifications_json', JSON.stringify(newArr), { shouldDirty: true });
+                                                }}
+                                                className="absolute top-2 right-2 bg-white/90 text-black px-2 py-1 rounded text-xs font-medium hover:bg-white transition shadow opacity-0 group-hover:opacity-100">
+                                                Xóa
+                                            </button>
+                                        </div>
+                                    ));
+                                })()}
+
+                                <label className={`border-2 border-dashed border-gray-300 rounded-sm aspect-video flex flex-col items-center justify-center text-gray-500 hover:border-black hover:text-black transition ${isUploading ? 'cursor-wait opacity-50' : 'cursor-pointer'}`}>
+                                    <span className="text-2xl mb-1">+</span>
+                                    <span className="text-xs font-medium text-center px-2">
+                                        {isUploading ? 'Đang tải...' : 'Tải lên ảnh mới'}
+                                    </span>
+                                    <input
+                                        type="file"
+                                        className="hidden"
+                                        accept="image/*"
+                                        disabled={isUploading}
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+                                            try {
+                                                // Borrow isUploading state to prevent double uploads
+                                                setIsUploading(true);
+                                                const url = await uploadService.uploadImage(file, 'certificates', file.name);
+                                                let currArr: any[] = [];
+                                                try {
+                                                    const val = watchProfile('certifications_json');
+                                                    if (val) currArr = JSON.parse(val);
+                                                    if (!Array.isArray(currArr)) currArr = [];
+                                                } catch (e) {
+                                                    currArr = [];
+                                                }
+                                                currArr.push({ name: 'Chứng chỉ', issuer: 'Upload', year: new Date().getFullYear(), url });
+                                                setProfileValue('certifications_json', JSON.stringify(currArr), { shouldDirty: true });
+                                            } catch (err) {
+                                                alert('Lỗi tải ảnh. Vui lòng thử lại');
+                                            } finally {
+                                                setIsUploading(false);
+                                                if (e.target) e.target.value = '';
+                                            }
+                                        }}
+                                    />
+                                </label>
+                            </div>
                         </div>
 
                         <div className="flex justify-end pt-4 pb-12">

@@ -51,7 +51,7 @@ const router = createBrowserRouter([
       { path: '/register', element: <Register /> },
       { path: '/dashboard', element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
       { path: '/coaches', element: <Coaches /> },
-      { path: '/coaches/:id', element: <CoachDetail /> },
+      { path: '/coaches/:trainerId', element: <CoachDetail /> },
       { path: '/profile', element: <ProtectedRoute><Profile /></ProtectedRoute> },
       { path: '/programs', element: <ProtectedRoute requiredRole={['trainer', 'athlete']}><ProgramsPage /></ProtectedRoute> },
       { path: '/messages', element: <ProtectedRoute><MessagesPage /></ProtectedRoute> },

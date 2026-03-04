@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import FeaturedCoaches from '../components/FeaturedCoaches';
 
 const HomeGymer = () => (
     <div className="relative bg-white px-8 py-24 md:px-16 md:py-32 flex flex-col justify-center animate-fade-in border-b md:border-b-0 md:border-r border-gray-200 group">
@@ -63,24 +64,8 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* 2. STATS SECTION */}
-            <section className="bg-white py-12 md:py-20 border-b border-gray-100">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-                        {[
-                            { label: 'Người tập luyện', value: '10,000+' },
-                            { label: 'Coach', value: '500+' },
-                            { label: 'Buổi tập đã xong', value: '50,000+' },
-                            { label: 'Đánh giá trung bình', value: '4.8' },
-                        ].map((stat, i) => (
-                            <div key={i} className="text-center">
-                                <div className="text-3xl md:text-4xl font-extrabold text-black mb-1">{stat.value}</div>
-                                <div className="text-xs text-gray-500 uppercase tracking-widest font-medium">{stat.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+            {/* 2. FEATURED COACHES SECTION (Replaces STATS) */}
+            <FeaturedCoaches />
 
             {/* 3. ROLES INTRODUCTION (Expanded) */}
             <section className="py-24 md:py-32 bg-white">
