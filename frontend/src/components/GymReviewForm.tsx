@@ -18,7 +18,7 @@ const GymReviewForm: React.FC<GymReviewFormProps> = ({ gymId, branchId, onSucces
         e.preventDefault();
         setSubmitting(true);
         try {
-            const res = await gymService.createReview(gymId, { branch_id: branchId, rating, comment });
+            const res = await gymService.createReview(gymId, branchId, { rating, comment });
             if (res.success) {
                 toast.success('Đánh giá của bạn đã được gửi!');
                 setComment('');

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { gymService } from '../services/gymService';
 import type { GymCenter, GymBranch } from '../types';
 import { Link } from 'react-router-dom';
-import GymTrainerManager from '../components/GymTrainerManager';
 import GymBranchEditor from '../components/GymBranchEditor';
 
 const GymOwnerDashboard: React.FC = () => {
@@ -148,7 +147,11 @@ const GymOwnerDashboard: React.FC = () => {
                 )}
 
                 {activeTab === 'trainers' && (
-                    <GymTrainerManager branches={branches} />
+                    <div className="bg-white p-10 text-center rounded-xl border border-gray-200">
+                        <h2 className="text-2xl font-bold mb-2">Quản lý Coach liên kết</h2>
+                        <p className="text-gray-500 mb-6">Tính năng quản lý Coach hiện được quản lý trực tiếp tại từng chi nhánh phòng tập.</p>
+                        <button className="btn-primary" onClick={() => setActiveTab('branches')}>Truy cập Quản lý Chi nhánh</button>
+                    </div>
                 )}
 
                 {activeTab === 'settings' && (
