@@ -1,0 +1,139 @@
+import { AppDataSource } from '../config/database';
+import { Subscription } from '../entities/Subscription';
+import { Program } from '../entities/Program';
+const subRepo = AppDataSource.getRepository(Subscription);
+const programRepo = AppDataSource.getRepository(Program);
+
+class SubscriptionService {
+    async createCheckoutSession(userId: string, programId: string) {
+        const program = await programRepo.findOneBy({ id: programId, is_published: true });
+        if (!program) throw new Error('Program not found');
+        if (!program.trainer_id) throw new Error('Invalid program');
+
+        const amount = program.price_monthly
+            ? Number(program.price_monthly)
+            : 50000; // Default 50,000 VND
+
+        // Syntax: GV userId programId
+        const transferContent = `GV ${userId.substring(0, 8)} ${programId.substring(0, 8)}`.toUpperCase();
+
+        return {
+            amount,
+            transfer_content: transferContent,
+            program: {
+                id: program.id,
+                name: program.name,
+                price_monthly: program.price_monthly,
+            },
+        };
+    }
+
+    async handleSepayWebhook(transactionData: any) {
+        // transactionData from Sepay typically looks like:
+        // { id, gateway, transactionDate, accountNumber, code, content, transferType, transferAmount, accumulated, subAccount, referenceCode }
+        const { content, transferAmount, id, transferType } = transactionData;
+
+        if (transferType !== 'in' || !content) return { success: true };
+
+        const contentStr = String(content).toUpperCase();
+
+        if (!contentStr.includes('GV ')) return { success: true }; // Not our transaction
+
+        // Extract ids from GV <user_id_prefix> <program_id_prefix>
+        const parts = contentStr.match(/GV\s+([A-Z0-9]+)\s+([A-Z0-9]+)/);
+        if (!parts) return { success: true };
+
+        const userIdPrefix = parts[1].toLowerCase();
+        const programIdPrefix = parts[2].toLowerCase();
+
+        // 1. Find user and program by prefix
+        const AppDataSrc = AppDataSource;
+        const users = await AppDataSrc.query(`SELECT id FROM users WHERE id::text LIKE $1`, [`${userIdPrefix}%`]);
+        const programs = await AppDataSrc.query(`SELECT id, trainer_id, price_monthly FROM programs WHERE id::text LIKE $1`, [`${programIdPrefix}%`]);
+
+        if (!users.length || !programs.length) return { success: true };
+
+        const userId = users[0].id;
+        const programId = programs[0].id;
+        const trainerId = programs[0].trainer_id;
+        const programAmount = Number(programs[0].price_monthly) || 50000;
+
+        // Tolerant verification for amount (>= programAmount)
+        if (Number(transferAmount) < programAmount) {
+            console.log(`Sepay: Amount ${transferAmount} is less than required ${programAmount}`);
+            return { success: true };
+        }
+
+        // Check if subscription already exists
+        const existing = await subRepo.findOneBy({
+            user_id: userId,
+            program_id: programId,
+            status: 'active',
+        });
+
+        if (existing) return { success: true }; // Already subbed
+
+        const sub = subRepo.create({
+            user_id: userId,
+            trainer_id: trainerId,
+            program_id: programId,
+            subscription_type: 'monthly',
+            price_paid: Number(transferAmount),
+            sepay_transaction_id: String(id),
+            status: 'active',
+            started_at: new Date(),
+            next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        });
+
+        await programRepo.increment({ id: programId }, 'current_clients', 1);
+        await subRepo.save(sub);
+
+        return { success: true };
+    }
+
+    async getUserSubscriptions(userId: string) {
+        return subRepo.find({
+            where: { user_id: userId },
+            relations: ['program', 'trainer'],
+            order: { created_at: 'DESC' },
+        });
+    }
+
+    async cancelSubscription(userId: string, subscriptionId: string) {
+        const sub = await subRepo.findOneBy({ id: subscriptionId, user_id: userId });
+        if (!sub) throw new Error('Subscription not found');
+        if (sub.status === 'cancelled') throw new Error('Already cancelled');
+
+        sub.status = 'cancelled';
+        sub.ended_at = new Date();
+
+        // Decrement program client count
+        await programRepo.decrement({ id: sub.program_id }, 'current_clients', 1);
+
+        return subRepo.save(sub);
+    }
+
+    async getTrainerStats(trainerId: string) {
+        const activeCount = await subRepo.count({
+            where: { trainer_id: trainerId, status: 'active' },
+        });
+
+        const allSubs = await subRepo.find({
+            where: { trainer_id: trainerId, status: 'active' },
+        });
+
+        const monthlyRevenue = allSubs.reduce((sum, s) => {
+            return sum + (Number(s.price_paid) || 0);
+        }, 0);
+
+        // Platform takes 20%, trainer gets 80%
+        const trainerRevenue = monthlyRevenue * 0.8;
+
+        return {
+            active_clients: activeCount,
+            monthly_revenue: trainerRevenue,
+        };
+    }
+}
+
+export const subscriptionService = new SubscriptionService();
