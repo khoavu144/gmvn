@@ -15,10 +15,10 @@ const HomeGymer = () => (
                 Nền tảng kết nối Gymer và Coach hàng đầu Việt Nam. Nhận giáo án cá nhân hóa, theo dõi tiến trình và tương tác trực tiếp 1-1.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/register" className="btn-primary px-8 py-4 text-sm whitespace-nowrap">
+                <Link to="/register" className="bg-black text-white hover:bg-gray-800 transition-colors font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-lg flex items-center justify-center whitespace-nowrap">
                     Bắt đầu tập luyện
                 </Link>
-                <Link to="/coaches" className="btn-secondary px-8 py-4 text-sm whitespace-nowrap">
+                <Link to="/coaches" className="border border-gray-300 text-black hover:border-black hover:bg-gray-50 transition-colors font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-lg flex items-center justify-center whitespace-nowrap">
                     Tìm Coach
                 </Link>
             </div>
@@ -44,7 +44,7 @@ const HomeGymCenter = () => (
                 <Link to="/gyms" className="bg-white text-black hover:bg-gray-200 transition-colors font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-lg flex items-center justify-center whitespace-nowrap">
                     Danh sách phòng tập
                 </Link>
-                <Link to="/register" className="border-2 border-gray-700 hover:border-white text-white transition-colors font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-lg flex items-center justify-center whitespace-nowrap">
+                <Link to="/register" className="border border-gray-700 text-white hover:border-white hover:bg-white/10 transition-colors font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-lg flex items-center justify-center whitespace-nowrap">
                     Đăng ký Đối Tác
                 </Link>
             </div>

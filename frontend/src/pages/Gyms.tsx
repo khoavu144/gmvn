@@ -12,6 +12,7 @@ const Gyms: React.FC = () => {
     // Filter states
     const [searchTerm, setSearchTerm] = useState('');
     const [cityFilter, setCityFilter] = useState('');
+    const [districtFilter, setDistrictFilter] = useState('');
 
     useEffect(() => {
         fetchGyms();
@@ -22,17 +23,22 @@ const Gyms: React.FC = () => {
         let result = gyms;
         if (searchTerm) {
             result = result.filter(g =>
-                g.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                g.branches?.some(b => b.address.toLowerCase().includes(searchTerm.toLowerCase()))
+                g.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                g.branches?.some(b => b.address?.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
         if (cityFilter) {
             result = result.filter(g =>
-                g.branches?.some(b => b.city?.toLowerCase() === cityFilter.toLowerCase())
+                g.branches?.some(b => b.city === cityFilter)
+            );
+        }
+        if (districtFilter) {
+            result = result.filter(g =>
+                g.branches?.some(b => b.city === cityFilter && b.district === districtFilter)
             );
         }
         setFilteredGyms(result);
-    }, [searchTerm, cityFilter, gyms]);
+    }, [searchTerm, cityFilter, districtFilter, gyms]);
 
     const fetchGyms = async () => {
         try {
@@ -51,12 +57,22 @@ const Gyms: React.FC = () => {
         }
     };
 
-    // Extract unique cities from gyms
-    const allCities = Array.from(
-        new Set(
-            gyms.flatMap(g => (g.branches || []).map(b => b.city).filter(Boolean))
-        )
-    ) as string[];
+    // Extract unique cities and districts from gyms
+    const locationData = React.useMemo(() => {
+        const data: Record<string, Set<string>> = {};
+        gyms.forEach(g => {
+            (g.branches || []).forEach(b => {
+                if (b.city) {
+                    if (!data[b.city]) data[b.city] = new Set();
+                    if (b.district) data[b.city].add(b.district);
+                }
+            });
+        });
+        return data;
+    }, [gyms]);
+
+    const allCities = Object.keys(locationData).sort();
+    const availableDistricts = cityFilter && locationData[cityFilter] ? Array.from(locationData[cityFilter]).sort() : [];
 
     return (
         <div className="bg-white min-h-screen pt-24 pb-16">
@@ -84,16 +100,30 @@ const Gyms: React.FC = () => {
                             className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-all placeholder-gray-400"
                         />
                     </div>
-                    <div className="w-full md:w-64">
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Khu vực</label>
+                    <div className="w-full md:w-56">
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Tỉnh/Thành phố</label>
                         <select
                             value={cityFilter}
-                            onChange={(e) => setCityFilter(e.target.value)}
+                            onChange={(e) => { setCityFilter(e.target.value); setDistrictFilter(''); }}
                             className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-all appearance-none"
                         >
-                            <option value="">Tất cả thành phố</option>
+                            <option value="">Tất cả</option>
                             {allCities.map(city => (
                                 <option key={city} value={city}>{city}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="w-full md:w-56">
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Quận/Huyện</label>
+                        <select
+                            value={districtFilter}
+                            onChange={(e) => setDistrictFilter(e.target.value)}
+                            disabled={!cityFilter}
+                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-all appearance-none disabled:bg-gray-100 disabled:text-gray-400"
+                        >
+                            <option value="">Tất cả</option>
+                            {availableDistricts.map(district => (
+                                <option key={district} value={district}>{district}</option>
                             ))}
                         </select>
                     </div>
