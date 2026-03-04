@@ -78,7 +78,11 @@ app.get('/api/v1/health', async (_req, res) => {
         res.status(200).json({
             status: 'OK',
             timestamp: new Date().toISOString(),
-            db: { users: userCount, gyms: gymCount },
+            db: {
+                initialized: AppDataSource.isInitialized,
+                users: userCount,
+                gyms: gymCount
+            },
             env: process.env.NODE_ENV
         });
     } catch (error: any) {
