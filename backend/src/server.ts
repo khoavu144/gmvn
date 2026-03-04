@@ -17,10 +17,23 @@ AppDataSource.initialize()
             rankingService.scheduleCronJobs();
         });
 
-        httpServer.listen(PORT, () => {
+        httpServer.listen(PORT, async () => {
             console.log(`🚀 Server running on port ${PORT}`);
             console.log(`📡 API: http://localhost:${PORT}/api/v1`);
             console.log(`💬 Socket.io enabled`);
+
+            // Seed production data if flag is set
+            if (process.env.RUN_SEED === 'true') {
+                console.log('🌱 RUN_SEED flag detected. Running comprehensive demo seed...');
+                try {
+                    // We use dynamic import to avoid bundling seed logic if not needed
+                    const { seedRemote } = await import('./seeds/comprehensiveDemo');
+                    await seedRemote();
+                    console.log('✨ Seed completed successfully via boot flag.');
+                } catch (seedError) {
+                    console.error('❌ Remote seed failed:', seedError);
+                }
+            }
         });
     })
     .catch((error) => {

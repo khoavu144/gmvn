@@ -12,7 +12,7 @@ import bcrypt from 'bcryptjs';
 
 const DEMO_PASSWORD = 'Demo@123456';
 
-async function seed() {
+export async function seedRemote() {
     console.log('🚀 Starting Comprehensive Demo Data Seed (Fixed relations)...');
     try {
         if (!AppDataSource.isInitialized) await AppDataSource.initialize();
@@ -41,7 +41,7 @@ async function seed() {
                 years_experience: 7,
                 clients_trained: 150,
                 success_stories: 45,
-                certifications_json: JSON.stringify([{name: 'ICS Level 2', issuer: 'International Calisthenics', year: 2021, url: ''}]),
+                certifications_json: JSON.stringify([{ name: 'ICS Level 2', issuer: 'International Calisthenics', year: 2021, url: '' }]),
                 is_verified: true,
             },
             {
@@ -109,7 +109,7 @@ async function seed() {
                 coach = userRepo.create({ ...c, password: hashedPassword, is_verified: true });
                 coach = await userRepo.save(coach);
                 console.log(`✅ Created Coach: ${c.full_name}`);
-                
+
                 const program = programRepo.create({
                     trainer_id: coach.id,
                     name: `Gói tập 12 tuần: ${c.specialties[0]}`,
@@ -139,12 +139,12 @@ async function seed() {
         for (const a of athletesData) {
             let athlete = await userRepo.findOneBy({ email: a.email });
             if (!athlete) {
-                athlete = userRepo.create({ 
-                    ...a, 
-                    password: hashedPassword, 
+                athlete = userRepo.create({
+                    ...a,
+                    password: hashedPassword,
                     user_type: 'athlete',
                     avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${a.full_name}&backgroundColor=b6e3f4`,
-                    is_verified: true 
+                    is_verified: true
                 });
                 await userRepo.save(athlete);
                 console.log(`✅ Created Athlete: ${a.full_name}`);
@@ -155,8 +155,8 @@ async function seed() {
         const gymsData = [
             {
                 owner: { email: 'tien.gym@demo.com', full_name: 'Vương Đình Tiến' },
-                gym: { 
-                    name: 'Elite Fitness & Yoga Center', 
+                gym: {
+                    name: 'Elite Fitness & Yoga Center',
                     tagline: 'Đẳng cấp thể hình 5 sao',
                     description: 'Phòng tập cao cấp với các trang thiết bị nhập khẩu từ Ý, khu vực xông hơi và hồ bơi vô cực.',
                     cover_image_url: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80&w=1200'
@@ -168,8 +168,8 @@ async function seed() {
             },
             {
                 owner: { email: 'hieu.box@demo.com', full_name: 'Bùi Công Hiếu' },
-                gym: { 
-                    name: 'The Warehouse Boxing & MMA', 
+                gym: {
+                    name: 'The Warehouse Boxing & MMA',
                     tagline: 'Bản lĩnh chiến binh',
                     description: 'Phòng tập thuần striking và grappling. Không gian thô mộc, tinh thần thép.',
                     cover_image_url: 'https://images.unsplash.com/photo-1594381898411-846e7d193883?auto=format&fit=crop&q=80&w=1200'
@@ -181,8 +181,8 @@ async function seed() {
             },
             {
                 owner: { email: 'thao.lotus@demo.com', full_name: 'Lý Ngọc Thảo' },
-                gym: { 
-                    name: 'Lotus Zen Yoga Studio', 
+                gym: {
+                    name: 'Lotus Zen Yoga Studio',
                     tagline: 'Khởi đầu bình an',
                     description: 'Không gian tĩnh lặng giữa lòng thành phố cho những tâm hồn yêu Yoga.',
                     cover_image_url: 'https://images.unsplash.com/photo-1545208393-596371ba4d31?auto=format&fit=crop&q=80&w=1200'
@@ -194,8 +194,8 @@ async function seed() {
             },
             {
                 owner: { email: 'anh.iron@demo.com', full_name: 'Ngô Duy Anh' },
-                gym: { 
-                    name: 'Iron Paradise Hardcore Gym', 
+                gym: {
+                    name: 'Iron Paradise Hardcore Gym',
                     tagline: 'Xây dựng cơ bắp thật sự',
                     description: 'Phòng tập dành cho những người nâng vật nặng. Không máy lạnh, chỉ có mồ hôi và sắt.',
                     cover_image_url: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1200'
@@ -207,8 +207,8 @@ async function seed() {
             },
             {
                 owner: { email: 'hanh.sky@demo.com', full_name: 'Trương Mỹ Hạnh' },
-                gym: { 
-                    name: 'Skyline Fitness Lounge', 
+                gym: {
+                    name: 'Skyline Fitness Lounge',
                     tagline: 'View toàn thành phố',
                     description: 'Vừa tập luyện vừa ngắm nhìn hoàng hôn trên tầng 40.',
                     cover_image_url: 'https://images.unsplash.com/photo-1571902258032-78a167d6742c?auto=format&fit=crop&q=80&w=1200'
@@ -224,12 +224,12 @@ async function seed() {
         for (const data of gymsData) {
             let owner = await userRepo.findOneBy({ email: data.owner.email });
             if (!owner) {
-                owner = userRepo.create({ 
-                    ...data.owner, 
-                    password: hashedPassword, 
+                owner = userRepo.create({
+                    ...data.owner,
+                    password: hashedPassword,
                     user_type: 'gym_owner',
                     gym_owner_status: 'approved',
-                    is_verified: true 
+                    is_verified: true
                 });
                 owner = await userRepo.save(owner);
                 console.log(`✅ Created Gym Owner: ${data.owner.full_name}`);
@@ -261,18 +261,18 @@ async function seed() {
                     await equipmentRepo.save(equipmentRepo.create({ branch_id: branch.id, name: eq, category: 'other' }));
                 }
 
-                await pricingRepo.save(pricingRepo.create({ 
+                await pricingRepo.save(pricingRepo.create({
                     branch_id: branch.id,
                     plan_name: data.pricing.plan_name,
-                    description: 'Truy cập đầy đủ dịch vụ', 
+                    description: 'Truy cập đầy đủ dịch vụ',
                     price: data.pricing.price as any,
                     billing_cycle: data.pricing.billing_cycle as any
                 }));
 
-                await galleryRepo.save(galleryRepo.create({ 
+                await galleryRepo.save(galleryRepo.create({
                     branch_id: branch.id,
-                    image_url: center.cover_image_url!, 
-                    caption: 'Toàn cảnh phòng tập' 
+                    image_url: center.cover_image_url!,
+                    caption: 'Toàn cảnh phòng tập'
                 }));
             }
         }
@@ -286,5 +286,3 @@ async function seed() {
         if (AppDataSource.isInitialized) await AppDataSource.destroy();
     }
 }
-
-seed();

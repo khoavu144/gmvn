@@ -38,8 +38,8 @@ dotenv.config();
 export const AppDataSource = new DataSource({
     type: 'postgres',
     url: process.env.DATABASE_URL,
-    synchronize: process.env.NODE_ENV !== 'production', // Auto-sync schema in dev
-    logging: process.env.NODE_ENV !== 'production',
+    synchronize: true, // Thử bật sync để fix schema production
+    logging: true,
     entities: [
         User,
         Program,
