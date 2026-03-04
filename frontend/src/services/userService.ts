@@ -17,4 +17,10 @@ export const userService = {
         const response = await api.put<ApiResponse<User>>('/users/profile', data);
         return response.data.data!;
     },
+    searchCoaches: async (search?: string): Promise<User[]> => {
+        const response = await api.get<ApiResponse<{ trainers: User[] }>>('/users/trainers', {
+            params: { search, limit: 50 },
+        });
+        return response.data.data!.trainers;
+    },
 };

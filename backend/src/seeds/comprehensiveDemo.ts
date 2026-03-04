@@ -239,6 +239,7 @@ export async function seedRemote() {
                     ...data.gym,
                     owner_id: owner.id,
                     slug,
+                    logo_url: data.gym.cover_image_url,
                     is_verified: true,
                     is_active: true
                 });

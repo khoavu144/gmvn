@@ -8,9 +8,9 @@ export default function FeaturedCoaches() {
     useEffect(() => {
         apiClient.get('/users/trainers')
             .then(res => {
-                if (res.data?.data) {
+                if (res.data?.data?.trainers) {
                     // Randomize the order
-                    const shuffled = [...res.data.data].sort(() => 0.5 - Math.random());
+                    const shuffled = [...res.data.data.trainers].sort(() => 0.5 - Math.random());
                     setCoaches(shuffled.slice(0, 10)); // Take top 10
                 }
             })
@@ -29,13 +29,13 @@ export default function FeaturedCoaches() {
                     </div>
                 </div>
             </div>
-            
+
             {/* Scrolling track */}
             <div className="relative w-full flex overflow-x-hidden">
                 <div className="flex gap-6 animate-marquee shrink-0 whitespace-nowrap px-4 hover:pause">
                     {coaches.concat(coaches).map((coach, index) => (
-                        <Link 
-                            key={`${coach.id}-${index}`} 
+                        <Link
+                            key={`${coach.id}-${index}`}
                             to={`/coaches/${coach.id}`}
                             className="group block w-64 shrink-0 bg-gray-50 border border-gray-200 rounded-lg overflow-hidden hover:border-black transition"
                         >
