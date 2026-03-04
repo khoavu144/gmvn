@@ -282,7 +282,5 @@ export async function seedRemote() {
 
     } catch (error) {
         console.error('❌ Seed failed:', error);
-    } finally {
-        if (AppDataSource.isInitialized) await AppDataSource.destroy();
     }
 }
