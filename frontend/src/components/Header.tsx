@@ -31,17 +31,17 @@ export default function Header() {
                 </Link>
 
                 {/* Desktop Nav */}
-                <div className="hidden md:flex items-center gap-6">
-                    <Link to="/gyms" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">Gym Center</Link>
-                    <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">Coach</Link>
-                    <Link to="/about" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">Về chúng tôi</Link>
+                <div className="hidden lg:flex items-center gap-6">
+                    <Link to="/gyms" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Gym Center</Link>
+                    <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Coach</Link>
+                    <Link to="/about" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Về chúng tôi</Link>
                     {isAuthenticated && (
                         <>
-                            <Link to="/programs" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">Khóa học</Link>
+                            <Link to="/programs" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Khóa học</Link>
                             {user?.user_type === 'athlete' && (
-                                <Link to="/workouts" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">Lịch tập</Link>
+                                <Link to="/workouts" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Lịch tập</Link>
                             )}
-                            <Link to="/messages" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">Tin nhắn</Link>
+                            <Link to="/messages" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Tin nhắn</Link>
                         </>
                     )}
                 </div>
@@ -49,7 +49,7 @@ export default function Header() {
                 <div className="flex items-center gap-2 sm:gap-4">
                     {isAuthenticated && user ? (
                         <div className="flex items-center gap-3 sm:gap-4">
-                            <div className="hidden md:flex flex-col items-end">
+                            <div className="hidden lg:flex flex-col items-end">
                                 <div className="text-right hidden sm:block">
                                     <p className="text-sm font-bold text-black">{user.full_name}</p>
                                     <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
@@ -57,19 +57,19 @@ export default function Header() {
                                     </p>
                                 </div>
                             </div>
-                            <div className="h-8 w-px bg-gray-200 hidden md:block"></div>
-                            <Link to={user.user_type === 'gym_owner' ? "/gym-owner" : "/dashboard"} className="hidden sm:block btn-secondary text-sm px-3 py-1.5 whitespace-nowrap">
+                            <div className="h-8 w-px bg-gray-200 hidden lg:block"></div>
+                            <Link to={user.user_type === 'gym_owner' ? "/gym-owner" : "/dashboard"} className="hidden lg:block btn-secondary text-sm px-3 py-1.5 whitespace-nowrap">
                                 {user.user_type === 'gym_owner' ? 'Quản lý Gym' : 'Cá nhân'}
                             </Link>
                             <button
                                 onClick={handleLogout}
-                                className="hidden md:block text-sm text-gray-500 hover:text-black transition-colors"
+                                className="hidden lg:block text-sm text-gray-500 hover:text-black transition-colors whitespace-nowrap"
                             >
                                 Thoát
                             </button>
                         </div>
                     ) : (
-                        <div className="hidden md:flex items-center gap-2">
+                        <div className="hidden lg:flex items-center gap-2">
                             <Link to="/login" className="btn-tertiary text-sm whitespace-nowrap">
                                 Đăng nhập
                             </Link>
@@ -82,7 +82,7 @@ export default function Header() {
                     {/* Hamburger Toggle */}
                     <button
                         onClick={toggleMenu}
-                        className="md:hidden p-2 text-black focus:outline-none"
+                        className="lg:hidden p-2 text-black focus:outline-none"
                         aria-label="Toggle menu"
                     >
                         {isMenuOpen ? (
@@ -96,7 +96,7 @@ export default function Header() {
 
             {/* Mobile Menu Overlay */}
             {isMenuOpen && (
-                <div className="md:hidden fixed inset-0 top-14 bg-white z-[50] flex flex-col p-6 animate-fade-in">
+                <div className="lg:hidden fixed inset-0 top-14 bg-white z-[50] flex flex-col p-6 animate-fade-in">
                     <nav className="flex flex-col gap-6">
                         <Link to="/gyms" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Gym Center</Link>
                         <Link to="/coaches" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Coach</Link>
