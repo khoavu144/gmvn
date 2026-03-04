@@ -58,7 +58,7 @@ export default function Trainers() {
                 <>
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {data?.trainers.map((trainer) => (
-                            <Link key={trainer.id} to={`/trainers/${trainer.id}`} className="card group hover:border-black transition-colors flex flex-col cursor-pointer">
+                            <Link key={trainer.id} to={`/coaches/${trainer.id}`} className="card group hover:border-black transition-colors flex flex-col cursor-pointer">
                                 <div className="flex items-center gap-4 mb-4">
                                     <div className="shrink-0">
                                         {trainer.avatar_url ? (

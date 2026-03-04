@@ -37,10 +37,10 @@ export default function ProfilePublic() {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
                 <p className="text-gray-800 font-medium">Profile chưa được thiết lập.</p>
-                <Link to={`/trainers/${trainerId}`} className="btn-primary text-sm">
+                <Link to={`/coaches/${trainerId}`} className="btn-primary text-sm">
                     Xem thông tin cơ bản
                 </Link>
-                <Link to="/trainers" className="text-sm text-gray-500 underline">← Quay lại danh sách</Link>
+                <Link to="/coaches" className="text-sm text-gray-500 underline">← Quay lại danh sách</Link>
             </div>
         );
     }
@@ -241,7 +241,7 @@ export default function ProfilePublic() {
                             ) : (
                                 <p className="text-sm text-gray-400 mb-6">Liên hệ trực tiếp để nhận báo giá chi tiết.</p>
                             )}
-                            <Link to={`/trainers/${trainerId}`}
+                            <Link to={`/coaches/${trainerId}`}
                                 className="block w-full py-3 bg-white text-black text-center font-bold text-sm uppercase tracking-wider hover:bg-gray-200 transition-colors">
                                 Xem các gói tập
                             </Link>
