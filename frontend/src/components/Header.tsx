@@ -32,7 +32,7 @@ export default function Header() {
 
                 {/* Desktop Nav */}
                 <div className="hidden lg:flex items-center gap-6">
-                    <Link to="/gyms" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Gym Center</Link>
+                    <Link to="/gyms" className="text-sm font-black px-4 py-2 bg-black text-white hover:bg-gray-800 transition-all rounded-lg whitespace-nowrap tracking-tight uppercase">Gym Center</Link>
                     <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Coach</Link>
                     <Link to="/about" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Về chúng tôi</Link>
                     {isAuthenticated && (

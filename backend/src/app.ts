@@ -21,6 +21,8 @@ import gymOwnerRoutes from './routes/gymOwner';
 import gymAdminRoutes from './routes/gymAdmin';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import { User } from './entities/User';
+import { GymCenter } from './entities/GymCenter';
 import { AppDataSource } from './config/database';
 import { initSocket } from './socket';
 
@@ -68,9 +70,20 @@ app.use('/api/v1/gyms', gymRoutes);
 app.use('/api/v1/gym-owner', gymOwnerRoutes);
 app.use('/api/v1/admin/gyms', gymAdminRoutes);
 
-// Health check
-app.get('/api/v1/health', (_req, res) => {
-    res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+// Health check with DB status
+app.get('/api/v1/health', async (_req, res) => {
+    try {
+        const userCount = await AppDataSource.getRepository(User).count();
+        const gymCount = await AppDataSource.getRepository(GymCenter).count();
+        res.status(200).json({
+            status: 'OK',
+            timestamp: new Date().toISOString(),
+            db: { users: userCount, gyms: gymCount },
+            env: process.env.NODE_ENV
+        });
+    } catch (error) {
+        res.status(500).json({ status: 'ERROR', message: 'Database connection failed' });
+    }
 });
 
 // Error handling
