@@ -35,14 +35,25 @@ export interface Program {
     id: string;
     trainer_id: string;
     name: string;
-    description: string;
-    duration_weeks: number;
-    difficulty: 'beginner' | 'intermediate' | 'advanced';
-    equipment_needed: string[];
-    price_monthly: number;
-    price_one_time: number;
-    thumbnail_url: string | null;
+    description: string | null;
+    duration_weeks: number | null;
+    difficulty: 'beginner' | 'intermediate' | 'advanced' | null;
+    equipment_needed: string[] | null;
+    price_monthly: number | null;
+    price_one_time: number | null;
+
+    // New Fields
+    training_format: 'online' | 'offline_1on1' | 'offline_group' | 'hybrid';
+    included_features: string[] | null;
+    pricing_type: 'lump_sum' | 'monthly' | 'per_session';
+    price_per_session: number | null;
+    training_goals: string[] | null;
+    prerequisites: string | null;
+    cover_image_url: string | null;
+
     is_published: boolean;
+    max_clients: number;
+    current_clients: number;
 }
 
 export interface AuthResponse {
