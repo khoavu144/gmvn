@@ -26,7 +26,6 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
     useEffect(() => {
         if (imageFile) {
-            setCrop(undefined); // Reset crop
             const reader = new FileReader();
             reader.addEventListener('load', () =>
                 setImgSrc(reader.result?.toString() || '')

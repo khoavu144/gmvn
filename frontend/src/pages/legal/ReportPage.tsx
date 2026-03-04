@@ -33,6 +33,7 @@ export default function ReportPage() {
         anonymous: false,
     });
     const [submitted, setSubmitted] = useState(false);
+    const [reportId] = useState(() => `RPT-${Math.random().toString(36).substring(7).toUpperCase()}`);
 
     const handleNext = () => {
         if (step === 1 && form.violation_type) setStep(2);
@@ -59,7 +60,7 @@ export default function ReportPage() {
                         {!form.anonymous && ` Kết quả sẽ được gửi đến ${form.reporter_email}.`}
                     </p>
                     <p className="text-xs text-gray-400 mt-4">
-                        Mã báo cáo: RPT-{Math.random().toString(36).substring(7).toUpperCase()}
+                        Mã báo cáo: {reportId}
                     </p>
                 </div>
             </LegalPageLayout>

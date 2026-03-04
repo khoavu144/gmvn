@@ -2,7 +2,7 @@
 
 ## 🎯 ĐÂY LÀ PHIÊN BẢN HOÀN CHỈNH
 
-Tất cả tài liệu cần thiết để xây dựng **GymEr Việt** đã được chuẩn bị sẵn sàng.
+Tất cả tài liệu cần thiết để xây dựng **GYMERVIET** đã được chuẩn bị sẵn sàng.
 
 ---
 
@@ -250,7 +250,7 @@ Không có câu hỏi không được trả lời.
 Không có chi tiết bị bỏ sót.
 Mọi thứ đã sẵn sàng.
 
-→ Let's build GymEr Việt! 🚀
+→ Let's build GYMERVIET! 🚀
 ```
 
 ---
@@ -278,7 +278,7 @@ Mọi thứ đã sẵn sàng.
 
 ---
 
-**Chúc mừng! Bạn có blueprint hoàn chỉnh để xây dựng GymEr Việt.**
+**Chúc mừng! Bạn có blueprint hoàn chỉnh để xây dựng GYMERVIET.**
 **Hãy làm điều gì đó tuyệt vời!** 🚀
 
 ---

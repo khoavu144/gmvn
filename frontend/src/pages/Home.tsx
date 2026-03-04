@@ -363,7 +363,7 @@ export default function Home() {
                     <div className="space-y-4">
                         {[
                             {
-                                q: 'GymEr Việt hoạt động như thế nào?',
+                                q: 'GYMERVIET hoạt động như thế nào?',
                                 a: 'Chúng tôi là nền tảng kết nối trực tiếp. Bạn tìm HLV phù hợp, nhắn tin trao đổi, và đăng ký gói tập. Mọi quy trình theo dõi buổi tập và tiến độ đều được thực hiện ngay trên web app.'
                             },
                             {

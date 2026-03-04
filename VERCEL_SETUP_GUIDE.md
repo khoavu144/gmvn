@@ -36,7 +36,7 @@ Cứ tới khi màn hình bùm nổ bong bóng Confetti 🎊🎊 tung tóe là n
 
 ### Bước 5: Xem bản Web thực tế
 1. Cậu nhấp lên cái màn hình Preview nhỏ hoặc ấn **Continue to Dashboard**!
-2. Ở dashboard, Vercel cung cấp cho cậu một "Domain miễn phí" loằng ngoằng (ví dụ: `gmvn-rho.vercel.app`), cậu thử ấn vô. Cậu sẽ thấy Giao diện ứng dụng GymEr Việt thân quen đã hiển thị trên mạng cho toàn bộ thiên hạ thấy rồi đó!
+2. Ở dashboard, Vercel cung cấp cho cậu một "Domain miễn phí" loằng ngoằng (ví dụ: `gmvn-rho.vercel.app`), cậu thử ấn vô. Cậu sẽ thấy Giao diện ứng dụng GYMERVIET thân quen đã hiển thị trên mạng cho toàn bộ thiên hạ thấy rồi đó!
 
 ---
 *(Sau này nếu cậu mua Domain riêng là gymerviet.com. Cậu chỉ cần vô Vercel Setting -> Domains. Click Add Domain gõ chữ gymerviet.com vào thì tự Vercel nó chèn Config Name Server về máy gốc và phát SSL xanh cho cậu ngầu như Theanh28 luôn!)*

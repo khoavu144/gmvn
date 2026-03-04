@@ -91,7 +91,7 @@ SECTION 3: HOW IT WORKS (NEW - 3 Step Process)
 
 SECTION 4: WHY CHOOSE US (NEW - 4 Feature Cards)
 ├─────────────────────────────────────────────────────────────┤
-│ Tại sao chọn Gymer Việt?                                    │
+│ Tại sao chọn GYMERVIET?                                    │
 │                                                               │
 │ ┌────────────────┐ ┌────────────────┐ ┌────────────────┐    │
 │ │ Trainer        │ │ Personal       │ │ Real Results   │    │
@@ -171,7 +171,7 @@ SECTION 8: FAQ (NEW - Accordion)
 ├─────────────────────────────────────────────────────────────┤
 │ Câu hỏi thường gặp                                           │
 │                                                               │
-│ ▼ GymEr Việt hoạt động như thế nào?                         │
+│ ▼ GYMERVIET hoạt động như thế nào?                         │
 │   (Answer visible)                                           │
 │                                                               │
 │ ► Tôi có thể thay HLV không?                               │

@@ -93,7 +93,7 @@ MÔI TRƯỜNG PHÁT TRIỂN:
    └─ Browser dev tools
 
 THIẾT KẾ FIGMA:
-☐ Tạo Figma project: GymEr Việt
+☐ Tạo Figma project: GYMERVIET
 ☐ Tạo pages cho:
    ├─ Authentication
    ├─ Trainer Discovery
@@ -1353,7 +1353,7 @@ Nếu tất cả ở trên đã sẵn sàng:
 
 **Chúc mừng! Hãy tạo ra thứ gì đó tuyệt vời.** 💪
 
-**GymEr Việt sẽ đổi cuộc chơi fitness training!** 🏋️
+**GYMERVIET sẽ đổi cuộc chơi fitness training!** 🏋️
 
 ---
 
