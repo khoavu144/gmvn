@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { verifyAccessToken, TokenPayload } from '../utils/jwt';
+import { AppDataSource } from '../config/database';
+import { AthleteAchievement } from '../entities/AthleteAchievement';
 
 // Extend Express Request to include user
 declare global {
@@ -51,4 +53,28 @@ export const trainerOnly: RequestHandler = (req, res, next) => {
         return;
     }
     next();
+};
+
+export const canCreateProgram: RequestHandler = async (req, res, next) => {
+    const userType = req.user?.user_type;
+    const userId = req.user?.user_id;
+
+    if (userType === 'trainer') {
+        next();
+        return;
+    }
+
+    if (userType === 'athlete' && userId) {
+        const achievementRepo = AppDataSource.getRepository(AthleteAchievement);
+        const achievementsCount = await achievementRepo.count({
+            where: { athlete_id: userId, status: 'APPROVED' }
+        });
+
+        if (achievementsCount >= 1) { // Verified Athlete
+            next();
+            return;
+        }
+    }
+
+    res.status(403).json({ success: false, error: 'You must be a trainer or a verified athlete to perform this action' });
 };

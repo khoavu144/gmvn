@@ -13,6 +13,15 @@ import { TrainerExperience } from '../entities/TrainerExperience';
 import { TrainerGallery } from '../entities/TrainerGallery';
 import { TrainerFAQ } from '../entities/TrainerFAQ';
 
+// New Final Spec Entities
+import { AthleteAchievement } from '../entities/AthleteAchievement';
+import { UserPointsHistory } from '../entities/UserPointsHistory';
+import { RankingCache } from '../entities/RankingCache';
+import { ProgramReport } from '../entities/ProgramReport';
+import { FinancialTransaction } from '../entities/FinancialTransaction';
+import { AdminAuditLog } from '../entities/AdminAuditLog';
+import { RevenueTier } from '../entities/RevenueTier';
+
 dotenv.config();
 
 export const AppDataSource = new DataSource({
@@ -33,6 +42,13 @@ export const AppDataSource = new DataSource({
         TrainerExperience,
         TrainerGallery,
         TrainerFAQ,
+        AthleteAchievement,
+        UserPointsHistory,
+        RankingCache,
+        ProgramReport,
+        FinancialTransaction,
+        AdminAuditLog,
+        RevenueTier,
     ],
     subscribers: [],
     migrations: [],

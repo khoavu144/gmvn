@@ -16,11 +16,12 @@ const router = Router();
 router.get('/trainers/:trainerId/programs', authenticate, getTrainerPrograms);
 router.get('/:id', authenticate, getProgramById);
 
-// Trainer only routes (BUG-17: use trainerOnly instead of proOnly)
-router.post('/', authenticate, trainerOnly, createProgram);
-router.put('/:id', authenticate, trainerOnly, updateProgram);
-router.delete('/:id', authenticate, trainerOnly, deleteProgram);
-router.post('/:id/publish', authenticate, trainerOnly, publishProgram);
-router.post('/:id/workouts', authenticate, trainerOnly, addWorkout);
+// Trainer or verified Athlete only routes
+import { canCreateProgram } from '../middleware/auth';
+router.post('/', authenticate, canCreateProgram, createProgram);
+router.put('/:id', authenticate, canCreateProgram, updateProgram);
+router.delete('/:id', authenticate, canCreateProgram, deleteProgram);
+router.post('/:id/publish', authenticate, canCreateProgram, publishProgram);
+router.post('/:id/workouts', authenticate, canCreateProgram, addWorkout);
 
 export default router;

@@ -15,6 +15,7 @@ import dashboardRoutes from './routes/dashboard';
 import workoutProgressRoutes from './routes/workoutProgress';
 import profileRoutes from './routes/profile';
 import uploadRoutes from './routes/upload';
+import adminRoutes from './routes/admin';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { AppDataSource } from './config/database';
@@ -58,6 +59,7 @@ app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1', workoutProgressRoutes);
 app.use('/api/v1/profiles', profileRoutes);
 app.use('/api/v1/upload', uploadRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 // Health check
 app.get('/api/v1/health', (_req, res) => {

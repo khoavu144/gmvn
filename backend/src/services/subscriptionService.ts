@@ -1,6 +1,9 @@
 import { AppDataSource } from '../config/database';
 import { Subscription } from '../entities/Subscription';
 import { Program } from '../entities/Program';
+import { FinancialTransaction } from '../entities/FinancialTransaction';
+import { RevenueTier } from '../entities/RevenueTier';
+
 class SubscriptionService {
     private get subRepo() {
         return AppDataSource.getRepository(Subscription);
@@ -8,6 +11,14 @@ class SubscriptionService {
 
     private get programRepo() {
         return AppDataSource.getRepository(Program);
+    }
+
+    private get ftRepo() {
+        return AppDataSource.getRepository(FinancialTransaction);
+    }
+
+    private get tierRepo() {
+        return AppDataSource.getRepository(RevenueTier);
     }
 
     async createCheckoutSession(userId: string, programId: string) {
@@ -92,6 +103,31 @@ class SubscriptionService {
         await this.programRepo.increment({ id: programId }, 'current_clients', 1);
         await this.subRepo.save(sub);
 
+        // --- Handle Financial Transaction and Tiered Split ---
+        // Get creator's revenue tier (default 95%)
+        let tier = await this.tierRepo.findOneBy({ creator_id: trainerId });
+        const splitPercentage = tier ? tier.split_percentage : 95;
+
+        const grossAmount = Number(transferAmount);
+        const stripeFee = 0; // Sepay doesn't use Stripe, but keeping field for future. Can estimate platform fee instead.
+        const platformFeePercentage = 100 - splitPercentage;
+        const platformFee = grossAmount * (platformFeePercentage / 100);
+        const creatorAmount = grossAmount - platformFee - stripeFee;
+
+        await this.ftRepo.save(
+            this.ftRepo.create({
+                program_id: programId,
+                creator_id: trainerId,
+                buyer_id: userId,
+                gross_amount: grossAmount,
+                split_percentage: splitPercentage,
+                platform_fee: platformFee,
+                stripe_fee: stripeFee,
+                creator_amount: creatorAmount,
+                status: 'completed',
+            })
+        );
+
         return { success: true };
     }
 
@@ -122,16 +158,15 @@ class SubscriptionService {
             where: { trainer_id: trainerId, status: 'active' },
         });
 
-        const allSubs = await this.subRepo.find({
-            where: { trainer_id: trainerId, status: 'active' },
-        });
+        // Use the new FinancialTransaction table to calculate exact revenue
+        const result = await this.ftRepo
+            .createQueryBuilder('ft')
+            .select('SUM(ft.creator_amount)', 'totalRevenue')
+            .where('ft.creator_id = :trainerId', { trainerId })
+            .andWhere('ft.status = :status', { status: 'completed' })
+            .getRawOne();
 
-        const monthlyRevenue = allSubs.reduce((sum, s) => {
-            return sum + (Number(s.price_paid) || 0);
-        }, 0);
-
-        // Platform takes 5%, trainer gets 95%
-        const trainerRevenue = monthlyRevenue * 0.95;
+        const trainerRevenue = result?.totalRevenue ? Number(result.totalRevenue) : 0;
 
         return {
             active_clients: activeCount,

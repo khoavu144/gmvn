@@ -12,6 +12,11 @@ AppDataSource.initialize()
         // Re-initialize socket with the existing httpServer
         initSocket(httpServer);
 
+        // Start scheduled jobs (ranking decay tools)
+        import('./services/rankingService').then(({ rankingService }) => {
+            rankingService.scheduleCronJobs();
+        });
+
         httpServer.listen(PORT, () => {
             console.log(`🚀 Server running on port ${PORT}`);
             console.log(`📡 API: http://localhost:${PORT}/api/v1`);
