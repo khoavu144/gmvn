@@ -235,14 +235,19 @@ export async function seedRemote() {
                 console.log(`✅ Created Gym Owner: ${data.owner.full_name}`);
 
                 const slug = data.gym.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + Date.now();
-                let center = gymRepo.create({
-                    ...data.gym,
-                    owner_id: owner.id,
-                    slug,
-                    logo_url: data.gym.cover_image_url,
-                    is_verified: true,
-                    is_active: true
-                });
+                let center = await gymRepo.findOneBy({ name: data.gym.name, owner_id: owner.id });
+                if (!center) {
+                    center = gymRepo.create({
+                        ...data.gym,
+                        owner_id: owner.id,
+                        slug,
+                        logo_url: data.gym.cover_image_url,
+                        is_verified: true,
+                        is_active: true
+                    });
+                } else {
+                    center.logo_url = data.gym.cover_image_url;
+                }
                 center = await gymRepo.save(center);
                 console.log(`🏛️ Created Gym Center: ${center.name}`);
 
