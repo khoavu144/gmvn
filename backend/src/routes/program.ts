@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, proOnly } from '../middleware/auth';
+import { authenticate, trainerOnly } from '../middleware/auth';
 import {
     createProgram,
     updateProgram,
@@ -16,11 +16,11 @@ const router = Router();
 router.get('/trainers/:trainerId/programs', authenticate, getTrainerPrograms);
 router.get('/:id', authenticate, getProgramById);
 
-// Trainer only routes
-router.post('/', authenticate, proOnly, createProgram);
-router.put('/:id', authenticate, proOnly, updateProgram);
-router.delete('/:id', authenticate, proOnly, deleteProgram);
-router.post('/:id/publish', authenticate, proOnly, publishProgram);
-router.post('/:id/workouts', authenticate, proOnly, addWorkout);
+// Trainer only routes (BUG-17: use trainerOnly instead of proOnly)
+router.post('/', authenticate, trainerOnly, createProgram);
+router.put('/:id', authenticate, trainerOnly, updateProgram);
+router.delete('/:id', authenticate, trainerOnly, deleteProgram);
+router.post('/:id/publish', authenticate, trainerOnly, publishProgram);
+router.post('/:id/workouts', authenticate, trainerOnly, addWorkout);
 
 export default router;

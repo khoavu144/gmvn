@@ -130,8 +130,8 @@ class SubscriptionService {
             return sum + (Number(s.price_paid) || 0);
         }, 0);
 
-        // Platform takes 20%, trainer gets 80%
-        const trainerRevenue = monthlyRevenue * 0.8;
+        // Platform takes 5%, trainer gets 95%
+        const trainerRevenue = monthlyRevenue * 0.95;
 
         return {
             active_clients: activeCount,

@@ -32,11 +32,13 @@ app.use(cors({
     credentials: true,
 }));
 
+const isDev = process.env.NODE_ENV !== 'production';
 const apiLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
-    max: 100, // Limit each IP to 100 requests per `window` (here, per 1 minute)
-    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    max: isDev ? 1000 : 100, // Dev: 1000/min, Production: 100/min
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: () => isDev && process.env.SKIP_RATE_LIMIT === 'true',
     message: { error: 'Too many requests from this IP, please try again after a minute' }
 });
 

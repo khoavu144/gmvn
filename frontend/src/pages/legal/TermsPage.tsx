@@ -34,8 +34,8 @@ export default function TermsPage() {
                     <LegalList items={[
                         'GYMERVIET là nền tảng kết nối — chúng tôi không trực tiếp cung cấp dịch vụ huấn luyện.',
                         'Chất lượng dịch vụ huấn luyện là trách nhiệm của HLV đăng ký trên nền tảng.',
-                        'GYMERVIET thu phí nền tảng 20% từ mỗi giao dịch thành công.',
-                        'Giá hiển thị trên gói tập là giá học viên trả, HLV nhận 80% sau khi trừ phí.',
+                        'GYMERVIET thu phí nền tảng 5% từ mỗi giao dịch thành công.',
+                        'Giá hiển thị trên gói tập là giá học viên trả, HLV nhận 95% sau khi trừ phí.',
                     ]} />
                 </LegalSection>
 

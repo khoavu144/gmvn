@@ -2,11 +2,14 @@ import { AppDataSource } from '../config/database';
 import { User } from '../entities/User';
 import { UpdateProfileInput } from '../schemas/user';
 
-const userRepository = AppDataSource.getRepository(User);
+
 
 class UserService {
+    private get repo() {
+        return AppDataSource.getRepository(User);
+    }
     async updateProfile(userId: string, input: UpdateProfileInput) {
-        const user = await userRepository.findOneBy({ id: userId });
+        const user = await this.repo.findOneBy({ id: userId });
         if (!user) {
             throw new Error('User not found');
         }
@@ -14,7 +17,7 @@ class UserService {
         // Merge input into user entity
         Object.assign(user, input);
 
-        await userRepository.save(user);
+        await this.repo.save(user);
 
         return {
             id: user.id,
@@ -35,11 +38,15 @@ class UserService {
     }
 
     async getTrainers(page: number = 1, limit: number = 10, search?: string) {
-        const queryBuilder = userRepository.createQueryBuilder('user')
+        const queryBuilder = this.repo.createQueryBuilder('user')
             .where('user.user_type = :type', { type: 'trainer' });
 
         if (search) {
-            queryBuilder.andWhere('user.full_name ILIKE :search OR user.bio ILIKE :search', { search: `%${search}%` });
+            // BUG-14 Fix: search in full_name, bio, AND specialties JSONB array
+            queryBuilder.andWhere(
+                '(user.full_name ILIKE :search OR user.bio ILIKE :search OR EXISTS (SELECT 1 FROM jsonb_array_elements_text(user.specialties) AS spec WHERE spec ILIKE :search))',
+                { search: `%${search}%` }
+            );
         }
 
         // Default sorting by newest
@@ -67,7 +74,7 @@ class UserService {
     }
 
     async getTrainerById(id: string) {
-        const trainer = await userRepository.findOneBy({ id, user_type: 'trainer' });
+        const trainer = await this.repo.findOneBy({ id, user_type: 'trainer' });
         if (!trainer) {
             throw new Error('Trainer not found');
         }

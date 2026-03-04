@@ -1,6 +1,6 @@
 import { AppDataSource } from '../config/database';
 import { Message } from '../entities/Message';
-import { MoreThan, LessThan } from 'typeorm';
+import { User } from '../entities/User';
 
 class MessageService {
     private get repo() {
@@ -17,67 +17,62 @@ class MessageService {
     }
 
     async getConversations(userId: string) {
-        // Get all unique partners for this user
-        const sent = await this.repo
-            .createQueryBuilder('msg')
-            .select('msg.receiver_id', 'partner_id')
-            .where('msg.sender_id = :uid', { uid: userId })
-            .getRawMany();
+        // BUG-18 Fix: Use 2 queries instead of N+1
+        // Query 1: Get all unique partners + last message in one go using raw SQL
+        const lastMessagesRaw = await this.repo.query(`
+            SELECT DISTINCT ON (partner_id)
+                CASE
+                    WHEN sender_id = $1 THEN receiver_id
+                    ELSE sender_id
+                END AS partner_id,
+                id, content, created_at, is_read, sender_id, receiver_id
+            FROM messages
+            WHERE sender_id = $1 OR receiver_id = $1
+            ORDER BY partner_id, created_at DESC
+        `, [userId]);
 
-        const received = await this.repo
-            .createQueryBuilder('msg')
-            .select('msg.sender_id', 'partner_id')
-            .where('msg.receiver_id = :uid', { uid: userId })
-            .getRawMany();
+        if (lastMessagesRaw.length === 0) return [];
 
-        const partnerIds = [
-            ...new Set([
-                ...sent.map((r: any) => r.partner_id),
-                ...received.map((r: any) => r.partner_id),
-            ]),
-        ];
+        const partnerIds: string[] = lastMessagesRaw.map((r: any) => r.partner_id);
 
-        const conversations = await Promise.all(
-            partnerIds.map(async (partnerId) => {
-                const lastMessage = await this.repo.findOne({
-                    where: [
-                        { sender_id: userId, receiver_id: partnerId },
-                        { sender_id: partnerId, receiver_id: userId },
-                    ],
-                    relations: ['sender', 'receiver'],
-                    order: { created_at: 'DESC' },
-                });
+        // Query 2: Get all partner user info at once
+        const userRepo = AppDataSource.getRepository(User);
+        const partners = await userRepo
+            .createQueryBuilder('u')
+            .select(['u.id', 'u.full_name', 'u.avatar_url'])
+            .where('u.id IN (:...ids)', { ids: partnerIds })
+            .getMany();
 
-                const unreadCount = await this.repo.count({
-                    where: { sender_id: partnerId, receiver_id: userId, is_read: false },
-                });
+        const partnerMap = new Map(partners.map(p => [p.id, p]));
 
-                const partner = lastMessage?.sender_id === userId
-                    ? lastMessage?.receiver
-                    : lastMessage?.sender;
+        // Query 3: Get unread counts for all partners in one shot
+        const unreadRaw = await this.repo.query(`
+            SELECT sender_id, COUNT(*)::int AS unread_count
+            FROM messages
+            WHERE receiver_id = $1 AND is_read = false
+            GROUP BY sender_id
+        `, [userId]);
 
-                return {
-                    partner_id: partnerId,
-                    partner: partner
-                        ? {
-                            id: partner.id,
-                            full_name: partner.full_name,
-                            avatar_url: partner.avatar_url,
-                        }
-                        : null,
-                    last_message: lastMessage
-                        ? {
-                            content: lastMessage.content,
-                            created_at: lastMessage.created_at,
-                            is_read: lastMessage.is_read,
-                        }
-                        : null,
-                    unread_count: unreadCount,
-                };
-            })
-        );
+        const unreadMap = new Map<string, number>(unreadRaw.map((r: any) => [r.sender_id, r.unread_count]));
 
-        return conversations.sort((a, b) => {
+        const conversations = lastMessagesRaw.map((msg: any) => {
+            const partner = partnerMap.get(msg.partner_id);
+            return {
+                partner_id: msg.partner_id,
+                partner: partner
+                    ? { id: partner.id, full_name: partner.full_name, avatar_url: partner.avatar_url }
+                    : null,
+                last_message: {
+                    content: msg.content,
+                    created_at: msg.created_at,
+                    is_read: msg.is_read,
+                },
+                unread_count: unreadMap.get(msg.partner_id) ?? 0,
+            };
+        });
+
+        // Sort by last message time (newest first)
+        return conversations.sort((a: any, b: any) => {
             const aTime = a.last_message?.created_at ? new Date(a.last_message.created_at).getTime() : 0;
             const bTime = b.last_message?.created_at ? new Date(b.last_message.created_at).getTime() : 0;
             return bTime - aTime;

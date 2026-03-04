@@ -10,7 +10,7 @@ export default function TrainerGuidePage() {
             maxWidth="xl"
         >
             <LegalCallout type="info">
-                GYMERVIET hiện không yêu cầu phí đăng ký cho HLV. Chúng tôi chỉ thu 20% phí nền tảng
+                GYMERVIET hiện không yêu cầu phí đăng ký cho HLV. Chúng tôi chỉ thu 5% phí nền tảng
                 khi có giao dịch thành công.
             </LegalCallout>
 
@@ -62,16 +62,16 @@ export default function TrainerGuidePage() {
                             <thead>
                                 <tr className="border-b-2 border-gray-200">
                                     <th className="text-left py-3 px-4 font-bold text-black">Giá học viên trả</th>
-                                    <th className="text-right py-3 px-4 font-bold text-black">Phí nền tảng (20%)</th>
-                                    <th className="text-right py-3 px-4 font-bold text-black">HLV nhận (80%)</th>
+                                    <th className="text-right py-3 px-4 font-bold text-black">Phí nền tảng (5%)</th>
+                                    <th className="text-right py-3 px-4 font-bold text-black">HLV nhận (95%)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {[
-                                    [500000, 100000, 400000],
-                                    [1000000, 200000, 800000],
-                                    [2000000, 400000, 1600000],
-                                    [5000000, 1000000, 4000000],
+                                    [500000, 25000, 475000],
+                                    [1000000, 50000, 950000],
+                                    [2000000, 100000, 1900000],
+                                    [5000000, 250000, 4750000],
                                 ].map((row, i) => (
                                     <tr key={i} className="border-b border-gray-100 hover:bg-gray-50">
                                         <td className="py-3 px-4">{row[0].toLocaleString('vi-VN')}đ</td>

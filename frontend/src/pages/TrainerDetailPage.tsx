@@ -13,6 +13,9 @@ interface Program {
     difficulty: string | null;
     price_monthly: number | null;
     price_one_time: number | null;
+    price_per_session: number | null;
+    pricing_type: 'monthly' | 'lump_sum' | 'per_session';
+    training_format: string;
     current_clients: number;
     max_clients: number;
 }
@@ -218,13 +221,24 @@ export default function TrainerDetailPage() {
 
                                     <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
                                         <div>
-                                            {prog.price_monthly ? (
+                                            {/* BUG-12 Fix: Show price by pricing_type */}
+                                            {prog.pricing_type === 'monthly' && prog.price_monthly ? (
                                                 <div className="text-lg font-bold text-black">
                                                     {Number(prog.price_monthly).toLocaleString('vi-VN')}₫
                                                     <span className="text-xs font-normal text-gray-500">/tháng</span>
                                                 </div>
+                                            ) : prog.pricing_type === 'lump_sum' && prog.price_one_time ? (
+                                                <div className="text-lg font-bold text-black">
+                                                    {Number(prog.price_one_time).toLocaleString('vi-VN')}₫
+                                                    <span className="text-xs font-normal text-gray-500"> 1 lần</span>
+                                                </div>
+                                            ) : prog.pricing_type === 'per_session' && prog.price_per_session ? (
+                                                <div className="text-lg font-bold text-black">
+                                                    {Number(prog.price_per_session).toLocaleString('vi-VN')}₫
+                                                    <span className="text-xs font-normal text-gray-500">/buổi</span>
+                                                </div>
                                             ) : (
-                                                <div className="text-sm text-gray-500 font-medium">Báo giá theo nhu cầu</div>
+                                                <div className="text-sm text-gray-500 font-medium">Liên hệ báo giá</div>
                                             )}
                                         </div>
                                         <button

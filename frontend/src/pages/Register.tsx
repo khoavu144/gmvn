@@ -60,7 +60,7 @@ export default function Register() {
                 {/* Heading */}
                 <div className="text-center mb-8">
                     <h2 className="text-2xl font-bold text-black">Đăng ký</h2>
-                    <p className="text-body mt-2">Bắt đầu hành trình tập luyện cùng GymEr</p>
+                    <p className="text-body mt-2">Bắt đầu hành trình tập luyện cùng GYMERVIET</p>
                 </div>
 
                 {/* Card */}

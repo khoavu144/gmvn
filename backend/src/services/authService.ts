@@ -87,7 +87,7 @@ class AuthService {
         };
     }
 
-    async refreshToken(userId: string, email: string, user_type: 'athlete' | 'trainer' | 'admin') {
+    async refreshToken(userId: string, email: string, user_type: 'user' | 'athlete' | 'trainer' | 'admin') {
         const payload = { user_id: userId, email, user_type };
         const access_token = generateAccessToken(payload);
         return { access_token };

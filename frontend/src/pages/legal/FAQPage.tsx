@@ -46,7 +46,7 @@ const faqData: FAQCategory[] = [
             },
             {
                 q: 'Phí nền tảng là bao nhiêu?',
-                a: 'GYMERVIET thu 20% từ mỗi giao dịch thành công. Ví dụ: gói 1.000.000đ — học viên trả 1.000.000đ, HLV nhận 800.000đ.',
+                a: 'GYMERVIET thu 5% từ mỗi giao dịch thành công. Ví dụ: gói 1.000.000đ — học viên trả 1.000.000đ, HLV nhận 950.000đ.',
             },
             {
                 q: 'Tôi có thể hủy gói tập đang active không?',

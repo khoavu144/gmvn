@@ -22,8 +22,8 @@ export default function PaymentPolicyPage() {
 
             <LegalSection title="2. Phí nền tảng">
                 <LegalCallout type="info">
-                    GYMERVIET thu <strong>20% phí nền tảng</strong> từ mỗi giao dịch thành công.
-                    HLV nhận <strong>80%</strong> giá trị gói tập.
+                    GYMERVIET thu <strong>5% phí nền tảng</strong> từ mỗi giao dịch thành công.
+                    HLV nhận <strong>95%</strong> giá trị gói tập.
                 </LegalCallout>
                 <p className="mt-4">
                     Phí nền tảng bao gồm: xử lý thanh toán, lưu trữ dữ liệu, hỗ trợ kỹ thuật,
@@ -42,8 +42,8 @@ export default function PaymentPolicyPage() {
 
                 <p className="font-semibold text-black mt-5 mb-3">Trường hợp được hoàn tiền theo tỉ lệ:</p>
                 <LegalList items={[
-                    'Hủy sau ngày đầu tiên: Hoàn (số tuần chưa bắt đầu / tổng số tuần) × 80% giá trị gói.',
-                    'HLV không hoàn thành cam kết: Xem xét từng trường hợp, tối đa 80% giá trị còn lại.',
+                    'Hủy sau ngày đầu tiên: Hoàn (số tuần chưa bắt đầu / tổng số tuần) × 95% giá trị gói.',
+                    'HLV không hoàn thành cam kết: Xem xét từng trường hợp, tối đa 95% giá trị còn lại.',
                 ]} />
 
                 <p className="font-semibold text-black mt-5 mb-3">Trường hợp KHÔNG được hoàn tiền:</p>

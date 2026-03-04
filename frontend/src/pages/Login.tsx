@@ -38,7 +38,7 @@ export default function Login() {
                 {/* Heading */}
                 <div className="text-center mb-8">
                     <h2 className="text-2xl font-bold text-black text-center">Đăng nhập</h2>
-                    <p className="text-body mt-2 text-center">Truy cập vào tài khoản GymEr của bạn</p>
+                    <p className="text-body mt-2 text-center">Truy cập vào tài khoản GYMERVIET của bạn</p>
                 </div>
 
                 {/* Card */}
