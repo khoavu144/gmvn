@@ -33,6 +33,7 @@ export const gymController = {
             }
             res.json({ success: true, gym });
         } catch (error: any) {
+            if (error?.message?.includes('uuid')) return res.status(404).json({ success: false, error: 'Gym không tồn tại' }) as any;
             res.status(500).json({ success: false, error: error.message });
         }
     },
@@ -48,6 +49,7 @@ export const gymController = {
             }
             res.json({ success: true, branch });
         } catch (error: any) {
+            if (error?.message?.includes('uuid')) return res.status(404).json({ success: false, error: 'Chi nhánh không tồn tại' }) as any;
             res.status(500).json({ success: false, error: error.message });
         }
     },
@@ -59,6 +61,7 @@ export const gymController = {
             const trainers = await gymService.getGymTrainers(gymId);
             res.json({ success: true, trainers });
         } catch (error: any) {
+            if (error?.message?.includes('uuid')) return res.status(404).json({ success: false, error: 'Gym không tồn tại' }) as any;
             res.status(500).json({ success: false, error: error.message });
         }
     },
@@ -73,6 +76,7 @@ export const gymController = {
             const result = await gymReviewService.getReviewsWithStats(branchIds);
             res.json({ success: true, ...result });
         } catch (error: any) {
+            if (error?.message?.includes('uuid')) return res.status(404).json({ success: false, error: 'Gym không tồn tại' }) as any;
             res.status(500).json({ success: false, error: error.message });
         }
     },
