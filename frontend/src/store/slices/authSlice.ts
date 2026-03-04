@@ -5,7 +5,7 @@ interface User {
     id: string;
     email: string;
     full_name: string;
-    user_type: 'user' | 'athlete' | 'trainer' | 'admin';
+    user_type: 'user' | 'athlete' | 'trainer' | 'admin' | 'gym_owner';
     avatar_url: string | null;
     bio?: string | null;
     height_cm?: number | null;
@@ -14,6 +14,7 @@ interface User {
     specialties?: string[] | null;
     base_price_monthly?: number | null;
     is_verified?: boolean;
+    gym_owner_status?: 'pending_review' | 'approved' | 'rejected' | null;
     created_at: string;
     updated_at?: string;
 }

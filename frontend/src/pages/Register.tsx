@@ -12,7 +12,7 @@ export default function Register() {
         email: '',
         password: '',
         confirmPassword: '',
-        user_type: 'user' as 'user' | 'athlete' | 'trainer',
+        user_type: 'user' as 'user' | 'athlete' | 'trainer' | 'gym_owner',
     });
     const [error, setError] = useState('');
     const [loading, setLoadingState] = useState(false);
@@ -43,7 +43,11 @@ export default function Register() {
                 user_type: form.user_type,
             });
             dispatch(setCredentials(result));
-            navigate('/dashboard');
+            if (result.user.user_type === 'gym_owner') {
+                navigate('/gym-owner/register');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err: any) {
             setError(
                 err.response?.data?.error || 'Registration failed. Please try again.'
@@ -115,8 +119,9 @@ export default function Register() {
                                 onChange={handleChange}
                                 className="form-input"
                             >
-                                <option value="athlete">Người tập luyện (Gymer)</option>
-                                <option value="trainer">Huấn luyện viên (Coach/PT)</option>
+                                <option value="athlete">Cá nhân tập luyện (Gymer)</option>
+                                <option value="trainer">Coach chuyên nghiệp (PT/HLV)</option>
+                                <option value="gym_owner">Chủ phòng tập (Gym Owner)</option>
                             </select>
                         </div>
 

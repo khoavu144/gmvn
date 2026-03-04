@@ -47,7 +47,7 @@ export default function PrivacyPage() {
                     </LegalCallout>
                     <p className="mt-4">Thông tin chỉ được chia sẻ trong các trường hợp:</p>
                     <LegalList items={[
-                        'Với HLV hoặc học viên khi bạn chủ động thiết lập mối quan hệ tập luyện.',
+                        'Với Coach hoặc học viên khi bạn chủ động thiết lập mối quan hệ tập luyện.',
                         'Với SePay (đối tác xử lý thanh toán) — chỉ thông tin cần thiết để xác nhận giao dịch.',
                         'Với Supabase (lưu trữ file ảnh) — chỉ các file bạn chủ động upload.',
                         'Theo yêu cầu của pháp luật Việt Nam khi có lệnh từ cơ quan có thẩm quyền.',

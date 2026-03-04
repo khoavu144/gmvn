@@ -4,6 +4,7 @@ import apiClient from '../services/api';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import { useToast } from '../components/Toast';
+import CoachGymBadge from '../components/CoachGymBadge';
 
 interface Program {
     id: string;
@@ -31,13 +32,15 @@ interface Trainer {
     created_at: string;
 }
 
-export default function TrainerDetailPage() {
+export default function CoachDetailPage() {
     const { toast, ToastComponent } = useToast();
     const { trainerId } = useParams<{ trainerId: string }>();
     const navigate = useNavigate();
     const { user } = useSelector((state: RootState) => state.auth);
+
     const [trainer, setTrainer] = useState<Trainer | null>(null);
     const [programs, setPrograms] = useState<Program[]>([]);
+    const [gymLinks, setGymLinks] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [subscribing, setSubscribing] = useState<string | null>(null);
     const [pendingPayment, setPendingPayment] = useState<{
@@ -51,12 +54,14 @@ export default function TrainerDetailPage() {
         if (!trainerId) return;
         const load = async () => {
             try {
-                const [trainerRes, programsRes] = await Promise.all([
+                const [trainerRes, programsRes, gymsRes] = await Promise.all([
                     apiClient.get(`/users/trainers/${trainerId}`),
                     apiClient.get(`/programs/trainers/${trainerId}/programs`),
+                    apiClient.get(`/gyms/trainer/${trainerId}`).catch(() => ({ data: { gyms: [] } }))
                 ]);
                 setTrainer(trainerRes.data.data);
                 setPrograms(programsRes.data.programs || []);
+                setGymLinks(gymsRes.data.gyms || []);
             } catch (err) {
                 console.error(err);
             } finally {
@@ -93,7 +98,6 @@ export default function TrainerDetailPage() {
             if (res.data.isActive) {
                 toast.success('Thanh toán thành công! Gói tập đã được kích hoạt.');
                 setPendingPayment(null);
-                // Optionally refresh program slots
             } else {
                 toast.error('Chưa nhận được thanh toán. Vui lòng đợi vài phút hoặc thử lại.');
             }
@@ -117,7 +121,7 @@ export default function TrainerDetailPage() {
 
     if (!trainer) return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
-            <div className="text-gray-800 font-medium">Không tìm thấy huấn luyện viên</div>
+            <div className="text-gray-800 font-medium">Không tìm thấy Coach</div>
             <Link to="/trainers" className="text-black underline text-sm">← Về danh sách</Link>
         </div>
     );
@@ -125,7 +129,6 @@ export default function TrainerDetailPage() {
     return (
         <div className="bg-gray-50 pb-16">
             {ToastComponent}
-            {/* Sub Header Navigation */}
             <div className="bg-white border-b border-gray-200">
                 <div className="max-w-4xl mx-auto px-4 h-12 flex items-center">
                     <button onClick={() => navigate(-1)} className="text-sm font-medium text-gray-600 hover:text-black">
@@ -139,7 +142,6 @@ export default function TrainerDetailPage() {
             </div>
 
             <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-                {/* Trainer Quick Context */}
                 <div className="card flex flex-col sm:flex-row gap-6 p-6 items-start sm:items-center">
                     <div className="shrink-0 mx-auto sm:mx-0">
                         {trainer.avatar_url ? (
@@ -175,14 +177,27 @@ export default function TrainerDetailPage() {
                                 <div className="font-bold text-black">{Number(trainer.base_price_monthly).toLocaleString('vi-VN')}₫<span className="text-xs font-normal">/th</span></div>
                             </div>
                         )}
-                        <button
-                            onClick={handleMessage}
-                            className="btn-secondary w-full"
-                        >
-                            Nhắn tin
-                        </button>
+                        <button onClick={handleMessage} className="btn-secondary w-full">Nhắn tin</button>
                     </div>
                 </div>
+
+                {/* Gym Affiliations */}
+                {gymLinks.length > 0 && (
+                    <div>
+                        <h2 className="text-h3 mb-4 border-b border-gray-200 pb-2">Hoạt động tại Gym</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                            {gymLinks.map(link => (
+                                <CoachGymBadge
+                                    key={link.id}
+                                    gymId={link.gym_center?.id}
+                                    gymName={link.gym_center?.name}
+                                    branchName={link.branch?.branch_name}
+                                    role={link.role_at_gym}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )}
 
                 {/* Programs List */}
                 <div>
@@ -192,7 +207,7 @@ export default function TrainerDetailPage() {
 
                     {programs.length === 0 ? (
                         <div className="card text-center text-gray-500 py-12 text-sm border-dashed">
-                            Huấn luyện viên chưa có gói tập nào khả dụng.
+                            Coach chưa có gói tập nào khả dụng.
                         </div>
                     ) : (
                         <div className="grid gap-4 md:grid-cols-2">
@@ -221,7 +236,6 @@ export default function TrainerDetailPage() {
 
                                     <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
                                         <div>
-                                            {/* BUG-12 Fix: Show price by pricing_type */}
                                             {prog.pricing_type === 'monthly' && prog.price_monthly ? (
                                                 <div className="text-lg font-bold text-black">
                                                     {Number(prog.price_monthly).toLocaleString('vi-VN')}₫
@@ -266,9 +280,7 @@ export default function TrainerDetailPage() {
                         </div>
                         <div className="text-center space-y-4">
                             <p className="text-sm text-gray-600">Vui lòng chuyển khoản với nội dung chính xác dưới đây để hệ thống duyệt tự động.</p>
-
                             <img src={`https://img.vietqr.io/image/970436-0987654321-compact2.png?amount=${pendingPayment.amount}&addInfo=${encodeURIComponent(pendingPayment.transfer_content)}&accountName=GYMERVIET`} alt="QR Code" className="mx-auto border border-gray-200 rounded-md w-48 h-48 object-contain" />
-
                             <div className="bg-gray-50 p-4 rounded-md text-left text-sm space-y-2 font-mono">
                                 <div className="flex justify-between">
                                     <span className="text-gray-500">Số tiền:</span>
@@ -280,11 +292,7 @@ export default function TrainerDetailPage() {
                                 </div>
                             </div>
                         </div>
-                        <button
-                            onClick={handleCheckPayment}
-                            disabled={checkingStatus}
-                            className="btn-primary w-full"
-                        >
+                        <button onClick={handleCheckPayment} disabled={checkingStatus} className="btn-primary w-full">
                             {checkingStatus ? 'Đang kiểm tra...' : 'Tôi đã chuyển khoản'}
                         </button>
                     </div>

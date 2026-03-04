@@ -60,7 +60,7 @@ const trainerProfileSchema = z.object({
 
 type PersonalFormValues = z.infer<typeof profileSchema>;
 type TrainerProfileFormValues = z.infer<typeof trainerProfileSchema>;
-type ActiveTab = 'personal' | 'trainer_profile' | 'experience' | 'gallery' | 'faq';
+type ActiveTab = 'personal' | 'coach_profile' | 'experience' | 'gallery' | 'faq';
 
 // ── Experience Form ───────────────────────────────────────────────────────────
 function ExperienceTab() {
@@ -426,7 +426,7 @@ export default function Profile() {
     }, [user, dispatch]);
 
     useEffect(() => {
-        if (successMsg && (activeTab === 'trainer_profile')) {
+        if (successMsg && (activeTab === 'coach_profile')) {
             const t = setTimeout(() => dispatch(clearProfileMessages()), 3000);
             return () => clearTimeout(t);
         }
@@ -609,7 +609,7 @@ export default function Profile() {
 
     const proTabs: { key: ActiveTab; label: string }[] = [
         { key: 'personal', label: 'Cá nhân' },
-        { key: 'trainer_profile', label: user.user_type === 'athlete' ? 'Hồ sơ VĐV (Public)' : 'Hồ sơ (Public)' },
+        { key: 'coach_profile', label: user.user_type === 'athlete' ? 'Hồ sơ VĐV (Public)' : 'Hồ sơ Coach (Public)' },
         { key: 'experience', label: user.user_type === 'athlete' ? 'Thành tích/Giải đấu' : 'Kinh nghiệm' },
         { key: 'gallery', label: 'Gallery' },
         { key: 'faq', label: 'FAQ' },
@@ -725,8 +725,8 @@ export default function Profile() {
                     </div>
                 )}
 
-                {/* ── TAB: TRAINER PROFILE ─────────────────────────────────────── */}
-                {activeTab === 'trainer_profile' && (user.user_type === 'trainer' || user.user_type === 'athlete') && (
+                {/* ── TAB: COACH PROFILE ───────────────────────────────────────── */}
+                {activeTab === 'coach_profile' && (user.user_type === 'trainer' || user.user_type === 'athlete') && (
                     <form onSubmit={handleProfile(onSubmitProfile)} className="space-y-6">
                         {successMsg && (
                             <div className="bg-gray-50 border border-black text-black px-4 py-3 rounded-xs text-sm">
@@ -745,8 +745,8 @@ export default function Profile() {
                                 <div>
                                     <label className="form-label">Profile URL slug</label>
                                     <div className="flex border border-gray-200 rounded-xs bg-gray-50 focus-within:border-black focus-within:ring-1 focus-within:ring-black transition overflow-hidden">
-                                        <span className="px-3 py-2.5 text-gray-500 text-sm border-r border-gray-200 select-none">gymerviet.com/trainer/</span>
-                                        <input type="text" {...regProfile('slug')} placeholder="ten-hlv"
+                                        <span className="px-3 py-2.5 text-gray-500 text-sm border-r border-gray-200 select-none">gymerviet.com/coach/</span>
+                                        <input type="text" {...regProfile('slug')} placeholder="ten-coach"
                                             className="flex-1 bg-white outline-none px-3 text-sm text-black w-full" />
                                     </div>
                                     {errorsProfile.slug && <p className="form-helper text-red-600">{errorsProfile.slug.message}</p>}

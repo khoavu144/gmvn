@@ -62,7 +62,7 @@ const goalOptions = [
 ];
 
 const formatOptions = [
-    { id: 'online', title: 'Online Coaching', desc: 'Huấn luyện từ xa hoàn toàn' },
+    { id: 'online', title: 'Online Coaching', desc: 'Coach từ xa hoàn toàn' },
     { id: 'offline_1on1', title: 'Offline 1 kèm 1', desc: 'Huấn luyện trực tiếp tại phòng' },
     { id: 'offline_group', title: 'Offline Nhóm', desc: 'Huấn luyện nhóm nhỏ' },
     { id: 'hybrid', title: 'Hybrid', desc: 'Kết hợp trực tiếp và từ xa' },

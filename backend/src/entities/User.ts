@@ -22,10 +22,18 @@ export class User {
 
     @Column({
         type: 'enum',
-        enum: ['user', 'athlete', 'trainer', 'admin'],
+        enum: ['user', 'athlete', 'trainer', 'gym_owner', 'admin'],
         default: 'athlete',
     })
-    user_type!: 'user' | 'athlete' | 'trainer' | 'admin';
+    user_type!: 'user' | 'athlete' | 'trainer' | 'gym_owner' | 'admin';
+
+    @Column({
+        type: 'enum',
+        enum: ['pending_review', 'approved', 'rejected'],
+        nullable: true,
+        default: null,
+    })
+    gym_owner_status!: 'pending_review' | 'approved' | 'rejected' | null;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
     avatar_url!: string | null;

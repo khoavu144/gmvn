@@ -37,6 +37,7 @@ class AuthService {
                 full_name: newUser.full_name,
                 user_type: newUser.user_type,
                 avatar_url: newUser.avatar_url,
+                gym_owner_status: newUser.gym_owner_status,
                 created_at: newUser.created_at,
             },
         };
@@ -66,6 +67,8 @@ class AuthService {
                 full_name: user.full_name,
                 user_type: user.user_type,
                 avatar_url: user.avatar_url,
+                gym_owner_status: user.gym_owner_status,
+                is_verified: user.is_verified,
                 created_at: user.created_at,
             },
         };
@@ -83,11 +86,15 @@ class AuthService {
             full_name: user.full_name,
             user_type: user.user_type,
             avatar_url: user.avatar_url,
+            bio: user.bio,
+            is_verified: user.is_verified,
+            gym_owner_status: user.gym_owner_status,
             created_at: user.created_at,
+            updated_at: user.updated_at,
         };
     }
 
-    async refreshToken(userId: string, email: string, user_type: 'user' | 'athlete' | 'trainer' | 'admin') {
+    async refreshToken(userId: string, email: string, user_type: 'user' | 'athlete' | 'trainer' | 'gym_owner' | 'admin') {
         const payload = { user_id: userId, email, user_type };
         const access_token = generateAccessToken(payload);
         return { access_token };

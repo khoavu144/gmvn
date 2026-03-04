@@ -80,7 +80,7 @@ body {
 
   /* Card utilities */
   .card {
-    @apply bg-white border border-gray-200 rounded-xs p-4 md:p-6 hover:border-gray-300 transition duration-normal;
+    @apply bg-white border border-gray-200 rounded-xs p-5 md:p-6 hover:border-gray-300 transition duration-normal;
   }
 
   .card-header {

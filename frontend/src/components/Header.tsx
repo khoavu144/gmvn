@@ -32,7 +32,9 @@ export default function Header() {
 
                 {/* Desktop Nav */}
                 <div className="hidden md:flex items-center gap-6">
-                    <Link to="/trainers" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">HLV & PT</Link>
+                    <Link to="/gyms" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">Gym Center</Link>
+                    <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">Coach</Link>
+                    <Link to="/about" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">Về chúng tôi</Link>
                     {isAuthenticated && (
                         <>
                             <Link to="/programs" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">Khóa học</Link>
@@ -48,22 +50,22 @@ export default function Header() {
                     {isAuthenticated && user ? (
                         <div className="flex items-center gap-3 sm:gap-4">
                             <div className="hidden md:flex flex-col items-end">
-                                <span className="text-sm font-medium text-black line-clamp-1">
-                                    {user.full_name}
-                                </span>
-                                <span className="text-[10px] font-bold bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded uppercase tracking-tighter">
-                                    {user.user_type === 'trainer' ? 'HLV' : user.user_type === 'athlete' ? 'VĐV' : 'USER'}
-                                </span>
+                                <div className="text-right hidden sm:block">
+                                    <p className="text-sm font-bold text-black">{user.full_name}</p>
+                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                                        {user.user_type === 'trainer' ? 'COACH' : user.user_type === 'athlete' ? 'VĐV' : user.user_type === 'gym_owner' ? 'CHỦ GYM' : 'USER'}
+                                    </p>
+                                </div>
                             </div>
                             <div className="h-8 w-px bg-gray-200 hidden md:block"></div>
-                            <Link to="/dashboard" className="hidden sm:block btn-secondary text-sm px-3 py-1.5">
-                                Dashboard
+                            <Link to={user.user_type === 'gym_owner' ? "/gym-owner" : "/dashboard"} className="hidden sm:block btn-secondary text-sm px-3 py-1.5 whitespace-nowrap">
+                                {user.user_type === 'gym_owner' ? 'Quản lý Gym' : 'Cá nhân'}
                             </Link>
                             <button
                                 onClick={handleLogout}
                                 className="hidden md:block text-sm text-gray-500 hover:text-black transition-colors"
                             >
-                                Đăng xuất
+                                Thoát
                             </button>
                         </div>
                     ) : (
@@ -96,17 +98,21 @@ export default function Header() {
             {isMenuOpen && (
                 <div className="md:hidden fixed inset-0 top-14 bg-white z-[50] flex flex-col p-6 animate-fade-in">
                     <nav className="flex flex-col gap-6">
-                        <Link to="/trainers" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Khám phá HLV</Link>
+                        <Link to="/gyms" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Gym Center</Link>
+                        <Link to="/coaches" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Coach</Link>
+                        <Link to="/about" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Về GYMERVIET</Link>
 
                         {isAuthenticated ? (
                             <>
-                                <Link to="/dashboard" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Dashboard</Link>
-                                <Link to="/programs" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Khóa học & Giáo án</Link>
+                                <Link to={user?.user_type === 'gym_owner' ? "/gym-owner" : "/dashboard"} onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">
+                                    {user?.user_type === 'gym_owner' ? 'Quản lý Gym' : 'Dashboard'}
+                                </Link>
+                                <Link to="/programs" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Khóa học</Link>
                                 {user?.user_type === 'athlete' && (
-                                    <Link to="/workouts" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Lịch tập cá nhân</Link>
+                                    <Link to="/workouts" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Lịch tập</Link>
                                 )}
                                 <Link to="/messages" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Tin nhắn</Link>
-                                <Link to="/profile" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Hồ sơ cá nhân</Link>
+                                <Link to="/profile" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Hồ sơ</Link>
                                 <button
                                     onClick={handleLogout}
                                     className="text-lg font-bold text-gray-500 text-left"
@@ -123,7 +129,7 @@ export default function Header() {
                     </nav>
 
                     <div className="mt-auto pt-10 border-t border-gray-100 italic text-sm text-gray-400">
-                        GYMERVIET — Verified Fitness Profile
+                        GYMERVIET — Hệ sinh thái Gym & Coach số 1 VN
                     </div>
                 </div>
             )}

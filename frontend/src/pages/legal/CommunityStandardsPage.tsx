@@ -17,19 +17,19 @@ export default function CommunityStandardsPage() {
             <div className="mt-8 space-y-0">
 
                 <LegalSection title="1. Tôn trọng lẫn nhau">
-                    <p>Chúng tôi kỳ vọng mọi thành viên — HLV và học viên — đều giao tiếp với thái độ lịch sự và chuyên nghiệp.</p>
+                    <p>Chúng tôi kỳ vọng mọi thành viên — Coach và học viên — đều giao tiếp với thái độ lịch sự và chuyên nghiệp.</p>
                     <LegalList items={[
                         'Không sử dụng ngôn ngữ thô tục, xúc phạm, kỳ thị trong tin nhắn hoặc mô tả profile.',
                         'Không quấy rối, đe dọa, hoặc gây áp lực cho người dùng khác.',
                         'Không phân biệt đối xử dựa trên giới tính, dân tộc, tôn giáo, vóc dáng cơ thể.',
-                        'Phản hồi tin nhắn trong thời gian hợp lý — đặc biệt với HLV đã nhận học viên.',
+                        'Phản hồi tin nhắn trong thời gian hợp lý — đặc biệt với Coach đã nhận học viên.',
                     ]} />
                 </LegalSection>
 
                 <LegalSection title="2. Thông tin trung thực">
                     <p>Sự tin tưởng là nền tảng của nền tảng này. Chúng tôi yêu cầu thông tin chính xác từ tất cả người dùng.</p>
                     <LegalList items={[
-                        'HLV phải cung cấp thông tin chứng chỉ, kinh nghiệm và thành tích thực tế, có thể xác minh.',
+                        'Coach phải cung cấp thông tin chứng chỉ, kinh nghiệm và thành tích thực tế, có thể xác minh.',
                         'Không đặt giá gói tập sai lệch hoặc mô tả dịch vụ không đúng sự thật.',
                         'Học viên không được giả mạo thông tin cá nhân hoặc tạo tài khoản trùng lặp để lách quy định.',
                         'Ảnh đại diện và ảnh bìa phải là ảnh thực tế của bản thân/hoạt động — không dùng ảnh người khác.',
@@ -50,7 +50,7 @@ export default function CommunityStandardsPage() {
                     <p>Mọi giao dịch thanh toán phải diễn ra qua hệ thống của GYMERVIET để đảm bảo quyền lợi cả hai bên.</p>
                     <LegalList items={[
                         'Không yêu cầu học viên thanh toán ngoài hệ thống (tiền mặt, chuyển khoản riêng không qua app).',
-                        'HLV không được hủy gói tập đơn phương sau khi học viên đã thanh toán.',
+                        'Coach không được hủy gói tập đơn phương sau khi học viên đã thanh toán.',
                         'Không hoàn tiền ngoài chính sách — xem chi tiết tại trang Chính sách thanh toán.',
                         'Báo cáo ngay nếu phát hiện giao dịch bất thường hoặc nghi ngờ gian lận.',
                     ]} />

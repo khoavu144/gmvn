@@ -5,13 +5,13 @@ export default function GuidelinesPage() {
     return (
         <LegalPageLayout
             title="Hướng dẫn sử dụng"
-            subtitle="Hướng dẫn từng bước để khai thác tối đa nền tảng GYMERVIET — dành cho cả học viên và huấn luyện viên."
+            subtitle="Hướng dẫn từng bước để khai thác tối đa nền tảng GYMERVIET — dành cho cả học viên và Coach."
             breadcrumbs={[{ label: 'Hướng dẫn sử dụng' }]}
             maxWidth="xl"
         >
             {/* Tab-like navigation */}
             <div className="flex gap-2 mb-10 border-b border-gray-200 pb-0 overflow-x-auto">
-                {['Tổng quan', 'Dành cho học viên', 'Dành cho HLV'].map((tab, i) => (
+                {['Tổng quan', 'Dành cho học viên', 'Dành cho Coach'].map((tab, i) => (
                     <a
                         key={tab}
                         href={`#section-${i}`}
@@ -28,9 +28,9 @@ export default function GuidelinesPage() {
                     <p>GYMERVIET kết nối 3 nhóm người dùng chính:</p>
                     <div className="grid sm:grid-cols-3 gap-4 mt-3">
                         {[
-                            { role: 'Người tập (User)', desc: 'Tìm kiếm và đăng ký gói tập với HLV. Theo dõi lịch tập, nhắn tin với HLV.', color: 'border-gray-200' },
+                            { role: 'Người tập (User)', desc: 'Tìm kiếm và đăng ký gói tập với Coach. Theo dõi lịch tập, nhắn tin với Coach.', color: 'border-gray-200' },
                             { role: 'Vận động viên (Athlete)', desc: 'Như người tập nhưng có thêm portfolio chuyên nghiệp và có thể tạo gói tập của mình.', color: 'border-gray-300' },
-                            { role: 'Huấn luyện viên (Trainer)', desc: 'Tạo và bán gói tập, quản lý học viên, xây dựng hồ sơ public chuyên nghiệp.', color: 'border-black' },
+                            { role: 'Coach chuyên nghiệp', desc: 'Tạo và bán gói tập, quản lý học viên, xây dựng hồ sơ public chuyên nghiệp.', color: 'border-black' },
                         ].map((r) => (
                             <div key={r.role} className={`card border ${r.color}`}>
                                 <h4 className="font-bold text-sm text-black mb-2">{r.role}</h4>
@@ -51,11 +51,11 @@ export default function GuidelinesPage() {
                         'Đăng nhập ngay sau khi đăng ký thành công.',
                     ]} />
 
-                    <p className="font-medium text-black mt-5">Bước 2: Tìm huấn luyện viên</p>
+                    <p className="font-medium text-black mt-5">Bước 2: Tìm Coach</p>
                     <LegalList items={[
-                        'Vào mục "Khám phá Trainer" để duyệt danh sách HLV.',
+                        'Vào mục "Khám phá Coach" để duyệt danh sách Coach.',
                         'Dùng thanh tìm kiếm để lọc theo tên, chuyên môn (yoga, giảm cân, tăng cơ...).',
-                        'Bấm vào card HLV để xem profile đầy đủ, gói tập và đánh giá.',
+                        'Bấm vào card Coach để xem profile đầy đủ, gói tập và đánh giá.',
                         'Dùng nút "Nhắn tin" để hỏi thăm trước khi đăng ký.',
                     ]} />
 
@@ -76,9 +76,9 @@ export default function GuidelinesPage() {
                 </LegalSection>
             </div>
 
-            {/* Section 2: For trainers */}
+            {/* Section 2: For Coaches */}
             <div id="section-2">
-                <LegalSection title="Dành cho HLV — Xây dựng profile & bán gói tập">
+                <LegalSection title="Dành cho Coach — Xây dựng profile & bán gói tập">
                     <p className="font-medium text-black">Bước 1: Hoàn thiện hồ sơ cá nhân</p>
                     <LegalList items={[
                         'Profile → tab "Cá nhân": thêm ảnh đại diện, giới thiệu bản thân, chuyên môn.',
@@ -101,7 +101,7 @@ export default function GuidelinesPage() {
                     <LegalList items={[
                         'Dashboard → "Học viên" để xem danh sách học viên đang active.',
                         'Tin nhắn để liên lạc trực tiếp với từng học viên.',
-                        'Dashboard → "Doanh thu" để theo dõi thu nhập (sau khi trừ phí nền tảng 20%).',
+                        'Dashboard → "Doanh thu" để theo dõi thu nhập (sau khi trừ phí nền tảng 5%).',
                     ]} />
                 </LegalSection>
             </div>

@@ -3,7 +3,7 @@ export interface User {
     id: string;
     email: string;
     full_name: string;
-    user_type: 'user' | 'athlete' | 'trainer' | 'admin';
+    user_type: 'user' | 'athlete' | 'trainer' | 'gym_owner' | 'admin';
     avatar_url: string | null;
     bio?: string | null;
     height_cm?: number | null;
@@ -12,6 +12,7 @@ export interface User {
     specialties?: string[] | null;
     base_price_monthly?: number | null;
     is_verified?: boolean;
+    gym_owner_status?: 'pending_review' | 'approved' | 'rejected' | null;
     created_at: string;
     updated_at?: string;
 }
@@ -149,4 +150,136 @@ export interface TrainerFAQ {
     answer: string;
     order_number: number;
     created_at: string;
+}
+
+export interface GymCenter {
+    id: string;
+    owner_id: string;
+    name: string;
+    slug: string;
+    logo_url: string | null;
+    cover_image_url: string | null;
+    description: string | null;
+    tagline: string | null;
+    website_url: string | null;
+    social_links: any | null;
+    is_verified: boolean;
+    is_active: boolean;
+    view_count: number;
+    created_at: string;
+    updated_at: string;
+    owner?: User; // joined relation for admin
+    branches?: GymBranch[]; // optional relation
+}
+
+export interface GymBranch {
+    id: string;
+    gym_center_id: string;
+    branch_name: string;
+    address: string;
+    city: string | null;
+    district: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    phone: string | null;
+    email: string | null;
+    manager_name: string | null;
+    opening_hours: any | null;
+    is_active: boolean;
+    view_count: number;
+    description: string | null;
+    created_at: string;
+    updated_at: string;
+
+    // Relations (optional)
+    gym_center?: GymCenter;
+    gallery?: GymGallery[];
+    amenities?: GymAmenity[];
+    equipment?: GymEquipment[];
+    pricing?: GymPricing[];
+    events?: GymEvent[];
+    reviews?: GymReview[];
+    trainer_links?: GymTrainerLink[];
+}
+
+export interface GymGallery {
+    id: string;
+    branch_id: string;
+    image_url: string;
+    caption: string | null;
+    image_type: 'facility' | 'equipment' | 'class' | 'other';
+    order_number: number;
+}
+
+export interface GymAmenity {
+    id: string;
+    branch_id: string;
+    name: string;
+    is_available: boolean;
+    note: string | null;
+}
+
+export interface GymEquipment {
+    id: string;
+    branch_id: string;
+    category: string;
+    name: string;
+    quantity: number | null;
+    brand: string | null;
+    condition?: string | null; // Added for UI helper if needed
+    is_available: boolean;
+}
+
+export interface GymPricing {
+    id: string;
+    branch_id: string;
+    plan_name: string;
+    price: number;
+    billing_cycle: 'per_day' | 'per_month' | 'per_quarter' | 'per_year' | 'per_session';
+    description: string | null;
+    is_highlighted: boolean;
+    order_number: number;
+}
+
+export interface GymEvent {
+    id: string;
+    branch_id: string;
+    title: string;
+    description: string | null;
+    start_time: string;
+    end_time: string;
+    instructor_name: string | null;
+    max_participants: number | null;
+    event_type: 'class' | 'workshop' | 'competition' | 'promotion' | 'other';
+    image_url: string | null;
+}
+
+export interface GymTrainerLink {
+    id: string;
+    gym_center_id: string;
+    branch_id: string | null;
+    trainer_id: string;
+    role_at_gym: string | null;
+    status: 'pending' | 'active' | 'inactive' | 'removed';
+    created_at: string;
+    updated_at: string;
+
+    // Relations
+    gym_center?: GymCenter;
+    branch?: GymBranch;
+    trainer?: User;
+}
+
+export interface GymReview {
+    id: string;
+    branch_id: string;
+    user_id: string;     // references User.id
+    rating: number;
+    comment: string | null;
+    is_verified_athlete: boolean;
+    is_visible: boolean;
+    created_at: string;
+    updated_at: string;
+
+    user?: User; // joined relation
 }

@@ -59,8 +59,8 @@ export default function ProfilePublic() {
             {/* Sub Header Navigation */}
             <div className="bg-white border-b border-gray-200">
                 <div className="max-w-4xl mx-auto px-4 h-12 flex items-center">
-                    <Link to="/trainers" className="text-sm font-medium text-gray-600 hover:text-black">
-                        ← Danh sách HLV
+                    <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black">
+                        ← Toàn bộ Coach
                     </Link>
                 </div>
             </div>

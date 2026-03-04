@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import type { RootState } from '../store/store';
 import apiClient from '../services/api';
+import AdminGymApproval from '../components/AdminGymApproval';
+import AdminReviewManagement from '../components/AdminReviewManagement';
 
 interface OverviewData {
     active_clients?: number;
@@ -12,47 +14,109 @@ interface OverviewData {
     published_programs?: number;
 }
 
-// Cards for Trainer role
-const TrainerDashboard = ({ overview }: { overview: OverviewData }) => (
-    <div className="space-y-8">
-        {/* Stats row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-                { label: 'Học viên đang học', value: overview.active_clients ?? '—', icon: '👥' },
-                { label: 'Doanh thu/tháng', value: overview.monthly_revenue ? `${Number(overview.monthly_revenue).toLocaleString('vi-VN')} đ` : '—', icon: '💰' },
-                { label: 'Tin nhắn chưa đọc', value: overview.unread_messages ?? 0, icon: '💬' },
-                { label: 'Chương trình', value: `${overview.published_programs ?? 0}/${overview.total_programs ?? 0}`, icon: '📋' },
-            ].map(stat => (
-                <div key={stat.label} className="bg-white border border-gray-200 rounded-xs p-4 flex flex-col hover:border-gray-300 transition-colors">
-                    <div className="text-2xl mb-2 text-gray-500">{stat.icon}</div>
-                    <div className="text-xl font-bold text-black">{stat.value}</div>
-                    <div className="text-xs text-gray-600 mt-1">{stat.label}</div>
-                </div>
-            ))}
-        </div>
+import { gymService } from '../services/gymService';
+import type { GymTrainerLink } from '../types';
+import { useToast } from '../components/Toast';
 
-        {/* Quick actions */}
-        <div>
-            <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Lối tắt</h3>
-            <div className="grid md:grid-cols-3 gap-4">
+// Cards for Coach role
+const CoachDashboard = ({ overview }: { overview: OverviewData }) => {
+    const { toast, ToastComponent } = useToast();
+    const [invitations, setInvitations] = useState<GymTrainerLink[]>([]);
+    const [loadingInvs, setLoadingInvs] = useState(true);
+
+    useEffect(() => {
+        gymService.getTrainerInvitations()
+            .then(res => {
+                if (res.success) setInvitations(res.invitations || []);
+            })
+            .finally(() => setLoadingInvs(false));
+    }, []);
+
+    const handleAccept = async (id: string) => {
+        try {
+            const res = await gymService.acceptInvitation(id);
+            if (res.success) {
+                toast.success('Đã chấp nhận lời mời hợp tác!');
+                setInvitations(prev => prev.filter(i => i.id !== id));
+            }
+        } catch (error) { toast.error('Lỗi khi thực hiện'); }
+    };
+
+    const handleDecline = async (id: string) => {
+        try {
+            const res = await gymService.declineInvitation(id);
+            if (res.success) {
+                toast.success('Đã từ chối lời mời');
+                setInvitations(prev => prev.filter(i => i.id !== id));
+            }
+        } catch (error) { toast.error('Lỗi khi thực hiện'); }
+    };
+
+    return (
+        <div className="space-y-8">
+            {ToastComponent}
+            {/* Invitations Alert */}
+            {!loadingInvs && invitations.length > 0 && (
+                <div className="bg-amber-50 border-2 border-amber-500 rounded-xl p-6 animate-pulse-subtle">
+                    <h3 className="font-black uppercase tracking-tight text-amber-800 mb-4 flex items-center gap-2">
+                        <span>🔔</span> Bạn có {invitations.length} lời mời hợp tác mới
+                    </h3>
+                    <div className="grid gap-4">
+                        {invitations.map(inv => (
+                            <div key={inv.id} className="bg-white border border-amber-200 p-4 rounded-lg flex justify-between items-center shadow-sm">
+                                <div>
+                                    <p className="font-bold text-sm">{inv.gym_center?.name}</p>
+                                    <p className="text-xs text-gray-500">Vị trí: {inv.role_at_gym || 'Coach'} • Chi nhánh: {inv.branch?.branch_name}</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button onClick={() => handleAccept(inv.id)} className="bg-black text-white px-3 py-1.5 rounded-xs text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors">Chấp nhận</button>
+                                    <button onClick={() => handleDecline(inv.id)} className="text-gray-400 px-3 py-1.5 rounded-xs text-[10px] font-bold uppercase tracking-widest hover:text-red-500 transition-colors">Từ chối</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Stats row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { to: '/programs', icon: '📋', title: 'Quản lý Gói tập', desc: 'Tạo & publish chương trình' },
-                    { to: '/messages', icon: '💬', title: 'Tin nhắn', desc: 'Chat với học viên' },
-                    { to: '/profile', icon: '👤', title: 'Hồ sơ của tôi', desc: 'Cập nhật thông tin' },
-                ].map(card => (
-                    <Link key={card.to} to={card.to} className="card flex flex-col group">
-                        <div className="text-2xl mb-3 text-gray-700">{card.icon}</div>
-                        <h4 className="text-sm font-semibold text-black">{card.title}</h4>
-                        <p className="text-xs text-gray-600 mt-1 flex-1">{card.desc}</p>
-                        <span className="text-black text-sm font-medium group-hover:translate-x-1 transition-transform inline-block mt-3 border-t border-gray-100 pt-3">
-                            Mở →
-                        </span>
-                    </Link>
+                    { label: 'Học viên đang học', value: overview.active_clients ?? '—', icon: '👥' },
+                    { label: 'Doanh thu/tháng', value: overview.monthly_revenue ? `${Number(overview.monthly_revenue).toLocaleString('vi-VN')} đ` : '—', icon: '💰' },
+                    { label: 'Tin nhắn chưa đọc', value: overview.unread_messages ?? 0, icon: '💬' },
+                    { label: 'Chương trình', value: `${overview.published_programs ?? 0}/${overview.total_programs ?? 0}`, icon: '📋' },
+                ].map(stat => (
+                    <div key={stat.label} className="bg-white border border-gray-200 rounded-xs p-4 flex flex-col hover:border-gray-300 transition-colors">
+                        <div className="text-2xl mb-2 text-gray-500">{stat.icon}</div>
+                        <div className="text-xl font-bold text-black">{stat.value}</div>
+                        <div className="text-xs text-gray-600 mt-1">{stat.label}</div>
+                    </div>
                 ))}
             </div>
+
+            {/* Quick actions */}
+            <div>
+                <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Lối tắt</h3>
+                <div className="grid md:grid-cols-3 gap-4">
+                    {[
+                        { to: '/programs', icon: '📋', title: 'Quản lý Gói tập', desc: 'Tạo & publish chương trình' },
+                        { to: '/messages', icon: '💬', title: 'Tin nhắn', desc: 'Chat với học viên' },
+                        { to: '/profile', icon: '👤', title: 'Hồ sơ Coach', desc: 'Cập nhật thông tin chuyên môn' },
+                    ].map(card => (
+                        <Link key={card.to} to={card.to} className="card flex flex-col group">
+                            <div className="text-2xl mb-3 text-gray-700">{card.icon}</div>
+                            <h4 className="text-sm font-semibold text-black">{card.title}</h4>
+                            <p className="text-xs text-gray-600 mt-1 flex-1">{card.desc}</p>
+                            <span className="text-black text-sm font-medium group-hover:translate-x-1 transition-transform inline-block mt-3 border-t border-gray-100 pt-3">
+                                Mở →
+                            </span>
+                        </Link>
+                    ))}
+                </div>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 // Cards for Normal User role
 const UserDashboard = () => (
@@ -62,8 +126,8 @@ const UserDashboard = () => (
             <div className="grid md:grid-cols-3 gap-4">
                 {[
                     { to: '/workouts', icon: '🏋️', title: 'Lịch tập của tôi', desc: 'Xem & hoàn thành bài tập' },
-                    { to: '/trainers', icon: '🔍', title: 'Tìm HLV', desc: 'Khám phá huấn luyện viên' },
-                    { to: '/messages', icon: '💬', title: 'Tin nhắn', desc: 'Nhắn tin với HLV' },
+                    { to: '/coaches', icon: '🔍', title: 'Tìm Coach', desc: 'Khám phá Coach' },
+                    { to: '/messages', icon: '💬', title: 'Tin nhắn', desc: 'Nhắn tin với Coach' },
                     { to: '/profile', icon: '👤', title: 'Hồ sơ', desc: 'Cập nhật thông tin cá nhân' },
                 ].map(card => (
                     <Link key={card.to} to={card.to} className="card flex flex-col group">
@@ -90,8 +154,8 @@ const AthleteDashboard = () => (
                     { to: '/programs', icon: '📋', title: 'Quản lý Gói tập', desc: 'Tạo & publish chương trình' },
                     { to: '/workouts', icon: '🏋️', title: 'Lịch tập của tôi', desc: 'Xem & hoàn thành bài tập' },
                     { to: '/profile', icon: '🌟', title: 'Hồ sơ Portfolio', desc: 'Cập nhật Profile Vận động viên' },
-                    { to: '/trainers', icon: '🔍', title: 'Tìm HLV', desc: 'Khám phá huấn luyện viên' },
-                    { to: '/messages', icon: '💬', title: 'Tin nhắn', desc: 'Nhắn tin với HLV/Học viên' },
+                    { to: '/coaches', icon: '🔍', title: 'Tìm Coach', desc: 'Khám phá Coach' },
+                    { to: '/messages', icon: '💬', title: 'Tin nhắn', desc: 'Nhắn tin với Coach/Học viên' },
                 ].map(card => (
                     <Link key={card.to} to={card.to} className="card flex flex-col group">
                         <div className="text-2xl mb-3 text-gray-700">{card.icon}</div>
@@ -106,6 +170,83 @@ const AthleteDashboard = () => (
         </div>
     </div>
 );
+
+// Cards for Admin role
+const AdminDashboard = () => {
+    const [activeTab, setActiveTab] = useState<'overview' | 'gyms' | 'reviews'>('overview');
+
+    return (
+        <div className="space-y-8">
+            <div className="flex gap-4 border-b border-gray-200">
+                <button
+                    onClick={() => setActiveTab('overview')}
+                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'overview' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
+                >
+                    Tổng quan
+                </button>
+                <button
+                    onClick={() => setActiveTab('gyms')}
+                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'gyms' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
+                >
+                    Phê duyệt Gym
+                </button>
+                <button
+                    onClick={() => setActiveTab('reviews')}
+                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'reviews' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
+                >
+                    Đánh giá
+                </button>
+            </div>
+
+            {activeTab === 'overview' && (
+                <div>
+                    <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Quản trị Hệ thống</h3>
+                    <div className="grid md:grid-cols-3 gap-4">
+                        {[
+                            { onClick: () => setActiveTab('gyms'), icon: '🏢', title: 'Phê duyệt Gym Center', desc: 'Duyệt hồ sơ Gym Owner mới' },
+                            { onClick: () => setActiveTab('reviews'), icon: '⭐', title: 'Quản lý Đánh giá Gym', desc: 'Kiểm duyệt review vi phạm' },
+                            { to: '#', icon: '👤', title: 'Quản trị Người dùng', desc: 'Xử lý báo cáo vi phạm' },
+                        ].map(card => (
+                            card.onClick ? (
+                                <button key={card.title} onClick={card.onClick} className="card text-left flex flex-col group border-black hover:bg-black hover:text-white transition-colors">
+                                    <div className="text-2xl mb-3 text-gray-700 group-hover:text-white">{card.icon}</div>
+                                    <h4 className="text-sm font-semibold text-black group-hover:text-white">{card.title}</h4>
+                                    <p className="text-xs text-gray-600 group-hover:text-gray-300 mt-1 flex-1">{card.desc}</p>
+                                </button>
+                            ) : (
+                                <Link key={card.title} to={card.to || '#'} className="card flex flex-col group border-black hover:bg-black hover:text-white transition-colors">
+                                    <div className="text-2xl mb-3 text-gray-700 group-hover:text-white">{card.icon}</div>
+                                    <h4 className="text-sm font-semibold text-black group-hover:text-white">{card.title}</h4>
+                                    <p className="text-xs text-gray-600 group-hover:text-gray-300 mt-1 flex-1">{card.desc}</p>
+                                </Link>
+                            )
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'gyms' && (
+                <div>
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-xl font-black uppercase">Hồ sơ chờ phê duyệt</h3>
+                        <button onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-black">Quay lại</button>
+                    </div>
+                    <AdminGymApproval />
+                </div>
+            )}
+
+            {activeTab === 'reviews' && (
+                <div>
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-xl font-black uppercase">Quản lý Đánh giá</h3>
+                        <button onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-black">Quay lại</button>
+                    </div>
+                    <AdminReviewManagement />
+                </div>
+            )}
+        </div>
+    );
+};
 
 export default function Dashboard() {
     const user = useSelector((state: RootState) => state.auth.user);
@@ -132,9 +273,10 @@ export default function Dashboard() {
                 <p className="text-muted mt-1">Xin chào, {user.full_name}. Chúc bạn một ngày hiệu quả.</p>
             </div>
 
-            {user.user_type === 'trainer' && <TrainerDashboard overview={overview} />}
+            {user.user_type === 'trainer' && <CoachDashboard overview={overview} />}
             {user.user_type === 'athlete' && <AthleteDashboard />}
             {user.user_type === 'user' && <UserDashboard />}
+            {user.user_type === 'admin' && <AdminDashboard />}
         </main>
     );
 }

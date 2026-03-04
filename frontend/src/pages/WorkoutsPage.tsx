@@ -67,7 +67,7 @@ export default function WorkoutsPage() {
                     <div className="card text-center py-16 border-dashed">
                         <p className="text-gray-500 mb-4 text-sm font-medium">Bạn chưa đăng ký gói tập nào.</p>
                         <button onClick={() => navigate('/trainers')} className="btn-primary px-6">
-                            Tìm Huấn luyện viên
+                            Tìm Coach
                         </button>
                     </div>
                 ) : (

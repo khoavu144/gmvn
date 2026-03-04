@@ -25,9 +25,9 @@ const footerLinks = [
         ],
     },
     {
-        title: 'Dành cho HLV',
+        title: 'Dành cho Coach',
         links: [
-            { label: 'Bắt đầu làm HLV', to: '/trainer-guide' },
+            { label: 'Bắt đầu làm Coach', to: '/coach-guide' },
             { label: 'Chính sách thanh toán', to: '/payment-policy' },
         ],
     },

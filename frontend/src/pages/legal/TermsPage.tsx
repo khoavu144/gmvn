@@ -33,9 +33,9 @@ export default function TermsPage() {
                 <LegalSection title="3. Dịch vụ và thanh toán">
                     <LegalList items={[
                         'GYMERVIET là nền tảng kết nối — chúng tôi không trực tiếp cung cấp dịch vụ huấn luyện.',
-                        'Chất lượng dịch vụ huấn luyện là trách nhiệm của HLV đăng ký trên nền tảng.',
+                        'Chất lượng dịch vụ huấn luyện là trách nhiệm của Coach đăng ký trên nền tảng.',
                         'GYMERVIET thu phí nền tảng 5% từ mỗi giao dịch thành công.',
-                        'Giá hiển thị trên gói tập là giá học viên trả, HLV nhận 95% sau khi trừ phí.',
+                        'Giá hiển thị trên gói tập là giá học viên trả, Coach nhận 95% sau khi trừ phí.',
                     ]} />
                 </LegalSection>
 
@@ -59,7 +59,7 @@ export default function TermsPage() {
                 <LegalSection title="6. Chấm dứt dịch vụ">
                     <p>
                         Chúng tôi có thể tạm khóa hoặc xóa tài khoản vi phạm Tiêu chuẩn Cộng đồng.
-                        Với các tài khoản HLV bị xóa, các học viên đang active sẽ được hoàn tiền
+                        Với các tài khoản Coach bị xóa, các học viên đang active sẽ được hoàn tiền
                         phần còn lại của gói tập.
                     </p>
                 </LegalSection>

@@ -27,4 +27,13 @@ export const trainerService = {
         const response = await api.get<ApiResponse<User>>(`/users/trainers/${id}`);
         return response.data.data!;
     },
+
+    searchTrainers: async (params: { search: string; page?: number; limit?: number }) => {
+        const response = await api.get<ApiResponse<GetTrainersResponse>>('/users/trainers', { params });
+        return {
+            success: response.data.success,
+            trainers: response.data.data?.trainers || [],
+            total: response.data.data?.total || 0
+        };
+    }
 };

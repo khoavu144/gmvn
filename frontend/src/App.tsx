@@ -13,13 +13,19 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import Trainers from './pages/Trainers';
+import Coaches from './pages/Coaches';
+import CoachDetail from './pages/CoachDetailPage';
 import Profile from './pages/Profile';
-import TrainerDetailPage from './pages/TrainerDetailPage';
 import ProgramsPage from './pages/ProgramsPage';
 import MessagesPage from './pages/MessagesPage';
 import WorkoutsPage from './pages/WorkoutsPage';
 import ProfilePublic from './pages/ProfilePublic';
+
+// Gym Module Pages
+import Gyms from './pages/Gyms';
+import GymDetailPage from './pages/GymDetailPage';
+import GymRegisterPage from './pages/GymRegisterPage';
+import GymOwnerDashboard from './pages/GymOwnerDashboard';
 
 // Legal & Community Pages
 import AboutPage from './pages/legal/AboutPage';
@@ -29,7 +35,7 @@ import PrivacyPage from './pages/legal/PrivacyPage';
 import TermsPage from './pages/legal/TermsPage';
 import FAQPage from './pages/legal/FAQPage';
 import ContactPage from './pages/legal/ContactPage';
-import TrainerGuidePage from './pages/legal/TrainerGuidePage';
+import CoachGuidePage from './pages/legal/CoachGuidePage';
 import PaymentPolicyPage from './pages/legal/PaymentPolicyPage';
 import ReportPage from './pages/legal/ReportPage';
 
@@ -44,14 +50,20 @@ const router = createBrowserRouter([
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
       { path: '/dashboard', element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
-      { path: '/trainers', element: <Trainers /> },
-      { path: '/trainers/:trainerId', element: <TrainerDetailPage /> },
+      { path: '/coaches', element: <Coaches /> },
+      { path: '/coaches/:id', element: <CoachDetail /> },
       { path: '/profile', element: <ProtectedRoute><Profile /></ProtectedRoute> },
       { path: '/programs', element: <ProtectedRoute requiredRole={['trainer', 'athlete']}><ProgramsPage /></ProtectedRoute> },
       { path: '/messages', element: <ProtectedRoute><MessagesPage /></ProtectedRoute> },
       { path: '/workouts', element: <ProtectedRoute requiredRole="athlete"><WorkoutsPage /></ProtectedRoute> },
       // Public trainer profile landing page (slug or trainerId)
       { path: '/trainer/:trainerId', element: <ProfilePublic /> },
+
+      // Gym Module Routes
+      { path: '/gyms', element: <Gyms /> },
+      { path: '/gyms/:id', element: <GymDetailPage /> },
+      { path: '/gym-owner/register', element: <ProtectedRoute requiredRole="gym_owner"><GymRegisterPage /></ProtectedRoute> },
+      { path: '/gym-owner', element: <ProtectedRoute requiredRole="gym_owner"><GymOwnerDashboard /></ProtectedRoute> },
 
       // Legal & Community Routes
       { path: '/about', element: <AboutPage /> },
@@ -61,7 +73,7 @@ const router = createBrowserRouter([
       { path: '/terms', element: <TermsPage /> },
       { path: '/faq', element: <FAQPage /> },
       { path: '/contact', element: <ContactPage /> },
-      { path: '/trainer-guide', element: <TrainerGuidePage /> },
+      { path: '/coach-guide', element: <CoachGuidePage /> },
       { path: '/payment-policy', element: <PaymentPolicyPage /> },
       { path: '/report', element: <ReportPage /> },
     ]

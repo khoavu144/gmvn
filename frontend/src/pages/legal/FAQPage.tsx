@@ -19,7 +19,7 @@ const faqData: FAQCategory[] = [
         icon: '👤',
         items: [
             {
-                q: 'Tôi có thể đổi loại tài khoản từ Gymer sang HLV không?',
+                q: 'Tôi có thể đổi loại tài khoản từ Gymer sang Coach không?',
                 a: 'Hiện tại chưa hỗ trợ đổi loại tài khoản trực tiếp. Bạn cần liên hệ đội hỗ trợ qua trang Liên hệ để được chuyển đổi thủ công.',
             },
             {
@@ -42,11 +42,11 @@ const faqData: FAQCategory[] = [
             },
             {
                 q: 'Có được hoàn tiền không?',
-                a: 'Chúng tôi hỗ trợ hoàn tiền trong vòng 7 ngày kể từ ngày kích hoạt nếu gói tập chưa bắt đầu hoặc HLV không cung cấp dịch vụ đúng cam kết. Xem chi tiết tại trang Chính sách thanh toán.',
+                a: 'Chúng tôi hỗ trợ hoàn tiền trong vòng 7 ngày kể từ ngày kích hoạt nếu gói tập chưa bắt đầu hoặc Coach không cung cấp dịch vụ đúng cam kết. Xem chi tiết tại trang Chính sách thanh toán.',
             },
             {
                 q: 'Phí nền tảng là bao nhiêu?',
-                a: 'GYMERVIET thu 5% từ mỗi giao dịch thành công. Ví dụ: gói 1.000.000đ — học viên trả 1.000.000đ, HLV nhận 950.000đ.',
+                a: 'GYMERVIET thu 5% từ mỗi giao dịch thành công. Ví dụ: gói 1.000.000đ — học viên trả 1.000.000đ, Coach nhận 950.000đ.',
             },
             {
                 q: 'Tôi có thể hủy gói tập đang active không?',
@@ -55,12 +55,12 @@ const faqData: FAQCategory[] = [
         ],
     },
     {
-        title: 'Dành cho HLV',
+        title: 'Dành cho Coach',
         icon: '🏋️',
         items: [
             {
                 q: 'Badge "Verified" là gì và làm thế nào để được xác minh?',
-                a: 'Badge Verified xác nhận HLV đã được đội ngũ GYMERVIET kiểm tra chứng chỉ và kinh nghiệm thực tế. Gửi hồ sơ xác minh qua trang Liên hệ để được xem xét.',
+                a: 'Badge Verified xác nhận Coach đã được đội ngũ GYMERVIET kiểm tra chứng chỉ và kinh nghiệm thực tế. Gửi hồ sơ xác minh qua trang Liên hệ để được xem xét.',
             },
             {
                 q: 'Tôi có thể tạo bao nhiêu gói tập?',

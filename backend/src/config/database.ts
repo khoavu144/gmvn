@@ -22,6 +22,17 @@ import { FinancialTransaction } from '../entities/FinancialTransaction';
 import { AdminAuditLog } from '../entities/AdminAuditLog';
 import { RevenueTier } from '../entities/RevenueTier';
 
+// Gym Center Entities
+import { GymCenter } from '../entities/GymCenter';
+import { GymBranch } from '../entities/GymBranch';
+import { GymGallery } from '../entities/GymGallery';
+import { GymAmenity } from '../entities/GymAmenity';
+import { GymEquipment } from '../entities/GymEquipment';
+import { GymTrainerLink } from '../entities/GymTrainerLink';
+import { GymPricing } from '../entities/GymPricing';
+import { GymEvent } from '../entities/GymEvent';
+import { GymReview } from '../entities/GymReview';
+
 dotenv.config();
 
 export const AppDataSource = new DataSource({
@@ -49,6 +60,16 @@ export const AppDataSource = new DataSource({
         FinancialTransaction,
         AdminAuditLog,
         RevenueTier,
+        // Gym Center Module
+        GymCenter,
+        GymBranch,
+        GymGallery,
+        GymAmenity,
+        GymEquipment,
+        GymTrainerLink,
+        GymPricing,
+        GymEvent,
+        GymReview,
     ],
     subscribers: [],
     migrations: [],

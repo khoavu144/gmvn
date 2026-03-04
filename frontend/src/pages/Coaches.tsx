@@ -25,7 +25,7 @@ export default function Trainers() {
     return (
         <main className="max-w-7xl w-full mx-auto px-4 py-8 flex-1">
             <div className="mb-8">
-                <h1 className="text-h1 mb-6">Khám phá Huấn luyện viên</h1>
+                <h1 className="text-h1 mb-6">Khám phá Coach</h1>
 
                 {/* Search Bar */}
                 <div className="max-w-xl">
@@ -39,7 +39,7 @@ export default function Trainers() {
                             name="search"
                             id="search"
                             className="form-input pl-10"
-                            placeholder="Tìm kiếm theo tên, chuyên môn, khu vực..."
+                            placeholder="Tìm theo tên, chuyên môn hoặc từ khóa..."
                             value={search}
                             onChange={(e) => handleSearchChange(e.target.value)}
                         />
@@ -53,7 +53,7 @@ export default function Trainers() {
             ) : isError ? (
                 <div className="text-center text-red-600 py-20 font-medium">Đã xảy ra lỗi khi tải dữ liệu.</div>
             ) : data?.trainers.length === 0 ? (
-                <div className="text-center text-gray-500 py-20 text-sm">Không tìm thấy huấn luyện viên nào phù hợp.</div>
+                <div className="text-center text-gray-500 py-20 text-sm">Không tìm thấy Coach nào phù hợp.</div>
             ) : (
                 <>
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -74,6 +74,9 @@ export default function Trainers() {
                                         <p className="text-sm font-medium text-gray-700 mt-0.5">
                                             {trainer.base_price_monthly ? `${trainer.base_price_monthly.toLocaleString('vi-VN')} ₫/tháng` : 'Liên hệ báo giá'}
                                         </p>
+                                        <div className="flex items-center text-[10px] font-black text-black bg-gray-100 px-1.5 py-0.5 rounded-sm mt-1 w-fit">
+                                            ★ {(trainer as any).avg_rating?.toFixed(1) || '5.0'}
+                                        </div>
                                     </div>
                                 </div>
 

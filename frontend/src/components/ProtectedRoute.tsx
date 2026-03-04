@@ -31,5 +31,27 @@ export default function ProtectedRoute({ children, requiredRole }: Props) {
         }
     }
 
+    if (user && user.user_type === 'gym_owner') {
+        const isGymOwnerRoute = location.pathname.startsWith('/gym-owner');
+        const isRegisteringRoute = location.pathname === '/gym-owner/register';
+
+        if (location.pathname === '/dashboard') {
+            return <Navigate to="/gym-owner" replace />;
+        }
+
+        if (isGymOwnerRoute && !isRegisteringRoute) {
+            if (user.gym_owner_status === 'pending_review') {
+                return <Navigate to="/gym-owner/register?step=3" replace />; // or a dedicated pending page
+            }
+            if (user.gym_owner_status !== 'approved') {
+                return <Navigate to="/gym-owner/register" replace />;
+            }
+        }
+
+        if (isRegisteringRoute && user.gym_owner_status === 'approved') {
+            return <Navigate to="/gym-owner" replace />;
+        }
+    }
+
     return <>{children}</>;
 }
