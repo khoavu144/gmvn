@@ -81,8 +81,12 @@ app.get('/api/v1/health', async (_req, res) => {
             db: { users: userCount, gyms: gymCount },
             env: process.env.NODE_ENV
         });
-    } catch (error) {
-        res.status(500).json({ status: 'ERROR', message: 'Database connection failed' });
+    } catch (error: any) {
+        res.status(500).json({
+            status: 'ERROR',
+            message: 'Database connection failed',
+            error: error.message
+        });
     }
 });
 
