@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,6 +22,9 @@ import {
 } from '../store/slices/profileSlice';
 import type { AppDispatch, RootState } from '../store/store';
 import type { User, TrainerExperience, TrainerGallery, TrainerFAQ } from '../types';
+import { ImageCropperModal } from '../components/ImageCropperModal';
+import { uploadService } from '../services/uploadService';
+import CreatableSelect from 'react-select/creatable';
 
 // ── Schemas ────────────────────────────────────────────────────────────────
 const profileSchema = z.object({
@@ -429,6 +432,32 @@ export default function Profile() {
         }
     }, [successMsg, dispatch, activeTab]);
 
+    // Upload state
+    const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+    const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedImageFile(file);
+            setIsCropModalOpen(true);
+        }
+        // Reset input so the same file can be selected again if needed
+        if (e.target) e.target.value = '';
+    };
+
+
+    const headlineOptions = [
+        { value: 'Fitness Coach', label: 'Fitness Coach' },
+        { value: 'Yoga Instructor', label: 'Yoga Instructor' },
+        { value: 'Rehab Specialist', label: 'Rehab Specialist' },
+        { value: 'Strength & Conditioning Coach', label: 'Strength & Conditioning Coach' },
+        { value: 'Pilates Teacher', label: 'Pilates Teacher' },
+        { value: 'Bodybuilding Coach', label: 'Bodybuilding Coach' },
+    ];
+
     // ── Personal form ──────────────────────────────────────────────────────────
     const {
         register: regPersonal,
@@ -467,6 +496,8 @@ export default function Profile() {
     const {
         register: regProfile,
         handleSubmit: handleProfile,
+        setValue: setProfileValue,
+        watch: watchProfile,
         formState: { errors: errorsProfile },
     } = useForm<TrainerProfileFormValues>({
         resolver: zodResolver(trainerProfileSchema),
@@ -528,6 +559,21 @@ export default function Profile() {
             social_links,
             certifications,
         } as any));
+    };
+
+    // Fix the previous mock onChange by using real setValue
+    const handleCropCompleteReal = async (croppedBlob: Blob) => {
+        setIsUploading(true);
+        try {
+            const originalName = selectedImageFile?.name || 'cover.jpg';
+            const url = await uploadService.uploadImage(croppedBlob, 'covers', originalName);
+            setProfileValue('cover_image_url', url, { shouldValidate: true, shouldDirty: true });
+        } catch (error) {
+            alert('Upload ảnh thất bại! Vui lòng thử lại.');
+        } finally {
+            setIsUploading(false);
+            setSelectedImageFile(null);
+        }
     };
 
     if (!user) return <div className="p-8 text-black">Vui lòng đăng nhập.</div>;
@@ -677,8 +723,26 @@ export default function Profile() {
                                     {errorsProfile.slug && <p className="form-helper text-red-600">{errorsProfile.slug.message}</p>}
                                 </div>
                                 <div>
-                                    <label className="form-label">Cover image URL</label>
-                                    <input type="url" {...regProfile('cover_image_url')} placeholder="https://..." className="form-input" />
+                                    <label className="form-label">Ảnh bìa (Cover Image)</label>
+                                    <div className="flex flex-col gap-3">
+                                        {watchProfile('cover_image_url') ? (
+                                            <div className="relative w-full aspect-[21/9] bg-gray-100 border border-gray-200 rounded overflow-hidden">
+                                                <img src={watchProfile('cover_image_url') || ''} alt="Cover Preview" className="w-full h-full object-cover" />
+                                                <button type="button" onClick={() => setProfileValue('cover_image_url', '')} className="absolute top-2 right-2 bg-white/90 text-black px-2 py-1 rounded text-xs font-medium hover:bg-white transition shadow">
+                                                    Xóa ảnh
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="w-full aspect-[21/9] bg-gray-50 border-2 border-dashed border-gray-300 rounded flex flex-col items-center justify-center text-gray-500">
+                                                <span className="text-sm">Chưa có ảnh bìa</span>
+                                            </div>
+                                        )}
+                                        <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+                                        <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="btn-secondary w-fit text-sm">
+                                            {isUploading ? 'Đang tải lên...' : 'Tải lên từ thiết bị'}
+                                        </button>
+                                        <input type="hidden" {...regProfile('cover_image_url')} />
+                                    </div>
                                 </div>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-6 pt-4 border-t border-gray-200">
@@ -698,7 +762,35 @@ export default function Profile() {
                             <div className="space-y-6">
                                 <div>
                                     <label className="form-label">Headline (Chức danh chính)</label>
-                                    <input type="text" {...regProfile('headline')} placeholder="VD: Senior Strength & Conditioning Coach" className="form-input" />
+                                    <CreatableSelect
+                                        isClearable
+                                        options={headlineOptions}
+                                        value={watchProfile('headline') ? { label: watchProfile('headline'), value: watchProfile('headline') } : null}
+                                        onChange={(newValue) => setProfileValue('headline', newValue ? newValue.value : '', { shouldDirty: true })}
+                                        placeholder="Chọn hoặc gõ chức danh mới..."
+                                        className="text-sm"
+                                        classNamePrefix="react-select"
+                                        styles={{
+                                            control: (base) => ({
+                                                ...base,
+                                                borderColor: '#e5e7eb',
+                                                borderRadius: '2px', // rounded-xs equivalent roughly
+                                                padding: '2px',
+                                                boxShadow: 'none',
+                                                '&:hover': {
+                                                    borderColor: '#000'
+                                                }
+                                            }),
+                                            option: (base, state) => ({
+                                                ...base,
+                                                backgroundColor: state.isSelected ? '#000' : state.isFocused ? '#f3f4f6' : 'white',
+                                                color: state.isSelected ? 'white' : 'black',
+                                                '&:active': {
+                                                    backgroundColor: '#e5e7eb'
+                                                }
+                                            })
+                                        }}
+                                    />
                                 </div>
                                 <div>
                                     <label className="form-label">Tóm tắt ngắn (1-2 câu)</label>
@@ -785,6 +877,19 @@ export default function Profile() {
 
                 {/* ── TAB: FAQ ────────────────────────────────────────────────── */}
                 {activeTab === 'faq' && user.user_type === 'trainer' && <FAQTab />}
+
+                {/* Modals outside form flow */}
+                <ImageCropperModal
+                    isOpen={isCropModalOpen}
+                    onClose={() => {
+                        setIsCropModalOpen(false);
+                        setSelectedImageFile(null);
+                    }}
+                    imageFile={selectedImageFile}
+                    onCropComplete={handleCropCompleteReal}
+                    aspectRatio={21 / 9} // Ultra-wide banner format for cover
+                    title="Cắt ảnh bìa (Cover Image)"
+                />
 
             </main>
         </div>
