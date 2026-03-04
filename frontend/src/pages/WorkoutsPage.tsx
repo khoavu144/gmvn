@@ -19,11 +19,12 @@ export default function WorkoutsPage() {
     const [selectedWeek, setSelectedWeek] = useState(1);
     const [loggedIds, setLoggedIds] = useState<Set<string>>(new Set());
     const [loading, setLoading] = useState(false);
+    const [notes, setNotes] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (!user || user.user_type !== 'athlete') { navigate('/dashboard'); return; }
         loadSubs();
-    }, [user]);
+    }, [user, navigate]);
 
     const loadSubs = async () => {
         try {
@@ -43,9 +44,9 @@ export default function WorkoutsPage() {
     };
 
     const handleLog = async (workoutId: string) => {
-        const notes = prompt('Ghi chú (tùy chọn):') ?? '';
+        const workoutNotes = notes[workoutId] || '';
         try {
-            await apiClient.post(`/workouts/${workoutId}/log`, { notes });
+            await apiClient.post(`/workouts/${workoutId}/log`, { notes: workoutNotes });
             setLoggedIds(prev => new Set([...prev, workoutId]));
             toast.success('Đã ghi nhận hoàn thành buổi tập!');
         } catch (err: any) { toast.error(err.response?.data?.error || 'Lỗi'); }
@@ -54,7 +55,7 @@ export default function WorkoutsPage() {
     const dayNames = ['', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'];
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-16">
+        <div className="pb-16">
             {ToastComponent}
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <div className="mb-8">
@@ -116,10 +117,20 @@ export default function WorkoutsPage() {
                                                         {w.name || `Buổi tập ngày ${w.day_number}`}
                                                     </h3>
                                                 </div>
-                                                <button onClick={() => handleLog(w.id)} disabled={isDone}
-                                                    className={`shrink-0 px-4 py-2 rounded-xs text-sm font-semibold transition-colors border ${isDone ? 'bg-transparent text-gray-400 border-transparent cursor-not-allowed' : 'btn-primary'}`}>
-                                                    {isDone ? 'Đã hoàn thành' : 'Đánh dấu xong'}
-                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    {!isDone && (
+                                                        <textarea
+                                                            placeholder="Ghi chú buổi tập..."
+                                                            className="form-input text-xs h-10 min-h-[40px] w-48 resize-none py-2"
+                                                            value={notes[w.id] || ''}
+                                                            onChange={(e) => setNotes(prev => ({ ...prev, [w.id]: e.target.value }))}
+                                                        />
+                                                    )}
+                                                    <button onClick={() => handleLog(w.id)} disabled={isDone}
+                                                        className={`shrink-0 px-4 py-2 rounded-xs text-sm font-semibold transition-colors border ${isDone ? 'bg-transparent text-gray-400 border-transparent cursor-not-allowed' : 'btn-primary'}`}>
+                                                        {isDone ? 'Đã hoàn thành' : 'Đánh dấu xong'}
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             {w.exercises?.length > 0 ? (

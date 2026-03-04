@@ -29,17 +29,17 @@ export const authenticate: RequestHandler = (req, res, next) => {
     }
 };
 
-export const trainerOnly: RequestHandler = (req, res, next) => {
-    if (req.user?.user_type !== 'trainer') {
-        res.status(403).json({ success: false, error: 'Trainers only' });
+export const proOnly: RequestHandler = (req, res, next) => {
+    if (req.user?.user_type !== 'trainer' && req.user?.user_type !== 'athlete') {
+        res.status(403).json({ success: false, error: 'Only trainers or professional athletes can perform this action' });
         return;
     }
     next();
 };
 
-export const athleteOnly: RequestHandler = (req, res, next) => {
-    if (req.user?.user_type !== 'athlete') {
-        res.status(403).json({ success: false, error: 'Athletes only' });
+export const adminOnly: RequestHandler = (req, res, next) => {
+    if (req.user?.user_type !== 'admin') {
+        res.status(403).json({ success: false, error: 'Admin access only' });
         return;
     }
     next();

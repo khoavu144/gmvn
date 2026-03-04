@@ -420,7 +420,7 @@ export default function Profile() {
     const [certsError, setCertsError] = useState('');
 
     useEffect(() => {
-        if (user?.user_type === 'trainer') {
+        if (user?.user_type === 'trainer' || user?.user_type === 'athlete') {
             dispatch(fetchMyProfile());
         }
     }, [user, dispatch]);
@@ -498,6 +498,7 @@ export default function Profile() {
         handleSubmit: handleProfile,
         setValue: setProfileValue,
         watch: watchProfile,
+        reset: resetProfileForm,
         formState: { errors: errorsProfile },
     } = useForm<TrainerProfileFormValues>({
         resolver: zodResolver(trainerProfileSchema),
@@ -524,6 +525,34 @@ export default function Profile() {
                 : '',
         },
     });
+
+    // BUG-09: Fix form re-population when myProfile data is fetched asynchronously
+    useEffect(() => {
+        if (myProfile) {
+            resetProfileForm({
+                slug: myProfile.slug || '',
+                cover_image_url: myProfile.cover_image_url || '',
+                headline: myProfile.headline || '',
+                bio_short: myProfile.bio_short || '',
+                bio_long: myProfile.bio_long || '',
+                years_experience: myProfile.years_experience || null,
+                clients_trained: myProfile.clients_trained || null,
+                success_stories: myProfile.success_stories || null,
+                phone: myProfile.phone || '',
+                location: myProfile.location || '',
+                is_accepting_clients: myProfile.is_accepting_clients ?? true,
+                is_profile_public: myProfile.is_profile_public ?? true,
+                facebook: myProfile.social_links?.facebook || '',
+                instagram: myProfile.social_links?.instagram || '',
+                youtube: myProfile.social_links?.youtube || '',
+                tiktok: myProfile.social_links?.tiktok || '',
+                website: myProfile.social_links?.website || '',
+                certifications_json: myProfile.certifications
+                    ? JSON.stringify(myProfile.certifications, null, 2)
+                    : '',
+            });
+        }
+    }, [myProfile, resetProfileForm]);
 
     const onSubmitProfile = (data: TrainerProfileFormValues) => {
         setCertsError('');
@@ -578,19 +607,19 @@ export default function Profile() {
 
     if (!user) return <div className="p-8 text-black">Vui lòng đăng nhập.</div>;
 
-    const trainerTabs: { key: ActiveTab; label: string }[] = [
+    const proTabs: { key: ActiveTab; label: string }[] = [
         { key: 'personal', label: 'Cá nhân' },
-        { key: 'trainer_profile', label: 'Hồ sơ public' },
-        { key: 'experience', label: 'Kinh nghiệm' },
+        { key: 'trainer_profile', label: user.user_type === 'athlete' ? 'Hồ sơ VĐV (Public)' : 'Hồ sơ (Public)' },
+        { key: 'experience', label: user.user_type === 'athlete' ? 'Thành tích/Giải đấu' : 'Kinh nghiệm' },
         { key: 'gallery', label: 'Gallery' },
         { key: 'faq', label: 'FAQ' },
     ];
 
-    const athleteTabs: { key: ActiveTab; label: string }[] = [
+    const normalTabs: { key: ActiveTab; label: string }[] = [
         { key: 'personal', label: 'Thông tin cá nhân' },
     ];
 
-    const tabs = user.user_type === 'trainer' ? trainerTabs : athleteTabs;
+    const tabs = (user.user_type === 'trainer' || user.user_type === 'athlete') ? proTabs : normalTabs;
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -697,7 +726,7 @@ export default function Profile() {
                 )}
 
                 {/* ── TAB: TRAINER PROFILE ─────────────────────────────────────── */}
-                {activeTab === 'trainer_profile' && user.user_type === 'trainer' && (
+                {activeTab === 'trainer_profile' && (user.user_type === 'trainer' || user.user_type === 'athlete') && (
                     <form onSubmit={handleProfile(onSubmitProfile)} className="space-y-6">
                         {successMsg && (
                             <div className="bg-gray-50 border border-black text-black px-4 py-3 rounded-xs text-sm">
@@ -870,13 +899,13 @@ export default function Profile() {
                 )}
 
                 {/* ── TAB: EXPERIENCE ─────────────────────────────────────────── */}
-                {activeTab === 'experience' && user.user_type === 'trainer' && <ExperienceTab />}
+                {activeTab === 'experience' && (user.user_type === 'trainer' || user.user_type === 'athlete') && <ExperienceTab />}
 
                 {/* ── TAB: GALLERY ────────────────────────────────────────────── */}
-                {activeTab === 'gallery' && user.user_type === 'trainer' && <GalleryTab />}
+                {activeTab === 'gallery' && (user.user_type === 'trainer' || user.user_type === 'athlete') && <GalleryTab />}
 
                 {/* ── TAB: FAQ ────────────────────────────────────────────────── */}
-                {activeTab === 'faq' && user.user_type === 'trainer' && <FAQTab />}
+                {activeTab === 'faq' && (user.user_type === 'trainer' || user.user_type === 'athlete') && <FAQTab />}
 
                 {/* Modals outside form flow */}
                 <ImageCropperModal

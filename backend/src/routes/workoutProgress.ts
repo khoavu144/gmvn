@@ -8,14 +8,13 @@ import { Subscription } from '../entities/Subscription';
 import { Workout } from '../entities/Workout';
 
 const router = Router();
-const workoutLogRepo = AppDataSource.getRepository(WorkoutLog);
-const progressRepo = AppDataSource.getRepository(UserProgress);
-const subRepo = AppDataSource.getRepository(Subscription);
-const workoutRepo = AppDataSource.getRepository(Workout);
 
 // GET /api/v1/subscriptions/:subscriptionId/workouts?week=1
 router.get('/subscriptions/:subscriptionId/workouts', authenticate, async (req: Request, res: Response) => {
     try {
+        const subRepo = AppDataSource.getRepository(Subscription);
+        const workoutRepo = AppDataSource.getRepository(Workout);
+
         const userId = req.user!.user_id;
         const { subscriptionId } = req.params;
         const week = req.query.week ? parseInt(req.query.week as string) : undefined;
@@ -45,6 +44,7 @@ router.get('/subscriptions/:subscriptionId/workouts', authenticate, async (req: 
 // POST /api/v1/workouts/:workoutId/log
 router.post('/workouts/:workoutId/log', authenticate, async (req: Request, res: Response) => {
     try {
+        const workoutLogRepo = AppDataSource.getRepository(WorkoutLog);
         const userId = req.user!.user_id;
         const { workoutId } = req.params;
         const { notes } = req.body;
@@ -65,6 +65,7 @@ router.post('/workouts/:workoutId/log', authenticate, async (req: Request, res: 
 // GET /api/v1/users/me/progress
 router.get('/users/me/progress', authenticate, async (req: Request, res: Response) => {
     try {
+        const progressRepo = AppDataSource.getRepository(UserProgress);
         const userId = req.user!.user_id;
         const from = req.query.from ? new Date(req.query.from as string) : undefined;
         const to = req.query.to ? new Date(req.query.to as string) : undefined;
@@ -90,6 +91,7 @@ router.get('/users/me/progress', authenticate, async (req: Request, res: Respons
 // POST /api/v1/users/me/progress
 router.post('/users/me/progress', authenticate, async (req: Request, res: Response) => {
     try {
+        const progressRepo = AppDataSource.getRepository(UserProgress);
         const userId = req.user!.user_id;
         const { weight_kg, chest_cm, waist_cm, hip_cm, arm_cm } = req.body;
 
@@ -109,5 +111,6 @@ router.post('/users/me/progress', authenticate, async (req: Request, res: Respon
         res.status(400).json({ error: err.message });
     }
 });
+
 
 export default router;

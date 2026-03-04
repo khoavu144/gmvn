@@ -7,6 +7,7 @@ import type { AppDispatch, RootState } from './store/store';
 import { setCredentials, logout } from './store/slices/authSlice';
 import apiClient from './services/api';
 import ProtectedRoute from './components/ProtectedRoute';
+import MainLayout from './components/MainLayout';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -20,22 +21,53 @@ import MessagesPage from './pages/MessagesPage';
 import WorkoutsPage from './pages/WorkoutsPage';
 import ProfilePublic from './pages/ProfilePublic';
 
+// Legal & Community Pages
+import AboutPage from './pages/legal/AboutPage';
+import CommunityStandardsPage from './pages/legal/CommunityStandardsPage';
+import GuidelinesPage from './pages/legal/GuidelinesPage';
+import PrivacyPage from './pages/legal/PrivacyPage';
+import TermsPage from './pages/legal/TermsPage';
+import FAQPage from './pages/legal/FAQPage';
+import ContactPage from './pages/legal/ContactPage';
+import TrainerGuidePage from './pages/legal/TrainerGuidePage';
+import PaymentPolicyPage from './pages/legal/PaymentPolicyPage';
+import ReportPage from './pages/legal/ReportPage';
+
+
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
-  { path: '/', element: <Home /> },
-  { path: '/login', element: <Login /> },
-  { path: '/register', element: <Register /> },
-  { path: '/dashboard', element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
-  { path: '/trainers', element: <Trainers /> },
-  { path: '/trainers/:trainerId', element: <TrainerDetailPage /> },
-  { path: '/profile', element: <ProtectedRoute><Profile /></ProtectedRoute> },
-  { path: '/programs', element: <ProtectedRoute requiredRole="trainer"><ProgramsPage /></ProtectedRoute> },
-  { path: '/messages', element: <ProtectedRoute><MessagesPage /></ProtectedRoute> },
-  { path: '/workouts', element: <ProtectedRoute requiredRole="athlete"><WorkoutsPage /></ProtectedRoute> },
-  // Public trainer profile landing page (slug or trainerId)
-  { path: '/trainer/:trainerId', element: <ProfilePublic /> },
+  {
+    element: <MainLayout />,
+    children: [
+      { path: '/', element: <Home /> },
+      { path: '/login', element: <Login /> },
+      { path: '/register', element: <Register /> },
+      { path: '/dashboard', element: <ProtectedRoute><Dashboard /></ProtectedRoute> },
+      { path: '/trainers', element: <Trainers /> },
+      { path: '/trainers/:trainerId', element: <TrainerDetailPage /> },
+      { path: '/profile', element: <ProtectedRoute><Profile /></ProtectedRoute> },
+      { path: '/programs', element: <ProtectedRoute requiredRole={['trainer', 'athlete']}><ProgramsPage /></ProtectedRoute> },
+      { path: '/messages', element: <ProtectedRoute><MessagesPage /></ProtectedRoute> },
+      { path: '/workouts', element: <ProtectedRoute requiredRole="athlete"><WorkoutsPage /></ProtectedRoute> },
+      // Public trainer profile landing page (slug or trainerId)
+      { path: '/trainer/:trainerId', element: <ProfilePublic /> },
+
+      // Legal & Community Routes
+      { path: '/about', element: <AboutPage /> },
+      { path: '/community-standards', element: <CommunityStandardsPage /> },
+      { path: '/guidelines', element: <GuidelinesPage /> },
+      { path: '/privacy', element: <PrivacyPage /> },
+      { path: '/terms', element: <TermsPage /> },
+      { path: '/faq', element: <FAQPage /> },
+      { path: '/contact', element: <ContactPage /> },
+      { path: '/trainer-guide', element: <TrainerGuidePage /> },
+      { path: '/payment-policy', element: <PaymentPolicyPage /> },
+      { path: '/report', element: <ReportPage /> },
+    ]
+  }
 ]);
+
 
 function AuthRestorer({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch<AppDispatch>();

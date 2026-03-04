@@ -1,12 +1,17 @@
 import { AppDataSource } from '../config/database';
 import { Subscription } from '../entities/Subscription';
 import { Program } from '../entities/Program';
-const subRepo = AppDataSource.getRepository(Subscription);
-const programRepo = AppDataSource.getRepository(Program);
-
 class SubscriptionService {
+    private get subRepo() {
+        return AppDataSource.getRepository(Subscription);
+    }
+
+    private get programRepo() {
+        return AppDataSource.getRepository(Program);
+    }
+
     async createCheckoutSession(userId: string, programId: string) {
-        const program = await programRepo.findOneBy({ id: programId, is_published: true });
+        const program = await this.programRepo.findOneBy({ id: programId, is_published: true });
         if (!program) throw new Error('Program not found');
         if (!program.trainer_id) throw new Error('Invalid program');
 
@@ -47,9 +52,8 @@ class SubscriptionService {
         const programIdPrefix = parts[2].toLowerCase();
 
         // 1. Find user and program by prefix
-        const AppDataSrc = AppDataSource;
-        const users = await AppDataSrc.query(`SELECT id FROM users WHERE id::text LIKE $1`, [`${userIdPrefix}%`]);
-        const programs = await AppDataSrc.query(`SELECT id, trainer_id, price_monthly FROM programs WHERE id::text LIKE $1`, [`${programIdPrefix}%`]);
+        const users = await AppDataSource.query(`SELECT id FROM users WHERE id::text LIKE $1`, [`${userIdPrefix}%`]);
+        const programs = await AppDataSource.query(`SELECT id, trainer_id, price_monthly FROM programs WHERE id::text LIKE $1`, [`${programIdPrefix}%`]);
 
         if (!users.length || !programs.length) return { success: true };
 
@@ -65,7 +69,7 @@ class SubscriptionService {
         }
 
         // Check if subscription already exists
-        const existing = await subRepo.findOneBy({
+        const existing = await this.subRepo.findOneBy({
             user_id: userId,
             program_id: programId,
             status: 'active',
@@ -73,7 +77,7 @@ class SubscriptionService {
 
         if (existing) return { success: true }; // Already subbed
 
-        const sub = subRepo.create({
+        const sub = this.subRepo.create({
             user_id: userId,
             trainer_id: trainerId,
             program_id: programId,
@@ -85,14 +89,14 @@ class SubscriptionService {
             next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
         });
 
-        await programRepo.increment({ id: programId }, 'current_clients', 1);
-        await subRepo.save(sub);
+        await this.programRepo.increment({ id: programId }, 'current_clients', 1);
+        await this.subRepo.save(sub);
 
         return { success: true };
     }
 
     async getUserSubscriptions(userId: string) {
-        return subRepo.find({
+        return this.subRepo.find({
             where: { user_id: userId },
             relations: ['program', 'trainer'],
             order: { created_at: 'DESC' },
@@ -100,7 +104,7 @@ class SubscriptionService {
     }
 
     async cancelSubscription(userId: string, subscriptionId: string) {
-        const sub = await subRepo.findOneBy({ id: subscriptionId, user_id: userId });
+        const sub = await this.subRepo.findOneBy({ id: subscriptionId, user_id: userId });
         if (!sub) throw new Error('Subscription not found');
         if (sub.status === 'cancelled') throw new Error('Already cancelled');
 
@@ -108,17 +112,17 @@ class SubscriptionService {
         sub.ended_at = new Date();
 
         // Decrement program client count
-        await programRepo.decrement({ id: sub.program_id }, 'current_clients', 1);
+        await this.programRepo.decrement({ id: sub.program_id }, 'current_clients', 1);
 
-        return subRepo.save(sub);
+        return this.subRepo.save(sub);
     }
 
     async getTrainerStats(trainerId: string) {
-        const activeCount = await subRepo.count({
+        const activeCount = await this.subRepo.count({
             where: { trainer_id: trainerId, status: 'active' },
         });
 
-        const allSubs = await subRepo.find({
+        const allSubs = await this.subRepo.find({
             where: { trainer_id: trainerId, status: 'active' },
         });
 

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, trainerOnly } from '../middleware/auth';
+import { authenticate, proOnly } from '../middleware/auth';
 import {
     getPublicProfile,
     getFullPublicProfile,
@@ -25,7 +25,7 @@ import {
 
 const router = Router();
 const auth = authenticate;
-const trainerAuth = [authenticate, trainerOnly];
+const trainerAuth = [authenticate, proOnly];
 
 // ── PUBLIC ────────────────────────────────────────────────────────────────────
 router.get('/slug/:slug', getProfileBySlug);

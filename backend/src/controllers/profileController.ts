@@ -67,8 +67,8 @@ export const getMyProfile = async (req: Request, res: Response) => {
 export const updateMyProfile = async (req: Request, res: Response) => {
     try {
         const trainerId = req.user!.user_id;
-        if (req.user!.user_type !== 'trainer') {
-            return res.status(403).json({ error: 'Only trainers can update a trainer profile' });
+        if (req.user!.user_type !== 'trainer' && req.user!.user_type !== 'athlete') {
+            return res.status(403).json({ error: 'Only trainers or athletes can update a profile' });
         }
 
         if (req.body.slug) {

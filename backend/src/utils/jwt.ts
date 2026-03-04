@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 export interface TokenPayload {
     user_id: string;
     email: string;
-    user_type: 'athlete' | 'trainer' | 'admin';
+    user_type: 'user' | 'athlete' | 'trainer' | 'admin';
 }
 
 export const generateAccessToken = (payload: TokenPayload): string => {

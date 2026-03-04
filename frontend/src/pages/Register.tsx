@@ -12,7 +12,7 @@ export default function Register() {
         email: '',
         password: '',
         confirmPassword: '',
-        user_type: 'athlete' as 'athlete' | 'trainer',
+        user_type: 'user' as 'user' | 'athlete' | 'trainer',
     });
     const [error, setError] = useState('');
     const [loading, setLoadingState] = useState(false);
@@ -55,12 +55,12 @@ export default function Register() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+        <div className="py-20 flex items-center justify-center px-4">
             <div className="w-full max-w-md">
-                {/* Logo */}
+                {/* Heading */}
                 <div className="text-center mb-8">
-                    <h1 className="text-h1">GYMERVIET</h1>
-                    <p className="text-body mt-2">Tạo tài khoản mới</p>
+                    <h2 className="text-2xl font-bold text-black">Đăng ký</h2>
+                    <p className="text-body mt-2">Bắt đầu hành trình tập luyện cùng GymEr</p>
                 </div>
 
                 {/* Card */}
@@ -115,8 +115,8 @@ export default function Register() {
                                 onChange={handleChange}
                                 className="form-input"
                             >
-                                <option value="athlete">Người tập (Athlete)</option>
-                                <option value="trainer">Huấn luyện viên (Trainer)</option>
+                                <option value="athlete">Người tập luyện (Gymer)</option>
+                                <option value="trainer">Huấn luyện viên (Coach/PT)</option>
                             </select>
                         </div>
 

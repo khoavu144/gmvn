@@ -4,7 +4,7 @@ import type { RootState } from '../store/store';
 
 interface Props {
     children: React.ReactNode;
-    requiredRole?: 'trainer' | 'athlete' | 'admin';
+    requiredRole?: string | string[];
 }
 
 export default function ProtectedRoute({ children, requiredRole }: Props) {
@@ -24,8 +24,11 @@ export default function ProtectedRoute({ children, requiredRole }: Props) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    if (requiredRole && user?.user_type !== requiredRole) {
-        return <Navigate to="/dashboard" replace />;
+    if (requiredRole && user) {
+        const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+        if (!roles.includes(user.user_type)) {
+            return <Navigate to="/dashboard" replace />;
+        }
     }
 
     return <>{children}</>;

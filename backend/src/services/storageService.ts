@@ -4,16 +4,21 @@ import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''; // Use service role key for backend operations
+const BUCKET_NAME = 'gymerviet_assets';
+let supabase: any = null;
 
-if (!supabaseUrl || !supabaseKey) {
-    console.warn('⚠️ SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is missing. Storage feature might not work.');
-}
+const getSupabase = () => {
+    if (supabase) return supabase;
+    const url = process.env.SUPABASE_URL || '';
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+    if (!url || url.includes('your_supabase_url_here') || !key || key.includes('your_supabase_key_here')) {
+        throw new Error('Supabase Storage is not configured. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env');
+    }
 
-const BUCKET_NAME = 'gymerviet_assets'; // Ensure this bucket is created in Supabase!
+    supabase = createClient(url, key);
+    return supabase;
+};
 
 export const uploadFileToSupabase = async (
     fileBuffer: Buffer,
@@ -22,10 +27,11 @@ export const uploadFileToSupabase = async (
     folder: string = 'uploads'
 ): Promise<string> => {
     try {
+        const client = getSupabase();
         const fileExtension = originalName.split('.').pop() || 'jpg';
         const fileName = `${folder}/${uuidv4()}.${fileExtension}`;
 
-        const { data, error } = await supabase.storage
+        const { data, error } = await client.storage
             .from(BUCKET_NAME)
             .upload(fileName, fileBuffer, {
                 contentType: mimeType,
@@ -38,7 +44,7 @@ export const uploadFileToSupabase = async (
         }
 
         // Get public URL
-        const { data: { publicUrl } } = supabase.storage
+        const { data: { publicUrl } } = client.storage
             .from(BUCKET_NAME)
             .getPublicUrl(fileName);
 

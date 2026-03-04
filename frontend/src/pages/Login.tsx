@@ -33,12 +33,12 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="py-20 flex items-center justify-center px-4">
             <div className="w-full max-w-md">
-                {/* Logo */}
+                {/* Heading */}
                 <div className="text-center mb-8">
-                    <h1 className="text-h1">GYMERVIET</h1>
-                    <p className="text-body mt-2">Đăng nhập vào hệ thống</p>
+                    <h2 className="text-2xl font-bold text-black text-center">Đăng nhập</h2>
+                    <p className="text-body mt-2 text-center">Truy cập vào tài khoản GymEr của bạn</p>
                 </div>
 
                 {/* Card */}

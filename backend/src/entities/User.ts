@@ -22,10 +22,10 @@ export class User {
 
     @Column({
         type: 'enum',
-        enum: ['athlete', 'trainer', 'admin'],
+        enum: ['user', 'athlete', 'trainer', 'admin'],
         default: 'athlete',
     })
-    user_type!: 'athlete' | 'trainer' | 'admin';
+    user_type!: 'user' | 'athlete' | 'trainer' | 'admin';
 
     @Column({ type: 'varchar', length: 255, nullable: true })
     avatar_url!: string | null;

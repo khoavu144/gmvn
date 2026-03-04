@@ -7,7 +7,7 @@ interface AuthResponse {
         id: string;
         email: string;
         full_name: string;
-        user_type: 'athlete' | 'trainer';
+        user_type: 'user' | 'athlete' | 'trainer' | 'admin';
         avatar_url: string | null;
         created_at: string;
     };
@@ -23,7 +23,7 @@ export const authApi = {
         email: string;
         password: string;
         full_name: string;
-        user_type: 'athlete' | 'trainer';
+        user_type: 'user' | 'athlete' | 'trainer';
     }): Promise<AuthResponse> {
         const response = await apiClient.post<ApiSuccessResponse<AuthResponse>>(
             '/auth/register',

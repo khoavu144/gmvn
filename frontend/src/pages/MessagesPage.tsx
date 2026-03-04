@@ -101,7 +101,7 @@ export default function MessagesPage() {
     const activeConv = conversations.find(c => c.partner_id === activePartner);
 
     return (
-        <div className="h-screen bg-white flex overflow-hidden border-t border-gray-200">
+        <div className="h-[calc(100vh-140px)] bg-white flex overflow-hidden">
             {/* Sidebar */}
             <div className="w-80 bg-gray-50 border-r border-gray-200 flex flex-col shrink-0">
                 <div className="p-4 border-b border-gray-200 bg-white">

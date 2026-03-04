@@ -98,9 +98,9 @@ export default function ProgramsPage() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (!user || user.user_type !== 'trainer') { navigate('/dashboard'); return; }
+        if (!user) { navigate('/login'); return; }
         loadPrograms();
-    }, [user]);
+    }, [user, navigate]);
 
     const loadPrograms = async () => {
         try {
@@ -199,7 +199,7 @@ export default function ProgramsPage() {
     const formatLabel: Record<string, string> = { online: 'Online', offline_1on1: '1-kèm-1', offline_group: 'Tập nhóm', hybrid: 'Hybrid' };
 
     return (
-        <div className="min-h-screen bg-gray-50 pb-16">
+        <div className="pb-16">
             {ToastComponent}
             <div className="max-w-4xl mx-auto px-4 py-8">
                 <div className="flex items-center justify-between mb-8">

@@ -5,7 +5,7 @@ interface User {
     id: string;
     email: string;
     full_name: string;
-    user_type: 'athlete' | 'trainer' | 'admin';
+    user_type: 'user' | 'athlete' | 'trainer' | 'admin';
     avatar_url: string | null;
     bio?: string | null;
     height_cm?: number | null;

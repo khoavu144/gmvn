@@ -5,7 +5,7 @@ import { subscriptionService } from '../services/subscriptionService';
 import { messageService } from '../services/messageService';
 import { programService } from '../services/programService';
 
-const subRepo = AppDataSource.getRepository(Subscription);
+// No global repository initialization to avoid startup crash
 
 export const getOverview = async (req: Request, res: Response) => {
     try {
@@ -38,6 +38,7 @@ export const getOverview = async (req: Request, res: Response) => {
 export const getClients = async (req: Request, res: Response) => {
     try {
         const trainerId = req.user!.user_id;
+        const subRepo = AppDataSource.getRepository(Subscription);
         const subscriptions = await subRepo.find({
             where: { trainer_id: trainerId, status: 'active' },
             relations: ['user', 'program'],
@@ -67,6 +68,7 @@ export const getClients = async (req: Request, res: Response) => {
 export const getPayments = async (req: Request, res: Response) => {
     try {
         const trainerId = req.user!.user_id;
+        const subRepo = AppDataSource.getRepository(Subscription);
         const subscriptions = await subRepo.find({
             where: { trainer_id: trainerId },
             relations: ['user', 'program'],

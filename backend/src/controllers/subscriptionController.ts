@@ -51,6 +51,15 @@ export const cancelSubscription = async (req: Request, res: Response) => {
 
 export const sepayWebhook = async (req: Request, res: Response) => {
     try {
+        const apiKey = req.headers['authorization'];
+        const secret = process.env.SEPAY_WEBHOOK_SECRET;
+
+        // Simple API Key check
+        if (secret && apiKey !== secret) {
+            console.warn('Unauthorized SePay webhook attempt');
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
         await subscriptionService.handleSepayWebhook(req.body);
         res.json({ success: true });
     } catch (err: any) {
