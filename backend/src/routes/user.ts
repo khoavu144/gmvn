@@ -17,5 +17,9 @@ router.put(
 // Public trainer discovery routes
 router.get('/trainers', userController.getTrainers);
 router.get('/trainers/:id', userController.getTrainerDetail);
+router.get('/trainers/slug/:slug', userController.getTrainerBySlug);
+router.get('/trainers/:id/similar', userController.getSimilarCoaches);
+router.get('/trainers/:id/testimonials', userController.getTestimonials);
+router.get('/trainers/:id/before-after', userController.getBeforeAfterPhotos);
 
 export default router;

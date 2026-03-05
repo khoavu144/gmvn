@@ -61,6 +61,9 @@ export class User {
     @Column({ type: 'boolean', default: false })
     is_verified!: boolean;
 
+    @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
+    slug!: string | null; // SEO-friendly URL slug for trainers (e.g., "nguyen-dieu-nhi")
+
     @CreateDateColumn()
     created_at!: Date;
 

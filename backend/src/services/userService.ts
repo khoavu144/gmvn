@@ -1,5 +1,7 @@
 import { AppDataSource } from '../config/database';
 import { User } from '../entities/User';
+import { Testimonial } from '../entities/Testimonial';
+import { BeforeAfterPhoto } from '../entities/BeforeAfterPhoto';
 import { UpdateProfileInput } from '../schemas/user';
 
 
@@ -131,6 +133,108 @@ class UserService {
             is_verified: trainer.is_verified,
             created_at: trainer.created_at,
         };
+    }
+
+    async getTrainerBySlug(slug: string) {
+        const trainer = await this.repo.findOneBy({ slug, user_type: 'trainer' });
+        if (!trainer) {
+            throw new Error('Trainer not found');
+        }
+
+        return {
+            id: trainer.id,
+            slug: trainer.slug,
+            full_name: trainer.full_name,
+            avatar_url: trainer.avatar_url,
+            bio: trainer.bio,
+            specialties: trainer.specialties,
+            base_price_monthly: trainer.base_price_monthly,
+            is_verified: trainer.is_verified,
+            created_at: trainer.created_at,
+        };
+    }
+
+    async getSimilarCoaches(trainerId: string, limit: number = 3) {
+        const trainer = await this.repo.findOneBy({ id: trainerId, user_type: 'trainer' });
+        if (!trainer || !trainer.specialties || trainer.specialties.length === 0) {
+            return [];
+        }
+
+        // Find trainers with overlapping specialties
+        const queryBuilder = this.repo.createQueryBuilder('user')
+            .where('user.user_type = :type', { type: 'trainer' })
+            .andWhere('user.id != :trainerId', { trainerId });
+
+        // Match any specialty
+        const specialtyConditions = trainer.specialties.map((_, idx) =>
+            `EXISTS (SELECT 1 FROM jsonb_array_elements_text(user.specialties) AS spec WHERE spec ILIKE :specialty${idx})`
+        ).join(' OR ');
+
+        const params: any = {};
+        trainer.specialties.forEach((spec, idx) => {
+            params[`specialty${idx}`] = `%${spec}%`;
+        });
+
+        queryBuilder.andWhere(`(${specialtyConditions})`, params)
+            .orderBy('user.created_at', 'DESC')
+            .limit(limit);
+
+        const similarTrainers = await queryBuilder.getMany();
+
+        return similarTrainers.map(t => ({
+            id: t.id,
+            slug: t.slug,
+            full_name: t.full_name,
+            avatar_url: t.avatar_url,
+            bio: t.bio,
+            specialties: t.specialties,
+            base_price_monthly: t.base_price_monthly,
+            is_verified: t.is_verified,
+        }));
+    }
+
+    async getTestimonials(trainerId: string, page: number = 1, limit: number = 10) {
+        const testimonialRepo = AppDataSource.getRepository(Testimonial);
+
+        const [testimonials, total] = await testimonialRepo.findAndCount({
+            where: { trainer_id: trainerId, is_approved: true },
+            order: { created_at: 'DESC' },
+            skip: (page - 1) * limit,
+            take: limit,
+        });
+
+        return {
+            testimonials: testimonials.map(t => ({
+                id: t.id,
+                client_name: t.client_name,
+                client_avatar: t.client_avatar,
+                rating: t.rating,
+                comment: t.comment,
+                created_at: t.created_at,
+            })),
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+        };
+    }
+
+    async getBeforeAfterPhotos(trainerId: string) {
+        const photoRepo = AppDataSource.getRepository(BeforeAfterPhoto);
+
+        const photos = await photoRepo.find({
+            where: { trainer_id: trainerId, is_approved: true },
+            order: { created_at: 'DESC' },
+        });
+
+        return photos.map(p => ({
+            id: p.id,
+            before_url: p.before_url,
+            after_url: p.after_url,
+            client_name: p.client_name,
+            story: p.story,
+            duration_weeks: p.duration_weeks,
+            created_at: p.created_at,
+        }));
     }
 }
 
