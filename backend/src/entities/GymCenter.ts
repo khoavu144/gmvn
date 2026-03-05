@@ -5,10 +5,13 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     OneToMany,
+    Index,
 } from 'typeorm';
 import { GymBranch } from './GymBranch';
 
 @Entity('gym_centers')
+@Index(['owner_id'])
+@Index(['slug'])
 export class GymCenter {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
@@ -17,7 +20,7 @@ export class GymCenter {
     owner_id!: string; // FK → users.id (gym_owner)
 
     @Column({ type: 'varchar', length: 255 })
-    name!: string;
+    name!: string; // Validated: 3-255 chars
 
     @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
     slug!: string | null;
@@ -57,6 +60,9 @@ export class GymCenter {
 
     @UpdateDateColumn()
     updated_at!: Date;
+
+    @Column({ type: 'timestamp', nullable: true })
+    deleted_at!: Date | null; // Soft delete
 
     // Relations
     @OneToMany(() => GymBranch, branch => branch.gym_center)

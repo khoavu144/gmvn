@@ -4,6 +4,8 @@ import {
     Column,
     ManyToOne,
     JoinColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 import { GymBranch } from './GymBranch';
 
@@ -48,6 +50,19 @@ export class GymEvent {
 
     @Column({ type: 'boolean', default: true })
     is_active!: boolean;
+
+    // Audit fields
+    @Column({ type: 'uuid', nullable: true })
+    created_by!: string | null; // FK → users.id
+
+    @CreateDateColumn()
+    created_at!: Date;
+
+    @UpdateDateColumn()
+    updated_at!: Date;
+
+    @Column({ type: 'timestamp', nullable: true })
+    deleted_at!: Date | null; // Soft delete
 
     // Relations
     @ManyToOne(() => GymBranch, branch => branch.events)

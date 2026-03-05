@@ -10,29 +10,53 @@ const rankRepo = () => AppDataSource.getRepository(RankingCache);
 const pointsRepo = () => AppDataSource.getRepository(UserPointsHistory);
 const achievementRepo = () => AppDataSource.getRepository(AthleteAchievement);
 
+// Constants
+const MULTIPLIER_MAX = 2.0; // Cap multiplier at 200%
+const BATCH_SIZE = 100; // Process rankings in batches
+
 export class RankingService {
 
-    // Scheduled: 1st of every month at midnight
+    // Scheduled: 1st of every month at midnight UTC
     public scheduleCronJobs() {
         cron.schedule('0 0 1 * *', async () => {
             console.log('🔄 Running monthly decay and seasonal leaderboard reset...');
-            await this.applyMonthlyDecay();
-            await this.resetSeasonalLeaderboard();
+            try {
+                await this.applyMonthlyDecay();
+                await this.resetSeasonalLeaderboard();
+            } catch (error) {
+                console.error('❌ Error in scheduled ranking jobs:', error);
+            }
         });
     }
 
-    // Decay activity score by 5% monthly for inactive users
+    // Decay activity score by 5% monthly for inactive users (batch processing)
     async applyMonthlyDecay() {
-        const rankings = await rankRepo().find();
-        for (const rank of rankings) {
-            // Apply 5% decay to activity score
-            const oldActivity = rank.activity_score;
-            const newActivity = oldActivity * 0.95; // 5% decay
-            rank.activity_score = newActivity;
+        let skip = 0;
+        let processed = 0;
 
-            // Recalculate Composite
-            await this.recalculateComposite(rank.user_id, rank);
+        while (true) {
+            const rankings = await rankRepo().find({
+                skip,
+                take: BATCH_SIZE,
+            });
+
+            if (rankings.length === 0) break;
+
+            for (const rank of rankings) {
+                // Apply 5% decay to activity score
+                const oldActivity = rank.activity_score;
+                const newActivity = oldActivity * 0.95; // 5% decay
+                rank.activity_score = newActivity;
+
+                // Recalculate Composite
+                await this.recalculateComposite(rank.user_id, rank);
+                processed++;
+            }
+
+            skip += BATCH_SIZE;
         }
+
+        console.log(`✅ Monthly decay applied to ${processed} rankings`);
     }
 
     async resetSeasonalLeaderboard() {
@@ -47,25 +71,46 @@ export class RankingService {
     }
 
     async addDailyCheckIn(userId: string) {
+        // Validate userId
+        if (!userId || typeof userId !== 'string') {
+            throw new Error('Invalid userId provided');
+        }
+
+        // Verify user exists
+        const user = await userRepo().findOneBy({ id: userId });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
         let rank = await rankRepo().findOne({ where: { user_id: userId } });
         if (!rank) {
             rank = rankRepo().create({ user_id: userId, activity_score: 10, season: 'all-time' });
-            await userRepo().findOneBy({ id: userId }); // Verify 
+            await rankRepo().save(rank); // Save immediately
         }
 
-        // Check if checked in today
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
+        // Check if checked in today (UTC timezone)
+        const now = new Date();
+        const startOfDayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
+        const endOfDayUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
 
         const todayCheckin = await pointsRepo().findOne({
-            where: { user_id: userId, reason: 'daily_checkin', timestamp: startOfDay as any } // simplified for basic logic
+            where: {
+                user_id: userId,
+                reason: 'daily_checkin',
+            },
         });
 
-        if (!todayCheckin) {
+        // Check if today's check-in exists (compare dates in UTC)
+        const hasCheckedInToday = todayCheckin &&
+            todayCheckin.timestamp >= startOfDayUTC &&
+            todayCheckin.timestamp <= endOfDayUTC;
+
+        if (!hasCheckedInToday) {
             await pointsRepo().insert({
                 user_id: userId,
                 points_change: 1,
-                reason: 'daily_checkin'
+                reason: 'daily_checkin',
+                timestamp: new Date(),
             });
 
             rank.activity_score += 1;
@@ -90,7 +135,7 @@ export class RankingService {
         const composite = (0.3 * rank.activity_score) + (0.4 * reputation) + (0.3 * quality);
         rank.composite_score = composite;
 
-        // Calculate Multiplier
+        // Calculate Multiplier with upper bound
         let multiplier = 1.0;
         const achievements = await achievementRepo().find({ where: { athlete_id: userId, status: 'APPROVED' } });
 
@@ -100,6 +145,9 @@ export class RankingService {
 
         const goldCount = achievements.filter(a => a.medal_type === 'GOLD').length;
         if (goldCount >= 3) multiplier *= 1.30; // Elite Performer (+30%)
+
+        // Cap multiplier at MULTIPLIER_MAX (2.0 = 200%)
+        multiplier = Math.min(multiplier, MULTIPLIER_MAX);
 
         rank.multiplier = multiplier;
         rank.final_score = composite * multiplier;
