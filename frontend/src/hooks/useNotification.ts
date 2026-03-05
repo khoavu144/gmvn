@@ -46,8 +46,7 @@ export const useNotification = () => {
  * Hook for handling async operations with loading and error states
  */
 export const useAsync = <T,>(
-    asyncFunction: () => Promise<T>,
-    immediate: boolean = true
+    asyncFunction: () => Promise<T>
 ) => {
     const [status, setStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
     const [data, setData] = useState<T | null>(null);
