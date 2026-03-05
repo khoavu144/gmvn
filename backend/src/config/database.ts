@@ -34,6 +34,10 @@ import { GymPricing } from '../entities/GymPricing';
 import { GymEvent } from '../entities/GymEvent';
 import { GymReview } from '../entities/GymReview';
 
+// Coach Profile Enhancement Entities
+import { Testimonial } from '../entities/Testimonial';
+import { BeforeAfterPhoto } from '../entities/BeforeAfterPhoto';
+
 dotenv.config();
 
 export const AppDataSource = new DataSource({
@@ -73,6 +77,9 @@ export const AppDataSource = new DataSource({
         GymPricing,
         GymEvent,
         GymReview,
+        // Coach Profile Enhancement
+        Testimonial,
+        BeforeAfterPhoto,
     ],
     subscribers: [],
     migrations: [],
