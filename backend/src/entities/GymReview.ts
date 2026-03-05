@@ -3,6 +3,7 @@ import {
     PrimaryGeneratedColumn,
     Column,
     CreateDateColumn,
+    UpdateDateColumn,
     ManyToOne,
     JoinColumn,
 } from 'typeorm';
@@ -32,8 +33,21 @@ export class GymReview {
     @Column({ type: 'boolean', default: true })
     is_visible!: boolean; // Admin có thể ẩn
 
+    // ── Sprint 3: Review Reply (Gym Owner / Trainer can reply) ──
+    @Column({ type: 'text', nullable: true })
+    reply_text!: string | null;
+
+    @Column({ type: 'uuid', nullable: true })
+    replied_by_id!: string | null; // FK → users.id (gym_owner / trainer)
+
+    @Column({ type: 'timestamptz', nullable: true })
+    replied_at!: Date | null;
+
     @CreateDateColumn()
     created_at!: Date;
+
+    @UpdateDateColumn()
+    updated_at!: Date;
 
     @ManyToOne(() => GymBranch, branch => branch.reviews)
     @JoinColumn({ name: 'branch_id' })
@@ -42,4 +56,8 @@ export class GymReview {
     @ManyToOne('User')
     @JoinColumn({ name: 'user_id' })
     user!: any;
+
+    @ManyToOne('User')
+    @JoinColumn({ name: 'replied_by_id' })
+    replied_by!: any;
 }

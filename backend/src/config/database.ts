@@ -14,6 +14,7 @@ import { TrainerGallery } from '../entities/TrainerGallery';
 import { TrainerFAQ } from '../entities/TrainerFAQ';
 
 // New Final Spec Entities
+import { ProgressPhoto } from '../entities/ProgressPhoto';
 import { AthleteAchievement } from '../entities/AthleteAchievement';
 import { UserPointsHistory } from '../entities/UserPointsHistory';
 import { RankingCache } from '../entities/RankingCache';
@@ -54,6 +55,7 @@ export const AppDataSource = new DataSource({
         TrainerExperience,
         TrainerGallery,
         TrainerFAQ,
+        ProgressPhoto,
         AthleteAchievement,
         UserPointsHistory,
         RankingCache,

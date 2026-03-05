@@ -13,7 +13,7 @@ const HomeGymer = () => (
                 Tập Luyện.<br /> <span className="text-gray-400">Đột Phá.</span>
             </h2>
             <p className="text-lg text-gray-600 mb-10 leading-relaxed font-medium">
-                Nền tảng kết nối Gymer và Coach hàng đầu Việt Nam. Nhận giáo án cá nhân hóa, theo dõi tiến trình và tương tác trực tiếp 1-1.
+                Nền tảng kết nối Gymer và Coach hàng đầu Việt Nam. Nhận giáo án cá nhân hóa, theo dõi tiến trình và tương tác trực tiếp.
             </p>
             <div className="flex flex-wrap gap-4">
                 <Link to="/register" className="bg-black text-white hover:bg-gray-800 transition-colors font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-lg flex items-center justify-center whitespace-nowrap flex-1 sm:flex-none">

@@ -185,6 +185,38 @@ export const gymService = {
         return branchRepo.save(branch);
     },
 
+    async createBranch(ownerId: string, data: {
+        branch_name: string;
+        address: string;
+        city?: string;
+        district?: string;
+        phone?: string;
+        email?: string;
+        description?: string;
+        manager_name?: string;
+    }) {
+        const gymCenterRepo = AppDataSource.getRepository(GymCenter);
+        const branchRepo = AppDataSource.getRepository(GymBranch);
+
+        // Lấy gym của owner
+        const center = await gymCenterRepo.findOne({ where: { owner_id: ownerId, is_active: true } });
+        if (!center) throw new Error('Không tìm thấy Gym Center của bạn');
+
+        const branch = branchRepo.create({
+            gym_center_id: center.id,
+            branch_name: data.branch_name,
+            address: data.address,
+            city: data.city ?? null,
+            district: data.district ?? null,
+            phone: data.phone ?? null,
+            email: data.email ?? null,
+            description: data.description ?? null,
+            manager_name: data.manager_name ?? null,
+            is_active: true,
+        });
+        return branchRepo.save(branch);
+    },
+
     // Bulk update amenities
     async updateAmenities(branchId: string, ownerId: string, amenities: Array<{ name: string; is_available: boolean; note?: string }>) {
         const branchRepo = AppDataSource.getRepository(GymBranch);
@@ -319,12 +351,20 @@ export const gymService = {
             ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
             : 0;
 
+        const rating_distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        reviews.forEach(r => {
+            if (r.rating >= 1 && r.rating <= 5) {
+                rating_distribution[r.rating]++;
+            }
+        });
+
         return {
             total_views: totalViews,
             total_trainers: totalTrainers,
             total_reviews: reviews.length,
             avg_rating: Math.round(avgRating * 10) / 10,
             total_branches: center.branches.length,
+            rating_distribution,
         };
     },
 

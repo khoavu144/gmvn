@@ -1,6 +1,7 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate, useParams } from 'react-router-dom';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { HelmetProvider } from 'react-helmet-async';
 import { useEffect } from 'react';
 import { store } from './store/store';
 import type { AppDispatch, RootState } from './store/store';
@@ -19,7 +20,7 @@ import Profile from './pages/Profile';
 import ProgramsPage from './pages/ProgramsPage';
 import MessagesPage from './pages/MessagesPage';
 import WorkoutsPage from './pages/WorkoutsPage';
-import ProfilePublic from './pages/ProfilePublic';
+
 
 // Gym Module Pages
 import Gyms from './pages/Gyms';
@@ -40,6 +41,12 @@ import PaymentPolicyPage from './pages/legal/PaymentPolicyPage';
 import ReportPage from './pages/legal/ReportPage';
 
 
+// Sprint 2: Redirect component for legacy /trainer/:id URLs
+function TrainerRedirect() {
+  const { trainerId } = useParams();
+  return <Navigate to={`/coaches/${trainerId}`} replace />;
+}
+
 const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
@@ -56,8 +63,8 @@ const router = createBrowserRouter([
       { path: '/programs', element: <ProtectedRoute requiredRole={['trainer', 'athlete']}><ProgramsPage /></ProtectedRoute> },
       { path: '/messages', element: <ProtectedRoute><MessagesPage /></ProtectedRoute> },
       { path: '/workouts', element: <ProtectedRoute requiredRole="athlete"><WorkoutsPage /></ProtectedRoute> },
-      // Public trainer profile landing page (slug or trainerId)
-      { path: '/trainer/:trainerId', element: <ProfilePublic /> },
+      // Sprint 2: /trainer/:trainerId redirects to canonical /coaches/:trainerId (merge duplicate routes)
+      { path: '/trainer/:trainerId', element: <TrainerRedirect /> },
 
       // Gym Module Routes
       { path: '/gyms', element: <Gyms /> },
@@ -110,13 +117,15 @@ function AuthRestorer({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <AuthRestorer>
-          <RouterProvider router={router} />
-        </AuthRestorer>
-      </QueryClientProvider>
-    </Provider>
+    <HelmetProvider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <AuthRestorer>
+            <RouterProvider router={router} />
+          </AuthRestorer>
+        </QueryClientProvider>
+      </Provider>
+    </HelmetProvider>
   );
 }
 

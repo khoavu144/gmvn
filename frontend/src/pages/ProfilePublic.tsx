@@ -37,7 +37,7 @@ export default function ProfilePublic() {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
                 <p className="text-gray-800 font-medium">Profile chưa được thiết lập.</p>
-                <Link to={`/coaches/${trainerId}`} className="btn-primary text-sm">
+                <Link to={`/profile/${trainerId}?view=public`} className="btn-primary text-sm">
                     Xem thông tin cơ bản
                 </Link>
                 <Link to="/coaches" className="text-sm text-gray-500 underline">← Quay lại danh sách</Link>

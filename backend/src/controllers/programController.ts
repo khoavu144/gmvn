@@ -33,6 +33,15 @@ export const publishProgram = async (req: Request, res: Response) => {
     }
 };
 
+export const getAllPrograms = async (req: Request, res: Response) => {
+    try {
+        const programs = await programService.getAllPrograms(true);
+        res.json({ success: true, programs });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
 export const getProgramById = async (req: Request, res: Response) => {
     try {
         const program = await programService.getProgramById(String(req.params.id));

@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import apiClient from '../services/api';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import { useToast } from '../components/Toast';
 import CoachGymBadge from '../components/CoachGymBadge';
+import ShareButton from '../components/ShareButton';
 
 interface Program {
     id: string;
@@ -128,16 +130,27 @@ export default function CoachDetailPage() {
 
     return (
         <div className="bg-gray-50 pb-16">
+            {/* Sprint 2: Dynamic SEO title & meta */}
+            <Helmet>
+                <title>{trainer.full_name} — GYMERVIET Coach</title>
+                <meta name="description" content={trainer.bio?.slice(0, 155) ?? `${trainer.full_name} là huấn luyện viên được xác thực trên GYMERVIET.`} />
+                <meta property="og:title" content={`${trainer.full_name} — GYMERVIET Coach`} />
+                <meta property="og:description" content={trainer.bio?.slice(0, 155) ?? ''} />
+                {trainer.avatar_url && <meta property="og:image" content={trainer.avatar_url} />}
+            </Helmet>
+
             {ToastComponent}
             <div className="bg-white border-b border-gray-200">
-                <div className="max-w-4xl mx-auto px-4 h-12 flex items-center">
+                <div className="max-w-4xl mx-auto px-4 h-12 flex items-center gap-4">
                     <button onClick={() => navigate(-1)} className="text-sm font-medium text-gray-600 hover:text-black">
                         ← Quay lại
                     </button>
-                    <span className="mx-4 text-gray-300">|</span>
-                    <Link to={`/trainer/${trainerId}`} className="text-sm font-medium text-gray-600 hover:text-black">
-                        Xem Profile Public
-                    </Link>
+                    {/* Sprint 2: ShareButton replaces broken "Xem Profile Public" link */}
+                    <ShareButton
+                        title={`${trainer.full_name} — GYMERVIET Coach`}
+                        text={trainer.bio ?? undefined}
+                        label="Chia sẻ"
+                    />
                 </div>
             </div>
 

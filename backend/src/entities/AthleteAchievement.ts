@@ -14,7 +14,7 @@ export class AthleteAchievement {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
 
-    @ManyToOne(() => User)
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'athlete_id' })
     athlete!: User;
 

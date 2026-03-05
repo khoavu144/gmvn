@@ -37,20 +37,60 @@ class UserService {
         };
     }
 
-    async getTrainers(page: number = 1, limit: number = 10, search?: string) {
+    async getTrainers(
+        page: number = 1,
+        limit: number = 10,
+        search?: string,
+        specialty?: string,
+        priceMin?: number,
+        priceMax?: number,
+        city?: string,
+        sort?: 'newest' | 'price_asc' | 'price_desc'
+    ) {
         const queryBuilder = this.repo.createQueryBuilder('user')
             .where('user.user_type = :type', { type: 'trainer' });
 
         if (search) {
-            // BUG-14 Fix: search in full_name, bio, AND specialties JSONB array
             queryBuilder.andWhere(
                 '(user.full_name ILIKE :search OR user.bio ILIKE :search OR EXISTS (SELECT 1 FROM jsonb_array_elements_text(user.specialties) AS spec WHERE spec ILIKE :search))',
                 { search: `%${search}%` }
             );
         }
 
-        // Default sorting by newest
-        queryBuilder.orderBy('user.created_at', 'DESC');
+        // Sprint 2: Specialty filter (JSONB array contains)
+        if (specialty) {
+            queryBuilder.andWhere(
+                'EXISTS (SELECT 1 FROM jsonb_array_elements_text(user.specialties) AS spec WHERE spec ILIKE :specialty)',
+                { specialty: `%${specialty}%` }
+            );
+        }
+
+        // Sprint 2: Price range filter
+        if (priceMin !== undefined) {
+            queryBuilder.andWhere('user.base_price_monthly >= :priceMin', { priceMin });
+        }
+        if (priceMax !== undefined) {
+            queryBuilder.andWhere('user.base_price_monthly <= :priceMax', { priceMax });
+        }
+
+        // Sprint 2: City filter (via trainer's city field if available, otherwise skip)
+        if (city) {
+            queryBuilder.andWhere('user.city ILIKE :city', { city: `%${city}%` });
+        }
+
+        // Sprint 2: Sort
+        switch (sort) {
+            case 'price_asc':
+                queryBuilder.orderBy('user.base_price_monthly', 'ASC', 'NULLS LAST');
+                break;
+            case 'price_desc':
+                queryBuilder.orderBy('user.base_price_monthly', 'DESC', 'NULLS LAST');
+                break;
+            case 'newest':
+            default:
+                queryBuilder.orderBy('user.created_at', 'DESC');
+                break;
+        }
 
         const [trainers, total] = await queryBuilder
             .skip((page - 1) * limit)
@@ -65,13 +105,15 @@ class UserService {
                 bio: t.bio,
                 specialties: t.specialties,
                 base_price_monthly: t.base_price_monthly,
-                is_verified: t.is_verified
+                is_verified: t.is_verified,
+                city: (t as any).city ?? null,
             })),
             total,
             page,
             totalPages: Math.ceil(total / limit)
         };
     }
+
 
     async getTrainerById(id: string) {
         const trainer = await this.repo.findOneBy({ id, user_type: 'trainer' });

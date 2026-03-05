@@ -19,5 +19,7 @@ router.get('/:gymId/reviews', gymController.getGymReviews);
 router.post('/:gymId/reviews', authenticate, gymController.createReview);
 router.put('/:gymId/reviews/:reviewId', authenticate, gymController.updateReview);
 router.delete('/:gymId/reviews/:reviewId', authenticate, gymController.deleteReview);
+// Sprint 3: Review Reply (gym_owner / trainer only)
+router.post('/:gymId/reviews/:reviewId/reply', authenticate, gymController.replyToReview);
 
 export default router;

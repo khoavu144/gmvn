@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import { gymService } from '../services/gymService';
 import type { GymCenter } from '../types';
 import GymCard from '../components/GymCard';
+
+const GymMapView = lazy(() => import('../components/GymMapView'));
+
+type ViewMode = 'grid' | 'map';
 
 const Gyms: React.FC = () => {
     const [gyms, setGyms] = useState<GymCenter[]>([]);
     const [filteredGyms, setFilteredGyms] = useState<GymCenter[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState<ViewMode>('grid');
+
 
     // Filter states
     const [searchTerm, setSearchTerm] = useState('');
@@ -88,8 +94,8 @@ const Gyms: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Filters */}
-                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 flex flex-col md:flex-row gap-4 mb-12">
+                {/* View mode toggle + filter row */}
+                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 flex flex-col md:flex-row gap-4 mb-12 items-end">
                     <div className="flex-grow">
                         <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Tìm kiếm</label>
                         <input
@@ -127,6 +133,25 @@ const Gyms: React.FC = () => {
                             ))}
                         </select>
                     </div>
+
+                    {/* Sprint 3: Grid / Map toggle */}
+                    <div className="flex-shrink-0">
+                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Chế độ xem</label>
+                        <div className="flex border border-gray-200 rounded-lg overflow-hidden bg-white">
+                            <button
+                                className={`px-4 py-2.5 text-sm font-bold transition-colors ${viewMode === 'grid' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                                onClick={() => setViewMode('grid')}
+                            >
+                                ▦ Grid
+                            </button>
+                            <button
+                                className={`px-4 py-2.5 text-sm font-bold transition-colors ${viewMode === 'map' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                                onClick={() => setViewMode('map')}
+                            >
+                                🗺️ Bản đồ
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -141,6 +166,11 @@ const Gyms: React.FC = () => {
                         {error}
                         <button onClick={fetchGyms} className="ml-4 underline font-bold">Thử lại</button>
                     </div>
+                ) : viewMode === 'map' ? (
+                    // Sprint 3: Map view — Suspense wraps lazy-loaded GymMapView
+                    <Suspense fallback={<div className="h-[520px] bg-gray-100 rounded-xl animate-pulse" />}>
+                        <GymMapView gyms={filteredGyms.length > 0 ? filteredGyms : gyms} />
+                    </Suspense>
                 ) : filteredGyms.length === 0 ? (
                     <div className="text-center py-20 bg-gray-50 rounded-xl border border-gray-200 border-dashed">
                         <div className="text-6xl font-black text-gray-200 mb-4">0</div>
@@ -160,3 +190,4 @@ const Gyms: React.FC = () => {
 };
 
 export default Gyms;
+

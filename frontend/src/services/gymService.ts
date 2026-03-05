@@ -78,6 +78,11 @@ export const gymService = {
         return response.data;
     },
 
+    async createBranch(data: { branch_name: string; address: string; city?: string; district?: string; phone?: string; description?: string }) {
+        const response = await apiClient.post('/gym-owner/branches', data);
+        return response.data; // { success, branch }
+    },
+
     async updateAmenities(branchId: string, amenities: Partial<GymAmenity>[]) {
         const response = await apiClient.put(`/gym-owner/branches/${branchId}/amenities`, { amenities });
         return response.data;
@@ -179,6 +184,12 @@ export const gymService = {
 
     async toggleReviewVisibility(reviewId: string) {
         const response = await apiClient.patch(`/admin/gyms/reviews/${reviewId}/toggle`);
+        return response.data;
+    },
+
+    // Sprint 3: Gym Owner / Trainer reply to a review
+    async replyToReview(gymId: string, reviewId: string, reply_text: string) {
+        const response = await apiClient.post(`/gyms/${gymId}/reviews/${reviewId}/reply`, { reply_text });
         return response.data;
     }
 };

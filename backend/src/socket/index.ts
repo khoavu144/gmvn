@@ -2,8 +2,20 @@ import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import { verifyAccessToken } from '../utils/jwt';
 import { messageService } from '../services/messageService';
+import { notificationService } from '../services/notificationService';
+import type { Notification } from '../entities/Notification';
 
 let io: Server;
+
+/**
+ * Sprint 3 helper: push a notification to a specific user via Socket.IO.
+ * Call this after notificationService.create() to deliver realtime.
+ */
+export const emitNotification = (userId: string, notification: Notification) => {
+    if (io) {
+        io.to(userId).emit('notification:new', notification);
+    }
+};
 
 export const initSocket = (httpServer: HttpServer) => {
     io = new Server(httpServer, {
@@ -29,13 +41,19 @@ export const initSocket = (httpServer: HttpServer) => {
         }
     });
 
-    io.on('connection', (socket: Socket) => {
+    io.on('connection', async (socket: Socket) => {
         const user = (socket as any).user;
-        // socket connected log removed
-
 
         // Join a room with user's own ID so we can target them
         socket.join(user.user_id);
+
+        // Sprint 3: Send unread notification count on connect
+        try {
+            const count = await notificationService.getUnreadCount(user.user_id);
+            socket.emit('notification:unread_count', { count });
+        } catch {
+            // Non-fatal: ignore if notifications table doesn't exist yet
+        }
 
         // Handle sending a message
         socket.on('message:send', async (data: { receiver_id: string; content: string }) => {

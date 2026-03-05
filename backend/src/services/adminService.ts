@@ -1,7 +1,57 @@
 import { AppDataSource } from '../config/database';
 import { AdminAuditLog } from '../entities/AdminAuditLog';
+import { User } from '../entities/User';
+import { GymBranch } from '../entities/GymBranch';
 
 const auditRepo = () => AppDataSource.getRepository(AdminAuditLog);
+const userRepo = () => AppDataSource.getRepository(User);
+const branchRepo = () => AppDataSource.getRepository(GymBranch);
+
+// ─── Action Strategy Map ───────────────────────────────────────────────────
+// Maps audit log action strings to actual execution functions.
+// Each function receives the full audit log for context (target_user_id, target_resource_id, new_value, etc).
+type ActionFn = (log: AdminAuditLog) => Promise<void>;
+
+const ACTION_DISPATCHERS: Record<string, ActionFn> = {
+
+    // Ban/unban a user account
+    ban_user: async (log) => {
+        if (!log.target_user_id) throw new Error('ban_user requires target_user_id');
+        await userRepo().update(log.target_user_id, { is_active: false } as Partial<User>);
+    },
+
+    unban_user: async (log) => {
+        if (!log.target_user_id) throw new Error('unban_user requires target_user_id');
+        await userRepo().update(log.target_user_id, { is_active: true } as Partial<User>);
+    },
+
+    // Verify/unverify a trainer
+    verify_trainer: async (log) => {
+        if (!log.target_user_id) throw new Error('verify_trainer requires target_user_id');
+        await userRepo().update(log.target_user_id, { is_verified: true } as Partial<User>);
+    },
+
+    unverify_trainer: async (log) => {
+        if (!log.target_user_id) throw new Error('unverify_trainer requires target_user_id');
+        await userRepo().update(log.target_user_id, { is_verified: false } as Partial<User>);
+    },
+
+    // Deactivate a gym branch
+    delete_gym_branch: async (log) => {
+        if (!log.target_resource_id) throw new Error('delete_gym_branch requires target_resource_id');
+        await branchRepo().update(log.target_resource_id, { is_active: false });
+    },
+};
+
+async function executeAction(log: AdminAuditLog): Promise<void> {
+    const dispatcher = ACTION_DISPATCHERS[log.action];
+    if (!dispatcher) {
+        // Unknown action — log a warning but don't throw (graceful degradation)
+        console.warn(`[AdminService] No dispatcher for action "${log.action}". Approved in log only.`);
+        return;
+    }
+    await dispatcher(log);
+}
 
 export class AdminService {
 
@@ -35,9 +85,8 @@ export class AdminService {
         log.result = 'approved';
         await auditRepo().save(log);
 
-        // Ideally here we would dispatch an event or call another service to actually DO the action
-        // For example:
-        // if (log.action === 'ban_user') await userService.banUser(log.target_user_id);
+        // Execute the corresponding action via strategy dispatch
+        await executeAction(log);
     }
 
     async rejectHighRiskAction(approverId: string, auditLogId: string, rejectionReason: string) {

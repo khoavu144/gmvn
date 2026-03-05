@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
 import type { RootState } from '../store/store';
+import NotificationBell from './NotificationBell';
 
 export default function Header() {
     const dispatch = useDispatch();
@@ -47,6 +48,8 @@ export default function Header() {
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-4">
+                    {/* Sprint 3: Notification Bell (visible only when logged in) */}
+                    <NotificationBell />
                     {isAuthenticated && user ? (
                         <div className="flex items-center gap-3 sm:gap-4">
                             <div className="hidden lg:flex flex-col items-end">

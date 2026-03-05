@@ -62,6 +62,12 @@ class ProgramService {
         return getProgramRepo().save(program);
     }
 
+    async getAllPrograms(onlyPublished = true) {
+        const where: any = {};
+        if (onlyPublished) where.is_published = true;
+        return getProgramRepo().find({ where, order: { created_at: 'DESC' } });
+    }
+
     async getProgramsByTrainer(trainerId: string, onlyPublished = false) {
         const where: any = { trainer_id: trainerId };
         if (onlyPublished) where.is_published = true;

@@ -8,16 +8,28 @@ export interface GetTrainersResponse {
     totalPages: number;
 }
 
+export interface TrainerFilters {
+    search?: string;
+    specialty?: string;
+    priceMin?: number;
+    priceMax?: number;
+    city?: string;
+    sort?: 'newest' | 'price_asc' | 'price_desc';
+}
+
 export const trainerService = {
-    getTrainers: async (page = 1, limit = 10, search?: string): Promise<GetTrainersResponse> => {
+    getTrainers: async (page = 1, limit = 10, filters: TrainerFilters = {}): Promise<GetTrainersResponse> => {
         const params = new URLSearchParams({
             page: page.toString(),
             limit: limit.toString(),
         });
 
-        if (search) {
-            params.append('search', search);
-        }
+        if (filters.search) params.append('search', filters.search);
+        if (filters.specialty) params.append('specialty', filters.specialty);
+        if (filters.priceMin !== undefined) params.append('priceMin', String(filters.priceMin));
+        if (filters.priceMax !== undefined) params.append('priceMax', String(filters.priceMax));
+        if (filters.city) params.append('city', filters.city);
+        if (filters.sort) params.append('sort', filters.sort);
 
         const response = await api.get<ApiResponse<GetTrainersResponse>>(`/users/trainers?${params.toString()}`);
         return response.data.data!;

@@ -5,6 +5,7 @@ import {
     updateProgram,
     publishProgram,
     getProgramById,
+    getAllPrograms,
     getTrainerPrograms,
     addWorkout,
     deleteProgram,
@@ -13,6 +14,7 @@ import {
 const router = Router();
 
 // Public (with optional auth for trainer's own programs)
+router.get('/', getAllPrograms);
 router.get('/trainers/:trainerId/programs', authenticate, getTrainerPrograms);
 router.get('/:id', authenticate, getProgramById);
 

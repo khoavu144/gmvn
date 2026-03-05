@@ -19,6 +19,7 @@ import adminRoutes from './routes/admin';
 import gymRoutes from './routes/gym';
 import gymOwnerRoutes from './routes/gymOwner';
 import gymAdminRoutes from './routes/gymAdmin';
+import notificationRoutes from './routes/notification';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { User } from './entities/User';
@@ -69,6 +70,8 @@ app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/gyms', gymRoutes);
 app.use('/api/v1/gym-owner', gymOwnerRoutes);
 app.use('/api/v1/admin/gyms', gymAdminRoutes);
+// Sprint 3: Notification system
+app.use('/api/v1/notifications', notificationRoutes);
 
 // Health check with DB status
 app.get('/api/v1/health', async (_req, res) => {

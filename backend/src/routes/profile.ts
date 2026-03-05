@@ -22,6 +22,11 @@ import {
     updateFAQ,
     deleteFAQ,
 } from '../controllers/profileController';
+import {
+    getProgressPhotos,
+    addProgressPhoto,
+    deleteProgressPhoto
+} from '../controllers/progressPhotoController';
 
 const router = Router();
 const auth = authenticate;
@@ -54,5 +59,10 @@ router.delete('/me/gallery/:id', ...trainerAuth, deleteGalleryImage);
 router.post('/me/faq', ...trainerAuth, addFAQ);
 router.put('/me/faq/:id', ...trainerAuth, updateFAQ);
 router.delete('/me/faq/:id', ...trainerAuth, deleteFAQ);
+
+// Progress Photos (Athletes & Users)
+router.get('/progress-photos', auth, getProgressPhotos);
+router.post('/progress-photos', auth, addProgressPhoto);
+router.delete('/progress-photos/:id', auth, deleteProgressPhoto);
 
 export default router;

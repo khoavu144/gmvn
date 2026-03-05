@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadialBarChart, RadialBar } from 'recharts';
 import { gymService } from '../services/gymService';
 import type { GymCenter, GymBranch } from '../types';
 import { Link } from 'react-router-dom';
@@ -12,8 +13,13 @@ const GymOwnerDashboard: React.FC = () => {
     // Branch Editor state
     const [editingBranch, setEditingBranch] = useState<GymBranch | null>(null);
 
+    // NEW: Form tạo chi nhánh mới
+    const [showNewBranchForm, setShowNewBranchForm] = useState(false);
+    const [newBranchForm, setNewBranchForm] = useState({ branch_name: '', address: '', city: '', district: '', phone: '', description: '' });
+    const [creatingBranch, setCreatingBranch] = useState(false);
+
     // BUG-005: Stats state
-    const [stats, setStats] = useState<{ total_views: number; total_trainers: number; avg_rating: number; total_reviews: number; total_branches: number } | null>(null);
+    const [stats, setStats] = useState<{ total_views: number; total_trainers: number; avg_rating: number; total_reviews: number; total_branches: number; rating_distribution?: Record<number, number> } | null>(null);
 
     // BUG-006: Settings state
     const [settingsForm, setSettingsForm] = useState({ name: '', description: '' });
@@ -41,6 +47,27 @@ const GymOwnerDashboard: React.FC = () => {
             console.error(error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCreateBranch = async () => {
+        if (!newBranchForm.branch_name || !newBranchForm.address) {
+            alert('Vui lòng nhập tên chi nhánh và địa chỉ');
+            return;
+        }
+        setCreatingBranch(true);
+        try {
+            const res = await gymService.createBranch(newBranchForm);
+            if (res.success) {
+                alert(`✅ Đã tạo chi nhánh "${newBranchForm.branch_name}" thành công!`);
+                setShowNewBranchForm(false);
+                setNewBranchForm({ branch_name: '', address: '', city: '', district: '', phone: '', description: '' });
+                fetchMyGym(); // reload fresh data
+            }
+        } catch (error) {
+            alert('Lỗi tạo chi nhánh. Thử lại nhé!');
+        } finally {
+            setCreatingBranch(false);
         }
     };
 
@@ -120,6 +147,56 @@ const GymOwnerDashboard: React.FC = () => {
                                 </div>
                             ))}
                         </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                            <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm h-80 col-span-1 lg:col-span-2 flex flex-col">
+                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-6">Phân bổ đánh giá</p>
+                                <div className="flex-1 min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={
+                                            [
+                                                { rating: '1★', count: stats?.rating_distribution?.[1] || 0 },
+                                                { rating: '2★', count: stats?.rating_distribution?.[2] || 0 },
+                                                { rating: '3★', count: stats?.rating_distribution?.[3] || 0 },
+                                                { rating: '4★', count: stats?.rating_distribution?.[4] || 0 },
+                                                { rating: '5★', count: stats?.rating_distribution?.[5] || 0 },
+                                            ]
+                                        } margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                            <XAxis dataKey="rating" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} allowDecimals={false} />
+                                            <Tooltip cursor={{ fill: '#f3f4f6' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                            <Bar dataKey="count" fill="#000000" radius={[4, 4, 0, 0]} maxBarSize={60} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                            <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm h-80 col-span-1 flex flex-col">
+                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-2">Tỷ lệ lấp đầy HLV</p>
+                                <div className="flex-1 min-h-0 relative">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <RadialBarChart
+                                            cx="50%" cy="50%"
+                                            innerRadius="70%" outerRadius="100%"
+                                            barSize={24}
+                                            data={[
+                                                { name: 'Đã lấp đầy', value: Math.min(100, Math.round(((stats?.total_trainers || 0) / (Math.max(1, branches.length) * 5)) * 100)) || 0, fill: '#000000' }
+                                            ]}
+                                            startAngle={90} endAngle={-270}
+                                        >
+                                            <RadialBar background={{ fill: '#f3f4f6' }} dataKey="value" cornerRadius={12} />
+                                        </RadialBarChart>
+                                    </ResponsiveContainer>
+                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                        <div className="text-center">
+                                            <span className="text-3xl font-black block">
+                                                {Math.min(100, Math.round(((stats?.total_trainers || 0) / (Math.max(1, branches.length) * 5)) * 100)) || 0}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -130,8 +207,102 @@ const GymOwnerDashboard: React.FC = () => {
                                 <h1 className="text-3xl font-black uppercase tracking-tight mb-2">Quản lý Chi Nhánh</h1>
                                 <p className="text-gray-500">Thêm, sửa thông tin chi tiết từng cơ sở</p>
                             </div>
-                            <button className="btn-primary py-2 px-4 shadow-none" onClick={() => alert('Tính năng đang được cập nhật...')}>Thêm chi nhánh mới</button>
+                            <button
+                                className="btn-primary py-2 px-4 shadow-none"
+                                onClick={() => setShowNewBranchForm(true)}
+                            >
+                                + Thêm chi nhánh mới
+                            </button>
                         </div>
+
+                        {/* ─── NEW BRANCH FORM ─── */}
+                        {showNewBranchForm && (
+                            <div className="mb-8 p-6 border-2 border-black rounded-xl bg-gray-50 animate-fade-in">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-lg font-black uppercase tracking-tight">Thêm Chi Nhánh Mới</h2>
+                                    <button onClick={() => setShowNewBranchForm(false)} className="text-gray-400 hover:text-black text-2xl font-black transition-colors">×</button>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Tên chi nhánh <span className="text-red-500">*</span></label>
+                                        <input
+                                            type="text"
+                                            className="form-input w-full"
+                                            placeholder="VD: GYMERVIET - Quận 3"
+                                            value={newBranchForm.branch_name}
+                                            onChange={e => setNewBranchForm(p => ({ ...p, branch_name: e.target.value }))}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Số điện thoại</label>
+                                        <input
+                                            type="text"
+                                            className="form-input w-full"
+                                            placeholder="0987 654 321"
+                                            value={newBranchForm.phone}
+                                            onChange={e => setNewBranchForm(p => ({ ...p, phone: e.target.value }))}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Địa chỉ <span className="text-red-500">*</span></label>
+                                        <input
+                                            type="text"
+                                            className="form-input w-full"
+                                            placeholder="Số nhà, tên đường..."
+                                            value={newBranchForm.address}
+                                            onChange={e => setNewBranchForm(p => ({ ...p, address: e.target.value }))}
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Quận/Huyện</label>
+                                            <input
+                                                type="text"
+                                                className="form-input w-full"
+                                                placeholder="Quận 3"
+                                                value={newBranchForm.district}
+                                                onChange={e => setNewBranchForm(p => ({ ...p, district: e.target.value }))}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Thành phố</label>
+                                            <input
+                                                type="text"
+                                                className="form-input w-full"
+                                                placeholder="TP HCM"
+                                                value={newBranchForm.city}
+                                                onChange={e => setNewBranchForm(p => ({ ...p, city: e.target.value }))}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mb-4">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Giới thiệu ngắn</label>
+                                    <textarea
+                                        className="form-input w-full h-20"
+                                        placeholder="Đặc điểm nổi bật của chi nhánh này..."
+                                        value={newBranchForm.description}
+                                        onChange={e => setNewBranchForm(p => ({ ...p, description: e.target.value }))}
+                                    />
+                                </div>
+                                <div className="flex gap-3">
+                                    <button
+                                        className="btn-primary px-8 py-3"
+                                        onClick={handleCreateBranch}
+                                        disabled={creatingBranch}
+                                    >
+                                        {creatingBranch ? 'Đang tạo...' : 'Tạo chi nhánh'}
+                                    </button>
+                                    <button
+                                        className="px-8 py-3 border border-gray-300 rounded-lg font-bold text-sm text-gray-600 hover:border-black transition-colors"
+                                        onClick={() => setShowNewBranchForm(false)}
+                                    >
+                                        Huỷ
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="grid gap-6">
                             {branches.map(branch => (
                                 <div key={branch.id} className="p-6 border border-gray-200 rounded-xl flex items-center justify-between hover:border-black transition-colors cursor-pointer group" onClick={() => setEditingBranch(branch)}>
@@ -142,6 +313,12 @@ const GymOwnerDashboard: React.FC = () => {
                                     <button className="text-sm font-bold text-gray-400 group-hover:text-black uppercase tracking-wider">Cập nhật</button>
                                 </div>
                             ))}
+                            {branches.length === 0 && (
+                                <div className="py-16 text-center border-2 border-dashed border-gray-200 rounded-xl">
+                                    <p className="text-gray-400 font-bold uppercase text-sm">Chưa có chi nhánh nào</p>
+                                    <button className="mt-4 btn-primary py-2 px-6" onClick={() => setShowNewBranchForm(true)}>Thêm chi nhánh đầu tiên</button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -197,7 +374,6 @@ const GymOwnerDashboard: React.FC = () => {
                     onClose={() => setEditingBranch(null)}
                     onUpdate={() => {
                         fetchMyGym();
-                        // Also update editingBranch state from fresh gym data if needed
                     }}
                 />
             )}

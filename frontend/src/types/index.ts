@@ -22,6 +22,7 @@ export interface Trainer {
     email: string;
     full_name: string;
     avatar_url: string | null;
+    headline?: string | null;
     bio: string | null;
     specialties: string[];
     certifications: { name: string; year: number }[];
@@ -270,6 +271,18 @@ export interface GymTrainerLink {
     trainer?: User;
 }
 
+// Sprint 3: In-app notification
+export interface Notification {
+    id: string;
+    user_id: string;
+    type: string;
+    title: string;
+    body: string | null;
+    link: string | null;
+    is_read: boolean;
+    created_at: string;
+}
+
 export interface GymReview {
     id: string;
     branch_id: string;
@@ -282,4 +295,20 @@ export interface GymReview {
     updated_at: string;
 
     user?: User; // joined relation
+
+    // Sprint 3: Review Reply
+    reply_text?: string | null;
+    replied_by_id?: string | null;
+    replied_at?: string | null;
+    replied_by?: User;
+}
+
+export interface ProgressPhoto {
+    id: string;
+    user_id: string;
+    image_url: string;
+    caption?: string | null;
+    taken_at?: string | null;
+    weight_kg?: number | null;
+    created_at: string;
 }

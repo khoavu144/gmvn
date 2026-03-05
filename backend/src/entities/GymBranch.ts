@@ -28,6 +28,12 @@ export class GymBranch {
     @Column({ type: 'varchar', length: 255 })
     branch_name!: string;
 
+    @Column({ type: 'text', nullable: true })
+    description!: string | null;
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    manager_name!: string | null;
+
     @Column({ type: 'varchar', length: 500 })
     address!: string;
 

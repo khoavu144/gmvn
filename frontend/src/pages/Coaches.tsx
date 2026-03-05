@@ -1,59 +1,167 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { trainerService } from '../services/trainerService';
+import { trainerService, type TrainerFilters } from '../services/trainerService';
 import { Link } from 'react-router-dom';
 
-export default function Trainers() {
+// ─── Specialty Options ────────────────────────────────────────────────────────
+const SPECIALTIES = [
+    'Gym tổng hợp', 'Cardio', 'Yoga', 'Pilates', 'CrossFit', 'Boxing', 'Kickboxing',
+    'Bodybuilding', 'Powerlifting', 'Calisthenics', 'Zumba', 'Stretching', 'Dinh dưỡng',
+    'Phục hồi chức năng', 'HIIT', 'Muay Thai', 'Dance Fitness', 'Bơi lội',
+];
+
+const SORT_OPTIONS: { value: TrainerFilters['sort']; label: string }[] = [
+    { value: 'newest', label: 'Mới nhất' },
+    { value: 'price_asc', label: 'Giá tăng dần' },
+    { value: 'price_desc', label: 'Giá giảm dần' },
+];
+
+// ─── Price preset helpers ─────────────────────────────────────────────────────
+const PRICE_RANGES = [
+    { label: 'Tất cả', min: undefined, max: undefined },
+    { label: 'Dưới 1 triệu', min: undefined, max: 1_000_000 },
+    { label: '1–2 triệu', min: 1_000_000, max: 2_000_000 },
+    { label: '2–5 triệu', min: 2_000_000, max: 5_000_000 },
+    { label: 'Trên 5 triệu', min: 5_000_000, max: undefined },
+];
+
+export default function Coaches() {
     const [search, setSearch] = useState('');
+    const [specialty, setSpecialty] = useState('');
+    const [priceIdx, setPriceIdx] = useState(0);
+    const [sort, setSort] = useState<TrainerFilters['sort']>('newest');
     const [page, setPage] = useState(1);
+    const [showFilters, setShowFilters] = useState(false);
     const PAGE_SIZE = 12;
 
+    const priceRange = PRICE_RANGES[priceIdx];
+
+    const filters: TrainerFilters = useMemo(() => ({
+        search: search || undefined,
+        specialty: specialty || undefined,
+        priceMin: priceRange.min,
+        priceMax: priceRange.max,
+        sort,
+    }), [search, specialty, priceRange.min, priceRange.max, sort]);
+
     const { data, isLoading, isError } = useQuery({
-        queryKey: ['trainers', search, page],
-        queryFn: () => trainerService.getTrainers(page, PAGE_SIZE, search),
+        queryKey: ['trainers', page, filters],
+        queryFn: () => trainerService.getTrainers(page, PAGE_SIZE, filters),
         staleTime: 60000,
     });
 
-    // Reset to page 1 on new search
-    const handleSearchChange = (val: string) => {
-        setSearch(val);
+    const totalPages = data?.totalPages ?? 1;
+    const hasActiveFilters = specialty || priceIdx !== 0 || sort !== 'newest';
+
+    const resetFilters = () => {
+        setSpecialty('');
+        setPriceIdx(0);
+        setSort('newest');
         setPage(1);
     };
 
-    const totalPages = data?.totalPages ?? 1;
-
     return (
         <main className="max-w-7xl w-full mx-auto px-4 py-8 flex-1">
+            {/* ── Header ── */}
             <div className="mb-8">
                 <h1 className="text-h1 mb-6">Khám phá Coach</h1>
 
-                {/* Search Bar */}
-                <div className="max-w-xl">
-                    <label htmlFor="search" className="sr-only">Tìm kiếm</label>
-                    <div className="relative">
+                {/* Search + Filter toggle row */}
+                <div className="flex gap-3 flex-wrap items-center">
+                    <div className="relative flex-1 min-w-[200px] max-w-xl">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <span className="text-gray-400 text-sm">🔍</span>
                         </div>
                         <input
                             type="text"
-                            name="search"
-                            id="search"
-                            className="form-input pl-10"
+                            className="form-input pl-10 w-full"
                             placeholder="Tìm theo tên, chuyên môn hoặc từ khóa..."
                             value={search}
-                            onChange={(e) => handleSearchChange(e.target.value)}
+                            onChange={e => { setSearch(e.target.value); setPage(1); }}
                         />
                     </div>
+
+                    <button
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border font-semibold text-sm transition-colors ${showFilters || hasActiveFilters ? 'border-black bg-black text-white' : 'border-gray-300 text-gray-700 hover:border-black'}`}
+                        onClick={() => setShowFilters(v => !v)}
+                    >
+                        ⚡ Lọc {hasActiveFilters && <span className="bg-white text-black rounded-full w-4 h-4 text-xs flex items-center justify-center font-black">!</span>}
+                    </button>
+
+                    {/* Sort */}
+                    <select
+                        className="form-input py-2 text-sm font-medium"
+                        value={sort}
+                        onChange={e => { setSort(e.target.value as TrainerFilters['sort']); setPage(1); }}
+                    >
+                        {SORT_OPTIONS.map(o => (
+                            <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                    </select>
                 </div>
+
+                {/* ── Filter Panel ── */}
+                {showFilters && (
+                    <div className="mt-4 p-5 border border-gray-200 rounded-xl bg-gray-50 space-y-5">
+                        {/* Specialty */}
+                        <div>
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Chuyên môn</label>
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${!specialty ? 'bg-black text-white border-black' : 'border-gray-300 text-gray-600 hover:border-black'}`}
+                                    onClick={() => { setSpecialty(''); setPage(1); }}
+                                >
+                                    Tất cả
+                                </button>
+                                {SPECIALTIES.map(s => (
+                                    <button
+                                        key={s}
+                                        className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${specialty === s ? 'bg-black text-white border-black' : 'border-gray-300 text-gray-600 hover:border-black'}`}
+                                        onClick={() => { setSpecialty(specialty === s ? '' : s); setPage(1); }}
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Price */}
+                        <div>
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Mức giá / tháng</label>
+                            <div className="flex flex-wrap gap-2">
+                                {PRICE_RANGES.map((r, idx) => (
+                                    <button
+                                        key={r.label}
+                                        className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${priceIdx === idx ? 'bg-black text-white border-black' : 'border-gray-300 text-gray-600 hover:border-black'}`}
+                                        onClick={() => { setPriceIdx(idx); setPage(1); }}
+                                    >
+                                        {r.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {hasActiveFilters && (
+                            <button className="text-sm text-red-600 font-medium hover:underline" onClick={resetFilters}>
+                                ✕ Xoá tất cả bộ lọc
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {/* Content */}
+            {/* ── Content ── */}
             {isLoading ? (
                 <div className="text-center text-gray-500 py-20 text-sm">Đang tải danh sách...</div>
             ) : isError ? (
                 <div className="text-center text-red-600 py-20 font-medium">Đã xảy ra lỗi khi tải dữ liệu.</div>
             ) : data?.trainers.length === 0 ? (
-                <div className="text-center text-gray-500 py-20 text-sm">Không tìm thấy Coach nào phù hợp.</div>
+                <div className="text-center text-gray-500 py-20 text-sm">
+                    Không tìm thấy Coach nào phù hợp.
+                    {hasActiveFilters && (
+                        <button className="ml-2 text-black font-bold underline" onClick={resetFilters}>Xoá bộ lọc</button>
+                    )}
+                </div>
             ) : (
                 <>
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -107,7 +215,7 @@ export default function Trainers() {
                         ))}
                     </div>
 
-                    {/* BUG-13 Fix: Pagination Controls */}
+                    {/* Pagination */}
                     {totalPages > 1 && (
                         <div className="mt-10 flex items-center justify-center gap-3">
                             <button

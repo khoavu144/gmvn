@@ -19,10 +19,16 @@ export const userController = {
         try {
             const page = parseInt(req.query.page as string) || 1;
             const limit = parseInt(req.query.limit as string) || 10;
-            const searchParam = req.query.search;
-            const search = typeof searchParam === 'string' ? searchParam : undefined;
+            const search = typeof req.query.search === 'string' ? req.query.search : undefined;
 
-            const result = await userService.getTrainers(page, limit, search);
+            // Sprint 2: filter params
+            const specialty = typeof req.query.specialty === 'string' ? req.query.specialty : undefined;
+            const priceMin = req.query.priceMin !== undefined ? Number(req.query.priceMin) : undefined;
+            const priceMax = req.query.priceMax !== undefined ? Number(req.query.priceMax) : undefined;
+            const city = typeof req.query.city === 'string' ? req.query.city : undefined;
+            const sort = (req.query.sort as 'newest' | 'price_asc' | 'price_desc') || 'newest';
+
+            const result = await userService.getTrainers(page, limit, search, specialty, priceMin, priceMax, city, sort);
             return res.status(200).json({ success: true, data: result });
         } catch (error: any) {
             return res.status(500).json({

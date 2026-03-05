@@ -2,6 +2,7 @@ import { AppDataSource } from '../config/database';
 import { GymReview } from '../entities/GymReview';
 import { GymTrainerLink } from '../entities/GymTrainerLink';
 import { GymBranch } from '../entities/GymBranch';
+import { GymCenter } from '../entities/GymCenter';
 import { Subscription } from '../entities/Subscription';
 import { In } from 'typeorm';
 
@@ -99,7 +100,7 @@ export const gymReviewService = {
         const reviews = await reviewRepo.find({
             where: { branch_id: In(branchIds), is_visible: true },
             order: { created_at: 'DESC' },
-            relations: ['user'],
+            relations: ['user', 'replied_by'],
         });
 
         const avgRating = reviews.length > 0
@@ -115,5 +116,44 @@ export const gymReviewService = {
             total_reviews: reviews.length,
             breakdown,
         };
+    },
+
+    // Sprint 3: Gym Owner / Trainer trả lời review
+    async replyToReview(
+        reviewId: string,
+        replierId: string,
+        replierType: 'gym_owner' | 'trainer',
+        replyText: string,
+    ) {
+        const reviewRepo = AppDataSource.getRepository(GymReview);
+        const centerRepo = AppDataSource.getRepository(GymCenter);
+        const linkRepo = AppDataSource.getRepository(GymTrainerLink);
+
+        const review = await reviewRepo.findOne({
+            where: { id: reviewId },
+            relations: ['branch'],
+        });
+        if (!review) throw new Error('Review không tồn tại');
+
+        const gymCenterId = review.branch.gym_center_id;
+
+        // Kiểm tra quyền
+        if (replierType === 'gym_owner') {
+            const center = await centerRepo.findOne({ where: { id: gymCenterId, owner_id: replierId } });
+            if (!center) throw new Error('Bạn không phải chủ sở hữu gym này');
+        } else {
+            // trainer: phải có active link với gym này
+            const link = await linkRepo.findOne({
+                where: { gym_center_id: gymCenterId, trainer_id: replierId, status: 'active' },
+            });
+            if (!link) throw new Error('Bạn không phải HLV của gym này');
+        }
+
+        if (!replyText.trim()) throw new Error('Nội dung phản hồi không được rỗng');
+
+        review.reply_text = replyText.trim();
+        review.replied_by_id = replierId;
+        review.replied_at = new Date();
+        return reviewRepo.save(review);
     },
 };

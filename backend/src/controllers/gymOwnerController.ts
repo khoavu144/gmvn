@@ -50,6 +50,22 @@ export const gymOwnerController = {
         }
     },
 
+    // POST /api/v1/gym-owner/branches — tạo chi nhánh mới
+    async createBranch(req: Request, res: Response): Promise<void> {
+        try {
+            const ownerId = req.user!.user_id;
+            const { branch_name, address, city, district, phone, email, description, manager_name } = req.body;
+            if (!branch_name || !address) {
+                res.status(400).json({ success: false, error: 'Tên chi nhánh và địa chỉ là bắt buộc' });
+                return;
+            }
+            const branch = await gymService.createBranch(ownerId, req.body);
+            res.status(201).json({ success: true, branch, message: 'Đã tạo chi nhánh mới' });
+        } catch (error: any) {
+            res.status(400).json({ success: false, error: error.message });
+        }
+    },
+
     // PUT /api/v1/gym-owner/branches/:branchId/amenities — cập nhật tiện ích
     async updateAmenities(req: Request, res: Response): Promise<void> {
         try {

@@ -126,6 +126,31 @@ export const gymController = {
         }
     },
 
+    // POST /api/v1/gyms/:gymId/reviews/:reviewId/reply — Sprint 3: Gym Owner/Trainer trả lời review
+    async replyToReview(req: Request, res: Response): Promise<void> {
+        try {
+            const reviewId = String(req.params.reviewId);
+            const replierId = req.user!.user_id;
+            const replierType = req.user!.user_type as 'gym_owner' | 'trainer';
+            const { reply_text } = req.body;
+
+            if (!reply_text) {
+                res.status(400).json({ success: false, error: 'Thiếu nội dung phản hồi' });
+                return;
+            }
+            if (replierType !== 'gym_owner' && replierType !== 'trainer') {
+                res.status(403).json({ success: false, error: 'Chỉ Gym Owner hoặc HLV mới được trả lời' });
+                return;
+            }
+
+            const review = await gymReviewService.replyToReview(reviewId, replierId, replierType, reply_text);
+            res.json({ success: true, review });
+        } catch (error: any) {
+            const code = error.message.includes('không phải') ? 403 : 400;
+            res.status(code).json({ success: false, error: error.message });
+        }
+    },
+
     // GET /api/v1/gyms/check-review/:gymId — kiểm tra quyền review
     async checkReviewEligibility(req: Request, res: Response): Promise<void> {
         try {

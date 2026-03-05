@@ -1,20 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { gymService } from '../services/gymService';
-import type { GymCenter, GymBranch } from '../types';
+import type { GymCenter, GymBranch, GymGallery } from '../types';
 import GymReviewForm from '../components/GymReviewForm';
 import GymReviewList from '../components/GymReviewList';
+import ShareButton from '../components/ShareButton';
+
+const DAY_VI: Record<string, string> = {
+    mon: 'Thứ 2', tue: 'Thứ 3', wed: 'Thứ 4',
+    thu: 'Thứ 5', fri: 'Thứ 6', sat: 'Thứ 7', sun: 'CN',
+};
 
 const GymDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+
+    // ─── ALL HOOKS AT THE TOP (Rules of Hooks) ───────────────────────────
     const [gym, setGym] = useState<GymCenter | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeBranchId, setActiveBranchId] = useState<string | null>(null);
     const [branchDetail, setBranchDetail] = useState<GymBranch | null>(null);
     const [loadingBranch, setLoadingBranch] = useState(false);
+    const [canReview, setCanReview] = useState(false);
+    const [lightboxImg, setLightboxImg] = useState<GymGallery | null>(null);
+    // ─────────────────────────────────────────────────────────────────────
 
     useEffect(() => {
         if (id) fetchGym();
+    }, [id]);
+
+    useEffect(() => {
+        if (id && activeBranchId) {
+            fetchBranchDetail(id, activeBranchId);
+        }
+    }, [id, activeBranchId]);
+
+    useEffect(() => {
+        if (id) fetchReviewEligibility();
     }, [id]);
 
     const fetchGym = async () => {
@@ -34,12 +56,6 @@ const GymDetailPage: React.FC = () => {
         }
     };
 
-    useEffect(() => {
-        if (id && activeBranchId) {
-            fetchBranchDetail(id, activeBranchId);
-        }
-    }, [id, activeBranchId]);
-
     const fetchBranchDetail = async (gymId: string, branchId: string) => {
         try {
             setLoadingBranch(true);
@@ -54,22 +70,6 @@ const GymDetailPage: React.FC = () => {
         }
     };
 
-    if (loading) {
-        return <div className="min-h-screen pt-24 pb-16 flex justify-center"><div className="animate-pulse w-1/2 h-64 bg-gray-100 rounded-xl"></div></div>;
-    }
-
-    if (!gym) {
-        return <div className="min-h-screen pt-24 text-center font-bold text-xl">Không tìm thấy Gym</div>;
-    }
-
-    const branches = gym.branches || [];
-
-    const [canReview, setCanReview] = useState(false);
-
-    useEffect(() => {
-        if (id) fetchReviewEligibility();
-    }, [id]);
-
     const fetchReviewEligibility = async () => {
         try {
             const res = await gymService.checkReviewEligibility(id!);
@@ -79,8 +79,55 @@ const GymDetailPage: React.FC = () => {
         }
     };
 
+    // ─── EARLY RETURNS (after all hooks) ─────────────────────────────────
+    if (loading) {
+        return <div className="min-h-screen pt-24 pb-16 flex justify-center"><div className="animate-pulse w-1/2 h-64 bg-gray-100 rounded-xl"></div></div>;
+    }
+
+    if (!gym) {
+        return <div className="min-h-screen pt-24 text-center font-bold text-xl">Không tìm thấy Gym</div>;
+    }
+    // ─────────────────────────────────────────────────────────────────────
+
+    const branches = gym.branches || [];
+    const gallery = branchDetail?.gallery || [];
+
     return (
         <div className="bg-white min-h-screen pt-24 pb-16">
+            {/* Sprint 2: Dynamic SEO title & meta */}
+            <Helmet>
+                <title>{gym.name} — GYMERVIET Gym</title>
+                <meta name="description" content={gym.description?.slice(0, 155) ?? `${gym.name} — hệ thống phòng tập xác thực trên GYMERVIET.`} />
+                <meta property="og:title" content={`${gym.name} — GYMERVIET`} />
+                <meta property="og:description" content={gym.description?.slice(0, 155) ?? ''} />
+                {gym.logo_url && <meta property="og:image" content={gym.logo_url} />}
+            </Helmet>
+            {/* Lightbox */}
+            {lightboxImg && (
+                <div
+                    className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+                    onClick={() => setLightboxImg(null)}
+                >
+                    <button
+                        className="absolute top-4 right-6 text-white text-4xl font-black hover:text-gray-300 transition-colors"
+                        onClick={() => setLightboxImg(null)}
+                    >
+                        ×
+                    </button>
+                    <img
+                        src={lightboxImg.image_url}
+                        alt={lightboxImg.caption || 'Gallery'}
+                        className="max-h-[90vh] max-w-full object-contain rounded-lg"
+                        onClick={e => e.stopPropagation()}
+                    />
+                    {lightboxImg.caption && (
+                        <p className="absolute bottom-6 text-white text-sm font-medium text-center px-4">
+                            {lightboxImg.caption}
+                        </p>
+                    )}
+                </div>
+            )}
+
             {/* Header Section */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
                 <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 pb-8 border-b-2 border-black">
@@ -102,6 +149,12 @@ const GymDetailPage: React.FC = () => {
                             <p className="text-gray-500 font-medium">{gym.tagline}</p>
                         </div>
                     </div>
+                    {/* Sprint 2: Share button */}
+                    <ShareButton
+                        title={`${gym.name} — GYMERVIET`}
+                        text={gym.description ?? undefined}
+                        label="Chia sẻ Gym"
+                    />
                 </div>
 
                 <div className="mt-8 text-gray-800 text-lg leading-relaxed max-w-3xl">
@@ -138,23 +191,39 @@ const GymDetailPage: React.FC = () => {
                 ) : branchDetail ? (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
-                        {/* Left Col: Info & Amenities */}
+                        {/* Left Col: Gallery, Amenities, Pricing */}
                         <div className="lg:col-span-2 space-y-12">
-                            {/* Gallery Placeholder (If implemented, map images here) */}
-                            <div className="grid grid-cols-2 gap-4">
-                                {(branchDetail.gallery && branchDetail.gallery.length > 0) ? (
-                                    branchDetail.gallery.slice(0, 2).map(img => (
-                                        <div key={img.id} className="aspect-video bg-gray-100 rounded-xl overflow-hidden">
-                                            <img src={img.image_url} alt="Gallery" className="w-full h-full object-cover" />
-                                        </div>
-                                    ))
-                                ) : (
-                                    <>
-                                        <div className="aspect-video bg-gray-100 rounded-xl"></div>
-                                        <div className="aspect-video bg-gray-100 rounded-xl"></div>
-                                    </>
-                                )}
-                            </div>
+
+                            {/* Gallery — show up to 4, with lightbox */}
+                            {gallery.length > 0 ? (
+                                <div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {gallery.slice(0, 4).map((img, idx) => (
+                                            <div
+                                                key={img.id}
+                                                className={`relative cursor-pointer group overflow-hidden rounded-xl bg-gray-100 ${idx === 0 ? 'col-span-2 aspect-video' : 'aspect-video'}`}
+                                                onClick={() => setLightboxImg(img)}
+                                            >
+                                                <img
+                                                    src={img.image_url}
+                                                    alt={img.caption || 'Gallery'}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                                />
+                                                {/* "Xem tất cả" overlay on last visible item */}
+                                                {idx === 3 && gallery.length > 4 && (
+                                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                                        <span className="text-white font-black text-lg">+{gallery.length - 4} ảnh</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="aspect-video bg-gray-100 rounded-xl col-span-2"></div>
+                                </div>
+                            )}
 
                             <section>
                                 <h3 className="text-2xl font-black uppercase mb-6 pb-2 border-b border-gray-200">Tiện ích & Dịch vụ</h3>
@@ -211,10 +280,26 @@ const GymDetailPage: React.FC = () => {
                                         </div>
                                     )}
 
+                                    {/* ─── Opening Hours (đã fix: không dùng JSON.stringify) ─── */}
                                     {branchDetail.opening_hours && (
                                         <div>
-                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Giờ mở cửa</label>
-                                            <pre className="font-sans font-medium text-gray-900 text-sm whitespace-pre-wrap">{JSON.stringify(branchDetail.opening_hours, null, 2)}</pre>
+                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-3">Giờ mở cửa</label>
+                                            <div className="space-y-2">
+                                                {Object.entries(branchDetail.opening_hours).map(([day, hours]) => {
+                                                    if (!hours) return null;
+                                                    const h = hours as { open: string; close: string; is_closed?: boolean };
+                                                    return (
+                                                        <div key={day} className="flex justify-between items-center text-sm">
+                                                            <span className="font-semibold text-gray-700 w-16">{DAY_VI[day] ?? day}</span>
+                                                            {h.is_closed ? (
+                                                                <span className="text-red-500 font-medium">Đóng cửa</span>
+                                                            ) : (
+                                                                <span className="text-gray-900 font-medium">{h.open} – {h.close}</span>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
                                     )}
                                 </div>

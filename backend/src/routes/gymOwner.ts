@@ -15,6 +15,7 @@ router.post('/register', gymOwnerController.registerGym);
 // Các routes sau cần gymOwnerOnly
 router.get('/my-gyms', gymOwnerOnly, gymOwnerController.getMyGyms);
 router.put('/centers/:centerId', gymOwnerOnly, gymOwnerController.updateGymCenter);
+router.post('/branches', gymOwnerOnly, gymOwnerController.createBranch);
 router.put('/branches/:branchId', gymOwnerOnly, gymOwnerController.updateBranch);
 router.put('/branches/:branchId/amenities', gymOwnerOnly, gymOwnerController.updateAmenities);
 router.put('/branches/:branchId/equipment', gymOwnerOnly, gymOwnerController.updateEquipment);
