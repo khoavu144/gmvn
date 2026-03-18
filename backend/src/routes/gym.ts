@@ -5,7 +5,7 @@ import { authenticate } from '../middleware/auth';
 const router = Router();
 
 // Specific routes first
-router.get('/check-review/:gymId', authenticate, gymController.checkReviewEligibility);
+router.get('/:gymId/check-review', authenticate, gymController.checkReviewEligibility);
 router.get('/trainer/:trainerId', gymController.getTrainerGyms);
 
 // Public routes

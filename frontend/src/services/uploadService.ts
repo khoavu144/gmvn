@@ -1,4 +1,5 @@
 import api from './api';
+import { logger } from '../lib/logger';
 
 export const uploadService = {
     /**
@@ -29,7 +30,7 @@ export const uploadService = {
             });
             return response.data.data.url;
         } catch (error) {
-            console.error('Upload Error:', error);
+            logger.error('Upload Error:', error);
             throw error;
         }
     }

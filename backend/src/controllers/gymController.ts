@@ -22,7 +22,7 @@ export const gymController = {
         }
     },
 
-    // GET /api/v1/gyms/:gymId — detail GymCenter
+    // GET /api/v1/gyms/:gymId — detail GymCenter (accepts UUID or slug)
     async getGymCenter(req: Request, res: Response): Promise<void> {
         try {
             const gymId = String(req.params.gymId);
@@ -31,7 +31,7 @@ export const gymController = {
                 res.status(404).json({ success: false, error: 'Gym không tồn tại' });
                 return;
             }
-            res.json({ success: true, gym });
+            res.json({ success: true, gym, canonical_slug: gym.slug });
         } catch (error: any) {
             if (error?.message?.includes('uuid')) return res.status(404).json({ success: false, error: 'Gym không tồn tại' }) as any;
             res.status(500).json({ success: false, error: error.message });

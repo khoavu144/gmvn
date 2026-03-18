@@ -45,9 +45,38 @@ router.get('/subscriptions/:subscriptionId/workouts', authenticate, async (req: 
 router.post('/workouts/:workoutId/log', authenticate, async (req: Request, res: Response) => {
     try {
         const workoutLogRepo = AppDataSource.getRepository(WorkoutLog);
+        const workoutRepo = AppDataSource.getRepository(Workout);
+        const subscriptionRepo = AppDataSource.getRepository(Subscription);
         const userId = req.user!.user_id;
         const { workoutId } = req.params;
         const { notes } = req.body;
+
+        const workout = await workoutRepo.findOneBy({ id: String(workoutId) });
+        if (!workout) {
+            return res.status(404).json({ error: 'Workout not found' });
+        }
+
+        const activeSubscription = await subscriptionRepo.findOneBy({
+            user_id: userId,
+            program_id: workout.program_id,
+            status: 'active',
+        });
+
+        if (!activeSubscription) {
+            return res.status(403).json({ error: 'You do not have access to this workout' });
+        }
+
+        const existingLog = await workoutLogRepo.findOneBy({
+            user_id: userId,
+            workout_id: String(workoutId),
+        });
+
+        if (existingLog) {
+            existingLog.completed_at = existingLog.completed_at || new Date();
+            existingLog.notes = notes ?? existingLog.notes;
+            const saved = await workoutLogRepo.save(existingLog);
+            return res.json({ success: true, log: saved, already_logged: true });
+        }
 
         const log = workoutLogRepo.create();
         log.user_id = userId;

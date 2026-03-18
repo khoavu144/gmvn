@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate, trainerOnly } from '../middleware/auth';
+import { authenticate, optionalAuthenticate, trainerOnly } from '../middleware/auth';
 import {
     createProgram,
     updateProgram,
@@ -15,8 +15,8 @@ const router = Router();
 
 // Public (with optional auth for trainer's own programs)
 router.get('/', getAllPrograms);
-router.get('/trainers/:trainerId/programs', authenticate, getTrainerPrograms);
-router.get('/:id', authenticate, getProgramById);
+router.get('/trainers/:trainerId/programs', optionalAuthenticate, getTrainerPrograms);
+router.get('/:id', optionalAuthenticate, getProgramById);
 
 // Trainer or verified Athlete only routes
 import { canCreateProgram } from '../middleware/auth';

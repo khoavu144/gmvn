@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials, setLoading } from '../store/slices/authSlice';
 import { authApi } from '../services/auth';
+import type { RootState } from '../store/store';
 
 export default function Login() {
     const navigate = useNavigate();
@@ -10,42 +11,46 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [loading, setLoadingState] = useState(false);
+    const loading = useSelector((state: RootState) => state.auth.isLoading);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        setLoadingState(true);
         dispatch(setLoading(true));
 
         try {
             const result = await authApi.login({ email, password });
-            dispatch(setCredentials(result));
+            dispatch(setCredentials({
+                user: result.user,
+                access_token: result.access_token,
+                refresh_token: result.refresh_token,
+            }));
             navigate('/dashboard');
         } catch (err: any) {
-            setError(
-                err.response?.data?.error || 'Login failed. Please try again.'
-            );
+            const statusCode = err.response?.status;
+            const fallbackMessage = statusCode === 429
+                ? 'Bạn đã thử đăng nhập quá nhiều lần. Vui lòng đợi vài phút rồi thử lại.'
+                : 'Đăng nhập thất bại. Vui lòng thử lại.';
+
+            setError(err.response?.data?.error || fallbackMessage);
             dispatch(setLoading(false));
-        } finally {
-            setLoadingState(false);
         }
     };
 
     return (
-        <div className="py-20 flex items-center justify-center px-4">
-            <div className="w-full max-w-md">
-                {/* Heading */}
-                <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-black text-center">Đăng nhập</h2>
-                    <p className="text-body mt-2 text-center">Truy cập vào tài khoản GYMERVIET của bạn</p>
+        <div className="page-shell">
+            <div className="page-container max-w-md py-16 sm:py-20">
+                <div className="text-center page-header">
+                    <p className="page-kicker">Welcome Back</p>
+                    <h1 className="page-title text-center">Đăng nhập</h1>
+                    <p className="page-description mx-auto text-center">Truy cập vào tài khoản GYMERVIET của bạn với giao diện thống nhất theo homepage.</p>
                 </div>
 
                 {/* Card */}
                 <div className="card">
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-4" aria-label="Biểu mẫu đăng nhập">
                         {error && (
-                            <div className="bg-red-50 border border-red-200 text-gray-800 px-4 py-3 rounded-xs text-sm">
+                            <div role="alert" aria-live="assertive" className="bg-red-50 border border-red-200 text-gray-800 px-4 py-3 rounded-xs text-sm">
                                 {error}
                             </div>
                         )}
@@ -57,6 +62,8 @@ export default function Login() {
                             <input
                                 id="email"
                                 type="email"
+                                aria-required="true"
+                                aria-invalid={!!error}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -72,6 +79,8 @@ export default function Login() {
                             <input
                                 id="password"
                                 type="password"
+                                aria-required="true"
+                                aria-invalid={!!error}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
@@ -83,6 +92,7 @@ export default function Login() {
                         <button
                             type="submit"
                             disabled={loading}
+                            aria-busy={loading}
                             className="btn-primary w-full mt-2"
                         >
                             {loading ? 'Đang xác thực...' : 'Đăng nhập'}
@@ -101,7 +111,7 @@ export default function Login() {
                 </div>
 
                 <div className="mt-8 text-center">
-                    <Link to="/" className="text-sm text-gray-500 hover:text-black hover:underline">
+                    <Link to="/" className="back-link justify-center">
                         ← Quay lại trang chủ
                     </Link>
                 </div>

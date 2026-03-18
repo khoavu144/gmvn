@@ -16,8 +16,10 @@ import { GymEquipment } from './GymEquipment';
 import { GymPricing } from './GymPricing';
 import { GymEvent } from './GymEvent';
 import { GymReview } from './GymReview';
+import { Index } from 'typeorm';
 
 @Entity('gym_branches')
+@Index(['gym_center_id'])
 export class GymBranch {
     @PrimaryGeneratedColumn('uuid')
     id!: string;

@@ -32,6 +32,12 @@ export class Testimonial {
     @Column({ type: 'text' })
     comment!: string;
 
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    result_achieved!: string | null; // e.g. "Giảm 12kg trong 3 tháng"
+
+    @Column({ type: 'boolean', default: false })
+    is_featured!: boolean; // Show on public profile
+
     @Column({ type: 'boolean', default: true })
     is_approved!: boolean;
 

@@ -26,6 +26,8 @@ import { User } from './entities/User';
 import { GymCenter } from './entities/GymCenter';
 import { AppDataSource } from './config/database';
 import { initSocket } from './socket';
+import { refreshTokenStore } from './services/refreshTokenStore';
+import { requestLogger } from './middleware/requestLogger';
 
 dotenv.config();
 
@@ -34,6 +36,7 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(helmet());
+app.use(requestLogger);
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
@@ -78,13 +81,17 @@ app.get('/api/v1/health', async (_req, res) => {
     try {
         const userCount = await AppDataSource.getRepository(User).count();
         const gymCount = await AppDataSource.getRepository(GymCenter).count();
+        const redisHealthy = await refreshTokenStore.ping();
         res.status(200).json({
-            status: 'OK',
+            status: redisHealthy ? 'OK' : 'DEGRADED',
             timestamp: new Date().toISOString(),
             db: {
                 initialized: AppDataSource.isInitialized,
                 users: userCount,
                 gyms: gymCount
+            },
+            redis: {
+                connected: redisHealthy
             },
             env: process.env.NODE_ENV
         });

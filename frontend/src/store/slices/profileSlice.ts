@@ -1,7 +1,70 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import apiClient from '../../services/api';
-import type { TrainerProfile, TrainerExperience, TrainerGallery, TrainerFAQ } from '../../types';
+import type { TrainerProfile, TrainerExperience, TrainerGallery, TrainerFAQ, TrainerSkill, TrainerPackage, TrainerTestimonial } from '../../types';
+
+interface PremiumHeroBadge {
+    label: string;
+    value?: string;
+    icon_key?: string;
+}
+
+interface PremiumHeroMetric {
+    label: string;
+    value: string;
+}
+
+interface PremiumHero {
+    tagline: string | null;
+    themeVariant: string | null;
+    badges: PremiumHeroBadge[];
+    metrics: PremiumHeroMetric[];
+    ctaConfig: {
+        primary_label?: string;
+        secondary_label?: string;
+    } | null;
+    isFeaturedProfile: boolean;
+}
+
+interface TrainerProfileHighlight {
+    id: string;
+    trainer_id: string;
+    title: string;
+    value: string;
+    icon_key: string | null;
+    order_number: number;
+}
+
+interface TrainerMediaFeature {
+    id: string;
+    trainer_id: string;
+    media_type: 'image' | 'video';
+    url: string;
+    thumbnail_url: string | null;
+    caption: string | null;
+    order_number: number;
+    is_featured: boolean;
+}
+
+interface TrainerPressMention {
+    id: string;
+    trainer_id: string;
+    source_name: string;
+    title: string;
+    mention_url: string | null;
+    logo_url: string | null;
+    excerpt: string | null;
+    published_at: string | null;
+    order_number: number;
+}
+
+export interface ViewedPremiumProfile {
+    hero: PremiumHero;
+    sectionOrder: string[];
+    highlights: TrainerProfileHighlight[];
+    mediaFeatures: TrainerMediaFeature[];
+    pressMentions: TrainerPressMention[];
+}
 import { profileApiService } from '../../services/profileService';
 
 // ── Async Thunks ─────────────────────────────────────────────────────────────
@@ -24,19 +87,44 @@ export const fetchMyProfile = createAsyncThunk(
     }
 );
 
+// BUG FIX: fetchPublicProfile now uses slug via /profiles/slug/:slug endpoint
+// which returns full CV data including skills, packages, testimonials
 export const fetchPublicProfile = createAsyncThunk(
     'profile/fetchPublicProfile',
-    async (trainerId: string, { rejectWithValue }) => {
+    async (identifier: string, { rejectWithValue }) => {
         try {
-            const response = await apiClient.get(`/profiles/trainer/${trainerId}/full`);
+            const response = await apiClient.get(`/profiles/slug/${identifier}`);
             return response.data as {
                 success: boolean;
                 profile: TrainerProfile;
                 experience: TrainerExperience[];
                 gallery: TrainerGallery[];
                 faq: TrainerFAQ[];
+                skills: TrainerSkill[];
+                packages: TrainerPackage[];
+                testimonials: TrainerTestimonial[];
+                premium?: ViewedPremiumProfile;
             };
         } catch (err: any) {
+            if (err.response?.status === 404) {
+                try {
+                    const fallbackResponse = await apiClient.get(`/profiles/trainer/${identifier}/full`);
+                    return fallbackResponse.data as {
+                        success: boolean;
+                        profile: TrainerProfile;
+                        experience: TrainerExperience[];
+                        gallery: TrainerGallery[];
+                        faq: TrainerFAQ[];
+                        skills: TrainerSkill[];
+                        packages: TrainerPackage[];
+                        testimonials: TrainerTestimonial[];
+                        premium?: ViewedPremiumProfile;
+                    };
+                } catch (fallbackErr: any) {
+                    return rejectWithValue(fallbackErr.response?.data?.error || 'Profile không tồn tại');
+                }
+            }
+
             return rejectWithValue(err.response?.data?.error || 'Profile không tồn tại');
         }
     }
@@ -173,6 +261,10 @@ interface ProfileState {
     viewedExperience: TrainerExperience[];
     viewedGallery: TrainerGallery[];
     viewedFaq: TrainerFAQ[];
+    viewedSkills: TrainerSkill[];
+    viewedPackages: TrainerPackage[];
+    viewedTestimonials: TrainerTestimonial[];
+    viewedPremium: ViewedPremiumProfile | null;
     loading: boolean;
     saving: boolean;
     error: string | null;
@@ -188,6 +280,10 @@ const initialState: ProfileState = {
     viewedExperience: [],
     viewedGallery: [],
     viewedFaq: [],
+    viewedSkills: [],
+    viewedPackages: [],
+    viewedTestimonials: [],
+    viewedPremium: null,
     loading: false,
     saving: false,
     error: null,
@@ -231,6 +327,10 @@ const profileSlice = createSlice({
                 state.viewedExperience = action.payload.experience || [];
                 state.viewedGallery = action.payload.gallery || [];
                 state.viewedFaq = action.payload.faq || [];
+                state.viewedSkills = action.payload.skills || [];
+                state.viewedPackages = action.payload.packages || [];
+                state.viewedTestimonials = action.payload.testimonials || [];
+                state.viewedPremium = action.payload.premium || null;
             })
             .addCase(fetchPublicProfile.rejected, (state, action) => {
                 state.loading = false;

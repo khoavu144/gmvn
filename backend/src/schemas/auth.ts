@@ -17,6 +17,10 @@ export const RefreshTokenSchema = z.object({
     refresh_token: z.string().min(1, 'Refresh token is required'),
 });
 
+export const LogoutSchema = z.object({
+    refresh_token: z.string().min(1, 'Refresh token is required').optional(),
+});
+
 // Generic validation middleware
 export const validateRequest = (schema: z.ZodSchema) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -36,3 +40,4 @@ export const validateRequest = (schema: z.ZodSchema) => {
 
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 export type LoginInput = z.infer<typeof LoginSchema>;
+export type LogoutInput = z.infer<typeof LogoutSchema>;

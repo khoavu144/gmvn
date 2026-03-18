@@ -52,8 +52,6 @@ const authSlice = createSlice({
             state.refreshToken = action.payload.refresh_token;
             state.isAuthenticated = true;
             state.isLoading = false;
-            localStorage.setItem('access_token', action.payload.access_token);
-            localStorage.setItem('refresh_token', action.payload.refresh_token);
         },
         setUser: (state, action: PayloadAction<User>) => {
             state.user = action.payload;
@@ -67,8 +65,6 @@ const authSlice = createSlice({
             state.refreshToken = null;
             state.isAuthenticated = false;
             state.isLoading = false;
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
         },
     },
 });

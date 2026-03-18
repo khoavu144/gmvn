@@ -31,6 +31,24 @@ export const authenticate: RequestHandler = (req, res, next) => {
     }
 };
 
+export const optionalAuthenticate: RequestHandler = (req, _res, next) => {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(' ')[1];
+
+    if (!token) {
+        next();
+        return;
+    }
+
+    try {
+        req.user = verifyAccessToken(token);
+    } catch {
+        req.user = undefined;
+    }
+
+    next();
+};
+
 export const proOnly: RequestHandler = (req, res, next) => {
     if (req.user?.user_type !== 'trainer' && req.user?.user_type !== 'athlete') {
         res.status(403).json({ success: false, error: 'Only trainers or professional athletes can perform this action' });

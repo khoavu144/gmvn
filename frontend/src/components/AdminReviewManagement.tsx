@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { logger } from '../lib/logger';
 import { gymService } from '../services/gymService';
 import { useToast } from './Toast';
 import type { GymReview } from '../types';
@@ -23,7 +24,7 @@ const AdminReviewManagement: React.FC = () => {
                 setReviews(res.reviews || []);
             }
         } catch (error) {
-            console.error(error);
+            logger.error(error);
         } finally {
             setLoading(false);
         }

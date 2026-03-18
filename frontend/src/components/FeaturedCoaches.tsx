@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { logger } from '../lib/logger';
 import { Link } from 'react-router-dom';
 import apiClient from '../services/api';
 import type { Trainer } from '../types';
@@ -16,7 +17,7 @@ export default function FeaturedCoaches() {
                     setCoaches(shuffled);
                 }
             })
-            .catch(console.error)
+            .catch(logger.error)
             .finally(() => setIsLoading(false));
     }, []);
 

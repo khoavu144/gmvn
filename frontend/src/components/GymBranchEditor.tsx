@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useToast } from '../components/Toast';
+import { ConfirmModal } from '../components/ConfirmModal';
 import { gymService } from '../services/gymService';
-import type { GymBranch, GymAmenity, GymEquipment, GymPricing, GymEvent } from '../types';
+import type { GymBranch, GymAmenity, GymEquipment, GymPricing, GymEvent, User } from '../types';
 
 interface GymBranchEditorProps {
     branch: GymBranch;
@@ -9,8 +11,16 @@ interface GymBranchEditorProps {
 }
 
 const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUpdate }) => {
+    const { toast, ToastComponent } = useToast();
     const [activeTab, setActiveTab] = useState<'info' | 'gallery' | 'amenities' | 'equipment' | 'pricing' | 'events' | 'reviews' | 'stats' | 'coaches'>('info');
     const [loading, setLoading] = useState(false);
+    const [confirmConfig, setConfirmConfig] = useState<{
+        isOpen: boolean;
+        title: string;
+        description: string;
+        onConfirm: () => void;
+        isDestructive?: boolean;
+    }>({ isOpen: false, title: '', description: '', onConfirm: () => { } });
 
     // Info states
     const [infoForm, setInfoForm] = useState({
@@ -48,17 +58,18 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
 
     // Trainers search state
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [searchResults, setSearchResults] = useState<User[]>([]);
     const [searching, setSearching] = useState(false);
+    const [inviteRole, setInviteRole] = useState('Huấn luyện viên');
 
     const handleSaveInfo = async () => {
         setLoading(true);
         try {
             await gymService.updateBranch(branch.id, infoForm);
-            alert('Đã cập nhật thông tin cơ bản');
+            toast.success('Đã cập nhật thông tin cơ bản');
             onUpdate();
         } catch (error) {
-            alert('Lỗi cập nhật thông tin');
+            toast.error('Lỗi cập nhật thông tin');
         } finally {
             setLoading(false);
         }
@@ -73,23 +84,31 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             setNewImageCaption('');
             onUpdate();
         } catch (error) {
-            alert('Lỗi thêm ảnh');
+            toast.error('Lỗi thêm ảnh');
         } finally {
             setLoading(false);
         }
     };
 
     const handleDeleteImage = async (imageId: string) => {
-        if (!confirm('Bạn có chắc muốn xóa ảnh này?')) return;
-        setLoading(true);
-        try {
-            await gymService.deleteGalleryImage(branch.id, imageId);
-            onUpdate();
-        } catch (error) {
-            alert('Lỗi xóa ảnh');
-        } finally {
-            setLoading(false);
-        }
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Xóa hình ảnh',
+            description: 'Bạn có chắc chắn muốn xóa ảnh này khỏi thư viện? Hành động này không thể hoàn tác.',
+            isDestructive: true,
+            onConfirm: async () => {
+                setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+                setLoading(true);
+                try {
+                    await gymService.deleteGalleryImage(branch.id, imageId);
+                    onUpdate();
+                } catch (error) {
+                    toast.error('Lỗi xóa ảnh');
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
     };
 
     const handleUpdateAmenities = async (updated: Partial<GymAmenity>[]) => {
@@ -99,7 +118,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             setAmenities(updated);
             onUpdate();
         } catch (error) {
-            alert('Lỗi cập nhật tiện ích');
+            toast.error('Lỗi cập nhật tiện ích');
         } finally {
             setLoading(false);
         }
@@ -112,7 +131,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             setEquipment(updated);
             onUpdate();
         } catch (error) {
-            alert('Lỗi cập nhật thiết bị');
+            toast.error('Lỗi cập nhật thiết bị');
         } finally {
             setLoading(false);
         }
@@ -125,7 +144,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             setPricing(updated);
             onUpdate();
         } catch (error) {
-            alert('Lỗi cập nhật bảng giá');
+            toast.error('Lỗi cập nhật bảng giá');
         } finally {
             setLoading(false);
         }
@@ -145,7 +164,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             });
             onUpdate();
         } catch (error) {
-            alert('Lỗi tạo sự kiện');
+            toast.error('Lỗi tạo sự kiện');
         } finally {
             setLoading(false);
         }
@@ -153,29 +172,38 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
     const handleInviteTrainer = async (trainerId: string) => {
         setLoading(true);
         try {
-            await gymService.inviteTrainer(branch.id, { trainer_id: trainerId, role_at_gym: 'Main Coach' });
-            alert('Đã gửi lời mời');
+            await gymService.inviteTrainer(branch.id, { trainer_id: trainerId, role_at_gym: inviteRole });
+            toast.success('Đã gửi lời mời');
             setSearchResults([]);
             setSearchQuery('');
+            setInviteRole('Huấn luyện viên');
             onUpdate();
         } catch (error) {
-            alert('Lỗi mời Coach');
+            toast.error('Lỗi mời Coach');
         } finally {
             setLoading(false);
         }
     };
 
     const handleRemoveTrainer = async (linkId: string) => {
-        if (!confirm('Gỡ Coach khỏi chi nhánh?')) return;
-        setLoading(true);
-        try {
-            await gymService.removeTrainer(branch.id, linkId);
-            onUpdate();
-        } catch (error) {
-            alert('Lỗi gỡ Coach');
-        } finally {
-            setLoading(false);
-        }
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Gỡ Coach khỏi chi nhánh',
+            description: 'Coach này sẽ không còn hiển thị như một thành viên của chi nhánh này nữa.',
+            isDestructive: true,
+            onConfirm: async () => {
+                setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+                setLoading(true);
+                try {
+                    await gymService.removeTrainer(branch.id, linkId);
+                    onUpdate();
+                } catch (error) {
+                    toast.error('Lỗi gỡ Coach');
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
     };
 
     const handleSearchCoaches = async () => {
@@ -187,27 +215,36 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             await gymService.listGyms({ search: searchQuery }); // Placeholder if specific user search not found
             // Better to use dedicated user search if available
             setSearchResults([]); // Defaulting until search integrated
-            alert('Tính năng tìm kiếm Coach đang được đồng bộ...');
+            toast.success('Tính năng tìm kiếm Coach đang được đồng bộ...');
         } finally {
             setSearching(false);
         }
     };
 
     const handleDeleteEvent = async (eventId: string) => {
-        if (!confirm('Xóa sự kiện này?')) return;
-        setLoading(true);
-        try {
-            await gymService.deleteEvent(branch.id, eventId);
-            onUpdate();
-        } catch (error) {
-            alert('Lỗi xóa sự kiện');
-        } finally {
-            setLoading(false);
-        }
+        setConfirmConfig({
+            isOpen: true,
+            title: 'Xóa sự kiện',
+            description: 'Sự kiện này sẽ bị gỡ khỏi lịch hoạt động. Hành động này không thể hoàn tác.',
+            isDestructive: true,
+            onConfirm: async () => {
+                setConfirmConfig(prev => ({ ...prev, isOpen: false }));
+                setLoading(true);
+                try {
+                    await gymService.deleteEvent(branch.id, eventId);
+                    onUpdate();
+                } catch (error) {
+                    toast.error('Lỗi xóa sự kiện');
+                } finally {
+                    setLoading(false);
+                }
+            }
+        });
     };
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            {ToastComponent}
             <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-fade-in text-black">
                 {/* Header */}
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
@@ -792,6 +829,16 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                                         value={searchQuery}
                                         onChange={e => setSearchQuery(e.target.value)}
                                     />
+                                    <select
+                                        value={inviteRole}
+                                        onChange={e => setInviteRole(e.target.value)}
+                                        className="form-input text-sm"
+                                    >
+                                        <option value="Huấn luyện viên">Huấn luyện viên</option>
+                                        <option value="PT Chính">PT Chính</option>
+                                        <option value="PT Phụ">PT Phụ</option>
+                                        <option value="Yoga Instructor">Yoga Instructor</option>
+                                    </select>
                                     <button
                                         onClick={handleSearchCoaches}
                                         className="btn-primary px-6 text-[10px] font-black uppercase"
@@ -868,6 +915,16 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                     <span>Tất cả thay đổi đều được lưu tức thì vào hệ thống</span>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={confirmConfig.isOpen}
+                title={confirmConfig.title}
+                description={confirmConfig.description}
+                confirmText="Xác nhận"
+                isDestructive={confirmConfig.isDestructive}
+                onConfirm={confirmConfig.onConfirm}
+                onCancel={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))}
+            />
         </div>
     );
 };

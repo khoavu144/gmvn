@@ -15,7 +15,7 @@ export const getPublicProfile = async (req: Request, res: Response) => {
     }
 };
 
-// GET /api/v1/profiles/trainer/:trainerId/full — Public full (with exp, gallery, faq)
+// GET /api/v1/profiles/trainer/:trainerId/full — Public full (with exp, gallery, faq, premium)
 export const getFullPublicProfile = async (req: Request, res: Response) => {
     try {
         const trainerId = String(req.params.trainerId);
@@ -28,20 +28,13 @@ export const getFullPublicProfile = async (req: Request, res: Response) => {
     }
 };
 
-// GET /api/v1/profiles/slug/:slug — Public by slug (full)
+// GET /api/v1/profiles/slug/:slug — Public by slug (full CV data + premium)
 export const getProfileBySlug = async (req: Request, res: Response) => {
     try {
         const { slug } = req.params;
-        const profile = await profileService.getProfileBySlug(String(slug));
-        if (!profile || !profile.is_profile_public) return res.status(404).json({ error: 'Profile not found' });
-        const trainerId = profile.trainer_id;
-        const [experience, gallery, faq] = await Promise.all([
-            profileService.getExperience(trainerId),
-            profileService.getGallery(trainerId),
-            profileService.getFAQ(trainerId),
-        ]);
-        profileService.trackView(trainerId).catch(() => { });
-        res.json({ success: true, profile, experience, gallery, faq });
+        const data = await profileService.getFullPublicProfileBySlug(String(slug));
+        if (!data) return res.status(404).json({ error: 'Profile not found or not public' });
+        res.json({ success: true, ...data });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }
@@ -51,13 +44,45 @@ export const getProfileBySlug = async (req: Request, res: Response) => {
 export const getMyProfile = async (req: Request, res: Response) => {
     try {
         const trainerId = req.user!.user_id;
-        const [profile, experience, gallery, faq] = await Promise.all([
+        const [profile, experience, gallery, faq, skills, packages, testimonials, highlights, mediaFeatures, pressMentions] = await Promise.all([
             profileService.getProfileByTrainerId(trainerId),
             profileService.getExperience(trainerId),
             profileService.getGallery(trainerId),
             profileService.getFAQ(trainerId),
+            profileService.getSkills(trainerId),
+            profileService.getPackages(trainerId),
+            profileService.getTestimonials(trainerId),
+            profileService.getHighlights(trainerId),
+            profileService.getMediaFeatures(trainerId),
+            profileService.getPressMentions(trainerId),
         ]);
-        res.json({ success: true, profile, experience, gallery, faq });
+
+        res.json({
+            success: true,
+            profile,
+            experience,
+            gallery,
+            faq,
+            skills,
+            packages,
+            testimonials,
+            premium: profile
+                ? {
+                    hero: {
+                        tagline: profile.profile_tagline,
+                        themeVariant: profile.profile_theme_variant,
+                        badges: profile.hero_badges ?? [],
+                        metrics: profile.key_metrics ?? [],
+                        ctaConfig: profile.cta_config,
+                        isFeaturedProfile: profile.is_featured_profile,
+                    },
+                    sectionOrder: profile.section_order ?? [],
+                    highlights,
+                    mediaFeatures,
+                    pressMentions,
+                }
+                : null,
+        });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
     }
@@ -209,6 +234,132 @@ export const deleteFAQ = async (req: Request, res: Response) => {
         const trainerId = req.user!.user_id;
         await profileService.deleteFAQ(trainerId, String(req.params.id));
         res.json({ success: true, message: 'FAQ deleted' });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+// ── Skills ────────────────────────────────────────────────────────────────────
+
+export const getSkills = async (req: Request, res: Response) => {
+    try {
+        const trainerId = String(req.params.trainerId);
+        const skills = await profileService.getSkills(trainerId);
+        res.json({ success: true, skills });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const addSkill = async (req: Request, res: Response) => {
+    try {
+        const trainerId = req.user!.user_id;
+        const skill = await profileService.addSkill(trainerId, req.body);
+        res.status(201).json({ success: true, skill });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+export const updateSkill = async (req: Request, res: Response) => {
+    try {
+        const trainerId = req.user!.user_id;
+        const skill = await profileService.updateSkill(trainerId, String(req.params.id), req.body);
+        res.json({ success: true, skill });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+export const deleteSkill = async (req: Request, res: Response) => {
+    try {
+        const trainerId = req.user!.user_id;
+        await profileService.deleteSkill(trainerId, String(req.params.id));
+        res.json({ success: true, message: 'Skill deleted' });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+// ── Packages ──────────────────────────────────────────────────────────────────
+
+export const getPackages = async (req: Request, res: Response) => {
+    try {
+        const trainerId = String(req.params.trainerId);
+        const packages = await profileService.getPackages(trainerId);
+        res.json({ success: true, packages });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const addPackage = async (req: Request, res: Response) => {
+    try {
+        const trainerId = req.user!.user_id;
+        const pkg = await profileService.addPackage(trainerId, req.body);
+        res.status(201).json({ success: true, package: pkg });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+export const updatePackage = async (req: Request, res: Response) => {
+    try {
+        const trainerId = req.user!.user_id;
+        const pkg = await profileService.updatePackage(trainerId, String(req.params.id), req.body);
+        res.json({ success: true, package: pkg });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+export const deletePackage = async (req: Request, res: Response) => {
+    try {
+        const trainerId = req.user!.user_id;
+        await profileService.deletePackage(trainerId, String(req.params.id));
+        res.json({ success: true, message: 'Package deleted' });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+// ── Testimonials ──────────────────────────────────────────────────────────────
+
+export const getTestimonials = async (req: Request, res: Response) => {
+    try {
+        const trainerId = String(req.params.trainerId);
+        const testimonials = await profileService.getTestimonials(trainerId);
+        res.json({ success: true, testimonials });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const addTestimonial = async (req: Request, res: Response) => {
+    try {
+        const trainerId = req.user!.user_id;
+        const t = await profileService.addTestimonial(trainerId, req.body);
+        res.status(201).json({ success: true, testimonial: t });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+export const updateTestimonial = async (req: Request, res: Response) => {
+    try {
+        const trainerId = req.user!.user_id;
+        const t = await profileService.updateTestimonial(trainerId, String(req.params.id), req.body);
+        res.json({ success: true, testimonial: t });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+export const deleteTestimonial = async (req: Request, res: Response) => {
+    try {
+        const trainerId = req.user!.user_id;
+        await profileService.deleteTestimonial(trainerId, String(req.params.id));
+        res.json({ success: true, message: 'Testimonial deleted' });
     } catch (err: any) {
         res.status(400).json({ error: err.message });
     }

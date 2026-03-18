@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { logger } from '../lib/logger';
 import { gymService } from '../services/gymService';
 import type { GymReview } from '../types';
 import { useSelector } from 'react-redux';
@@ -6,9 +7,10 @@ import type { RootState } from '../store/store';
 
 interface GymReviewListProps {
     gymId: string;
+    refreshTick?: number;
 }
 
-const GymReviewList: React.FC<GymReviewListProps> = ({ gymId }) => {
+const GymReviewList: React.FC<GymReviewListProps> = ({ gymId, refreshTick = 0 }) => {
     const [reviews, setReviews] = useState<GymReview[]>([]);
     const [loading, setLoading] = useState(true);
     const user = useSelector((state: RootState) => state.auth.user);
@@ -16,7 +18,7 @@ const GymReviewList: React.FC<GymReviewListProps> = ({ gymId }) => {
 
     useEffect(() => {
         fetchReviews();
-    }, [gymId]);
+    }, [gymId, refreshTick]);
 
     const fetchReviews = async () => {
         setLoading(true);
@@ -26,7 +28,7 @@ const GymReviewList: React.FC<GymReviewListProps> = ({ gymId }) => {
                 setReviews(res.reviews || []);
             }
         } catch (err) {
-            console.error(err);
+            logger.error(err);
         } finally {
             setLoading(false);
         }

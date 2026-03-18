@@ -65,21 +65,28 @@ class ProgramService {
     async getAllPrograms(onlyPublished = true) {
         const where: any = {};
         if (onlyPublished) where.is_published = true;
-        return getProgramRepo().find({ where, order: { created_at: 'DESC' } });
+        return getProgramRepo().find({ where, relations: ['trainer'], order: { created_at: 'DESC' } });
     }
 
     async getProgramsByTrainer(trainerId: string, onlyPublished = false) {
         const where: any = { trainer_id: trainerId };
         if (onlyPublished) where.is_published = true;
-        return getProgramRepo().find({ where, order: { created_at: 'DESC' } });
+        return getProgramRepo().find({ where, relations: ['trainer'], order: { created_at: 'DESC' } });
     }
 
-    async getProgramById(programId: string) {
-        const program = await getProgramRepo()
+    async getProgramById(programId: string, includeUnpublished = false) {
+        const query = getProgramRepo()
             .createQueryBuilder('program')
+            .leftJoinAndSelect('program.trainer', 'trainer')
             .leftJoinAndSelect('program.workouts', 'workout')
             .leftJoinAndSelect('workout.exercises', 'exercise')
-            .where('program.id = :id', { id: programId })
+            .where('program.id = :id', { id: programId });
+
+        if (!includeUnpublished) {
+            query.andWhere('program.is_published = true');
+        }
+
+        const program = await query
             .orderBy('workout.week_number', 'ASC')
             .addOrderBy('workout.day_number', 'ASC')
             .addOrderBy('exercise.order_number', 'ASC')

@@ -1,62 +1,54 @@
 import { Request, Response } from 'express';
 import { authService } from '../services/authService';
 import { verifyRefreshToken } from '../utils/jwt';
+import { asyncHandler } from '../utils/asyncHandler';
+import { AppError } from '../utils/AppError';
 
 export const authController = {
-    async register(req: Request, res: Response) {
+    register: asyncHandler(async (req: Request, res: Response) => {
         try {
             const result = await authService.register(req.body);
             return res.status(201).json({ success: true, data: result });
         } catch (error: any) {
-            const statusCode = error.message === 'Email already registered' ? 409 : 500;
-            return res.status(statusCode).json({
-                success: false,
-                error: error.message,
-            });
+            if (error.message === 'Email already registered') {
+                throw new AppError(error.message, 409);
+            }
+            throw error; // Will be caught by asyncHandler -> 500 Error Handler
         }
-    },
+    }),
 
-    async login(req: Request, res: Response) {
+    login: asyncHandler(async (req: Request, res: Response) => {
         try {
             const result = await authService.login(req.body);
             return res.status(200).json({ success: true, data: result });
         } catch (error: any) {
-            return res.status(401).json({
-                success: false,
-                error: error.message,
-            });
+            throw new AppError(error.message || 'Invalid email or password', 401);
         }
-    },
+    }),
 
-    async refreshToken(req: Request, res: Response) {
+    refreshToken: asyncHandler(async (req: Request, res: Response) => {
         try {
             const { refresh_token } = req.body;
             const payload = verifyRefreshToken(refresh_token);
-            const result = await authService.refreshToken(payload.user_id, payload.email, payload.user_type);
+            const result = await authService.refreshToken(payload, refresh_token);
             return res.status(200).json({ success: true, data: result });
         } catch (error: any) {
-            return res.status(401).json({
-                success: false,
-                error: 'Invalid refresh token',
-            });
+            throw new AppError(error.message || 'Invalid refresh token', 401);
         }
-    },
+    }),
 
-    async logout(_req: Request, res: Response) {
-        // In a production app, we'd invalidate tokens in Redis
+    logout: asyncHandler(async (req: Request, res: Response) => {
+        await authService.logout(req.body?.refresh_token);
         return res.status(200).json({ success: true, data: { message: 'Logged out' } });
-    },
+    }),
 
-    async getProfile(req: Request, res: Response) {
+    getProfile: asyncHandler(async (req: Request, res: Response) => {
         try {
             const userId = req.user!.user_id;
             const profile = await authService.getProfile(userId);
             return res.status(200).json({ success: true, data: profile });
         } catch (error: any) {
-            return res.status(404).json({
-                success: false,
-                error: error.message,
-            });
+            throw new AppError(error.message || 'User not found', 404);
         }
-    },
+    }),
 };

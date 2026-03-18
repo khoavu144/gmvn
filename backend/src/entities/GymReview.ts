@@ -8,8 +8,11 @@ import {
     JoinColumn,
 } from 'typeorm';
 import { GymBranch } from './GymBranch';
+import { Index } from 'typeorm';
 
 @Entity('gym_reviews')
+@Index(['branch_id', 'user_id'], { unique: true })
+@Index(['branch_id'])
 export class GymReview {
     @PrimaryGeneratedColumn('uuid')
     id!: string;

@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { logger } from '../lib/logger';
 import { gymService } from '../services/gymService';
 import { useToast } from './Toast';
+import { ConfirmModal } from './ConfirmModal';
 import type { GymCenter } from '../types';
 
 const AdminGymApproval: React.FC = () => {
     const { toast, ToastComponent } = useToast();
     const [pendingGyms, setPendingGyms] = useState<GymCenter[]>([]);
     const [loading, setLoading] = useState(true);
+    const [confirmConfig, setConfirmConfig] = useState<{ isOpen: boolean; gymId?: string }>({ isOpen: false });
 
     useEffect(() => {
         fetchPending();
@@ -20,36 +23,50 @@ const AdminGymApproval: React.FC = () => {
                 setPendingGyms(res.gyms || []);
             }
         } catch (error) {
-            console.error(error);
+            logger.error(error);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleApprove = async (id: string) => {
-        if (!window.confirm('Phê duyệt phòng tập này?')) return;
+    const execApprove = async () => {
+        if (!confirmConfig.gymId) return;
         try {
-            const res = await gymService.approveGym(id);
+            const res = await gymService.approveGym(confirmConfig.gymId);
             if (res.success) {
                 toast.success('Đã phê duyệt phòng tập!');
                 fetchPending();
             }
         } catch (error) {
             toast.error('Lỗi khi phê duyệt');
+        } finally {
+            setConfirmConfig({ isOpen: false });
         }
     };
 
-    const handleReject = async (id: string) => {
-        const reason = window.prompt('Lý do từ chối?');
-        if (reason === null) return;
+    const handleApprove = (id: string) => {
+        setConfirmConfig({ isOpen: true, gymId: id });
+    };
+
+    // Reject modal state
+    const [rejectConfig, setRejectConfig] = useState<{ isOpen: boolean; gymId?: string; reason: string }>({ isOpen: false, reason: '' });
+
+    const handleReject = (id: string) => {
+        setRejectConfig({ isOpen: true, gymId: id, reason: '' });
+    };
+
+    const execReject = async () => {
+        if (!rejectConfig.gymId) return;
         try {
-            const res = await gymService.rejectGym(id);
+            const res = await gymService.rejectGym(rejectConfig.gymId);
             if (res.success) {
                 toast.success('Đã từ chối phòng tập');
                 fetchPending();
             }
         } catch (error) {
             toast.error('Lỗi khi từ chối');
+        } finally {
+            setRejectConfig({ isOpen: false, reason: '' });
         }
     };
 
@@ -102,6 +119,36 @@ const AdminGymApproval: React.FC = () => {
                     </div>
                 </div>
             ))}
+
+            <ConfirmModal
+                isOpen={confirmConfig.isOpen}
+                title="Xác nhận phê duyệt"
+                description="Bạn có chắc chắn muốn xuất bản phòng tập này lên hệ thống? Hành động này sẽ thông báo cho chủ phòng tập."
+                confirmText="Phê duyệt"
+                onConfirm={execApprove}
+                onCancel={() => setConfirmConfig({ isOpen: false })}
+            />
+
+            {/* Reject reason modal */}
+            {rejectConfig.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+                    <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+                        <h3 className="text-lg font-black uppercase tracking-tight">Từ chối phòng tập</h3>
+                        <p className="text-sm text-gray-600">Vui lòng nhập lý do từ chối để thông báo cho chủ phòng tập.</p>
+                        <textarea
+                            value={rejectConfig.reason}
+                            onChange={e => setRejectConfig(prev => ({ ...prev, reason: e.target.value }))}
+                            className="form-input w-full h-24 resize-none"
+                            placeholder="Lý do từ chối..."
+                            autoFocus
+                        />
+                        <div className="flex gap-3 justify-end">
+                            <button onClick={() => setRejectConfig({ isOpen: false, reason: '' })} className="btn-secondary px-5 py-2 text-sm">Huỷ</button>
+                            <button onClick={execReject} className="bg-red-600 text-white px-5 py-2 rounded-sm text-sm font-bold hover:bg-red-700 transition-colors">Xác nhận từ chối</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

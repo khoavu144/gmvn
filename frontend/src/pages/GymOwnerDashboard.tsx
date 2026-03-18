@@ -1,11 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadialBarChart, RadialBar } from 'recharts';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
+import { logger } from '../lib/logger';
+import { useToast } from '../components/Toast';
 import { gymService } from '../services/gymService';
 import type { GymCenter, GymBranch } from '../types';
 import { Link } from 'react-router-dom';
 import GymBranchEditor from '../components/GymBranchEditor';
 
+const LazyBarChart = lazy(() => import('recharts').then((m) => ({ default: m.BarChart })));
+const LazyBar = lazy(() => import('recharts').then((m) => ({ default: m.Bar })));
+const LazyXAxis = lazy(() => import('recharts').then((m) => ({ default: m.XAxis })));
+const LazyYAxis = lazy(() => import('recharts').then((m) => ({ default: m.YAxis })));
+const LazyTooltip = lazy(() => import('recharts').then((m) => ({ default: m.Tooltip })));
+const LazyResponsiveContainer = lazy(() => import('recharts').then((m) => ({ default: m.ResponsiveContainer })));
+const LazyRadialBarChart = lazy(() => import('recharts').then((m) => ({ default: m.RadialBarChart })));
+const LazyRadialBar = lazy(() => import('recharts').then((m) => ({ default: m.RadialBar })));
+
+const ChartFallback = () => <div className="h-full w-full animate-pulse rounded-lg bg-gray-100" />;
+
 const GymOwnerDashboard: React.FC = () => {
+    const { toast, ToastComponent } = useToast();
     const [gym, setGym] = useState<GymCenter | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'overview' | 'branches' | 'trainers' | 'settings'>('overview');
@@ -44,7 +57,7 @@ const GymOwnerDashboard: React.FC = () => {
                 }
             }
         } catch (error) {
-            console.error(error);
+            logger.error(error);
         } finally {
             setLoading(false);
         }
@@ -52,20 +65,20 @@ const GymOwnerDashboard: React.FC = () => {
 
     const handleCreateBranch = async () => {
         if (!newBranchForm.branch_name || !newBranchForm.address) {
-            alert('Vui lòng nhập tên chi nhánh và địa chỉ');
+            toast.success('Vui lòng nhập tên chi nhánh và địa chỉ');
             return;
         }
         setCreatingBranch(true);
         try {
             const res = await gymService.createBranch(newBranchForm);
             if (res.success) {
-                alert(`✅ Đã tạo chi nhánh "${newBranchForm.branch_name}" thành công!`);
+                toast.success(`✅ Đã tạo chi nhánh "${newBranchForm.branch_name}" thành công!`);
                 setShowNewBranchForm(false);
                 setNewBranchForm({ branch_name: '', address: '', city: '', district: '', phone: '', description: '' });
                 fetchMyGym(); // reload fresh data
             }
         } catch (error) {
-            alert('Lỗi tạo chi nhánh. Thử lại nhé!');
+            toast.error('Lỗi tạo chi nhánh. Thử lại nhé!');
         } finally {
             setCreatingBranch(false);
         }
@@ -78,10 +91,10 @@ const GymOwnerDashboard: React.FC = () => {
             const res = await gymService.updateGymCenter(gym.id, settingsForm);
             if (res.success) {
                 setGym(prev => prev ? { ...prev, ...settingsForm } : prev);
-                alert('Đã cập nhật thông tin thành công!');
+                toast.success('Đã cập nhật thông tin thành công!');
             }
         } catch (error) {
-            alert('Lỗi cập nhật cài đặt');
+            toast.error('Lỗi cập nhật cài đặt');
         } finally {
             setSaving(false);
         }
@@ -90,6 +103,7 @@ const GymOwnerDashboard: React.FC = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex">
+            {ToastComponent}
                 <div className="w-64 bg-gray-50 border-r border-gray-200"></div>
                 <div className="flex-1 p-8"><div className="animate-pulse h-32 bg-gray-100 rounded-xl" /></div>
             </div>
@@ -152,41 +166,45 @@ const GymOwnerDashboard: React.FC = () => {
                             <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm h-80 col-span-1 lg:col-span-2 flex flex-col">
                                 <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-6">Phân bổ đánh giá</p>
                                 <div className="flex-1 min-h-0">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={
-                                            [
-                                                { rating: '1★', count: stats?.rating_distribution?.[1] || 0 },
-                                                { rating: '2★', count: stats?.rating_distribution?.[2] || 0 },
-                                                { rating: '3★', count: stats?.rating_distribution?.[3] || 0 },
-                                                { rating: '4★', count: stats?.rating_distribution?.[4] || 0 },
-                                                { rating: '5★', count: stats?.rating_distribution?.[5] || 0 },
-                                            ]
-                                        } margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                            <XAxis dataKey="rating" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
-                                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} allowDecimals={false} />
-                                            <Tooltip cursor={{ fill: '#f3f4f6' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                                            <Bar dataKey="count" fill="#000000" radius={[4, 4, 0, 0]} maxBarSize={60} />
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                                    <Suspense fallback={<ChartFallback />}>
+                                        <LazyResponsiveContainer width="100%" height="100%">
+                                            <LazyBarChart data={
+                                                [
+                                                    { rating: '1★', count: stats?.rating_distribution?.[1] || 0 },
+                                                    { rating: '2★', count: stats?.rating_distribution?.[2] || 0 },
+                                                    { rating: '3★', count: stats?.rating_distribution?.[3] || 0 },
+                                                    { rating: '4★', count: stats?.rating_distribution?.[4] || 0 },
+                                                    { rating: '5★', count: stats?.rating_distribution?.[5] || 0 },
+                                                ]
+                                            } margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                                <LazyXAxis dataKey="rating" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} />
+                                                <LazyYAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} allowDecimals={false} />
+                                                <LazyTooltip cursor={{ fill: '#f3f4f6' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                                <LazyBar dataKey="count" fill="#000000" radius={[4, 4, 0, 0]} maxBarSize={60} />
+                                            </LazyBarChart>
+                                        </LazyResponsiveContainer>
+                                    </Suspense>
                                 </div>
                             </div>
 
                             <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm h-80 col-span-1 flex flex-col">
                                 <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-2">Tỷ lệ lấp đầy HLV</p>
                                 <div className="flex-1 min-h-0 relative">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <RadialBarChart
-                                            cx="50%" cy="50%"
-                                            innerRadius="70%" outerRadius="100%"
-                                            barSize={24}
-                                            data={[
-                                                { name: 'Đã lấp đầy', value: Math.min(100, Math.round(((stats?.total_trainers || 0) / (Math.max(1, branches.length) * 5)) * 100)) || 0, fill: '#000000' }
-                                            ]}
-                                            startAngle={90} endAngle={-270}
-                                        >
-                                            <RadialBar background={{ fill: '#f3f4f6' }} dataKey="value" cornerRadius={12} />
-                                        </RadialBarChart>
-                                    </ResponsiveContainer>
+                                    <Suspense fallback={<ChartFallback />}>
+                                        <LazyResponsiveContainer width="100%" height="100%">
+                                            <LazyRadialBarChart
+                                                cx="50%" cy="50%"
+                                                innerRadius="70%" outerRadius="100%"
+                                                barSize={24}
+                                                data={[
+                                                    { name: 'Đã lấp đầy', value: Math.min(100, Math.round(((stats?.total_trainers || 0) / (Math.max(1, branches.length) * 5)) * 100)) || 0, fill: '#000000' }
+                                                ]}
+                                                startAngle={90} endAngle={-270}
+                                            >
+                                                <LazyRadialBar background={{ fill: '#f3f4f6' }} dataKey="value" cornerRadius={12} />
+                                            </LazyRadialBarChart>
+                                        </LazyResponsiveContainer>
+                                    </Suspense>
                                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                         <div className="text-center">
                                             <span className="text-3xl font-black block">

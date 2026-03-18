@@ -33,6 +33,22 @@ export interface Award {
     description?: string;
 }
 
+export interface ProfileBadge {
+    label: string;
+    value?: string;
+    icon_key?: string;
+}
+
+export interface ProfileMetric {
+    label: string;
+    value: string;
+}
+
+export interface ProfileCTAConfig {
+    primary_label?: string;
+    secondary_label?: string;
+}
+
 @Entity('trainer_profiles')
 export class TrainerProfile {
     @PrimaryGeneratedColumn('uuid')
@@ -46,8 +62,11 @@ export class TrainerProfile {
     trainer!: User;
 
     // === HEADER ===
-    @Column({ type: 'varchar', length: 255, nullable: true })
+    @Column({ type: 'varchar', length: 20, nullable: true })
     slug!: string | null; // SEO-friendly URL, e.g. 'john-strength-coach'
+
+    @Column({ type: 'varchar', length: 20, default: 'card' })
+    profile_template!: 'card' | 'hero'; // Op1: 'card' | Op2: 'hero'
 
     @Column({ type: 'varchar', length: 500, nullable: true })
     cover_image_url!: string | null;
@@ -104,6 +123,27 @@ export class TrainerProfile {
 
     @Column({ type: 'boolean', default: true })
     is_profile_public!: boolean;
+
+    @Column({ type: 'varchar', length: 160, nullable: true })
+    profile_tagline!: string | null;
+
+    @Column({ type: 'varchar', length: 30, nullable: true })
+    profile_theme_variant!: string | null;
+
+    @Column({ type: 'jsonb', nullable: true })
+    hero_badges!: ProfileBadge[] | null;
+
+    @Column({ type: 'jsonb', nullable: true })
+    key_metrics!: ProfileMetric[] | null;
+
+    @Column({ type: 'jsonb', nullable: true })
+    cta_config!: ProfileCTAConfig | null;
+
+    @Column({ type: 'jsonb', nullable: true })
+    section_order!: string[] | null;
+
+    @Column({ type: 'boolean', default: false })
+    is_featured_profile!: boolean;
 
     @CreateDateColumn()
     created_at!: Date;

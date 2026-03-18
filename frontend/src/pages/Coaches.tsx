@@ -61,16 +61,30 @@ export default function Coaches() {
     };
 
     return (
-        <main className="max-w-7xl w-full mx-auto px-4 py-8 flex-1">
-            {/* ── Header ── */}
-            <div className="mb-8">
-                <h1 className="text-h1 mb-6">Khám phá Coach</h1>
+        <main className="page-shell">
+            <div className="page-container">
+                <section className="page-header">
+                    <p className="page-kicker">Coach Directory</p>
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div>
+                            <h1 className="page-title">Khám phá Coach</h1>
+                            <p className="page-description">
+                                Tìm huấn luyện viên theo chuyên môn, mức giá và phong cách đồng hành phù hợp với mục tiêu của bạn.
+                            </p>
+                        </div>
+                        {!isLoading && !isError && (
+                            <div className="text-sm text-gray-500 font-medium">
+                                {data?.trainers.length ?? 0} kết quả ở trang này
+                            </div>
+                        )}
+                    </div>
+                </section>
 
                 {/* Search + Filter toggle row */}
                 <div className="flex gap-3 flex-wrap items-center">
                     <div className="relative flex-1 min-w-[200px] max-w-xl">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span className="text-gray-400 text-sm">🔍</span>
+                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                         </div>
                         <input
                             type="text"
@@ -85,7 +99,7 @@ export default function Coaches() {
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg border font-semibold text-sm transition-colors ${showFilters || hasActiveFilters ? 'border-black bg-black text-white' : 'border-gray-300 text-gray-700 hover:border-black'}`}
                         onClick={() => setShowFilters(v => !v)}
                     >
-                        ⚡ Lọc {hasActiveFilters && <span className="bg-white text-black rounded-full w-4 h-4 text-xs flex items-center justify-center font-black">!</span>}
+                        Lọc {hasActiveFilters && <span className="bg-white text-black rounded-full w-4 h-4 text-xs flex items-center justify-center font-black">!</span>}
                     </button>
 
                     {/* Sort */}
@@ -102,13 +116,13 @@ export default function Coaches() {
 
                 {/* ── Filter Panel ── */}
                 {showFilters && (
-                    <div className="mt-4 p-5 border border-gray-200 rounded-xl bg-gray-50 space-y-5">
+                    <div className="mt-4 p-5 border border-gray-200 rounded-sm bg-gray-50 space-y-5">
                         {/* Specialty */}
                         <div>
                             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Chuyên môn</label>
                             <div className="flex flex-wrap gap-2">
                                 <button
-                                    className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${!specialty ? 'bg-black text-white border-black' : 'border-gray-300 text-gray-600 hover:border-black'}`}
+                                    className={`filter-chip ${!specialty ? 'filter-chip-active' : 'filter-chip-idle'}`}
                                     onClick={() => { setSpecialty(''); setPage(1); }}
                                 >
                                     Tất cả
@@ -116,7 +130,7 @@ export default function Coaches() {
                                 {SPECIALTIES.map(s => (
                                     <button
                                         key={s}
-                                        className={`px-3 py-1 rounded-full text-sm font-medium border transition-colors ${specialty === s ? 'bg-black text-white border-black' : 'border-gray-300 text-gray-600 hover:border-black'}`}
+                                        className={`filter-chip ${specialty === s ? 'filter-chip-active' : 'filter-chip-idle'}`}
                                         onClick={() => { setSpecialty(specialty === s ? '' : s); setPage(1); }}
                                     >
                                         {s}
@@ -132,7 +146,7 @@ export default function Coaches() {
                                 {PRICE_RANGES.map((r, idx) => (
                                     <button
                                         key={r.label}
-                                        className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors ${priceIdx === idx ? 'bg-black text-white border-black' : 'border-gray-300 text-gray-600 hover:border-black'}`}
+                                        className={`filter-chip ${priceIdx === idx ? 'filter-chip-active' : 'filter-chip-idle'}`}
                                         onClick={() => { setPriceIdx(idx); setPage(1); }}
                                     >
                                         {r.label}
@@ -148,97 +162,126 @@ export default function Coaches() {
                         )}
                     </div>
                 )}
-            </div>
-
-            {/* ── Content ── */}
-            {isLoading ? (
-                <div className="text-center text-gray-500 py-20 text-sm">Đang tải danh sách...</div>
-            ) : isError ? (
-                <div className="text-center text-red-600 py-20 font-medium">Đã xảy ra lỗi khi tải dữ liệu.</div>
-            ) : data?.trainers.length === 0 ? (
-                <div className="text-center text-gray-500 py-20 text-sm">
-                    Không tìm thấy Coach nào phù hợp.
-                    {hasActiveFilters && (
-                        <button className="ml-2 text-black font-bold underline" onClick={resetFilters}>Xoá bộ lọc</button>
-                    )}
-                </div>
-            ) : (
-                <>
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {data?.trainers.map((trainer) => (
-                            <Link key={trainer.id} to={`/coaches/${trainer.id}`} className="card group hover:border-black transition-colors flex flex-col cursor-pointer">
+                {/* ── Content ── */}
+                {isLoading ? (
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 animate-pulse">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <div key={i} className="card border border-gray-100 flex flex-col">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <div className="shrink-0">
-                                        {trainer.avatar_url ? (
-                                            <img className="w-16 h-16 rounded-xs object-cover border border-gray-200 grayscale group-hover:grayscale-0 transition-all" src={trainer.avatar_url} alt={trainer.full_name} />
-                                        ) : (
-                                            <div className="w-16 h-16 bg-gray-100 border border-gray-200 rounded-xs flex items-center justify-center text-gray-400 text-xl font-bold uppercase">
-                                                {trainer.full_name.charAt(0)}
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="min-w-0">
-                                        <h3 className="text-base font-bold text-black truncate">{trainer.full_name}</h3>
-                                        <p className="text-sm font-medium text-gray-700 mt-0.5">
-                                            {trainer.base_price_monthly ? `${trainer.base_price_monthly.toLocaleString('vi-VN')} ₫/tháng` : 'Liên hệ báo giá'}
-                                        </p>
-                                        <div className="flex items-center text-[10px] font-black text-black bg-gray-100 px-1.5 py-0.5 rounded-sm mt-1 w-fit">
-                                            ★ {(trainer as any).avg_rating?.toFixed(1) || '5.0'}
-                                        </div>
+                                    <div className="w-16 h-16 rounded-xs bg-gray-200 shrink-0"></div>
+                                    <div className="w-full space-y-2">
+                                        <div className="h-5 bg-gray-200 rounded-sm w-3/4"></div>
+                                        <div className="h-4 bg-gray-200 rounded-sm w-1/2"></div>
                                     </div>
                                 </div>
-
-                                <p className="text-sm text-gray-600 line-clamp-3 flex-1 mb-4">
-                                    {trainer.bio || 'Chưa có thông tin giới thiệu.'}
-                                </p>
-
-                                {trainer.specialties && trainer.specialties.length > 0 && (
-                                    <div className="flex flex-wrap gap-2 mb-4">
-                                        {trainer.specialties.slice(0, 3).map(spec => (
-                                            <span key={spec} className="inline-flex py-0.5 px-2 bg-gray-100 border border-gray-200 text-gray-700 text-xs font-medium rounded-xs">
-                                                {spec}
-                                            </span>
-                                        ))}
-                                        {trainer.specialties.length > 3 && (
-                                            <span className="inline-flex py-0.5 px-2 bg-gray-50 border border-gray-200 text-gray-500 text-xs font-medium rounded-xs">
-                                                +{trainer.specialties.length - 3}
-                                            </span>
-                                        )}
-                                    </div>
-                                )}
-
-                                <div className="pt-3 border-t border-gray-100 flex justify-between items-center text-sm font-medium text-black">
-                                    Xem hồ sơ chi tiết
-                                    <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                <div className="space-y-2 mb-4 flex-1">
+                                    <div className="h-3 bg-gray-200 rounded-sm w-full"></div>
+                                    <div className="h-3 bg-gray-200 rounded-sm w-5/6"></div>
+                                    <div className="h-3 bg-gray-200 rounded-sm w-4/6"></div>
                                 </div>
-                            </Link>
+                                <div className="flex gap-2 mb-4">
+                                    <div className="h-5 w-16 bg-gray-200 rounded-sm"></div>
+                                    <div className="h-5 w-20 bg-gray-200 rounded-sm"></div>
+                                </div>
+                            </div>
                         ))}
                     </div>
+                ) : isError ? (
+                    <div className="empty-state">
+                        <p className="text-sm font-medium text-red-600">Đã xảy ra lỗi khi tải dữ liệu.</p>
+                    </div>
+                ) : data?.trainers.length === 0 ? (
+                    <div className="empty-state text-sm text-gray-500">
+                        <div className="empty-state-number">0</div>
+                        <p className="text-sm font-medium text-gray-700">Không tìm thấy Coach nào phù hợp.</p>
+                        {hasActiveFilters && (
+                            <button className="mt-3 text-black font-bold underline" onClick={resetFilters}>Xoá bộ lọc</button>
+                        )}
+                    </div>
+                ) : (
+                    <>
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            {data?.trainers.map((trainer) => {
+                                const detailLink = trainer.user_type === 'athlete'
+                                    ? (trainer.profile_slug ? `/athletes/${trainer.profile_slug}` : `/athletes/${trainer.id}`)
+                                    : (trainer.profile_slug ? `/coach/${trainer.profile_slug}` : `/coaches/${trainer.id}`);
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="mt-10 flex items-center justify-center gap-3">
-                            <button
-                                onClick={() => setPage(p => Math.max(1, p - 1))}
-                                disabled={page === 1}
-                                className="btn-secondary px-4 disabled:opacity-40 disabled:cursor-not-allowed"
-                            >
-                                ← Trang trước
-                            </button>
-                            <span className="text-sm font-mono text-gray-600 min-w-[80px] text-center">
-                                {page} / {totalPages}
-                            </span>
-                            <button
-                                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                disabled={page === totalPages}
-                                className="btn-secondary px-4 disabled:opacity-40 disabled:cursor-not-allowed"
-                            >
-                                Trang sau →
-                            </button>
+                                return (
+                                    <Link key={trainer.id} to={detailLink} className="card group hover:border-black transition-colors flex flex-col cursor-pointer">
+                                        <div className="flex items-center gap-4 mb-4">
+                                            <div className="shrink-0">
+                                                {trainer.avatar_url ? (
+                                                    <img className="w-16 h-16 rounded-xs object-cover border border-gray-200 grayscale group-hover:grayscale-0 transition-all" src={trainer.avatar_url} alt={trainer.full_name} />
+                                                ) : (
+                                                    <div className="w-16 h-16 bg-gray-100 border border-gray-200 rounded-xs flex items-center justify-center text-gray-400 text-xl font-bold uppercase">
+                                                        {trainer.full_name.charAt(0)}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <h3 className="text-base font-bold text-black truncate">{trainer.full_name}</h3>
+                                                <p className="text-sm font-medium text-gray-700 mt-0.5">
+                                                    {trainer.base_price_monthly ? `${trainer.base_price_monthly.toLocaleString('vi-VN')} ₫/tháng` : 'Liên hệ báo giá'}
+                                                </p>
+                                                <div className="flex items-center text-[10px] font-black text-black bg-gray-100 px-1.5 py-0.5 rounded-sm mt-1 w-fit">
+                                                    ★ {(trainer as any).avg_rating?.toFixed(1) || '5.0'}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <p className="text-sm text-gray-600 line-clamp-3 flex-1 mb-4">
+                                            {trainer.bio || 'Chưa có thông tin giới thiệu.'}
+                                        </p>
+
+                                        {trainer.specialties && trainer.specialties.length > 0 && (
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                {trainer.specialties.slice(0, 3).map(spec => (
+                                                    <span key={spec} className="inline-flex py-0.5 px-2 bg-gray-100 border border-gray-200 text-gray-700 text-xs font-medium rounded-xs">
+                                                        {spec}
+                                                    </span>
+                                                ))}
+                                                {trainer.specialties.length > 3 && (
+                                                    <span className="inline-flex py-0.5 px-2 bg-gray-50 border border-gray-200 text-gray-500 text-xs font-medium rounded-xs">
+                                                        +{trainer.specialties.length - 3}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        <div className="pt-3 border-t border-gray-100 flex justify-between items-center text-sm font-medium text-black">
+                                            Xem hồ sơ chi tiết
+                                            <span className="group-hover:translate-x-1 transition-transform">→</span>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
                         </div>
-                    )}
-                </>
-            )}
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <div className="mt-10 flex items-center justify-center gap-3">
+                                <button
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                    className="btn-secondary px-4 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    ← Trang trước
+                                </button>
+                                <span className="text-sm font-mono text-gray-600 min-w-[80px] text-center">
+                                    {page} / {totalPages}
+                                </span>
+                                <button
+                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={page === totalPages}
+                                    className="btn-secondary px-4 disabled:opacity-40 disabled:cursor-not-allowed"
+                                >
+                                    Trang sau →
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
         </main>
     );
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { logger } from '../lib/logger';
 import { useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
@@ -31,23 +32,66 @@ export default function MessagesPage() {
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+    // Keep activePartner in a ref to avoid stale closure without reconnecting socket on every switch
+    const activePartnerRef = useRef(activePartner);
+    useEffect(() => {
+        activePartnerRef.current = activePartner;
+    }, [activePartner]);
+
     // Connect socket on mount
     useEffect(() => {
         if (!accessToken) return;
         socketService.connect(accessToken);
 
         const handleMessage = (data: any) => {
-            setMessages(prev => {
-                if (data.message.sender_id !== activePartner && data.message.receiver_id !== user?.id) return prev; // also ensure it belongs to the active conversation if wanted, but simpler to just match activePartner
-                if (data.message.sender_id !== activePartner) return prev;
-                return [...prev, data.message];
+            const incomingMessage = data?.message;
+            if (!incomingMessage) return;
+
+            setConversations(prev => {
+                const existing = prev.find(conv => conv.partner_id === incomingMessage.sender_id);
+                const nextConversation: Conversation = existing ?? {
+                    partner_id: incomingMessage.sender_id,
+                    partner: null,
+                    last_message: null,
+                    unread_count: 0,
+                };
+
+                const updated: Conversation = {
+                    ...nextConversation,
+                    last_message: {
+                        content: incomingMessage.content,
+                        created_at: incomingMessage.created_at,
+                        is_read: incomingMessage.is_read,
+                    },
+                    unread_count: incomingMessage.sender_id === activePartnerRef.current
+                        ? 0
+                        : (nextConversation.unread_count ?? 0) + 1,
+                };
+
+                return [
+                    updated,
+                    ...prev.filter(conv => conv.partner_id !== incomingMessage.sender_id),
+                ];
             });
-            loadConversations();
+
+            if (incomingMessage.sender_id === activePartnerRef.current) {
+                setMessages(prev => {
+                    if (prev.some(message => message.id === incomingMessage.id)) {
+                        return prev;
+                    }
+
+                    return [...prev, incomingMessage];
+                });
+            }
         };
 
         socketService.onMessageReceive(handleMessage);
-        return () => { socketService.offMessageReceive(); };
-    }, [accessToken, activePartner]);
+
+        return () => {
+            socketService.offMessageReceive();
+            socketService.disconnect();
+        };
+    }, [accessToken, user?.id]);
 
     // Load conversations
     useEffect(() => { loadConversations(); }, []);
@@ -55,8 +99,18 @@ export default function MessagesPage() {
     // Load initial partner from URL param
     useEffect(() => {
         const to = searchParams.get('to');
-        if (to) { setActivePartner(to); loadMessages(to); }
-    }, [searchParams]);
+        if (to) {
+            setActivePartner(to);
+            loadMessages(to);
+            return;
+        }
+
+        if (!activePartner && conversations.length > 0) {
+            const firstPartnerId = conversations[0].partner_id;
+            setActivePartner(firstPartnerId);
+            loadMessages(firstPartnerId);
+        }
+    }, [searchParams, conversations, activePartner]);
 
     // Scroll to bottom on new messages
     useEffect(() => {
@@ -67,7 +121,7 @@ export default function MessagesPage() {
         try {
             const res = await apiClient.get('/messages/conversations');
             setConversations(res.data.conversations || []);
-        } catch (err) { console.error(err); }
+        } catch (err) { logger.error(err); }
     };
 
     const loadMessages = async (partnerId: string) => {
@@ -75,26 +129,55 @@ export default function MessagesPage() {
         try {
             const res = await apiClient.get(`/messages/conversations/${partnerId}`);
             setMessages(res.data.messages || []);
-        } catch (err) { console.error(err); } finally { setLoading(false); }
+        } catch (err) { logger.error(err); } finally { setLoading(false); }
     };
 
     const selectConversation = (partnerId: string) => {
         setActivePartner(partnerId);
+        setConversations(prev => prev.map(conv => (
+            conv.partner_id === partnerId
+                ? { ...conv, unread_count: 0 }
+                : conv
+        )));
         loadMessages(partnerId);
     };
 
     const sendMessage = () => {
-        if (!newMessage.trim() || !activePartner) return;
-        socketService.sendMessage(activePartner, newMessage.trim());
-        // Optimistically add to UI
-        setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            sender_id: user?.id || '',
+        if (!newMessage.trim() || !activePartner || !user?.id) return;
+
+        const content = newMessage.trim();
+        const optimisticMessage: Message = {
+            id: `temp-${Date.now()}`,
+            sender_id: user.id,
             receiver_id: activePartner,
-            content: newMessage.trim(),
+            content,
             created_at: new Date().toISOString(),
             is_read: false,
-        }]);
+        };
+
+        socketService.sendMessage(activePartner, content);
+        setMessages(prev => [...prev, optimisticMessage]);
+        setConversations(prev => {
+            const existing = prev.find(conv => conv.partner_id === activePartner);
+            const nextConversation: Conversation = existing ?? {
+                partner_id: activePartner,
+                partner: null,
+                last_message: null,
+                unread_count: 0,
+            };
+
+            const updated: Conversation = {
+                ...nextConversation,
+                last_message: {
+                    content,
+                    created_at: optimisticMessage.created_at,
+                    is_read: false,
+                },
+                unread_count: 0,
+            };
+
+            return [updated, ...prev.filter(conv => conv.partner_id !== activePartner)];
+        });
         setNewMessage('');
     };
 
@@ -160,7 +243,11 @@ export default function MessagesPage() {
 
                         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-gray-50/50">
                             {loading ? (
-                                <div className="text-center text-gray-400 text-sm mt-4">Đang tải...</div>
+                                <div className="space-y-4 mt-4 animate-pulse">
+                                    <div className="flex justify-start"><div className="h-10 w-48 bg-gray-200 rounded-2xl rounded-tl-sm"></div></div>
+                                    <div className="flex justify-end"><div className="h-10 w-56 bg-gray-300 rounded-2xl rounded-tr-sm"></div></div>
+                                    <div className="flex justify-start"><div className="h-10 w-36 bg-gray-200 rounded-2xl rounded-tl-sm"></div></div>
+                                </div>
                             ) : messages.length === 0 ? (
                                 <div className="h-full flex items-center justify-center">
                                     <div className="text-center text-gray-400 text-sm border border-dashed border-gray-200 p-6 rounded-xs">

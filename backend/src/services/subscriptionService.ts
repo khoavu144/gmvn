@@ -26,9 +26,15 @@ class SubscriptionService {
         if (!program) throw new Error('Program not found');
         if (!program.trainer_id) throw new Error('Invalid program');
 
-        const amount = program.price_monthly
-            ? Number(program.price_monthly)
-            : 50000; // Default 50,000 VND
+        const amount = program.pricing_type === 'lump_sum'
+            ? Number(program.price_one_time)
+            : program.pricing_type === 'per_session'
+                ? Number(program.price_per_session)
+                : Number(program.price_monthly);
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+            throw new Error('Program price is invalid');
+        }
 
         // Syntax: GV userId programId
         const transferContent = `GV ${userId.substring(0, 8)} ${programId.substring(0, 8)}`.toUpperCase();
@@ -64,14 +70,19 @@ class SubscriptionService {
 
         // 1. Find user and program by prefix
         const users = await AppDataSource.query(`SELECT id FROM users WHERE id::text LIKE $1`, [`${userIdPrefix}%`]);
-        const programs = await AppDataSource.query(`SELECT id, trainer_id, price_monthly FROM programs WHERE id::text LIKE $1`, [`${programIdPrefix}%`]);
+        const programs = await AppDataSource.query(`SELECT id, trainer_id, price_monthly, price_one_time, price_per_session, pricing_type FROM programs WHERE id::text LIKE $1`, [`${programIdPrefix}%`]);
 
         if (!users.length || !programs.length) return { success: true };
 
         const userId = users[0].id;
         const programId = programs[0].id;
         const trainerId = programs[0].trainer_id;
-        const programAmount = Number(programs[0].price_monthly) || 50000;
+        const rawProgram = programs[0];
+        const programAmount = rawProgram.pricing_type === 'lump_sum'
+            ? Number(rawProgram.price_one_time)
+            : rawProgram.pricing_type === 'per_session'
+                ? Number(rawProgram.price_per_session)
+                : Number(rawProgram.price_monthly);
 
         // Tolerant verification for amount (>= programAmount)
         if (Number(transferAmount) < programAmount) {
@@ -88,16 +99,23 @@ class SubscriptionService {
 
         if (existing) return { success: true }; // Already subbed
 
+        const pricingType = rawProgram.pricing_type ?? 'monthly';
+        const subscriptionType = pricingType === 'lump_sum' || pricingType === 'per_session'
+            ? 'one_time'
+            : 'monthly';
+
         const sub = this.subRepo.create({
             user_id: userId,
             trainer_id: trainerId,
             program_id: programId,
-            subscription_type: 'monthly',
+            subscription_type: subscriptionType,
             price_paid: Number(transferAmount),
             sepay_transaction_id: String(id),
             status: 'active',
             started_at: new Date(),
-            next_billing_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            next_billing_date: subscriptionType === 'monthly'
+                ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                : null,
         });
 
         await this.programRepo.increment({ id: programId }, 'current_clients', 1);

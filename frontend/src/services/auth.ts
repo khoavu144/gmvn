@@ -13,6 +13,11 @@ interface AuthResponse {
     };
 }
 
+interface RefreshResponse {
+    access_token: string;
+    refresh_token: string;
+}
+
 interface ApiSuccessResponse<T> {
     success: true;
     data: T;
@@ -43,15 +48,17 @@ export const authApi = {
         return response.data.data;
     },
 
-    async refreshToken(refreshToken: string): Promise<{ access_token: string }> {
+    async refreshToken(refreshToken: string): Promise<RefreshResponse> {
         const response = await apiClient.post<
-            ApiSuccessResponse<{ access_token: string }>
+            ApiSuccessResponse<RefreshResponse>
         >('/auth/refresh', { refresh_token: refreshToken });
         return response.data.data;
     },
 
-    async logout(): Promise<void> {
-        await apiClient.post('/auth/logout');
+    async logout(refreshToken?: string): Promise<void> {
+        await apiClient.post('/auth/logout', {
+            refresh_token: refreshToken,
+        });
     },
 
     async getProfile() {

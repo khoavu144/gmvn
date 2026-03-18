@@ -44,8 +44,15 @@ export const getAllPrograms = async (req: Request, res: Response) => {
 
 export const getProgramById = async (req: Request, res: Response) => {
     try {
-        const program = await programService.getProgramById(String(req.params.id));
-        res.json({ success: true, program });
+        const programId = String(req.params.id);
+        const includeUnpublished = Boolean(req.user);
+        const program = await programService.getProgramById(programId, includeUnpublished);
+
+        if (program.is_published || req.user?.user_id === program.trainer_id) {
+            return res.json({ success: true, program });
+        }
+
+        return res.status(404).json({ error: 'Program not found' });
     } catch (err: any) {
         res.status(404).json({ error: err.message });
     }

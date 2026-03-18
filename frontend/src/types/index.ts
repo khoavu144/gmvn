@@ -15,6 +15,7 @@ export interface User {
     gym_owner_status?: 'pending_review' | 'approved' | 'rejected' | null;
     created_at: string;
     updated_at?: string;
+    profile_slug?: string | null; // for /coach/:slug URL
 }
 
 export interface Trainer {
@@ -95,6 +96,22 @@ export interface Award {
     description?: string;
 }
 
+export interface ProfileBadge {
+    label: string;
+    value?: string;
+    icon_key?: string;
+}
+
+export interface ProfileMetric {
+    label: string;
+    value: string;
+}
+
+export interface ProfileCTAConfig {
+    primary_label?: string;
+    secondary_label?: string;
+}
+
 export interface TrainerProfile {
     id: string;
     trainer_id: string;
@@ -116,7 +133,15 @@ export interface TrainerProfile {
     languages: string[] | null;
     is_accepting_clients: boolean;
     theme_color: string;
+    profile_template: 'card' | 'hero';
     is_profile_public: boolean;
+    profile_tagline?: string | null;
+    profile_theme_variant?: string | null;
+    hero_badges?: ProfileBadge[] | null;
+    key_metrics?: ProfileMetric[] | null;
+    cta_config?: ProfileCTAConfig | null;
+    section_order?: string[] | null;
+    is_featured_profile?: boolean;
     created_at: string;
     updated_at: string;
 }
@@ -153,20 +178,64 @@ export interface TrainerFAQ {
     created_at: string;
 }
 
+export interface TrainerSkill {
+    id: string;
+    trainer_id: string;
+    name: string;
+    level: number; // 0-100
+    category: string | null;
+    order_number: number;
+    created_at: string;
+}
+
+export interface TrainerPackage {
+    id: string;
+    trainer_id: string;
+    name: string;
+    description: string | null;
+    duration_months: number;
+    sessions_per_week: number | null;
+    price: number;
+    features: string[];
+    is_popular: boolean;
+    is_active: boolean;
+    order_number: number;
+    created_at: string;
+}
+
+export interface TrainerTestimonial {
+    id: string;
+    trainer_id: string;
+    client_name: string;
+    client_avatar: string | null;
+    rating: number;
+    comment: string;
+    result_achieved: string | null;
+    is_featured: boolean;
+    is_approved: boolean;
+    created_at: string;
+}
+
 export interface GymCenter {
     id: string;
     owner_id: string;
     name: string;
-    slug: string;
+    slug: string | null;
     logo_url: string | null;
     cover_image_url: string | null;
     description: string | null;
     tagline: string | null;
+    founded_year: number | null;
+    total_area_sqm: number | null;
+    total_equipment_count: number | null;
+    highlights: string[] | null;
     website_url: string | null;
     social_links: any | null;
     is_verified: boolean;
     is_active: boolean;
     view_count: number;
+    avg_rating?: number | null;
+    review_count?: number | null;
     created_at: string;
     updated_at: string;
     owner?: User; // joined relation for admin
@@ -182,6 +251,7 @@ export interface GymBranch {
     district: string | null;
     latitude: number | null;
     longitude: number | null;
+    google_maps_embed_url: string | null;
     phone: string | null;
     email: string | null;
     manager_name: string | null;

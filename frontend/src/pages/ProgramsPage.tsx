@@ -1,14 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
+import { lazy, Suspense, useState, useEffect, useRef } from 'react';
+import { logger } from '../lib/logger';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import apiClient from '../services/api';
 import { useToast } from '../components/Toast';
-import Select from 'react-select';
-import CreatableSelect from 'react-select/creatable';
-import { ImageCropperModal } from '../components/ImageCropperModal';
 import { uploadService } from '../services/uploadService';
 import type { Program } from '../types';
+
+const Select = lazy(() => import('react-select'));
+const CreatableSelect = lazy(() => import('react-select/creatable'));
+const ImageCropperModal = lazy(() =>
+    import('../components/ImageCropperModal').then((module) => ({ default: module.ImageCropperModal }))
+);
 
 interface FormData {
     name: string;
@@ -80,6 +84,8 @@ const prereqOptions = [
     { value: 'Cần tạ đơn cơ bản', label: 'Thiết bị cơ bản (Dumbbell/Band)' },
 ];
 
+const InputFallback = () => <div className="h-10 w-full animate-pulse rounded-xs bg-gray-100" />;
+
 export default function ProgramsPage() {
     const { toast, ToastComponent } = useToast();
     const navigate = useNavigate();
@@ -106,7 +112,7 @@ export default function ProgramsPage() {
         try {
             const res = await apiClient.get(`/programs/trainers/${user!.id}/programs`);
             setPrograms(res.data.programs || []);
-        } catch (err) { console.error(err); } finally { setLoading(false); }
+        } catch (err) { logger.error(err); } finally { setLoading(false); }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,20 +205,26 @@ export default function ProgramsPage() {
     const formatLabel: Record<string, string> = { online: 'Online', offline_1on1: '1-kèm-1', offline_group: 'Tập nhóm', hybrid: 'Hybrid' };
 
     return (
-        <div className="pb-16">
+        <div className="page-shell">
             {ToastComponent}
-            <div className="max-w-4xl mx-auto px-4 py-8">
-                <div className="flex items-center justify-between mb-8">
-                    <div>
-                        <button onClick={() => navigate('/dashboard')} className="text-gray-500 hover:text-black text-sm mb-2 block font-medium">← Về Dashboard</button>
-                        <h1 className="text-h2 m-0">Quản lý Gói tập</h1>
+            <div className="page-container">
+                <section className="page-header">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <button onClick={() => navigate('/dashboard')} className="back-link mb-3">← Về Dashboard</button>
+                            <p className="page-kicker">Program Workspace</p>
+                            <h1 className="page-title">Quản lý Gói tập</h1>
+                            <p className="page-description">
+                                Tạo, chỉnh sửa và công bố các gói tập với bố cục nhất quán theo phong cách homepage của hệ thống.
+                            </p>
+                        </div>
+                        {!showForm && (
+                            <button onClick={() => { setShowForm(true); setEditingId(null); setForm(defaultForm); }} className="btn-primary self-start sm:self-auto">
+                                + Tạo gói mới
+                            </button>
+                        )}
                     </div>
-                    {!showForm && (
-                        <button onClick={() => { setShowForm(true); setEditingId(null); setForm(defaultForm); }} className="btn-primary">
-                            + Tạo gói mới
-                        </button>
-                    )}
-                </div>
+                </section>
 
                 {/* Create/Edit Form */}
                 {showForm && (
@@ -280,42 +292,63 @@ export default function ProgramsPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div>
                                         <label className="form-label">Mục tiêu hình thể</label>
-                                        <Select
-                                            isMulti
-                                            options={goalOptions}
-                                            placeholder="Chọn các mục tiêu..."
-                                            value={goalOptions.filter(o => form.training_goals.includes(o.value))}
-                                            onChange={(selected) => setForm(f => ({ ...f, training_goals: selected.map(s => s.value) }))}
-                                            className="text-sm"
-                                            styles={{ control: (b) => ({ ...b, borderColor: '#e5e7eb', borderRadius: '2px' }) }}
-                                        />
+                                        <Suspense fallback={<InputFallback />}>
+                                            <Select
+                                                isMulti
+                                                options={goalOptions}
+                                                placeholder="Chọn các mục tiêu..."
+                                                value={goalOptions.filter(o => form.training_goals.includes(o.value))}
+                                                onChange={(selected) => {
+                                                    const values = Array.isArray(selected)
+                                                        ? selected.map((item: any) => String(item.value))
+                                                        : [];
+                                                    setForm(f => ({ ...f, training_goals: values }));
+                                                }}
+                                                className="text-sm"
+                                                styles={{ control: (b) => ({ ...b, borderColor: '#e5e7eb', borderRadius: '2px' }) }}
+                                            />
+                                        </Suspense>
                                     </div>
                                     <div>
                                         <label className="form-label">Yêu cầu đầu vào (Prerequisites)</label>
-                                        <CreatableSelect
-                                            isClearable
-                                            options={prereqOptions}
-                                            placeholder="Chọn hoặc nhập yêu cầu..."
-                                            value={form.prerequisites ? { value: form.prerequisites, label: form.prerequisites } : null}
-                                            onChange={(val) => setForm(f => ({ ...f, prerequisites: val ? val.value : '' }))}
-                                            className="text-sm"
-                                            styles={{ control: (b) => ({ ...b, borderColor: '#e5e7eb', borderRadius: '2px' }) }}
-                                        />
+                                        <Suspense fallback={<InputFallback />}>
+                                            <CreatableSelect
+                                                isClearable
+                                                options={prereqOptions}
+                                                placeholder="Chọn hoặc nhập yêu cầu..."
+                                                value={form.prerequisites ? { value: form.prerequisites, label: form.prerequisites } : null}
+                                                onChange={(val) => {
+                                                    const nextValue = val && typeof val === 'object' && 'value' in val
+                                                        ? String((val as any).value)
+                                                        : '';
+                                                    setForm(f => ({ ...f, prerequisites: nextValue }));
+                                                }}
+                                                className="text-sm"
+                                                styles={{ control: (b) => ({ ...b, borderColor: '#e5e7eb', borderRadius: '2px' }) }}
+                                            />
+                                        </Suspense>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
                                     <div>
                                         <label className="form-label">Checklist Quyền lợi đi kèm</label>
-                                        <Select
-                                            isMulti
-                                            options={featureOptions}
-                                            placeholder="Chọn các quyền lợi..."
-                                            value={featureOptions.filter(o => form.included_features.includes(o.value))}
-                                            onChange={(selected) => setForm(f => ({ ...f, included_features: selected.map(s => s.value) }))}
-                                            className="text-sm"
-                                            styles={{ control: (b) => ({ ...b, borderColor: '#e5e7eb', borderRadius: '2px' }) }}
-                                        />
+                                        <Suspense fallback={<InputFallback />}>
+                                            <Select
+                                                isMulti
+                                                options={featureOptions}
+                                                placeholder="Chọn các quyền lợi..."
+                                                value={featureOptions.filter(o => form.included_features.includes(o.value))}
+                                                onChange={(selected) => {
+                                                    const values = Array.isArray(selected)
+                                                        ? selected.map((item: any) => String(item.value))
+                                                        : [];
+                                                    setForm(f => ({ ...f, included_features: values }));
+                                                }}
+                                                className="text-sm"
+                                                styles={{ control: (b) => ({ ...b, borderColor: '#e5e7eb', borderRadius: '2px' }) }}
+                                            />
+                                        </Suspense>
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
@@ -391,7 +424,27 @@ export default function ProgramsPage() {
                 {!showForm && (
                     <>
                         {loading ? (
-                            <div className="text-center text-gray-500 py-16 text-sm">Đang tải...</div>
+                            <div className="grid grid-cols-1 gap-6 animate-pulse">
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="card !p-0 flex flex-col sm:flex-row shadow-sm border border-gray-100">
+                                        <div className="sm:w-48 aspect-[16/9] sm:aspect-auto bg-gray-200"></div>
+                                        <div className="p-5 flex-1 flex flex-col justify-center">
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div className="h-6 bg-gray-200 w-1/2 rounded-full"></div>
+                                                <div className="h-6 bg-gray-200 w-16 rounded-full"></div>
+                                            </div>
+                                            <div className="space-y-2 mb-4">
+                                                <div className="h-3 bg-gray-200 w-full rounded-sm"></div>
+                                                <div className="h-3 bg-gray-200 w-5/6 rounded-sm"></div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <div className="h-5 bg-gray-200 w-12 rounded-sm"></div>
+                                                <div className="h-5 bg-gray-200 w-16 rounded-sm"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         ) : programs.length === 0 ? (
                             <div className="card text-center py-16 border-dashed">
                                 <p className="text-gray-500 text-sm">Bạn chưa thiết lập gói huấn luyện nào.</p>
@@ -462,14 +515,16 @@ export default function ProgramsPage() {
                     </>
                 )}
 
-                <ImageCropperModal
-                    isOpen={isCropModalOpen}
-                    onClose={() => { setIsCropModalOpen(false); setSelectedImageFile(null); }}
-                    imageFile={selectedImageFile}
-                    onCropComplete={handleCropComplete}
-                    aspectRatio={16 / 9}
-                    title="Cắt ảnh bìa (Gói tập)"
-                />
+                <Suspense fallback={null}>
+                    <ImageCropperModal
+                        isOpen={isCropModalOpen}
+                        onClose={() => { setIsCropModalOpen(false); setSelectedImageFile(null); }}
+                        imageFile={selectedImageFile}
+                        onCropComplete={handleCropComplete}
+                        aspectRatio={16 / 9}
+                        title="Cắt ảnh bìa (Gói tập)"
+                    />
+                </Suspense>
 
             </div>
         </div>

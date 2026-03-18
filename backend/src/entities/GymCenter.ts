@@ -37,6 +37,18 @@ export class GymCenter {
     @Column({ type: 'varchar', length: 200, nullable: true })
     tagline!: string | null;
 
+    @Column({ type: 'int', nullable: true })
+    founded_year!: number | null;
+
+    @Column({ type: 'int', nullable: true })
+    total_area_sqm!: number | null;
+
+    @Column({ type: 'int', nullable: true })
+    total_equipment_count!: number | null;
+
+    @Column({ type: 'jsonb', nullable: true })
+    highlights!: string[] | null; // ['Open 24h', '5 chi nhánh', 'Hồ bơi Olympic']
+
     @Column({ type: 'jsonb', nullable: true })
     social_links!: {
         facebook?: string;

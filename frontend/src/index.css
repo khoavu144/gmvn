@@ -1,6 +1,14 @@
+@import './styles/globals.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  a, button, input, select, textarea, [role="button"], [tabindex]:not([tabindex="-1"]) {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2;
+  }
+}
 
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", sans-serif;
@@ -50,7 +58,7 @@ body {
 
   /* Button base styles */
   .btn-base {
-    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-xs font-medium transition duration-normal focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-sm font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] touch-manipulation;
   }
 
   .btn-primary {
@@ -67,7 +75,7 @@ body {
 
   /* Form utilities */
   .form-input {
-    @apply w-full px-3 py-2.5 bg-white border border-gray-200 rounded-xs text-base text-black font-normal placeholder:text-gray-500 transition duration-normal focus:outline-none focus:border-black focus:ring-1 focus:ring-black disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed;
+    @apply w-full px-3 py-2.5 bg-white border border-gray-200 rounded-sm text-base text-black font-normal placeholder:text-gray-500 transition duration-200 focus:outline-none focus:border-black focus:ring-1 focus:ring-black disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed min-h-[44px] touch-manipulation;
   }
 
   .form-label {
@@ -80,7 +88,7 @@ body {
 
   /* Card utilities */
   .card {
-    @apply bg-white border border-gray-200 rounded-xs p-5 md:p-6 hover:border-gray-300 transition duration-normal;
+    @apply bg-white border border-gray-200 rounded-sm p-5 md:p-6 hover:border-gray-300 transition duration-200;
   }
 
   .card-header {
@@ -94,6 +102,123 @@ body {
   .card-footer {
     @apply pt-3 mt-4 border-t border-gray-200;
   }
+
+  /* Missing utility classes (referenced in pages) */
+  .btn-ghost {
+    @apply btn-base bg-transparent text-black border border-gray-300 hover:bg-gray-100 hover:border-gray-500;
+  }
+
+  .btn-lg {
+    @apply px-8 py-3.5 text-sm;
+  }
+
+  /* Typography classes */
+  .heading-1 {
+    @apply text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight text-black;
+  }
+
+  .heading-2 {
+    @apply text-2xl sm:text-3xl font-bold tracking-tight text-black;
+  }
+
+  .heading-3 {
+    @apply text-xl font-bold text-black;
+  }
+
+  .body-1 {
+    @apply text-base text-gray-600 leading-relaxed;
+  }
+
+  .body-2 {
+    @apply text-sm text-gray-600 leading-relaxed;
+  }
+
+  .label {
+    @apply text-[10px] font-bold uppercase tracking-widest text-gray-400;
+  }
+
+  /* Semantic Alerts */
+  .alert-base {
+    @apply px-4 py-3 rounded-sm text-sm border font-medium;
+  }
+  .alert-error {
+    @apply alert-base bg-red-50 border-red-200 text-red-700;
+  }
+  .alert-warning {
+    @apply alert-base bg-amber-50 border-amber-200 text-amber-700;
+  }
+  .alert-success {
+    @apply alert-base bg-green-50 border-green-200 text-green-700;
+  }
+  .alert-info {
+    @apply alert-base bg-blue-50 border-blue-200 text-blue-700;
+  }
+
+  /* Homepage-inspired layout tokens */
+  .page-shell {
+    @apply min-h-screen bg-white pb-16;
+  }
+
+  .page-shell-muted {
+    @apply min-h-screen bg-gray-50 pb-16;
+  }
+
+  .page-container {
+    @apply max-w-5xl mx-auto px-4 sm:px-6 py-8;
+  }
+
+  .page-container-wide {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .page-header {
+    @apply mb-8 border-b border-gray-200 pb-6;
+  }
+
+  .page-kicker {
+    @apply text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3;
+  }
+
+  .page-title {
+    @apply text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight text-black;
+  }
+
+  .page-description {
+    @apply text-base text-gray-600 leading-relaxed mt-3 max-w-2xl;
+  }
+
+  .section-title {
+    @apply text-xl sm:text-2xl font-bold tracking-tight text-black;
+  }
+
+  .surface-panel {
+    @apply bg-white border border-gray-200 rounded-sm;
+  }
+
+  .filter-chip {
+    @apply px-3 py-1.5 rounded-full text-sm font-medium border transition-colors;
+  }
+
+  .filter-chip-active {
+    @apply bg-black text-white border-black;
+  }
+
+  .filter-chip-idle {
+    @apply border-gray-300 text-gray-600 hover:border-black;
+  }
+
+  .empty-state {
+    @apply surface-panel text-center py-16 px-6;
+  }
+
+  .empty-state-number {
+    @apply text-5xl font-black text-gray-100 mb-3;
+  }
+
+  .back-link {
+    @apply text-sm font-medium text-gray-500 hover:text-black transition-colors inline-flex items-center gap-1.5;
+  }
+
 }
 
 /* Animations - minimal */

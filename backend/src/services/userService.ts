@@ -99,17 +99,36 @@ class UserService {
             .take(limit)
             .getManyAndCount();
 
+        const trainerIds = trainers.map((t) => t.id);
+        const profileRows: Array<{ trainer_id: string; slug: string | null; headline: string | null }> = trainerIds.length
+            ? await AppDataSource
+                .createQueryBuilder()
+                .select('profile.trainer_id', 'trainer_id')
+                .addSelect('profile.slug', 'slug')
+                .addSelect('profile.headline', 'headline')
+                .from('trainer_profiles', 'profile')
+                .where('profile.trainer_id IN (:...ids)', { ids: trainerIds })
+                .getRawMany()
+            : [];
+
+        const profileByTrainerId = new Map(profileRows.map((row) => [row.trainer_id, row]));
+
         return {
-            trainers: trainers.map(t => ({
-                id: t.id,
-                full_name: t.full_name,
-                avatar_url: t.avatar_url,
-                bio: t.bio,
-                specialties: t.specialties,
-                base_price_monthly: t.base_price_monthly,
-                is_verified: t.is_verified,
-                city: (t as any).city ?? null,
-            })),
+            trainers: trainers.map((t) => {
+                const profileRow = profileByTrainerId.get(t.id);
+                return {
+                    id: t.id,
+                    profile_slug: profileRow?.slug ?? t.slug ?? null, // for /coach/:slug URL
+                    full_name: t.full_name,
+                    headline: profileRow?.headline ?? null,
+                    avatar_url: t.avatar_url,
+                    bio: t.bio,
+                    specialties: t.specialties,
+                    base_price_monthly: t.base_price_monthly,
+                    is_verified: t.is_verified,
+                    city: (t as any).city ?? null,
+                };
+            }),
             total,
             page,
             totalPages: Math.ceil(total / limit)
@@ -123,8 +142,19 @@ class UserService {
             throw new Error('Trainer not found');
         }
 
+        const profileRow = await AppDataSource
+            .createQueryBuilder()
+            .select('profile.slug', 'slug')
+            .from('trainer_profiles', 'profile')
+            .where('profile.trainer_id = :trainerId', { trainerId: id })
+            .getRawOne<{ slug: string | null }>();
+
+        const resolvedSlug = profileRow?.slug ?? trainer.slug ?? null;
+
         return {
             id: trainer.id,
+            slug: resolvedSlug,
+            profile_slug: resolvedSlug,
             full_name: trainer.full_name,
             avatar_url: trainer.avatar_url,
             bio: trainer.bio,
@@ -136,14 +166,28 @@ class UserService {
     }
 
     async getTrainerBySlug(slug: string) {
-        const trainer = await this.repo.findOneBy({ slug, user_type: 'trainer' });
+        let trainer = await this.repo.findOneBy({ slug, user_type: 'trainer' });
+
+        if (!trainer) {
+            const profileRow = await AppDataSource
+                .createQueryBuilder()
+                .select('profile.trainer_id', 'trainer_id')
+                .from('trainer_profiles', 'profile')
+                .where('profile.slug = :slug', { slug })
+                .getRawOne<{ trainer_id: string }>();
+
+            if (profileRow?.trainer_id) {
+                trainer = await this.repo.findOneBy({ id: profileRow.trainer_id, user_type: 'trainer' });
+            }
+        }
+
         if (!trainer) {
             throw new Error('Trainer not found');
         }
 
         return {
             id: trainer.id,
-            slug: trainer.slug,
+            slug,
             full_name: trainer.full_name,
             avatar_url: trainer.avatar_url,
             bio: trainer.bio,
@@ -156,41 +200,71 @@ class UserService {
 
     async getSimilarCoaches(trainerId: string, limit: number = 3) {
         const trainer = await this.repo.findOneBy({ id: trainerId, user_type: 'trainer' });
-        if (!trainer || !trainer.specialties || trainer.specialties.length === 0) {
+        if (!trainer) {
             return [];
         }
 
-        // Find trainers with overlapping specialties
-        const queryBuilder = this.repo.createQueryBuilder('user')
-            .where('user.user_type = :type', { type: 'trainer' })
-            .andWhere('user.id != :trainerId', { trainerId });
+        let similarTrainers: User[] = [];
 
-        // Match any specialty
-        const specialtyConditions = trainer.specialties.map((_, idx) =>
-            `EXISTS (SELECT 1 FROM jsonb_array_elements_text(user.specialties) AS spec WHERE spec ILIKE :specialty${idx})`
-        ).join(' OR ');
+        if (trainer.specialties && trainer.specialties.length > 0) {
+            // Find trainers with overlapping specialties
+            const queryBuilder = this.repo.createQueryBuilder('user')
+                .where('user.user_type = :type', { type: 'trainer' })
+                .andWhere('user.id != :trainerId', { trainerId });
 
-        const params: any = {};
-        trainer.specialties.forEach((spec, idx) => {
-            params[`specialty${idx}`] = `%${spec}%`;
+            const specialtyConditions = trainer.specialties.map((_, idx) =>
+                `EXISTS (SELECT 1 FROM jsonb_array_elements_text(user.specialties) AS spec WHERE spec ILIKE :specialty${idx})`
+            ).join(' OR ');
+
+            const params: Record<string, string> = {};
+            trainer.specialties.forEach((spec, idx) => {
+                params[`specialty${idx}`] = `%${spec}%`;
+            });
+
+            similarTrainers = await queryBuilder
+                .andWhere(`(${specialtyConditions})`, params)
+                .orderBy('user.created_at', 'DESC')
+                .limit(limit)
+                .getMany();
+        }
+
+        // Fallback: return newest trainers when specialty match is empty
+        if (similarTrainers.length === 0) {
+            similarTrainers = await this.repo.createQueryBuilder('user')
+                .where('user.user_type = :type', { type: 'trainer' })
+                .andWhere('user.id != :trainerId', { trainerId })
+                .orderBy('user.created_at', 'DESC')
+                .limit(limit)
+                .getMany();
+        }
+
+        const similarIds = similarTrainers.map((t) => t.id);
+        const similarProfileRows: Array<{ trainer_id: string; slug: string | null }> = similarIds.length
+            ? await AppDataSource
+                .createQueryBuilder()
+                .select('profile.trainer_id', 'trainer_id')
+                .addSelect('profile.slug', 'slug')
+                .from('trainer_profiles', 'profile')
+                .where('profile.trainer_id IN (:...ids)', { ids: similarIds })
+                .getRawMany()
+            : [];
+
+        const profileSlugByTrainerId = new Map(similarProfileRows.map((row) => [row.trainer_id, row.slug]));
+
+        return similarTrainers.map(t => {
+            const resolvedSlug = profileSlugByTrainerId.get(t.id) ?? t.slug ?? null;
+            return {
+                id: t.id,
+                slug: resolvedSlug,
+                profile_slug: resolvedSlug,
+                full_name: t.full_name,
+                avatar_url: t.avatar_url,
+                bio: t.bio,
+                specialties: t.specialties,
+                base_price_monthly: t.base_price_monthly,
+                is_verified: t.is_verified,
+            };
         });
-
-        queryBuilder.andWhere(`(${specialtyConditions})`, params)
-            .orderBy('user.created_at', 'DESC')
-            .limit(limit);
-
-        const similarTrainers = await queryBuilder.getMany();
-
-        return similarTrainers.map(t => ({
-            id: t.id,
-            slug: t.slug,
-            full_name: t.full_name,
-            avatar_url: t.avatar_url,
-            bio: t.bio,
-            specialties: t.specialties,
-            base_price_monthly: t.base_price_monthly,
-            is_verified: t.is_verified,
-        }));
     }
 
     async getTestimonials(trainerId: string, page: number = 1, limit: number = 10) {

@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import dotenv from 'dotenv';
+import { getEnv } from './env';
 import { User } from '../entities/User';
 import { Program } from '../entities/Program';
 import { Workout } from '../entities/Workout';
@@ -34,18 +34,24 @@ import { GymPricing } from '../entities/GymPricing';
 import { GymEvent } from '../entities/GymEvent';
 import { GymReview } from '../entities/GymReview';
 
+import { TrainerSkill } from '../entities/TrainerSkill';
+import { TrainerPackage } from '../entities/TrainerPackage';
+
 // Coach Profile Enhancement Entities
 import { Testimonial } from '../entities/Testimonial';
 import { BeforeAfterPhoto } from '../entities/BeforeAfterPhoto';
+import { TrainerProfileHighlight } from '../entities/TrainerProfileHighlight';
+import { TrainerMediaFeature } from '../entities/TrainerMediaFeature';
+import { TrainerPressMention } from '../entities/TrainerPressMention';
 
-dotenv.config();
+const env = getEnv();
 
 export const AppDataSource = new DataSource({
     type: 'postgres',
-    url: process.env.DATABASE_URL,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-    synchronize: true, // Thử bật sync để fix schema production
-    logging: true,
+    url: env.DATABASE_URL,
+    ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    synchronize: false,
+    logging: env.NODE_ENV === 'development',
     entities: [
         User,
         Program,
@@ -80,6 +86,11 @@ export const AppDataSource = new DataSource({
         // Coach Profile Enhancement
         Testimonial,
         BeforeAfterPhoto,
+        TrainerSkill,
+        TrainerPackage,
+        TrainerProfileHighlight,
+        TrainerMediaFeature,
+        TrainerPressMention,
     ],
     subscribers: [],
     migrations: [],

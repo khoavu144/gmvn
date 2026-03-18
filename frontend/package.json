@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "budget:check": "node ./scripts/check-bundle-budget.mjs",
+    "build:ci": "npm run build && npm run budget:check",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -21,7 +23,9 @@
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "framer-motion": "^12.35.2",
     "leaflet": "^1.9.4",
+    "lucide-react": "^0.577.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-helmet-async": "^3.0.0",

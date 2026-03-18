@@ -1,193 +1,232 @@
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+/**
+ * Gyms.tsx — Gym listing page
+ * Redesigned: better filter bar (city/district/amenity/price),
+ * wpresidence-inspired card grid, map toggle preserved.
+ */
+import React, { useState, lazy, Suspense, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { gymService } from '../services/gymService';
 import type { GymCenter } from '../types';
 import GymCard from '../components/GymCard';
+import { Helmet } from 'react-helmet-async';
 
 const GymMapView = lazy(() => import('../components/GymMapView'));
-
 type ViewMode = 'grid' | 'map';
 
-const Gyms: React.FC = () => {
-    const [gyms, setGyms] = useState<GymCenter[]>([]);
-    const [filteredGyms, setFilteredGyms] = useState<GymCenter[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [viewMode, setViewMode] = useState<ViewMode>('grid');
+const SORT_OPTIONS = [
+    { value: 'views', label: 'Phổ biến nhất' },
+    { value: 'newest', label: 'Mới nhất' },
+    { value: 'rating', label: 'Đánh giá cao' },
+];
 
+const Gyms: React.FC = () => {
+    const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
     // Filter states
     const [searchTerm, setSearchTerm] = useState('');
     const [cityFilter, setCityFilter] = useState('');
     const [districtFilter, setDistrictFilter] = useState('');
+    const [verifiedOnly, setVerifiedOnly] = useState(false);
+    const [sortBy, setSortBy] = useState('views');
 
-    useEffect(() => {
-        fetchGyms();
-    }, []);
+    const {
+        data: gyms = [] as GymCenter[],
+        isLoading: loading,
+        error: queryError,
+        refetch: fetchGyms
+    } = useQuery<GymCenter[]>({
+        queryKey: ['gyms', 'list'],
+        queryFn: async () => {
+            const response = await gymService.listGyms({ limit: 60, sort: 'views' });
+            if (!response.success) throw new Error(response.error || 'Lỗi tải danh sách gyms');
+            return response.gyms || [];
+        },
+        staleTime: 5 * 60 * 1000,
+    });
 
-    useEffect(() => {
-        // Client-side filtering as secondary layer for instant UX if dataset is small
-        let result = gyms;
-        if (searchTerm) {
-            result = result.filter(g =>
-                g.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                g.branches?.some(b => b.address?.toLowerCase().includes(searchTerm.toLowerCase()))
-            );
-        }
-        if (cityFilter) {
-            result = result.filter(g =>
-                g.branches?.some(b => b.city === cityFilter)
-            );
-        }
-        if (districtFilter) {
-            result = result.filter(g =>
-                g.branches?.some(b => b.city === cityFilter && b.district === districtFilter)
-            );
-        }
-        setFilteredGyms(result);
-    }, [searchTerm, cityFilter, districtFilter, gyms]);
+    const error = queryError ? (queryError as Error).message : null;
 
-    const fetchGyms = async () => {
-        try {
-            setLoading(true);
-            const response = await gymService.listGyms({ limit: 50, sort: 'views' });
-            if (response.success) {
-                setGyms(response.gyms || []);
-                setFilteredGyms(response.gyms || []);
-            } else {
-                setError(response.error || 'Lỗi tải danh sách gyms');
-            }
-        } catch (err: any) {
-            setError(err.message || 'Lỗi kết nối server');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Extract unique cities and districts from gyms
-    const locationData = React.useMemo(() => {
+    // Location data
+    const locationData = useMemo(() => {
         const data: Record<string, Set<string>> = {};
-        gyms.forEach(g => {
-            (g.branches || []).forEach(b => {
-                if (b.city) {
-                    if (!data[b.city]) data[b.city] = new Set();
-                    if (b.district) data[b.city].add(b.district);
-                }
-            });
-        });
+        gyms.forEach(g => (g.branches || []).forEach(b => {
+            if (b.city) {
+                if (!data[b.city]) data[b.city] = new Set();
+                if (b.district) data[b.city].add(b.district);
+            }
+        }));
         return data;
     }, [gyms]);
 
     const allCities = Object.keys(locationData).sort();
-    const availableDistricts = cityFilter && locationData[cityFilter] ? Array.from(locationData[cityFilter]).sort() : [];
+    const availableDistricts = cityFilter && locationData[cityFilter]
+        ? Array.from(locationData[cityFilter]).sort() : [];
+
+    // Filtered + sorted gyms
+    const filteredGyms = useMemo(() => {
+        let result = gyms;
+        if (searchTerm) {
+            const q = searchTerm.toLowerCase();
+            result = result.filter(g =>
+                g.name?.toLowerCase().includes(q) ||
+                g.tagline?.toLowerCase().includes(q) ||
+                g.branches?.some(b => b.address?.toLowerCase().includes(q))
+            );
+        }
+        if (cityFilter) result = result.filter(g => g.branches?.some(b => b.city === cityFilter));
+        if (districtFilter) result = result.filter(g => g.branches?.some(b => b.city === cityFilter && b.district === districtFilter));
+        if (verifiedOnly) result = result.filter(g => g.is_verified);
+        // sort
+        if (sortBy === 'newest') result = [...result].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        else if (sortBy === 'rating') result = [...result].sort((a, b) => (Number(b.avg_rating) || 0) - (Number(a.avg_rating) || 0));
+        else result = [...result].sort((a, b) => b.view_count - a.view_count); // views
+        return result;
+    }, [gyms, searchTerm, cityFilter, districtFilter, verifiedOnly, sortBy]);
+
+    const hasFilters = searchTerm || cityFilter || districtFilter || verifiedOnly;
 
     return (
-        <div className="bg-white min-h-screen pt-24 pb-16">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <>
+            <Helmet>
+                <title>Khám phá Gym — GymViet</title>
+                <meta name="description" content="Tìm kiếm phòng tập thể dục, gym cao cấp tại Việt Nam. Hệ thống đối tác uy tín của GymViet." />
+            </Helmet>
 
-                {/* Header Header */}
-                <div className="mb-12">
-                    <h1 className="text-4xl md:text-5xl font-black text-gray-900 uppercase tracking-tight mb-4">
-                        Khám phá <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-500">Gym Center</span>
-                    </h1>
-                    <p className="text-lg text-gray-600 max-w-2xl">
-                        Tìm kiếm không gian tập luyện đẳng cấp, phù hợp nhất với phong cách và mục tiêu của bạn. Hệ thống đối tác uy tín của GYMERVIET.
-                    </p>
-                </div>
+            <div className="bg-gray-50 min-h-screen pb-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                {/* View mode toggle + filter row */}
-                <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 flex flex-col md:flex-row gap-4 mb-12 items-end">
-                    <div className="flex-grow">
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Tìm kiếm</label>
-                        <input
-                            type="text"
-                            placeholder="Tên phòng tập, địa chỉ..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-all placeholder-gray-400"
-                        />
-                    </div>
-                    <div className="w-full md:w-56">
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Tỉnh/Thành phố</label>
-                        <select
-                            value={cityFilter}
-                            onChange={(e) => { setCityFilter(e.target.value); setDistrictFilter(''); }}
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-all appearance-none"
-                        >
-                            <option value="">Tất cả</option>
-                            {allCities.map(city => (
-                                <option key={city} value={city}>{city}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="w-full md:w-56">
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Quận/Huyện</label>
-                        <select
-                            value={districtFilter}
-                            onChange={(e) => setDistrictFilter(e.target.value)}
-                            disabled={!cityFilter}
-                            className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition-all appearance-none disabled:bg-gray-100 disabled:text-gray-400"
-                        >
-                            <option value="">Tất cả</option>
-                            {availableDistricts.map(district => (
-                                <option key={district} value={district}>{district}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    {/* Sprint 3: Grid / Map toggle */}
-                    <div className="flex-shrink-0">
-                        <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Chế độ xem</label>
-                        <div className="flex border border-gray-200 rounded-lg overflow-hidden bg-white">
-                            <button
-                                className={`px-4 py-2.5 text-sm font-bold transition-colors ${viewMode === 'grid' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-                                onClick={() => setViewMode('grid')}
-                            >
-                                ▦ Grid
-                            </button>
-                            <button
-                                className={`px-4 py-2.5 text-sm font-bold transition-colors ${viewMode === 'map' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-                                onClick={() => setViewMode('map')}
-                            >
-                                🗺️ Bản đồ
-                            </button>
+                    {/* ── PAGE HEADER ──────────────────────────────────── */}
+                    <div className="pt-8 pb-6 border-b border-gray-200 mb-6">
+                        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                            <div>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Gymerviet Network</p>
+                                <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
+                                    Phòng tập
+                                    {!loading && <span className="text-gray-300 ml-3 text-2xl font-mono">({filteredGyms.length})</span>}
+                                </h1>
+                            </div>
+                            {/* View toggle */}
+                            <div className="flex border border-gray-200 overflow-hidden bg-white shrink-0">
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${viewMode === 'grid' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'}`}
+                                >Grid</button>
+                                <button
+                                    onClick={() => setViewMode('map')}
+                                    className={`px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors ${viewMode === 'map' ? 'bg-black text-white' : 'text-gray-500 hover:text-black'}`}
+                                >Bản đồ</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Content */}
-                {loading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                            <div key={i} className="animate-pulse bg-gray-50 rounded-xl h-[400px]"></div>
-                        ))}
+                    {/* ── FILTER BAR ───────────────────────────────────── */}
+                    <div className="bg-white border border-gray-200 mb-6">
+                        {/* Primary row */}
+                        <div className="flex flex-col sm:flex-row gap-0 sm:divide-x sm:divide-gray-200">
+                            <div className="flex-1 px-4 py-3">
+                                <label htmlFor="search-gyms" className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Tìm kiếm</label>
+                                <input
+                                    id="search-gyms"
+                                    type="text"
+                                    placeholder="Tên gym, địa chỉ..."
+                                    value={searchTerm}
+                                    onChange={e => setSearchTerm(e.target.value)}
+                                    className="w-full text-sm text-black placeholder-gray-300 bg-transparent outline-none"
+                                />
+                            </div>
+                            <div className="px-4 py-3 sm:w-44">
+                                <label htmlFor="city-filter" className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Tỉnh/Thành</label>
+                                <select id="city-filter" value={cityFilter} onChange={e => { setCityFilter(e.target.value); setDistrictFilter(''); }}
+                                    className="w-full text-sm text-black bg-transparent outline-none appearance-none">
+                                    <option value="">Tất cả</option>
+                                    {allCities.map(c => <option key={c} value={c}>{c}</option>)}
+                                </select>
+                            </div>
+                            <div className="px-4 py-3 sm:w-44">
+                                <label htmlFor="district-filter" className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Quận/Huyện</label>
+                                <select id="district-filter" value={districtFilter} onChange={e => setDistrictFilter(e.target.value)}
+                                    disabled={!cityFilter}
+                                    className="w-full text-sm text-black bg-transparent outline-none appearance-none disabled:text-gray-300">
+                                    <option value="">Tất cả</option>
+                                    {availableDistricts.map(d => <option key={d} value={d}>{d}</option>)}
+                                </select>
+                            </div>
+                            <div className="px-4 py-3 sm:w-44">
+                                <label htmlFor="sort-filter" className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Sắp xếp</label>
+                                <select id="sort-filter" value={sortBy} onChange={e => setSortBy(e.target.value)}
+                                    className="w-full text-sm text-black bg-transparent outline-none appearance-none">
+                                    {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Secondary row: quick toggles */}
+                        <div className="border-t border-gray-100 px-4 py-2.5 flex items-center gap-4">
+                            <label className="flex items-center gap-2 cursor-pointer group">
+                                <input
+                                    type="checkbox"
+                                    checked={verifiedOnly}
+                                    onChange={(e) => setVerifiedOnly(e.target.checked)}
+                                    className="sr-only"
+                                />
+                                <div className={`w-8 h-4 rounded-full transition-colors relative cursor-pointer group-focus-within:ring-2 group-focus-within:ring-black group-focus-within:ring-offset-1 ${verifiedOnly ? 'bg-black' : 'bg-gray-200'}`}>
+                                    <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform ${verifiedOnly ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                                </div>
+                                <span className="text-xs font-medium text-gray-700">Chỉ Verified</span>
+                            </label>
+
+                            {hasFilters && (
+                                <button
+                                    onClick={() => { setSearchTerm(''); setCityFilter(''); setDistrictFilter(''); setVerifiedOnly(false); }}
+                                    className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-black transition-colors ml-auto">
+                                    Xóa bộ lọc ×
+                                </button>
+                            )}
+                        </div>
                     </div>
-                ) : error ? (
-                    <div className="bg-red-50 text-red-600 p-6 rounded-lg text-center font-medium border border-red-100">
-                        {error}
-                        <button onClick={fetchGyms} className="ml-4 underline font-bold">Thử lại</button>
-                    </div>
-                ) : viewMode === 'map' ? (
-                    // Sprint 3: Map view — Suspense wraps lazy-loaded GymMapView
-                    <Suspense fallback={<div className="h-[520px] bg-gray-100 rounded-xl animate-pulse" />}>
-                        <GymMapView gyms={filteredGyms.length > 0 ? filteredGyms : gyms} />
-                    </Suspense>
-                ) : filteredGyms.length === 0 ? (
-                    <div className="text-center py-20 bg-gray-50 rounded-xl border border-gray-200 border-dashed">
-                        <div className="text-6xl font-black text-gray-200 mb-4">0</div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Không tìm thấy phòng tập</h3>
-                        <p className="text-gray-500">Vui lòng thử nghiệm tìm kiếm khóa khác hoặc đổi khu vực</p>
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                        {filteredGyms.map(gym => (
-                            <GymCard key={gym.id} gym={gym} />
-                        ))}
-                    </div>
-                )}
+
+                    {/* ── CONTENT ──────────────────────────────────────── */}
+                    {loading ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {Array.from({ length: 8 }).map((_, i) => (
+                                <div key={i} className="bg-white border border-gray-100 animate-pulse">
+                                    <div className="bg-gray-100" style={{ aspectRatio: '4/3' }} />
+                                    <div className="p-4 space-y-2">
+                                        <div className="h-3 bg-gray-100 rounded w-3/4" />
+                                        <div className="h-2.5 bg-gray-100 rounded w-1/2" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : error ? (
+                        <div className="text-center py-12 border border-gray-200 bg-white">
+                            <p className="text-sm text-gray-500 mb-3">{error}</p>
+                            <button onClick={() => fetchGyms()} className="text-xs font-bold uppercase tracking-widest text-black underline underline-offset-2">
+                                Thử lại
+                            </button>
+                        </div>
+                    ) : viewMode === 'map' ? (
+                        <Suspense fallback={<div className="h-[520px] bg-gray-100 animate-pulse" />}>
+                            <GymMapView gyms={filteredGyms.length > 0 ? filteredGyms : gyms} />
+                        </Suspense>
+                    ) : filteredGyms.length === 0 ? (
+                        <div className="text-center py-20 border border-dashed border-gray-200 bg-white">
+                            <div className="text-5xl font-black text-gray-100 mb-3">0</div>
+                            <p className="text-sm font-medium text-gray-700 mb-1">Không tìm thấy phòng tập phù hợp</p>
+                            <p className="text-xs text-gray-400">Thử đổi khu vực hoặc xóa bộ lọc</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {filteredGyms.map(gym => (
+                                <GymCard key={gym.id} gym={gym} />
+                            ))}
+                        </div>
+                    )}
+
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
 export default Gyms;
-

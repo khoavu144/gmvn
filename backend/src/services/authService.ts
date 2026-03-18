@@ -1,12 +1,59 @@
+import { randomUUID } from 'crypto';
 import { AppDataSource } from '../config/database';
 import { User } from '../entities/User';
-import { hashPassword, verifyPassword } from '../utils/password';
-import { generateAccessToken, generateRefreshToken } from '../utils/jwt';
 import { RegisterInput, LoginInput } from '../schemas/auth';
+import {
+    generateAccessToken,
+    generateRefreshToken,
+    verifyRefreshToken,
+    type AppUserType,
+    type RefreshTokenPayload,
+    type TokenPayload,
+} from '../utils/jwt';
+import { hashPassword, verifyPassword } from '../utils/password';
+import { refreshTokenStore } from './refreshTokenStore';
 
 const getUserRepo = () => AppDataSource.getRepository(User);
 
 class AuthService {
+    private buildTokenPayload(user: User): TokenPayload {
+        return {
+            user_id: user.id,
+            email: user.email,
+            user_type: user.user_type as AppUserType,
+        };
+    }
+
+    private buildAuthUser(user: User) {
+        return {
+            id: user.id,
+            email: user.email,
+            full_name: user.full_name,
+            user_type: user.user_type as AppUserType,
+            avatar_url: user.avatar_url,
+            gym_owner_status: user.gym_owner_status,
+            is_verified: user.is_verified,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
+        };
+    }
+
+    private async issueSessionTokens(user: User, sessionId: string = randomUUID()) {
+        const payload = this.buildTokenPayload(user);
+        const access_token = generateAccessToken(payload);
+        const refresh_token = generateRefreshToken({
+            ...payload,
+            session_id: sessionId,
+        });
+
+        await refreshTokenStore.storeRefreshToken(user.id, sessionId, refresh_token);
+
+        return {
+            access_token,
+            refresh_token,
+        };
+    }
+
     async register(input: RegisterInput) {
         const existingUser = await getUserRepo().findOneBy({ email: input.email });
         if (existingUser) {
@@ -24,22 +71,11 @@ class AuthService {
 
         await getUserRepo().save(newUser);
 
-        const payload = { user_id: newUser.id, email: newUser.email, user_type: newUser.user_type };
-        const access_token = generateAccessToken(payload);
-        const refresh_token = generateRefreshToken(payload);
+        const tokens = await this.issueSessionTokens(newUser);
 
         return {
-            access_token,
-            refresh_token,
-            user: {
-                id: newUser.id,
-                email: newUser.email,
-                full_name: newUser.full_name,
-                user_type: newUser.user_type,
-                avatar_url: newUser.avatar_url,
-                gym_owner_status: newUser.gym_owner_status,
-                created_at: newUser.created_at,
-            },
+            ...tokens,
+            user: this.buildAuthUser(newUser),
         };
     }
 
@@ -54,23 +90,11 @@ class AuthService {
             throw new Error('Invalid email or password');
         }
 
-        const payload = { user_id: user.id, email: user.email, user_type: user.user_type };
-        const access_token = generateAccessToken(payload);
-        const refresh_token = generateRefreshToken(payload);
+        const tokens = await this.issueSessionTokens(user);
 
         return {
-            access_token,
-            refresh_token,
-            user: {
-                id: user.id,
-                email: user.email,
-                full_name: user.full_name,
-                user_type: user.user_type,
-                avatar_url: user.avatar_url,
-                gym_owner_status: user.gym_owner_status,
-                is_verified: user.is_verified,
-                created_at: user.created_at,
-            },
+            ...tokens,
+            user: this.buildAuthUser(user),
         };
     }
 
@@ -94,10 +118,39 @@ class AuthService {
         };
     }
 
-    async refreshToken(userId: string, email: string, user_type: 'user' | 'athlete' | 'trainer' | 'gym_owner' | 'admin') {
-        const payload = { user_id: userId, email, user_type };
-        const access_token = generateAccessToken(payload);
-        return { access_token };
+    async refreshToken(payload: RefreshTokenPayload, presentedRefreshToken: string) {
+        const user = await getUserRepo().findOneBy({ id: payload.user_id });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const storedRefreshToken = await refreshTokenStore.getRefreshToken(
+            payload.user_id,
+            payload.session_id
+        );
+
+        if (!storedRefreshToken || storedRefreshToken !== presentedRefreshToken) {
+            throw new Error('Refresh token revoked or rotated');
+        }
+
+        const tokens = await this.issueSessionTokens(user, payload.session_id);
+
+        return {
+            ...tokens,
+        };
+    }
+
+    async logout(refreshToken?: string) {
+        if (!refreshToken) {
+            return;
+        }
+
+        try {
+            const payload = verifyRefreshToken(refreshToken);
+            await refreshTokenStore.revokeRefreshToken(payload.user_id, payload.session_id);
+        } catch {
+            // Allow logout to stay idempotent even if refresh token is already expired or invalid.
+        }
     }
 }
 

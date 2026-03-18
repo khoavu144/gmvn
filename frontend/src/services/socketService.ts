@@ -1,4 +1,5 @@
 import { io, Socket } from 'socket.io-client';
+import { logger } from '../lib/logger';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 const SOCKET_URL = API_URL.replace('/api/v1', '');
@@ -19,7 +20,7 @@ class SocketService {
         });
 
         this.socket.on('connect_error', (err) => {
-            console.error('💬 Socket.io error:', err.message);
+            logger.error('💬 Socket.io error:', err.message);
         });
 
         return this.socket;

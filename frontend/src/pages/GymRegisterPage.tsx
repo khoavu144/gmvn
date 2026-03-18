@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import type { RootState } from '../store/store';
 import { gymService } from '../services/gymService';
 import { authApi } from '../services/auth';
@@ -7,6 +8,7 @@ import { setCredentials } from '../store/slices/authSlice';
 
 const GymRegisterPage: React.FC = () => {
     const { user, accessToken } = useSelector((state: RootState) => state.auth);
+    const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
 
     const [form, setForm] = useState({
@@ -23,6 +25,13 @@ const GymRegisterPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [submitted, setSubmitted] = useState(false);
+
+    useEffect(() => {
+        const isPendingView = searchParams.get('step') === '3';
+        if (isPendingView || user?.gym_owner_status === 'pending_review') {
+            setSubmitted(true);
+        }
+    }, [searchParams, user]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -67,8 +76,19 @@ const GymRegisterPage: React.FC = () => {
                     <p className="text-gray-600 mb-6">
                         GYMERVIET đang xác minh thông tin phòng tập của bạn. Quá trình này thường mất từ 1-2 ngày làm việc. Chúng tôi sẽ liên hệ qua email nếu cần thêm thông tin.
                     </p>
-                    <button className="btn-secondary w-full" onClick={() => window.location.reload()}>
-                        Tải lại trang
+                    <button 
+                        className="btn-secondary w-full" 
+                        onClick={async () => {
+                            try {
+                                const profileData = await authApi.getProfile();
+                                const refresh = localStorage.getItem('refresh_token') || '';
+                                dispatch(setCredentials({ user: profileData, access_token: accessToken as string, refresh_token: refresh }));
+                            } catch (e) {
+                                console.error('Tải lại trạng thái thất bại', e);
+                            }
+                        }}
+                    >
+                        Làm mới trạng thái
                     </button>
                 </div>
             </div>

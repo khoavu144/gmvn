@@ -6,43 +6,31 @@ import {
     getProfileBySlug,
     getMyProfile,
     updateMyProfile,
-    // Experience
-    getExperience,
-    addExperience,
-    updateExperience,
-    deleteExperience,
-    // Gallery
-    getGallery,
-    addGalleryImage,
-    updateGalleryImage,
-    deleteGalleryImage,
-    // FAQ
-    getFAQ,
-    addFAQ,
-    updateFAQ,
-    deleteFAQ,
+    getExperience, addExperience, updateExperience, deleteExperience,
+    getGallery, addGalleryImage, updateGalleryImage, deleteGalleryImage,
+    getFAQ, addFAQ, updateFAQ, deleteFAQ,
+    getSkills, addSkill, updateSkill, deleteSkill,
+    getPackages, addPackage, updatePackage, deletePackage,
+    getTestimonials, addTestimonial, updateTestimonial, deleteTestimonial,
 } from '../controllers/profileController';
-import {
-    getProgressPhotos,
-    addProgressPhoto,
-    deleteProgressPhoto
-} from '../controllers/progressPhotoController';
+import { getProgressPhotos, addProgressPhoto, deleteProgressPhoto } from '../controllers/progressPhotoController';
 
 const router = Router();
-const auth = authenticate;
 const trainerAuth = [authenticate, proOnly];
 
-// ── PUBLIC ────────────────────────────────────────────────────────────────────
+// PUBLIC
 router.get('/slug/:slug', getProfileBySlug);
 router.get('/trainer/:trainerId', getPublicProfile);
 router.get('/trainer/:trainerId/full', getFullPublicProfile);
 router.get('/trainer/:trainerId/experience', getExperience);
 router.get('/trainer/:trainerId/gallery', getGallery);
 router.get('/trainer/:trainerId/faq', getFAQ);
+router.get('/trainer/:trainerId/skills', getSkills);
+router.get('/trainer/:trainerId/packages', getPackages);
+router.get('/trainer/:trainerId/testimonials', getTestimonials);
 
-// ── TRAINER PROTECTED ─────────────────────────────────────────────────────────
-// Core profile
-router.get('/me', auth, getMyProfile);
+// PROTECTED - core
+router.get('/me', authenticate, getMyProfile);
 router.put('/me', ...trainerAuth, updateMyProfile);
 
 // Experience CRUD
@@ -60,9 +48,24 @@ router.post('/me/faq', ...trainerAuth, addFAQ);
 router.put('/me/faq/:id', ...trainerAuth, updateFAQ);
 router.delete('/me/faq/:id', ...trainerAuth, deleteFAQ);
 
-// Progress Photos (Athletes & Users)
-router.get('/progress-photos', auth, getProgressPhotos);
-router.post('/progress-photos', auth, addProgressPhoto);
-router.delete('/progress-photos/:id', auth, deleteProgressPhoto);
+// Skills CRUD
+router.post('/me/skills', ...trainerAuth, addSkill);
+router.put('/me/skills/:id', ...trainerAuth, updateSkill);
+router.delete('/me/skills/:id', ...trainerAuth, deleteSkill);
+
+// Packages CRUD
+router.post('/me/packages', ...trainerAuth, addPackage);
+router.put('/me/packages/:id', ...trainerAuth, updatePackage);
+router.delete('/me/packages/:id', ...trainerAuth, deletePackage);
+
+// Testimonials CRUD
+router.post('/me/testimonials', ...trainerAuth, addTestimonial);
+router.put('/me/testimonials/:id', ...trainerAuth, updateTestimonial);
+router.delete('/me/testimonials/:id', ...trainerAuth, deleteTestimonial);
+
+// Progress Photos
+router.get('/progress-photos', authenticate, getProgressPhotos);
+router.post('/progress-photos', authenticate, addProgressPhoto);
+router.delete('/progress-photos/:id', authenticate, deleteProgressPhoto);
 
 export default router;

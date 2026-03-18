@@ -42,7 +42,11 @@ export default function Register() {
                 full_name: form.full_name,
                 user_type: form.user_type,
             });
-            dispatch(setCredentials(result));
+            dispatch(setCredentials({
+                user: result.user,
+                access_token: result.access_token,
+                refresh_token: result.refresh_token,
+            }));
             if (result.user.user_type === 'gym_owner') {
                 navigate('/gym-owner/register');
             } else {
@@ -59,19 +63,19 @@ export default function Register() {
     };
 
     return (
-        <div className="py-20 flex items-center justify-center px-4">
-            <div className="w-full max-w-md">
-                {/* Heading */}
-                <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-black">Đăng ký</h2>
-                    <p className="text-body mt-2">Bắt đầu hành trình tập luyện cùng GYMERVIET</p>
+        <div className="page-shell">
+            <div className="page-container max-w-md py-16 sm:py-20">
+                <div className="text-center page-header">
+                    <p className="page-kicker">Join Gymerviet</p>
+                    <h1 className="page-title text-center">Đăng ký</h1>
+                    <p className="page-description mx-auto text-center">Bắt đầu hành trình tập luyện cùng GYMERVIET với trải nghiệm giao diện đồng bộ toàn hệ thống.</p>
                 </div>
 
                 {/* Card */}
                 <div className="card">
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-4" aria-label="Biểu mẫu đăng ký">
                         {error && (
-                            <div className="bg-red-50 border border-red-200 text-gray-800 px-4 py-3 rounded-xs text-sm">
+                            <div role="alert" aria-live="assertive" className="bg-red-50 border border-red-200 text-gray-800 px-4 py-3 rounded-xs text-sm">
                                 {error}
                             </div>
                         )}
@@ -84,6 +88,7 @@ export default function Register() {
                                 id="full_name"
                                 name="full_name"
                                 type="text"
+                                aria-required="true"
                                 value={form.full_name}
                                 onChange={handleChange}
                                 required
@@ -100,6 +105,7 @@ export default function Register() {
                                 id="email"
                                 name="email"
                                 type="email"
+                                aria-required="true"
                                 value={form.email}
                                 onChange={handleChange}
                                 required
@@ -133,6 +139,7 @@ export default function Register() {
                                 id="password"
                                 name="password"
                                 type="password"
+                                aria-required="true"
                                 value={form.password}
                                 onChange={handleChange}
                                 required
@@ -150,6 +157,7 @@ export default function Register() {
                                 id="confirmPassword"
                                 name="confirmPassword"
                                 type="password"
+                                aria-required="true"
                                 value={form.confirmPassword}
                                 onChange={handleChange}
                                 required
@@ -161,6 +169,7 @@ export default function Register() {
                         <button
                             type="submit"
                             disabled={loading}
+                            aria-busy={loading}
                             className="btn-primary w-full mt-4"
                         >
                             {loading ? 'Đang tạo...' : 'Đăng ký'}
@@ -179,7 +188,7 @@ export default function Register() {
                 </div>
 
                 <div className="mt-8 text-center">
-                    <Link to="/" className="text-sm text-gray-500 hover:text-black hover:underline">
+                    <Link to="/" className="back-link justify-center">
                         ← Quay lại trang chủ
                     </Link>
                 </div>

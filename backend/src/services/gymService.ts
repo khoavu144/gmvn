@@ -56,15 +56,19 @@ export const gymService = {
         };
     },
 
-    async getGymCenterById(gymCenterId: string) {
+    async getGymCenterById(gymCenterIdOrSlug: string) {
         const gymCenterRepo = AppDataSource.getRepository(GymCenter);
+        // Detect UUID vs slug: UUIDs are 36 chars with hyphens in pattern
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(gymCenterIdOrSlug);
+        const where = isUUID
+            ? { id: gymCenterIdOrSlug, is_active: true }
+            : { slug: gymCenterIdOrSlug, is_active: true };
         const gym = await gymCenterRepo.findOne({
-            where: { id: gymCenterId, is_verified: true, is_active: true },
+            where,
             relations: ['branches'],
         });
         if (gym) {
-            // Increment view count
-            await gymCenterRepo.update(gymCenterId, { view_count: () => 'view_count + 1' });
+            await gymCenterRepo.update(gym.id, { view_count: () => 'view_count + 1' });
         }
         return gym;
     },
@@ -423,7 +427,7 @@ export const gymService = {
         const linkRepo = AppDataSource.getRepository(GymTrainerLink);
         return linkRepo.find({
             where: { trainer_id: trainerId, status: 'active' },
-            relations: ['gym_center', 'branch'],
+            relations: ['branch', 'branch.gym_center'],
         });
     },
 

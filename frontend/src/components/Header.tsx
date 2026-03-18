@@ -1,138 +1,238 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { Menu, X, LogOut, User, MessageSquare, Calendar, Dumbbell, ChevronRight } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import type { RootState } from '../store/store';
+import { authApi } from '../services/auth';
 import NotificationBell from './NotificationBell';
+import { cn } from '../lib/utils';
 
 export default function Header() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [lastScrollY, setLastScrollY] = useState(0);
+    const [isHidden, setIsHidden] = useState(false);
 
-    const isAuthenticated = useSelector(
-        (state: RootState) => state.auth.isAuthenticated
-    );
-    const user = useSelector((state: RootState) => state.auth.user);
+    const { isAuthenticated, user, refreshToken } = useSelector((state: RootState) => state.auth);
 
-    const handleLogout = () => {
-        dispatch(logout());
-        setIsMenuOpen(false);
-        navigate('/login');
+    // Scroll behavior: hide on scroll down, show on scroll up
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            // Add backdrop when scrolled
+            setIsScrolled(currentScrollY > 10);
+
+            // Hide/show header based on scroll direction
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                setIsHidden(true);
+            } else {
+                setIsHidden(false);
+            }
+
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastScrollY, isScrolled]); // isScrolled is used in the effect
+
+    const handleLogout = async () => {
+        try {
+            await authApi.logout(refreshToken || localStorage.getItem('refresh_token') || undefined);
+        } catch {
+            // Keep client-side logout resilient even when the session is already invalid.
+        } finally {
+            dispatch(logout());
+            setIsMenuOpen(false);
+            navigate('/login');
+        }
     };
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
     const closeMenu = () => setIsMenuOpen(false);
 
     return (
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-[60]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex justify-between items-center">
+        <header
+            className={cn(
+                'fixed top-0 left-0 right-0 z-header h-header',
+                'bg-white',
+                'border-b border-gray-200',
+                'transition-transform duration-150',
+                isHidden && '-translate-y-full'
+            )}
+        >
+            <div className="max-w-page mx-auto px-4 sm:px-6 h-full flex justify-between items-center">
+                {/* Logo */}
                 <Link to="/" onClick={closeMenu} className="flex items-center">
-                    <img src="/logo.png" alt="GYMERVIET" className="h-8 sm:h-10 object-contain" />
+                    <img
+                        src="/logo.png"
+                        alt="GYMERVIET"
+                        className="h-8 sm:h-9 object-contain"
+                        decoding="async"
+                        fetchPriority="high"
+                    />
                 </Link>
 
                 {/* Desktop Nav */}
-                <div className="hidden lg:flex items-center gap-6">
-                    <Link to="/gyms" className="text-sm font-black px-4 py-2 bg-black text-white hover:bg-gray-800 transition-all rounded-lg whitespace-nowrap tracking-tight uppercase">Gym Center</Link>
-                    <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Coach</Link>
-                    <Link to="/about" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Về chúng tôi</Link>
+                <nav className="hidden lg:flex items-center gap-6">
+                    <Link
+                        to="/gyms"
+                        className="text-sm font-semibold px-4 py-2 bg-black text-white hover:bg-gray-800 rounded transition-colors"
+                    >
+                        Gym Center
+                    </Link>
+                    <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                        Coach
+                    </Link>
+                    <Link to="/about" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                        Về chúng tôi
+                    </Link>
                     {isAuthenticated && (
                         <>
-                            <Link to="/programs" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Khóa học</Link>
-                            {user?.user_type === 'athlete' && (
-                                <Link to="/workouts" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Lịch tập</Link>
+                            {(user?.user_type === 'trainer' || user?.user_type === 'athlete') && (
+                                <Link to="/programs" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                                    Khóa học
+                                </Link>
                             )}
-                            <Link to="/messages" className="text-sm font-medium text-gray-600 hover:text-black transition-colors whitespace-nowrap">Tin nhắn</Link>
+                            {user?.user_type === 'athlete' && (
+                                <Link to="/workouts" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                                    Lịch tập
+                                </Link>
+                            )}
+                            <Link to="/messages" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                                Tin nhắn
+                            </Link>
                         </>
                     )}
-                </div>
+                </nav>
 
-                <div className="flex items-center gap-2 sm:gap-4">
-                    {/* Sprint 3: Notification Bell (visible only when logged in) */}
+                {/* Right side */}
+                <div className="flex items-center gap-2 sm:gap-3">
                     <NotificationBell />
+
                     {isAuthenticated && user ? (
-                        <div className="flex items-center gap-3 sm:gap-4">
-                            <div className="hidden lg:flex flex-col items-end">
-                                <div className="text-right hidden sm:block">
-                                    <p className="text-sm font-bold text-black">{user.full_name}</p>
-                                    <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
-                                        {user.user_type === 'trainer' ? 'COACH' : user.user_type === 'athlete' ? 'VĐV' : user.user_type === 'gym_owner' ? 'CHỦ GYM' : 'USER'}
-                                    </p>
-                                </div>
+                        <div className="hidden lg:flex items-center gap-3">
+                            <div className="text-right">
+                                <p className="text-sm font-semibold text-gray-900">{user.full_name}</p>
+                                <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
+                                    {user.user_type === 'trainer' ? 'COACH' : user.user_type === 'athlete' ? 'VĐV' : user.user_type === 'gym_owner' ? 'CHỦ GYM' : 'USER'}
+                                </p>
                             </div>
-                            <div className="h-8 w-px bg-gray-200 hidden lg:block"></div>
-                            <Link to={user.user_type === 'gym_owner' ? "/gym-owner" : "/dashboard"} className="hidden lg:block btn-secondary text-sm px-3 py-1.5 whitespace-nowrap">
+                            <div className="h-6 w-px bg-gray-200" />
+                            <Link
+                                to={user.user_type === 'gym_owner' ? '/gym-owner' : '/dashboard'}
+                                className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+                            >
                                 {user.user_type === 'gym_owner' ? 'Quản lý Gym' : 'Cá nhân'}
                             </Link>
                             <button
                                 onClick={handleLogout}
-                                className="hidden lg:block text-sm text-gray-500 hover:text-black transition-colors whitespace-nowrap"
+                                className="text-sm text-gray-500 hover:text-black transition-colors flex items-center gap-1"
                             >
+                                <LogOut className="w-4 h-4" />
                                 Thoát
                             </button>
                         </div>
                     ) : (
                         <div className="hidden lg:flex items-center gap-2">
-                            <Link to="/login" className="btn-tertiary text-sm whitespace-nowrap">
+                            <Link
+                                to="/login"
+                                className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-1.5"
+                            >
                                 Đăng nhập
                             </Link>
-                            <Link to="/register" className="btn-primary text-sm whitespace-nowrap">
+                            <Link
+                                to="/register"
+                                className="text-sm font-medium px-4 py-2 bg-black text-white hover:bg-gray-800 rounded transition-colors"
+                            >
                                 Đăng ký
                             </Link>
                         </div>
                     )}
 
-                    {/* Hamburger Toggle */}
+                    {/* Mobile menu toggle */}
                     <button
                         onClick={toggleMenu}
-                        className="lg:hidden p-2 text-black focus:outline-none"
+                        className="lg:hidden p-2 text-gray-700 hover:text-black transition-colors"
                         aria-label="Toggle menu"
                     >
-                        {isMenuOpen ? (
-                            <span className="text-2xl font-mono">✕</span>
-                        ) : (
-                            <span className="text-2xl">☰</span>
-                        )}
+                        {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay */}
+            {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="lg:hidden fixed inset-0 top-14 bg-white z-[50] flex flex-col p-6 animate-fade-in">
-                    <nav className="flex flex-col gap-6">
-                        <Link to="/gyms" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Gym Center</Link>
-                        <Link to="/coaches" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Coach</Link>
-                        <Link to="/about" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Về GYMERVIET</Link>
+                <div className="lg:hidden fixed inset-0 top-header bg-white z-modal overflow-y-auto">
+                    <nav className="p-4 space-y-1">
+                        <MobileNavItem to="/gyms" onClick={closeMenu} highlight>
+                            <Dumbbell className="w-5 h-5" />
+                            Gym Center
+                        </MobileNavItem>
+                        <MobileNavItem to="/coaches" onClick={closeMenu}>
+                            <User className="w-5 h-5" />
+                            Coach
+                        </MobileNavItem>
+                        <MobileNavItem to="/about" onClick={closeMenu}>
+                            Về GYMERVIET
+                        </MobileNavItem>
 
                         {isAuthenticated ? (
                             <>
-                                <Link to={user?.user_type === 'gym_owner' ? "/gym-owner" : "/dashboard"} onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">
+                                <div className="h-px bg-gray-200 my-3" />
+                                <MobileNavItem to={user?.user_type === 'gym_owner' ? '/gym-owner' : '/dashboard'} onClick={closeMenu}>
                                     {user?.user_type === 'gym_owner' ? 'Quản lý Gym' : 'Dashboard'}
-                                </Link>
-                                <Link to="/programs" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Khóa học</Link>
-                                {user?.user_type === 'athlete' && (
-                                    <Link to="/workouts" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Lịch tập</Link>
+                                </MobileNavItem>
+                                {(user?.user_type === 'trainer' || user?.user_type === 'athlete') && (
+                                    <MobileNavItem to="/programs" onClick={closeMenu}>
+                                        Khóa học
+                                    </MobileNavItem>
                                 )}
-                                <Link to="/messages" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Tin nhắn</Link>
-                                <Link to="/profile" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Hồ sơ</Link>
+                                {user?.user_type === 'athlete' && (
+                                    <MobileNavItem to="/workouts" onClick={closeMenu}>
+                                        <Calendar className="w-5 h-5" />
+                                        Lịch tập
+                                    </MobileNavItem>
+                                )}
+                                <MobileNavItem to="/messages" onClick={closeMenu}>
+                                    <MessageSquare className="w-5 h-5" />
+                                    Tin nhắn
+                                </MobileNavItem>
+                                <MobileNavItem to="/profile" onClick={closeMenu}>
+                                    Hồ sơ
+                                </MobileNavItem>
+                                <div className="h-px bg-gray-200 my-3" />
                                 <button
                                     onClick={handleLogout}
-                                    className="text-lg font-bold text-gray-500 text-left"
+                                    className="w-full flex items-center justify-between px-4 py-3 text-red-600 font-medium"
                                 >
-                                    Đăng xuất
+                                    <span className="flex items-center gap-3">
+                                        <LogOut className="w-5 h-5" />
+                                        Đăng xuất
+                                    </span>
                                 </button>
                             </>
                         ) : (
                             <>
-                                <Link to="/login" onClick={closeMenu} className="text-lg font-bold text-black border-b border-gray-100 pb-2">Đăng nhập</Link>
-                                <Link to="/register" onClick={closeMenu} className="text-lg font-bold text-black">Đăng ký thành viên</Link>
+                                <div className="h-px bg-gray-200 my-3" />
+                                <MobileNavItem to="/login" onClick={closeMenu}>
+                                    Đăng nhập
+                                </MobileNavItem>
+                                <MobileNavItem to="/register" onClick={closeMenu} highlight>
+                                    Đăng ký thành viên
+                                </MobileNavItem>
                             </>
                         )}
                     </nav>
 
-                    <div className="mt-auto pt-10 border-t border-gray-100 italic text-sm text-gray-400">
-                        GYMERVIET — Hệ sinh thái Gym & Coach số 1 VN
+                    <div className="p-4 border-t border-gray-200">
+                        <p className="text-xs text-gray-400 italic">
+                            GYMERVIET — Hệ sinh thái Gym & Coach số 1 VN
+                        </p>
                     </div>
                 </div>
             )}
@@ -140,3 +240,31 @@ export default function Header() {
     );
 }
 
+// Mobile nav item component
+function MobileNavItem({
+    to,
+    onClick,
+    highlight,
+    children,
+}: {
+    to: string;
+    onClick: () => void;
+    highlight?: boolean;
+    children: React.ReactNode;
+}) {
+    return (
+        <Link
+            to={to}
+            onClick={onClick}
+            className={cn(
+                'flex items-center justify-between px-4 py-3 rounded-lg transition-colors',
+                highlight
+                    ? 'bg-black text-white font-semibold'
+                    : 'text-gray-700 hover:bg-gray-100'
+            )}
+        >
+            <span className="flex items-center gap-3">{children}</span>
+            <ChevronRight className="w-4 h-4 opacity-50" />
+        </Link>
+    );
+}

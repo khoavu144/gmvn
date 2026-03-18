@@ -9,11 +9,14 @@ import {
 } from 'typeorm';
 import { User } from './User';
 import { Program } from './Program';
+import { Index } from 'typeorm';
 
 export type SubscriptionStatus = 'active' | 'paused' | 'cancelled';
 export type SubscriptionType = 'monthly' | 'one_time';
 
 @Entity('subscriptions')
+@Index(['user_id'])
+@Index(['trainer_id'])
 export class Subscription {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
