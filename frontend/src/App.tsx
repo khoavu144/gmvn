@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, Navigate, useParams } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate, useParams, useRouteError, isRouteErrorResponse } from 'react-router-dom';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
@@ -11,34 +11,67 @@ import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
 
-const Home = lazy(() => import('./pages/Home'));
-const Login = lazy(() => import('./pages/Login'));
-const Register = lazy(() => import('./pages/Register'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Coaches = lazy(() => import('./pages/Coaches'));
-const CoachDetail = lazy(() => import('./pages/CoachDetailPage'));
-const AthleteDetailPage = lazy(() => import('./pages/AthleteDetailPage'));
-const Profile = lazy(() => import('./pages/Profile'));
-const ProfilePublic = lazy(() => import('./pages/ProfilePublic'));
-const ProgramsPage = lazy(() => import('./pages/ProgramsPage'));
-const MessagesPage = lazy(() => import('./pages/MessagesPage'));
-const WorkoutsPage = lazy(() => import('./pages/WorkoutsPage'));
+type LazyModule<TProps = Record<string, unknown>> = {
+  default: React.ComponentType<TProps>;
+};
 
-const Gyms = lazy(() => import('./pages/Gyms'));
-const GymDetailPage = lazy(() => import('./pages/GymDetailPage'));
-const GymRegisterPage = lazy(() => import('./pages/GymRegisterPage'));
-const GymOwnerDashboard = lazy(() => import('./pages/GymOwnerDashboard'));
+const lazyWithChunkRetry = <TProps extends Record<string, unknown> = Record<string, unknown>>(
+  importer: () => Promise<LazyModule<TProps>>,
+  chunkKey: string,
+) => lazy(async () => {
+  try {
+    const mod = await importer();
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem(`lazy-chunk-reload:${chunkKey}`);
+    }
+    return mod;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const isDynamicImportError = /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Loading chunk [\d]+ failed/i.test(message);
 
-const AboutPage = lazy(() => import('./pages/legal/AboutPage'));
-const CommunityStandardsPage = lazy(() => import('./pages/legal/CommunityStandardsPage'));
-const GuidelinesPage = lazy(() => import('./pages/legal/GuidelinesPage'));
-const PrivacyPage = lazy(() => import('./pages/legal/PrivacyPage'));
-const TermsPage = lazy(() => import('./pages/legal/TermsPage'));
-const FAQPage = lazy(() => import('./pages/legal/FAQPage'));
-const ContactPage = lazy(() => import('./pages/legal/ContactPage'));
-const CoachGuidePage = lazy(() => import('./pages/legal/CoachGuidePage'));
-const PaymentPolicyPage = lazy(() => import('./pages/legal/PaymentPolicyPage'));
-const ReportPage = lazy(() => import('./pages/legal/ReportPage'));
+    if (isDynamicImportError && typeof window !== 'undefined') {
+      const reloadKey = `lazy-chunk-reload:${chunkKey}`;
+      const alreadyReloaded = sessionStorage.getItem(reloadKey) === '1';
+
+      if (!alreadyReloaded) {
+        sessionStorage.setItem(reloadKey, '1');
+        window.location.reload();
+      }
+    }
+
+    throw error;
+  }
+});
+
+const Home = lazyWithChunkRetry(() => import('./pages/Home'), 'home');
+const Login = lazyWithChunkRetry(() => import('./pages/Login'), 'login');
+const Register = lazyWithChunkRetry(() => import('./pages/Register'), 'register');
+const Dashboard = lazyWithChunkRetry(() => import('./pages/Dashboard'), 'dashboard');
+const Coaches = lazyWithChunkRetry(() => import('./pages/Coaches'), 'coaches');
+const CoachDetail = lazyWithChunkRetry(() => import('./pages/CoachDetailPage'), 'coach-detail');
+const AthleteDetailPage = lazyWithChunkRetry(() => import('./pages/AthleteDetailPage'), 'athlete-detail');
+const Profile = lazyWithChunkRetry(() => import('./pages/Profile'), 'profile');
+const ProfilePublic = lazyWithChunkRetry(() => import('./pages/ProfilePublic'), 'profile-public');
+const ProgramsPage = lazyWithChunkRetry(() => import('./pages/ProgramsPage'), 'programs');
+const MessagesPage = lazyWithChunkRetry(() => import('./pages/MessagesPage'), 'messages');
+const WorkoutsPage = lazyWithChunkRetry(() => import('./pages/WorkoutsPage'), 'workouts');
+
+const Gyms = lazyWithChunkRetry(() => import('./pages/Gyms'), 'gyms');
+const GymDetailPage = lazyWithChunkRetry(() => import('./pages/GymDetailPage'), 'gym-detail');
+const GymRegisterPage = lazyWithChunkRetry(() => import('./pages/GymRegisterPage'), 'gym-register');
+const GymOwnerDashboard = lazyWithChunkRetry(() => import('./pages/GymOwnerDashboard'), 'gym-owner-dashboard');
+const CommunityGallery = lazyWithChunkRetry(() => import('./pages/CommunityGallery'), 'community-gallery');
+
+const AboutPage = lazyWithChunkRetry(() => import('./pages/legal/AboutPage'), 'about');
+const CommunityStandardsPage = lazyWithChunkRetry(() => import('./pages/legal/CommunityStandardsPage'), 'community-standards');
+const GuidelinesPage = lazyWithChunkRetry(() => import('./pages/legal/GuidelinesPage'), 'guidelines');
+const PrivacyPage = lazyWithChunkRetry(() => import('./pages/legal/PrivacyPage'), 'privacy');
+const TermsPage = lazyWithChunkRetry(() => import('./pages/legal/TermsPage'), 'terms');
+const FAQPage = lazyWithChunkRetry(() => import('./pages/legal/FAQPage'), 'faq');
+const ContactPage = lazyWithChunkRetry(() => import('./pages/legal/ContactPage'), 'contact');
+const CoachGuidePage = lazyWithChunkRetry(() => import('./pages/legal/CoachGuidePage'), 'coach-guide');
+const PaymentPolicyPage = lazyWithChunkRetry(() => import('./pages/legal/PaymentPolicyPage'), 'payment-policy');
+const ReportPage = lazyWithChunkRetry(() => import('./pages/legal/ReportPage'), 'report');
 
 
 // Sprint 2: Redirect component for legacy /trainer/:id URLs
@@ -69,9 +102,53 @@ const lazyRoute = (element: React.ReactNode) => (
   </Suspense>
 );
 
+const RouteErrorFallback = () => {
+  const error = useRouteError();
+  const rawMessage =
+    error instanceof Error
+      ? error.message
+      : isRouteErrorResponse(error)
+        ? `${error.status} ${error.statusText}`
+        : 'Đã xảy ra lỗi không xác định';
+
+  const isChunkError = /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Loading chunk [\d]+ failed/i.test(rawMessage);
+
+  return (
+    <div className="min-h-[70vh] flex items-center justify-center px-6 py-12 bg-white">
+      <div className="w-full max-w-xl rounded-3xl border border-gray-200 bg-white p-8 shadow-sm text-center">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">GYMERVIET</p>
+        <h1 className="mt-4 text-2xl font-black text-black tracking-tight">
+          {isChunkError ? 'Ứng dụng vừa cập nhật, vui lòng tải lại trang' : 'Không thể tải trang này'}
+        </h1>
+        <p className="mt-3 text-sm text-gray-600 leading-6">
+          {isChunkError
+            ? 'Có thể trình duyệt đang giữ file JavaScript cũ sau khi deploy. Hãy reload để đồng bộ phiên bản mới nhất.'
+            : rawMessage}
+        </p>
+        <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center justify-center rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+          >
+            Tải lại trang
+          </button>
+          <a
+            href="/"
+            className="inline-flex items-center justify-center rounded-2xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:border-black hover:text-black"
+          >
+            Về trang chủ
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const router = createBrowserRouter([
   {
     element: <MainLayout />,
+    errorElement: <RouteErrorFallback />,
     children: [
       { path: '/', element: lazyRoute(<Home />) },
       { path: '/login', element: lazyRoute(<Login />) },
@@ -89,6 +166,7 @@ const router = createBrowserRouter([
       { path: '/workouts', element: lazyRoute(<ProtectedRoute requiredRole="athlete"><WorkoutsPage /></ProtectedRoute>) },
       // Sprint 2: /trainer/:trainerId redirects to canonical /coaches/:trainerId (merge duplicate routes)
       { path: '/trainer/:trainerId', element: lazyRoute(<TrainerRedirect />) },
+      { path: '/gallery', element: lazyRoute(<CommunityGallery />) },
 
       // Gym Module Routes
       { path: '/gyms', element: lazyRoute(<Gyms />) },

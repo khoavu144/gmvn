@@ -1,9 +1,10 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPublicProfile } from '../store/slices/profileSlice';
 import type { AppDispatch, RootState } from '../store/store';
+import { getSrcSet, getOptimizedUrl } from '../utils/image';
 
 export default function AthleteDetailPage() {
     const { identifier } = useParams<{ identifier: string }>();
@@ -14,7 +15,6 @@ export default function AthleteDetailPage() {
         viewedProfile: profile,
         viewedExperience: experience,
         viewedGallery: gallery,
-        viewedFaq: faq,
         loading,
         error,
     } = useSelector((state: RootState) => state.profile);
@@ -135,16 +135,40 @@ export default function AthleteDetailPage() {
                     <div className="card p-0 overflow-hidden">
                         <div className="h-32 bg-gray-200">
                             {profile.cover_image_url ? (
-                                <img src={profile.cover_image_url} alt="cover" className="w-full h-full object-cover" decoding="async" />
+                                <img
+                                    src={getOptimizedUrl(profile.cover_image_url, 600)}
+                                    srcSet={getSrcSet(profile.cover_image_url)}
+                                    sizes="100vw"
+                                    alt="cover"
+                                    className="w-full h-full object-cover"
+                                    decoding="async"
+                                    width={1200}
+                                    height={128}
+                                />
                             ) : null}
                         </div>
                         <div className="px-5 pb-5 -mt-10">
-                            <img
-                                src={athlete.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(athlete.full_name || 'A')}&background=000&color=fff&size=160`}
-                                alt={athlete.full_name}
-                                className="w-20 h-20 rounded-xl object-cover border-4 border-white bg-gray-100"
-                                decoding="async"
-                            />
+                            {athlete.avatar_url ? (
+                                <img
+                                    src={getOptimizedUrl(athlete.avatar_url, 160)}
+                                    srcSet={getSrcSet(athlete.avatar_url)}
+                                    sizes="(max-width: 768px) 80px, 160px"
+                                    alt={athlete.full_name}
+                                    className="w-20 h-20 rounded-xl object-cover border-4 border-white bg-gray-100"
+                                    decoding="async"
+                                    width={160}
+                                    height={160}
+                                />
+                            ) : (
+                                <img
+                                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(athlete.full_name || 'A')}&background=000&color=fff&size=160`}
+                                    alt={athlete.full_name}
+                                    className="w-20 h-20 rounded-xl object-cover border-4 border-white bg-gray-100"
+                                    decoding="async"
+                                    width={160}
+                                    height={160}
+                                />
+                            )}
                             <h1 className="text-xl font-bold text-black mt-3">{athlete.full_name}</h1>
                             {(profile.headline || athlete.bio) && (
                                 <p className="text-sm text-gray-700 mt-1">{profile.headline || athlete.bio}</p>
@@ -220,33 +244,6 @@ export default function AthleteDetailPage() {
                                         {item.description && (
                                             <p className="text-sm text-gray-700 mt-3 whitespace-pre-line leading-relaxed">{item.description}</p>
                                         )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {gallery.length > 0 && (
-                        <div className="card">
-                            <h2 className="card-header">Gallery</h2>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                {gallery.map((img) => (
-                                    <div key={img.id} className="aspect-square overflow-hidden bg-gray-100 rounded-sm">
-                                        <img src={img.image_url} alt={img.caption || 'gallery'} className="w-full h-full object-cover" loading="lazy" decoding="async" />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {faq.length > 0 && (
-                        <div className="card">
-                            <h2 className="card-header">Câu hỏi thường gặp</h2>
-                            <div className="space-y-3">
-                                {faq.map((item) => (
-                                    <div key={item.id} className="border border-gray-200 rounded-sm p-4 bg-white">
-                                        <p className="text-sm font-semibold text-black">{item.question}</p>
-                                        <p className="text-sm text-gray-700 mt-2 whitespace-pre-line leading-relaxed">{item.answer}</p>
                                     </div>
                                 ))}
                             </div>

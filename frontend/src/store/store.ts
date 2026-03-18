@@ -1,6 +1,7 @@
 import { configureStore, createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit';
 import authReducer, { setCredentials, logout } from './slices/authSlice';
 import profileReducer from './slices/profileSlice';
+import communityGalleryReducer from './slices/communityGallerySlice';
 
 const authMiddleware = createListenerMiddleware();
 
@@ -27,6 +28,7 @@ export const store = configureStore({
     reducer: {
         auth: authReducer,
         profile: profileReducer,
+        communityGallery: communityGalleryReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().prepend(authMiddleware.middleware),

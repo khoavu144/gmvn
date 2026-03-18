@@ -35,18 +35,18 @@ const GymReviewList: React.FC<GymReviewListProps> = ({ gymId, refreshTick = 0 })
     };
 
     if (loading) {
-        return <div className="animate-pulse space-y-4">
-            <div className="h-24 bg-gray-100 rounded-xl w-full"></div>
-            <div className="h-24 bg-gray-100 rounded-xl w-full"></div>
+        return <div className="animate-pulse columns-1 md:columns-2 gap-4">
+            <div className="h-40 bg-white/5 border border-white/10 rounded-2xl w-full mb-4"></div>
+            <div className="h-32 bg-white/5 border border-white/10 rounded-2xl w-full mb-4"></div>
         </div>;
     }
 
     if (reviews.length === 0) {
-        return <div className="text-gray-500 italic text-sm py-4">Chưa có đánh giá nào cho phòng tập này.</div>;
+        return <div className="text-gray-400 italic text-sm py-8 text-center border border-dashed border-white/20 rounded-2xl bg-white/5">Chưa có đánh giá nào cho phòng tập này. Hãy là người đầu tiên!</div>;
     }
 
     return (
-        <div className="space-y-4">
+        <div className="columns-1 md:columns-2 gap-4">
             {reviews.map(review => (
                 <ReviewCard
                     key={review.id}
@@ -96,79 +96,80 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, gymId, canReply, onRepl
     };
 
     return (
-        <div className="border border-gray-100 bg-white p-4 rounded-xl">
+        <div className="border border-white/10 bg-white/5 p-5 sm:p-6 rounded-2xl break-inside-avoid mb-4 hover:bg-white/10 transition-colors">
             {/* Review body */}
             <div className="flex gap-4">
-                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-500 uppercase flex-shrink-0">
+                <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center font-bold text-gray-300 uppercase flex-shrink-0 border border-white/10">
                     {review.user?.full_name?.charAt(0) || 'H'}
                 </div>
-                <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                        <span className="font-bold text-sm">{review.user?.full_name || `Hội viên ${review.user_id.substring(0, 4)}...`}</span>
-                        <span className="text-xs text-gray-400">{new Date(review.created_at).toLocaleDateString('vi-VN')}</span>
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-0.5">
+                        <span className="font-bold text-sm text-gray-100 truncate pr-2">{review.user?.full_name || `Hội viên ${review.user_id.substring(0, 4)}...`}</span>
+                        <span className="text-[10px] font-medium tracking-wider text-gray-500 uppercase whitespace-nowrap">{new Date(review.created_at).toLocaleDateString('vi-VN')}</span>
                     </div>
-                    <div className="flex items-center mb-2">
+                    <div className="flex items-center mb-3">
                         {[1, 2, 3, 4, 5].map(star => (
-                            <span key={star} className={`text-sm ${review.rating >= star ? 'text-black' : 'text-gray-200'}`}>
+                            <span key={star} className={`text-sm ${review.rating >= star ? 'text-yellow-400' : 'text-gray-700'}`}>
                                 ★
                             </span>
                         ))}
                     </div>
-                    {review.comment && <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>}
+                    {review.comment && <p className="text-gray-300 text-sm leading-relaxed">{review.comment}</p>}
                 </div>
             </div>
 
             {/* Existing reply */}
             {review.reply_text && (
-                <div className="mt-3 ml-14 bg-gray-50 border border-gray-200 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Phản hồi từ Gym</span>
+                <div className="mt-5 bg-black/50 border border-white/10 rounded-xl p-4 relative">
+                    <div className="absolute -top-2 left-6 w-4 h-4 bg-black/50 border-t border-l border-white/10 rotate-45"></div>
+                    <div className="flex items-center gap-2 mb-2 relative z-10">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Phản hồi từ thiết chế</span>
                         {review.replied_at && (
-                            <span className="text-xs text-gray-400">
-                                · {new Date(review.replied_at).toLocaleDateString('vi-VN')}
+                            <span className="text-[10px] text-gray-600">
+                                • {new Date(review.replied_at).toLocaleDateString('vi-VN')}
                             </span>
                         )}
                     </div>
-                    <p className="text-sm text-gray-700 leading-relaxed">{review.reply_text}</p>
+                    <p className="text-sm text-gray-300 leading-relaxed relative z-10">{review.reply_text}</p>
                 </div>
             )}
 
             {/* Reply form (gym_owner / trainer, only if no reply yet) */}
             {canReply && !review.reply_text && (
-                <div className="mt-3 ml-14">
+                <div className="mt-4">
                     {!showReplyForm ? (
                         <button
                             onClick={() => setShowReplyForm(true)}
-                            className="text-xs font-bold text-gray-500 hover:text-black transition-colors underline underline-offset-2"
+                            className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white transition-colors border border-white/20 px-3 py-1.5 rounded-lg hover:border-white"
                         >
-                            ↩ Trả lời
+                            ↩ Trả lời đánh giá này
                         </button>
                     ) : (
-                        <form onSubmit={handleReplySubmit} className="space-y-2">
+                        <form onSubmit={handleReplySubmit} className="space-y-3 bg-black/30 p-4 rounded-xl border border-white/10 mt-2">
                             <textarea
                                 value={replyText}
                                 onChange={e => setReplyText(e.target.value)}
                                 placeholder="Viết phản hồi của bạn..."
                                 rows={3}
-                                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-black/20"
+                                className="w-full text-sm bg-transparent text-white border border-white/20 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-white focus:border-white placeholder-gray-500 transition-all font-medium"
                                 maxLength={1000}
                                 autoFocus
                             />
                             {replyError && (
-                                <p className="text-xs text-red-500">{replyError}</p>
+                                <p className="text-[10px] font-medium text-red-400">{replyError}</p>
                             )}
                             <div className="flex gap-2">
                                 <button
                                     type="submit"
                                     disabled={submitting || !replyText.trim()}
-                                    className="text-xs font-bold bg-black text-white px-3 py-1.5 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                                    className="text-xs font-bold uppercase tracking-wider bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-200 disabled:opacity-50 transition-colors"
                                 >
                                     {submitting ? 'Đang gửi...' : 'Gửi phản hồi'}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => { setShowReplyForm(false); setReplyText(''); setReplyError(null); }}
-                                    className="text-xs text-gray-500 hover:text-black transition-colors"
+                                    className="text-xs font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors px-3"
                                 >
                                     Hủy
                                 </button>

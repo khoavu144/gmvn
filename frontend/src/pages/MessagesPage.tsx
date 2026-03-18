@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { logger } from '../lib/logger';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import apiClient from '../services/api';
@@ -193,9 +194,9 @@ export default function MessagesPage() {
     const activeConv = conversations.find(c => c.partner_id === activePartner);
 
     return (
-        <div className="h-[calc(100vh-140px)] bg-white flex overflow-hidden">
+        <div className="h-[calc(100vh-140px)] bg-white flex overflow-hidden relative">
             {/* Sidebar */}
-            <div className="w-80 bg-gray-50 border-r border-gray-200 flex flex-col shrink-0">
+            <div className={`w-full md:w-80 bg-gray-50 border-r border-gray-200 flex-col shrink-0 ${activePartner ? 'hidden md:flex' : 'flex'}`}>
                 <div className="p-4 border-b border-gray-200 bg-white">
                     <h2 className="font-bold text-lg text-black">Tin nhắn</h2>
                 </div>
@@ -206,7 +207,16 @@ export default function MessagesPage() {
                             <button onClick={loadConversations} className="text-xs font-bold text-black border border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition">Thử lại</button>
                         </div>
                     ) : conversations.length === 0 ? (
-                        <div className="p-8 text-center text-gray-400 text-sm">Chưa có tin nhắn nào</div>
+                        <div className="p-8 text-center mt-10">
+                            <div className="text-4xl mb-3">👋</div>
+                            <h3 className="font-bold text-gray-900 mb-1">Hộp thư trống</h3>
+                            <p className="text-xs text-gray-500 mb-6">
+                                Các cuộc trò chuyện với Coach hoặc học viên sẽ xuất hiện ở đây.
+                            </p>
+                            <Link to="/coaches" className="text-xs font-bold text-black border border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition">
+                                Tìm Coach ngay
+                            </Link>
+                        </div>
                     ) : (
                         <div className="divide-y divide-gray-100">
                             {conversations.map(conv => (
@@ -245,10 +255,16 @@ export default function MessagesPage() {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 flex flex-col bg-white">
+            <div className={`flex-1 flex-col bg-white w-full h-full absolute inset-0 md:static ${!activePartner ? 'hidden md:flex' : 'flex'}`}>
                 {activePartner ? (
                     <>
                         <div className="bg-white border-b border-gray-200 p-4 flex items-center gap-3">
+                            <button 
+                                onClick={() => setActivePartner(null)} 
+                                className="md:hidden p-1 -ml-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition-colors"
+                            >
+                                <ChevronLeft className="w-6 h-6" />
+                            </button>
                             <div className="w-8 h-8 rounded-full border border-gray-200 bg-gray-50 flex items-center justify-center text-xs font-bold text-gray-600">
                                 {activeConv?.partner?.full_name?.charAt(0).toUpperCase() || '?'}
                             </div>
@@ -295,6 +311,7 @@ export default function MessagesPage() {
                                     onChange={e => setNewMessage(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
                                     placeholder="Nhập tin nhắn..."
+                                    aria-label="Nhập tin nhắn để gửi"
                                     className="form-input rounded-full px-5 py-3 pr-24 bg-gray-50 border-gray-200 focus:bg-white"
                                 />
                                 <button

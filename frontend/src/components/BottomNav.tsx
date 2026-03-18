@@ -15,8 +15,8 @@ export default function BottomNav() {
     // Public items (always visible)
     const publicItems = [
         { to: '/', icon: Home, label: 'Trang chủ' },
-        { to: '/gyms', icon: Dumbbell, label: 'Gym' },
         { to: '/coaches', icon: User, label: 'Coach' },
+        { to: '/gyms', icon: Dumbbell, label: 'Gym' },
     ];
 
     // Auth items
@@ -36,7 +36,7 @@ export default function BottomNav() {
     const items = [...publicItems, ...authItems].slice(0, 5);
 
     return (
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-header h-bottom-nav bg-white/95 dark:bg-black/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 safe-bottom">
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-header h-bottom-nav bg-white/95 backdrop-blur-md border-t border-gray-200 safe-bottom">
             <div className="flex items-center justify-around h-full max-w-page mx-auto">
                 {items.map((item) => {
                     const isActive = location.pathname === item.to;
@@ -52,7 +52,7 @@ export default function BottomNav() {
                             )}
                         >
                             <Icon className="w-5 h-5" />
-                            <span className="text-[10px] font-medium">{item.label}</span>
+                            <span className="text-[11px] font-medium">{item.label}</span>
                         </Link>
                     );
                 })}

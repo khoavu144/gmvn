@@ -69,12 +69,14 @@ export default function WorkoutsPage() {
                 </section>
 
                 {subs.length === 0 ? (
-                    <div className="empty-state border-dashed">
-                        <div className="empty-state-number">0</div>
-                        <p className="text-sm font-medium text-gray-700 mb-2">Bạn chưa đăng ký gói tập nào.</p>
-                        <p className="text-xs text-gray-400 mb-5">Hãy chọn một coach phù hợp để bắt đầu lộ trình tập luyện.</p>
-                        <button onClick={() => navigate('/coaches')} className="btn-primary px-6">
-                            Tìm Coach
+                    <div className="empty-state border-dashed border-gray-200 bg-gray-50 mt-4 rounded-xl max-w-2xl mx-auto">
+                        <div className="text-4xl mb-4">🎯</div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">Chưa có lộ trình tập luyện</h3>
+                        <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
+                            Khi bạn đăng ký học với Coach, các bài tập chi tiết theo từng ngày sẽ xuất hiện tại đây để bạn dễ dàng theo dõi.
+                        </p>
+                        <button onClick={() => navigate('/coaches')} className="btn-primary px-6 text-sm">
+                            Khám phá Coach
                         </button>
                     </div>
                 ) : (

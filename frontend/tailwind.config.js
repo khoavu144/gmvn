@@ -195,7 +195,5 @@ export default {
     safelist: [
         { pattern: /^(bg|text|border|ring)-(gray)-(50|100|200|300|400|500|600|700|800|900|950)$/ },
         { pattern: /^(bg|text|border)-(success|warning|error|info)(-light|-dark)?$/ },
-        { pattern: /^(rounded|rounded-sm|rounded-md|rounded-lg|rounded-full)$/ },
-        { pattern: /^(p|m|gap|space-[xy])-(0|1|2|3|4|5|6|8|10|12|16|20|24)$/ },
     ],
 }

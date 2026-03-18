@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addGalleryThunk, deleteGalleryThunk } from '../../store/slices/profileSlice';
 import type { AppDispatch, RootState } from '../../store/store';
 import type { TrainerGallery } from '../../types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { XMarkIcon, PlusIcon, TrashIcon, ArrowsPointingOutIcon, PhotoIcon } from '@heroicons/react/24/outline';
 
 const typeLabels: Record<string, string> = {

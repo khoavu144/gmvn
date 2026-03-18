@@ -35,34 +35,36 @@ const GymReviewForm: React.FC<GymReviewFormProps> = ({ gymId, branchId, onSucces
     };
 
     return (
-        <form onSubmit={handleSubmit} className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-            <h3 className="font-bold text-lg mb-4 uppercase tracking-tight">Đánh giá Gym Center</h3>
-            <div className="mb-4">
-                <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Đánh giá chung</label>
+        <form onSubmit={handleSubmit} className="bg-white/5 border border-white/10 rounded-2xl p-6 sm:p-8">
+            <h3 className="text-xl font-black mb-1 text-white tracking-tight">Trải nghiệm của bạn</h3>
+            <p className="text-gray-400 text-sm mb-6">Chia sẻ chân thực để giúp cộng đồng đưa ra quyết định tốt hơn.</p>
+            
+            <div className="mb-5">
+                <label className="block text-[10px] font-bold text-gray-400 mb-2.5 uppercase tracking-widest">Đánh giá chung</label>
                 <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map(star => (
                         <button
                             key={star}
                             type="button"
                             onClick={() => setRating(star)}
-                            className={`w-10 h-10 rounded-xs font-bold transition-colors ${rating >= star ? 'bg-black text-white' : 'bg-white border border-gray-200 text-gray-400 hover:border-black hover:text-black'}`}
+                            className={`w-11 h-11 rounded-xl font-bold transition-all ${rating >= star ? 'bg-yellow-400 text-black scale-105 shadow-lg shadow-yellow-400/20 border border-yellow-400' : 'bg-white/5 border border-white/10 text-gray-400 hover:border-white/30 hover:text-white'}`}
                         >
-                            {star}
+                            ★
                         </button>
                     ))}
                 </div>
             </div>
             <div className="mb-6">
-                <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wider">Chia sẻ trải nghiệm</label>
+                <label className="block text-[10px] font-bold text-gray-400 mb-2.5 uppercase tracking-widest">Chi tiết trải nghiệm</label>
                 <textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     required
-                    placeholder="Chất lượng dịch vụ thế nào? Thiết bị có đầy đủ không?..."
-                    className="form-input w-full h-24 resize-none"
+                    placeholder="Không gian phòng tập, thái độ nhân viên, chất lượng máy móc..."
+                    className="w-full h-28 resize-none bg-black/50 text-white border border-white/20 rounded-xl px-4 py-3 focus:outline-none focus:ring-1 focus:ring-white focus:border-white placeholder-gray-600 transition-all font-medium text-sm shadow-inner"
                 ></textarea>
             </div>
-            <button type="submit" disabled={submitting} className="btn-primary py-3 w-full sm:w-auto px-8 uppercase tracking-widest text-xs">
+            <button type="submit" disabled={submitting} className="w-full sm:w-auto px-8 py-3.5 bg-white text-black font-black uppercase tracking-wider text-xs rounded-xl hover:bg-gray-200 disabled:opacity-50 transition-colors">
                 {submitting ? 'Đang gửi...' : 'Gửi Đánh Giá'}
             </button>
         </form>

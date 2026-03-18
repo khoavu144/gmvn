@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
+import { getSrcSet, getOptimizedUrl } from '../utils/image';
+import { useLazySection } from '../hooks/useLazySection';
 import type { GymTrainerLink } from '../types';
 import { logger } from '../lib/logger';
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -78,6 +80,9 @@ export default function CoachDetailPage() {
         program_id: string;
     } | null>(null);
     const [checkingStatus, setCheckingStatus] = useState(false);
+
+    const testimonialsLazy = useLazySection();
+    const similarLazy = useLazySection();
 
     useEffect(() => {
         const load = async () => {
@@ -253,7 +258,17 @@ export default function CoachDetailPage() {
                     <div className="px-6 py-8 md:px-8 md:py-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                         <div className="flex items-center gap-4 min-w-0">
                             {trainer.avatar_url ? (
-                                <img src={trainer.avatar_url} alt={trainer.full_name} className="w-20 h-20 rounded-2xl object-cover border border-white/20" />
+                                <img
+                                    src={getOptimizedUrl(trainer.avatar_url, 400)}
+                                    srcSet={getSrcSet(trainer.avatar_url)}
+                                    sizes="(max-width: 768px) 160px, 200px"
+                                    alt={trainer.full_name}
+                                    className="w-20 h-20 rounded-2xl object-cover border border-white/20"
+                                    fetchPriority="high"
+                                    decoding="async"
+                                    width={200}
+                                    height={200}
+                                />
                             ) : (
                                 <div className="w-20 h-20 rounded-2xl border border-white/20 bg-white/10 flex items-center justify-center text-2xl font-bold text-white">
                                     {trainer.full_name.charAt(0)}
@@ -472,7 +487,17 @@ export default function CoachDetailPage() {
                                             className="block border border-gray-200 rounded-sm overflow-hidden hover:border-black transition-colors"
                                         >
                                             <div className="aspect-video bg-gray-100">
-                                                <img src={media.thumbnail_url || media.url} alt={media.caption || media.media_type} className="w-full h-full object-cover" />
+                                                <img
+                                                    src={getOptimizedUrl(media.thumbnail_url || media.url, 400)}
+                                                    srcSet={getSrcSet(media.thumbnail_url || media.url)}
+                                                    sizes="(max-width: 768px) 50vw, 33vw"
+                                                    alt={media.caption || media.media_type}
+                                                    className="w-full h-full object-cover"
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    width={400}
+                                                    height={400}
+                                                />
                                             </div>
                                             {media.caption && <p className="text-sm text-gray-700 px-3 py-2 border-t border-gray-100">{media.caption}</p>}
                                         </a>
@@ -502,69 +527,74 @@ export default function CoachDetailPage() {
                             </div>
                         )}
 
-                        {testimonials.length > 0 && (
-                            <div className="card">
-                                <h2 className="card-header">Đánh giá từ học viên</h2>
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    {testimonials.map((testimonial) => (
-                                        <div key={testimonial.id} className="border border-gray-200 rounded-sm p-4">
-                                            <div className="flex items-start gap-3 mb-3">
-                                                {testimonial.client_avatar ? (
-                                                    <img src={testimonial.client_avatar} alt={testimonial.client_name} className="w-10 h-10 rounded-full object-cover" />
-                                                ) : (
-                                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold">
-                                                        {testimonial.client_name.charAt(0)}
-                                                    </div>
-                                                )}
-                                                <div className="flex-1">
-                                                    <div className="font-bold text-sm">{testimonial.client_name}</div>
-                                                    <div className="text-yellow-500 text-sm">{'⭐'.repeat(testimonial.rating)}</div>
-                                                </div>
-                                            </div>
-                                            <p className="text-sm text-gray-600 leading-relaxed">{testimonial.comment}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {similarCoaches.length > 0 && (
-                            <div className="card">
-                                <h2 className="card-header">Huấn luyện viên tương tự</h2>
-                                <div className="grid gap-4 md:grid-cols-3">
-                                    {similarCoaches.map((coach) => {
-                                        const link = coach.slug ? `/coach/${coach.slug}` : `/coaches/${coach.id}`;
-                                        return (
-                                            <Link to={link} key={coach.id} className="border border-gray-200 rounded-sm p-4 hover:border-black transition-colors">
-                                                <div className="flex flex-col items-center text-center">
-                                                    {coach.avatar_url ? (
-                                                        <img src={coach.avatar_url} alt={coach.full_name} className="w-20 h-20 rounded-full object-cover border border-gray-200 mb-3" />
+                        {/* 6.3 Testimonials (Masonry Layout) */}
+                        <section id="testimonials" className="scroll-mt-24" ref={testimonialsLazy.ref}>
+                            {testimonialsLazy.isVisible && testimonials.length > 0 && (
+                                <div className="card">
+                                    <h2 className="card-header">Đánh giá từ học viên</h2>
+                                    <div className="grid gap-4 md:grid-cols-2">
+                                        {testimonials.map((testimonial) => (
+                                            <div key={testimonial.id} className="border border-gray-200 rounded-sm p-4">
+                                                <div className="flex items-start gap-3 mb-3">
+                                                    {testimonial.client_avatar ? (
+                                                        <img src={testimonial.client_avatar} alt={testimonial.client_name} className="w-10 h-10 rounded-full object-cover" />
                                                     ) : (
-                                                        <div className="w-20 h-20 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-bold mb-3">
-                                                            {coach.full_name.charAt(0)}
+                                                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold">
+                                                            {testimonial.client_name.charAt(0)}
                                                         </div>
                                                     )}
-                                                    <h3 className="font-bold text-base mb-1">{coach.full_name}</h3>
-                                                    {coach.specialties && coach.specialties.length > 0 && (
-                                                        <div className="flex flex-wrap justify-center gap-1 mb-2">
-                                                            {coach.specialties.slice(0, 2).map((s: string) => (
-                                                                <span key={s} className="text-xs bg-gray-100 px-2 py-0.5 rounded-xs border border-gray-200">{s}</span>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                    {coach.base_price_monthly && (
-                                                        <div className="text-sm font-bold text-black mt-2">
-                                                            {Number(coach.base_price_monthly).toLocaleString('vi-VN')}₫<span className="text-xs font-normal">/tháng</span>
-                                                        </div>
-                                                    )}
-                                                    <div className="btn-secondary w-full mt-3 text-sm text-center">Xem chi tiết</div>
+                                                    <div className="flex-1">
+                                                        <div className="font-bold text-sm">{testimonial.client_name}</div>
+                                                        <div className="text-yellow-500 text-sm">{'⭐'.repeat(testimonial.rating)}</div>
+                                                    </div>
                                                 </div>
-                                            </Link>
-                                        );
-                                    })}
+                                                <p className="text-sm text-gray-600 leading-relaxed">{testimonial.comment}</p>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </section>
+
+                        <div ref={similarLazy.ref} className="min-h-[200px]">
+                            {similarLazy.isVisible && similarCoaches.length > 0 && (
+                                <div className="card">
+                                    <h2 className="card-header">Huấn luyện viên tương tự</h2>
+                                    <div className="grid gap-4 md:grid-cols-3">
+                                        {similarCoaches.map((coach) => {
+                                            const link = coach.slug ? `/coach/${coach.slug}` : `/coaches/${coach.id}`;
+                                            return (
+                                                <Link to={link} key={coach.id} className="border border-gray-200 rounded-sm p-4 hover:border-black transition-colors">
+                                                    <div className="flex flex-col items-center text-center">
+                                                        {coach.avatar_url ? (
+                                                            <img src={coach.avatar_url} alt={coach.full_name} className="w-20 h-20 rounded-full object-cover border border-gray-200 mb-3" />
+                                                        ) : (
+                                                            <div className="w-20 h-20 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-bold mb-3">
+                                                                {coach.full_name.charAt(0)}
+                                                            </div>
+                                                        )}
+                                                        <h3 className="font-bold text-base mb-1">{coach.full_name}</h3>
+                                                        {coach.specialties && coach.specialties.length > 0 && (
+                                                            <div className="flex flex-wrap justify-center gap-1 mb-2">
+                                                                {coach.specialties.slice(0, 2).map((s: string) => (
+                                                                    <span key={s} className="text-xs bg-gray-100 px-2 py-0.5 rounded-xs border border-gray-200">{s}</span>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                        {coach.base_price_monthly && (
+                                                            <div className="text-sm font-bold text-black mt-2">
+                                                                {Number(coach.base_price_monthly).toLocaleString('vi-VN')}₫<span className="text-xs font-normal">/tháng</span>
+                                                            </div>
+                                                        )}
+                                                        <div className="btn-secondary w-full mt-3 text-sm text-center">Xem chi tiết</div>
+                                                    </div>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </section>
                 </div>
             </div>

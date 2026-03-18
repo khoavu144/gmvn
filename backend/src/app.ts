@@ -20,6 +20,7 @@ import gymRoutes from './routes/gym';
 import gymOwnerRoutes from './routes/gymOwner';
 import gymAdminRoutes from './routes/gymAdmin';
 import notificationRoutes from './routes/notification';
+import communityGalleryRoutes from './routes/communityGallery';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { User } from './entities/User';
@@ -94,6 +95,8 @@ app.use('/api/v1/gym-owner', gymOwnerRoutes);
 app.use('/api/v1/admin/gyms', gymAdminRoutes);
 // Sprint 3: Notification system
 app.use('/api/v1/notifications', notificationRoutes);
+// Community Gallery
+app.use('/api/v1/gallery', communityGalleryRoutes);
 
 // Health check with DB status
 app.get('/api/v1/health', async (_req, res) => {

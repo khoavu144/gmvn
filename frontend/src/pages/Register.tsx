@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useDispatch } from 'react-redux';
 import { setCredentials, setLoading } from '../store/slices/authSlice';
 import { authApi } from '../services/auth';
@@ -17,13 +18,15 @@ export default function Register() {
     const [error, setError] = useState('');
     const [loading, setLoadingState] = useState(false);
 
+    const [step, setStep] = useState<1 | 2>(1);
+
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleNext = (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
@@ -31,7 +34,12 @@ export default function Register() {
             setError('Mật khẩu xác nhận không khớp');
             return;
         }
+        setStep(2);
+    };
 
+    const handleSelectRoleAndSubmit = async (role: 'athlete' | 'trainer' | 'gym_owner') => {
+        setForm(prev => ({ ...prev, user_type: role }));
+        setError('');
         setLoadingState(true);
         dispatch(setLoading(true));
 
@@ -40,7 +48,7 @@ export default function Register() {
                 email: form.email,
                 password: form.password,
                 full_name: form.full_name,
-                user_type: form.user_type,
+                user_type: role,
             });
             dispatch(setCredentials({
                 user: result.user,
@@ -57,6 +65,7 @@ export default function Register() {
                 err.response?.data?.error || 'Registration failed. Please try again.'
             );
             dispatch(setLoading(false));
+            setStep(1); // Go back to step 1 on error
         } finally {
             setLoadingState(false);
         }
@@ -64,117 +73,155 @@ export default function Register() {
 
     return (
         <div className="page-shell">
+            <Helmet>
+                <title>Đăng ký — GymViet</title>
+                <meta name="description" content="Tạo tài khoản GYMERVIET miễn phí. Bắt đầu hành trình tập luyện với huấn luyện viên và phòng tập hàng đầu Việt Nam." />
+            </Helmet>
             <div className="page-container max-w-md py-16 sm:py-20">
-                <div className="text-center page-header">
-                    <p className="page-kicker">Join Gymerviet</p>
-                    <h1 className="page-title text-center">Đăng ký</h1>
-                    <p className="page-description mx-auto text-center">Bắt đầu hành trình tập luyện cùng GYMERVIET với trải nghiệm giao diện đồng bộ toàn hệ thống.</p>
+                <div className="text-center page-header mb-8">
+                    <p className="page-kicker">Gia nhập Gymerviet</p>
+                    <h1 className="page-title text-center text-3xl font-black mb-2">{step === 1 ? 'Tạo tài khoản' : 'Mục tiêu của bạn là gì?'}</h1>
+                    <p className="page-description mx-auto text-center">
+                        {step === 1 ? 'Bắt đầu hành trình tập luyện cùng cộng đồng GYMERVIET.' : 'Chọn vai trò để cá nhân hoá trải nghiệm của bạn.'}
+                    </p>
                 </div>
 
                 {/* Card */}
-                <div className="card">
-                    <form onSubmit={handleSubmit} className="space-y-4" aria-label="Biểu mẫu đăng ký">
-                        {error && (
-                            <div role="alert" aria-live="assertive" className="bg-red-50 border border-red-200 text-gray-800 px-4 py-3 rounded-xs text-sm">
-                                {error}
+                <div className="card border border-gray-200 shadow-sm">
+                    {error && (
+                        <div role="alert" aria-live="assertive" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4 font-medium">
+                            {error}
+                        </div>
+                    )}
+                    
+                    {step === 1 ? (
+                        <form onSubmit={handleNext} className="space-y-4" aria-label="Biểu mẫu đăng ký">
+                            <div>
+                                <label htmlFor="full_name" className="form-label text-[13px] font-bold">
+                                    Họ và tên
+                                </label>
+                                <input
+                                    id="full_name"
+                                    name="full_name"
+                                    type="text"
+                                    aria-required="true"
+                                    value={form.full_name}
+                                    onChange={handleChange}
+                                    required
+                                    className="form-input"
+                                    placeholder="Nguyễn Văn A"
+                                />
                             </div>
-                        )}
 
-                        <div>
-                            <label htmlFor="full_name" className="form-label">
-                                Họ và tên
-                            </label>
-                            <input
-                                id="full_name"
-                                name="full_name"
-                                type="text"
-                                aria-required="true"
-                                value={form.full_name}
-                                onChange={handleChange}
-                                required
-                                className="form-input"
-                                placeholder="Nguyễn Văn A"
-                            />
-                        </div>
+                            <div>
+                                <label htmlFor="email" className="form-label text-[13px] font-bold">
+                                    Email
+                                </label>
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    aria-required="true"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    required
+                                    className="form-input"
+                                    placeholder="your@email.com"
+                                />
+                            </div>
 
-                        <div>
-                            <label htmlFor="email" className="form-label">
-                                Email
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                aria-required="true"
-                                value={form.email}
-                                onChange={handleChange}
-                                required
-                                className="form-input"
-                                placeholder="your@email.com"
-                            />
-                        </div>
+                            <div>
+                                <label htmlFor="password" className="form-label text-[13px] font-bold">
+                                    Mật khẩu
+                                </label>
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    aria-required="true"
+                                    value={form.password}
+                                    onChange={handleChange}
+                                    required
+                                    minLength={8}
+                                    className="form-input"
+                                    placeholder="Tối thiểu 8 ký tự"
+                                />
+                            </div>
 
-                        <div>
-                            <label htmlFor="user_type" className="form-label">
-                                Loại tài khoản
-                            </label>
-                            <select
-                                id="user_type"
-                                name="user_type"
-                                value={form.user_type}
-                                onChange={handleChange}
-                                className="form-input"
+                            <div>
+                                <label htmlFor="confirmPassword" className="form-label text-[13px] font-bold">
+                                    Xác nhận mật khẩu
+                                </label>
+                                <input
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    type="password"
+                                    aria-required="true"
+                                    value={form.confirmPassword}
+                                    onChange={handleChange}
+                                    required
+                                    className="form-input"
+                                    placeholder="Nhập lại mật khẩu"
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="btn-base btn-lg bg-black text-white hover:bg-gray-800 font-bold w-full mt-6"
                             >
-                                <option value="athlete">Cá nhân tập luyện (Gymer)</option>
-                                <option value="trainer">Coach chuyên nghiệp (PT/HLV)</option>
-                                <option value="gym_owner">Chủ phòng tập (Gym Owner)</option>
-                            </select>
-                        </div>
+                                Tiếp tục →
+                            </button>
+                        </form>
+                    ) : (
+                        <div className="space-y-3">
+                            <button
+                                onClick={() => handleSelectRoleAndSubmit('athlete')}
+                                disabled={loading}
+                                className="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
+                            >
+                                <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🏋️</div>
+                                <div>
+                                    <div className="font-bold text-gray-900">Tôi muốn tập luyện</div>
+                                    <div className="text-xs text-gray-500 font-medium">Tìm coach, phòng tập và kết nối cộng đồng</div>
+                                </div>
+                            </button>
 
-                        <div>
-                            <label htmlFor="password" className="form-label">
-                                Mật khẩu
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                aria-required="true"
-                                value={form.password}
-                                onChange={handleChange}
-                                required
-                                minLength={8}
-                                className="form-input"
-                                placeholder="Tối thiểu 8 ký tự"
-                            />
-                        </div>
+                            <button
+                                onClick={() => handleSelectRoleAndSubmit('trainer')}
+                                disabled={loading}
+                                className="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
+                            >
+                                <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🎯</div>
+                                <div>
+                                    <div className="font-bold text-gray-900">Tôi là Coach / HLV</div>
+                                    <div className="text-xs text-gray-500 font-medium">Tạo hồ sơ chuyên nghiệp và quản lý học viên</div>
+                                </div>
+                            </button>
 
-                        <div>
-                            <label htmlFor="confirmPassword" className="form-label">
-                                Xác nhận mật khẩu
-                            </label>
-                            <input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                                aria-required="true"
-                                value={form.confirmPassword}
-                                onChange={handleChange}
-                                required
-                                className="form-input"
-                                placeholder="Nhập lại mật khẩu"
-                            />
-                        </div>
+                            <button
+                                onClick={() => handleSelectRoleAndSubmit('gym_owner')}
+                                disabled={loading}
+                                className="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
+                            >
+                                <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🏢</div>
+                                <div>
+                                    <div className="font-bold text-gray-900">Tôi quản lý Gym</div>
+                                    <div className="text-xs text-gray-500 font-medium">Đưa Gym lên bản đồ và quản lý nhân sự</div>
+                                </div>
+                            </button>
 
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            aria-busy={loading}
-                            className="btn-primary w-full mt-4"
-                        >
-                            {loading ? 'Đang tạo...' : 'Đăng ký'}
-                        </button>
-                    </form>
+                            {loading && <div className="text-center text-sm font-medium text-gray-500 mt-4 animate-pulse">Đang xử lý...</div>}
+
+                            <button 
+                                onClick={() => setStep(1)} 
+                                disabled={loading}
+                                className="mt-6 text-sm text-gray-500 font-medium hover:text-black w-full text-center flex items-center justify-center gap-1"
+                            >
+                                ← Quay lại
+                            </button>
+                        </div>
+                    )}
 
                     <div className="mt-6 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">
                         Đã có tài khoản?{' '}

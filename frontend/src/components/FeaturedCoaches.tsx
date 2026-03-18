@@ -1,100 +1,110 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { logger } from '../lib/logger';
 import { Link } from 'react-router-dom';
 import apiClient from '../services/api';
 import type { Trainer } from '../types';
+import { usePrefetchProfile } from '../hooks/usePrefetchProfile';
+
+type FeaturedTrainer = Trainer & {
+    is_verified?: boolean;
+    created_at?: string;
+    slug?: string;
+};
 
 export default function FeaturedCoaches() {
-    const [coaches, setCoaches] = useState<Trainer[]>([]);
+    const [coaches, setCoaches] = useState<FeaturedTrainer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { prefetchCoach } = usePrefetchProfile();
 
     useEffect(() => {
         apiClient.get('/users/trainers')
             .then(res => {
                 if (res.data?.data?.trainers) {
-                    const raw = res.data.data.trainers;
-                    const shuffled = [...raw].sort(() => 0.5 - Math.random()).slice(0, 10);
-                    setCoaches(shuffled);
+                    setCoaches(res.data.data.trainers);
                 }
             })
             .catch(logger.error)
             .finally(() => setIsLoading(false));
     }, []);
 
-    if (!isLoading && coaches.length === 0) return null;
+    const sortedAndCuratedCoaches = useMemo(() => {
+        return [...coaches].sort((a, b) => {
+            if (a.is_verified !== b.is_verified) return a.is_verified ? -1 : 1;
+            if (!!a.avatar_url !== !!b.avatar_url) return a.avatar_url ? -1 : 1;
+            const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+            const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+            return dateB - dateA;
+        }).slice(0, 6);
+    }, [coaches]);
+
+    if (!isLoading && sortedAndCuratedCoaches.length === 0) return null;
 
     return (
-        <section className="bg-white py-12 md:py-20 border-b border-gray-100 overflow-hidden">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-                <div className="flex justify-between items-end">
-                    <div>
-                        <h2 className="text-2xl font-black text-black">Các chuyên gia hàng đầu</h2>
-                        <p className="text-gray-500 text-sm mt-1">Đồng hành cùng bạn trên hành trình lột xác</p>
-                    </div>
+        <section className="bg-black py-20 md:py-32">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="mb-12 md:mb-16">
+                    <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">Danh Sách Nổi Bật</h2>
+                    <p className="text-gray-400 mt-3 text-sm md:text-base">Những chuyên gia hàng đầu kiến tạo sự thay đổi</p>
                 </div>
-            </div>
 
-            {/* Scrolling track */}
-            <div className="relative w-full flex overflow-x-hidden">
-                <div className="flex gap-6 animate-marquee shrink-0 whitespace-nowrap px-4 hover:pause">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                     {isLoading ? (
-                        Array.from({ length: 5 }).map((_, idx) => (
-                            <div key={`skeleton-${idx}`} className="w-64 shrink-0 bg-gray-50 border border-gray-200 rounded-lg overflow-hidden flex flex-col">
-                                <div className="aspect-square bg-gray-200 animate-pulse"></div>
-                                <div className="p-4 space-y-3">
-                                    <div className="h-5 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                                    <div className="h-3 bg-gray-200 rounded animate-pulse w-1/2"></div>
-                                    <div className="h-4 bg-gray-200 rounded animate-pulse w-1/4 mt-2"></div>
-                                </div>
+                        Array.from({ length: 6 }).map((_, idx) => (
+                            <div key={`skeleton-${idx}`} className={`bg-white/5 rounded-xl overflow-hidden animate-pulse ${idx === 0 || idx === 3 ? 'row-span-2 aspect-[3/5]' : 'aspect-square'}`}>
+                                <div className="w-full h-full bg-white/10"></div>
                             </div>
                         ))
                     ) : (
-                        coaches.concat(coaches).map((coach, index) => (
-                            <Link
-                                key={`${coach.id}-${index}`}
-                                to={`/coaches/${coach.id}`}
-                                className="group block w-64 shrink-0 bg-gray-50 border border-gray-200 rounded-lg overflow-hidden hover:border-black transition"
-                            >
-                                <div className="aspect-square bg-gray-200 overflow-hidden">
-                                    {coach.avatar_url ? (
-                                        <img src={coach.avatar_url} alt={coach.full_name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-3xl font-black text-gray-400">
-                                            {coach.full_name.charAt(0)}
+                        sortedAndCuratedCoaches.map((coach, index) => {
+                            // Make 1st and 4th items larger (row-span-2) to create asymmetry
+                            const isLarge = index === 0 || index === 3;
+                            const identifier = coach.slug || coach.id;
+
+                            return (
+                                <Link
+                                    key={`${coach.id}-${index}`}
+                                    to={`/coaches/${identifier}`}
+                                    className={`group relative block overflow-hidden rounded-xl bg-gray-900 border border-white/10 hover:border-white/30 transition-all duration-500 ${isLarge ? 'row-span-2 aspect-[3/5]' : 'aspect-square'}`}
+                                    onMouseEnter={() => prefetchCoach(identifier)}
+                                    onTouchStart={() => prefetchCoach(identifier)}
+                                >
+                                    <div className="absolute inset-0">
+                                        {coach.avatar_url ? (
+                                            <img
+                                                src={coach.avatar_url}
+                                                alt={coach.full_name}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-5xl font-black text-white/20 uppercase">
+                                                {coach.full_name.charAt(0)}
+                                            </div>
+                                        )}
+                                        {/* Dark overlay for text readability */}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300"></div>
+                                    </div>
+
+                                    <div className="absolute inset-0 p-5 md:p-6 flex flex-col justify-end text-white">
+                                        <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                            {coach.specialties && coach.specialties.length > 0 && (
+                                                <div className="flex gap-2 mb-3">
+                                                    <span className="bg-black/50 backdrop-blur-sm border border-white/20 text-white text-[10px] uppercase font-bold tracking-widest px-2.5 py-1 rounded-sm">
+                                                        [{coach.specialties[0]}]
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <h3 className="font-black text-xl md:text-2xl mb-1 uppercase tracking-tight line-clamp-1">{coach.full_name}</h3>
+                                            <p className="text-xs uppercase tracking-widest text-gray-400 font-medium line-clamp-1">
+                                                {coach.headline || 'Fitness Coach'}
+                                            </p>
                                         </div>
-                                    )}
-                                </div>
-                                <div className="p-4">
-                                    <h3 className="font-bold text-black text-base truncate">{coach.full_name}</h3>
-                                    <p className="text-xs text-gray-500 mt-1 uppercase tracking-wider font-medium truncate">
-                                        {coach.headline || 'Fitness Coach'}
-                                    </p>
-                                    {coach.specialties && coach.specialties.length > 0 && (
-                                        <div className="flex gap-1 mt-3 overflow-hidden text-clip">
-                                            <span className="bg-white border border-gray-200 text-gray-600 text-[10px] px-2 py-0.5 rounded-sm whitespace-nowrap">
-                                                {coach.specialties[0]}
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-                            </Link>
-                        ))
+                                    </div>
+                                </Link>
+                            );
+                        })
                     )}
                 </div>
             </div>
-            <style>{`
-                @keyframes marquee {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
-                }
-                .animate-marquee {
-                    animation: marquee 30s linear infinite;
-                    width: max-content;
-                }
-                .hover\\:pause:hover {
-                    animation-play-state: paused;
-                }
-            `}</style>
         </section>
     );
 }

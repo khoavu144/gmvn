@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials, setLoading } from '../store/slices/authSlice';
 import { authApi } from '../services/auth';
@@ -39,9 +40,13 @@ export default function Login() {
 
     return (
         <div className="page-shell">
+            <Helmet>
+                <title>Đăng nhập — GymViet</title>
+                <meta name="description" content="Đăng nhập tài khoản GYMERVIET để quản lý hồ sơ, kết nối Coach và theo dõi tiến trình tập luyện." />
+            </Helmet>
             <div className="page-container max-w-md py-16 sm:py-20">
                 <div className="text-center page-header">
-                    <p className="page-kicker">Welcome Back</p>
+                    <p className="page-kicker">Chào mừng trở lại</p>
                     <h1 className="page-title text-center">Đăng nhập</h1>
                     <p className="page-description mx-auto text-center">Truy cập vào tài khoản GYMERVIET của bạn với giao diện thống nhất theo homepage.</p>
                 </div>

@@ -43,6 +43,7 @@ import { BeforeAfterPhoto } from '../entities/BeforeAfterPhoto';
 import { TrainerProfileHighlight } from '../entities/TrainerProfileHighlight';
 import { TrainerMediaFeature } from '../entities/TrainerMediaFeature';
 import { TrainerPressMention } from '../entities/TrainerPressMention';
+import { CommunityGallery } from '../entities/CommunityGallery';
 
 const env = getEnv();
 
@@ -91,6 +92,8 @@ export const AppDataSource = new DataSource({
         TrainerProfileHighlight,
         TrainerMediaFeature,
         TrainerPressMention,
+        // Community Gallery
+        CommunityGallery,
     ],
     subscribers: [],
     migrations: [],

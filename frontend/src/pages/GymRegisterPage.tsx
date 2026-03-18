@@ -5,6 +5,7 @@ import type { RootState } from '../store/store';
 import { gymService } from '../services/gymService';
 import { authApi } from '../services/auth';
 import { setCredentials } from '../store/slices/authSlice';
+import { logger } from '../lib/logger';
 
 const GymRegisterPage: React.FC = () => {
     const { user, accessToken } = useSelector((state: RootState) => state.auth);
@@ -84,7 +85,7 @@ const GymRegisterPage: React.FC = () => {
                                 const refresh = localStorage.getItem('refresh_token') || '';
                                 dispatch(setCredentials({ user: profileData, access_token: accessToken as string, refresh_token: refresh }));
                             } catch (e) {
-                                console.error('Tải lại trạng thái thất bại', e);
+                                logger.error('Tải lại trạng thái thất bại', e as Error);
                             }
                         }}
                     >

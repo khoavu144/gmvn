@@ -1,7 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, memo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { trainerService, type TrainerFilters } from '../services/trainerService';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { usePrefetchProfile } from '../hooks/usePrefetchProfile';
 
 // ─── Specialty Options ────────────────────────────────────────────────────────
 const SPECIALTIES = [
@@ -25,7 +27,78 @@ const PRICE_RANGES = [
     { label: 'Trên 5 triệu', min: 5_000_000, max: undefined },
 ];
 
+const CoachCard = memo(({ trainer }: { trainer: any }) => {
+    const { prefetchCoach, prefetchAthlete } = usePrefetchProfile();
+
+    const detailLink = trainer.user_type === 'athlete'
+        ? (trainer.profile_slug ? `/athletes/${trainer.profile_slug}` : `/athletes/${trainer.id}`)
+        : (trainer.profile_slug ? `/coach/${trainer.profile_slug}` : `/coaches/${trainer.id}`);
+
+    const handlePrefetch = () => {
+        const identifier = trainer.profile_slug || trainer.id;
+        if (trainer.user_type === 'athlete') prefetchAthlete(identifier);
+        else prefetchCoach(identifier);
+    };
+
+    return (
+        <Link 
+            to={detailLink} 
+            className="card group hover:border-black transition-colors flex flex-col cursor-pointer"
+            onPointerEnter={handlePrefetch}
+        >
+            <div className="flex items-center gap-4 mb-4">
+                <div className="shrink-0">
+                    {trainer.avatar_url ? (
+                        <img className="w-16 h-16 rounded-xs object-cover border border-gray-200 transition-all" src={trainer.avatar_url} alt={trainer.full_name} fetchPriority="low" loading="lazy" decoding="async" />
+                    ) : (
+                        <div className="w-16 h-16 bg-gray-100 border border-gray-200 rounded-xs flex items-center justify-center text-gray-400 text-xl font-bold uppercase">
+                            {trainer.full_name.charAt(0)}
+                        </div>
+                    )}
+                </div>
+                <div className="min-w-0">
+                    <h3 className="text-base font-bold text-black truncate">{trainer.full_name}</h3>
+                    <p className="text-sm font-medium text-gray-700 mt-0.5">
+                        {trainer.base_price_monthly ? `${trainer.base_price_monthly.toLocaleString('vi-VN')} ₫/tháng` : 'Liên hệ báo giá'}
+                    </p>
+                    <div className="flex items-center text-[10px] font-black text-black bg-gray-100 px-1.5 py-0.5 rounded-sm mt-1 w-fit">
+                        ★ {trainer.avg_rating?.toFixed(1) || '5.0'}
+                    </div>
+                </div>
+            </div>
+
+            <p className="text-sm text-gray-600 line-clamp-3 flex-1 mb-4">
+                {trainer.bio || 'Chưa có thông tin giới thiệu.'}
+            </p>
+
+            {trainer.specialties && trainer.specialties.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                    {trainer.specialties.slice(0, 3).map((spec: string) => (
+                        <span key={spec} className="inline-flex py-0.5 px-2 bg-gray-100 border border-gray-200 text-gray-700 text-xs font-medium rounded-xs">
+                            {spec}
+                        </span>
+                    ))}
+                    {trainer.specialties.length > 3 && (
+                        <span className="inline-flex py-0.5 px-2 bg-gray-50 border border-gray-200 text-gray-500 text-xs font-medium rounded-xs">
+                            +{trainer.specialties.length - 3}
+                        </span>
+                    )}
+                </div>
+            )}
+
+            <div className="pt-3 border-t border-gray-100 flex justify-between items-center text-sm font-medium text-black">
+                Xem hồ sơ chi tiết
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+        </Link>
+    );
+});
+CoachCard.displayName = 'CoachCard';
+
 export default function Coaches() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const currentType = searchParams.get('type') === 'athlete' ? 'athlete' : 'trainer';
+
     const [search, setSearch] = useState('');
     const [specialty, setSpecialty] = useState('');
     const [priceIdx, setPriceIdx] = useState(0);
@@ -42,7 +115,8 @@ export default function Coaches() {
         priceMin: priceRange.min,
         priceMax: priceRange.max,
         sort,
-    }), [search, specialty, priceRange.min, priceRange.max, sort]);
+        user_type: currentType
+    }), [search, specialty, priceRange.min, priceRange.max, sort, currentType]);
 
     const { data, isLoading, isError, refetch } = useQuery({
         queryKey: ['trainers', page, filters],
@@ -62,14 +136,36 @@ export default function Coaches() {
 
     return (
         <main className="page-shell">
+            <Helmet>
+                <title>{currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET</title>
+                <meta name="description" content={currentType === 'athlete' ? 'Khám phá hồ sơ và hành trình của các vận động viên chuyên nghiệp trên GYMERVIET.' : 'Tìm huấn luyện viên cá nhân theo chuyên môn, mức giá và phong cách đồng hành phù hợp với mục tiêu tập luyện của bạn.'} />
+            </Helmet>
             <div className="page-container">
-                <section className="page-header">
-                    <p className="page-kicker">Coach Directory</p>
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <section className="page-header relative">
+                    {/* Tab Switcher */}
+                    <div className="flex bg-gray-100 p-1 rounded-full w-max mx-auto lg:mx-0 mb-6 border border-gray-200">
+                        <button
+                            onClick={() => { setSearchParams({}); setPage(1); }}
+                            className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${currentType === 'trainer' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-black'}`}
+                        >
+                            Coach
+                        </button>
+                        <button
+                            onClick={() => { setSearchParams({ type: 'athlete' }); setPage(1); }}
+                            className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${currentType === 'athlete' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-black'}`}
+                        >
+                            Vận động viên
+                        </button>
+                    </div>
+
+                    <p className="page-kicker">{currentType === 'athlete' ? 'Danh mục Vận động viên' : 'Danh mục Coach'}</p>
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between -mt-2">
                         <div>
-                            <h1 className="page-title">Khám phá Coach</h1>
-                            <p className="page-description">
-                                Tìm huấn luyện viên theo chuyên môn, mức giá và phong cách đồng hành phù hợp với mục tiêu của bạn.
+                            <h1 className="page-title">{currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'}</h1>
+                            <p className="page-description max-w-2xl text-left">
+                                {currentType === 'athlete' 
+                                    ? 'Kết nối với những cá nhân đam mê rèn luyện và chia sẻ hành trình thay đổi vóc dáng.'
+                                    : 'Tìm huấn luyện viên theo chuyên môn, mức giá và phong cách đồng hành phù hợp với mục tiêu của bạn.'}
                             </p>
                         </div>
                         {!isLoading && !isError && (
@@ -90,6 +186,7 @@ export default function Coaches() {
                             type="text"
                             className="form-input pl-10 w-full"
                             placeholder="Tìm theo tên, chuyên môn hoặc từ khóa..."
+                            aria-label="Tìm kiếm theo tên, chuyên môn hoặc từ khóa"
                             value={search}
                             onChange={e => { setSearch(e.target.value); setPage(1); }}
                         />
@@ -124,6 +221,7 @@ export default function Coaches() {
                                 <button
                                     className={`filter-chip ${!specialty ? 'filter-chip-active' : 'filter-chip-idle'}`}
                                     onClick={() => { setSpecialty(''); setPage(1); }}
+                                    aria-pressed={!specialty}
                                 >
                                     Tất cả
                                 </button>
@@ -132,6 +230,7 @@ export default function Coaches() {
                                         key={s}
                                         className={`filter-chip ${specialty === s ? 'filter-chip-active' : 'filter-chip-idle'}`}
                                         onClick={() => { setSpecialty(specialty === s ? '' : s); setPage(1); }}
+                                        aria-pressed={specialty === s}
                                     >
                                         {s}
                                     </button>
@@ -139,21 +238,24 @@ export default function Coaches() {
                             </div>
                         </div>
 
-                        {/* Price */}
-                        <div>
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Mức giá / tháng</label>
-                            <div className="flex flex-wrap gap-2">
-                                {PRICE_RANGES.map((r, idx) => (
-                                    <button
-                                        key={r.label}
-                                        className={`filter-chip ${priceIdx === idx ? 'filter-chip-active' : 'filter-chip-idle'}`}
-                                        onClick={() => { setPriceIdx(idx); setPage(1); }}
-                                    >
-                                        {r.label}
-                                    </button>
-                                ))}
+                        {/* Price - Only for Coach */}
+                        {currentType === 'trainer' && (
+                            <div>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Mức giá / tháng</label>
+                                <div className="flex flex-wrap gap-2">
+                                    {PRICE_RANGES.map((r, idx) => (
+                                        <button
+                                            key={r.label}
+                                            className={`filter-chip ${priceIdx === idx ? 'filter-chip-active' : 'filter-chip-idle'}`}
+                                            onClick={() => { setPriceIdx(idx); setPage(1); }}
+                                            aria-pressed={priceIdx === idx}
+                                        >
+                                            {r.label}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {hasActiveFilters && (
                             <button className="text-sm text-red-600 font-medium hover:underline" onClick={resetFilters}>
@@ -194,7 +296,7 @@ export default function Coaches() {
                 ) : data?.trainers.length === 0 ? (
                     <div className="empty-state text-sm text-gray-500">
                         <div className="empty-state-number">0</div>
-                        <p className="text-sm font-medium text-gray-700">Không tìm thấy Coach nào phù hợp.</p>
+                        <p className="text-sm font-medium text-gray-700">Chưa có dữ liệu phù hợp.</p>
                         {hasActiveFilters && (
                             <button className="mt-3 text-black font-bold underline" onClick={resetFilters}>Xoá bộ lọc</button>
                         )}
@@ -202,60 +304,9 @@ export default function Coaches() {
                 ) : (
                     <>
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {data?.trainers.map((trainer) => {
-                                const detailLink = trainer.user_type === 'athlete'
-                                    ? (trainer.profile_slug ? `/athletes/${trainer.profile_slug}` : `/athletes/${trainer.id}`)
-                                    : (trainer.profile_slug ? `/coach/${trainer.profile_slug}` : `/coaches/${trainer.id}`);
-
-                                return (
-                                    <Link key={trainer.id} to={detailLink} className="card group hover:border-black transition-colors flex flex-col cursor-pointer">
-                                        <div className="flex items-center gap-4 mb-4">
-                                            <div className="shrink-0">
-                                                {trainer.avatar_url ? (
-                                                    <img className="w-16 h-16 rounded-xs object-cover border border-gray-200 grayscale group-hover:grayscale-0 transition-all" src={trainer.avatar_url} alt={trainer.full_name} />
-                                                ) : (
-                                                    <div className="w-16 h-16 bg-gray-100 border border-gray-200 rounded-xs flex items-center justify-center text-gray-400 text-xl font-bold uppercase">
-                                                        {trainer.full_name.charAt(0)}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="min-w-0">
-                                                <h3 className="text-base font-bold text-black truncate">{trainer.full_name}</h3>
-                                                <p className="text-sm font-medium text-gray-700 mt-0.5">
-                                                    {trainer.base_price_monthly ? `${trainer.base_price_monthly.toLocaleString('vi-VN')} ₫/tháng` : 'Liên hệ báo giá'}
-                                                </p>
-                                                <div className="flex items-center text-[10px] font-black text-black bg-gray-100 px-1.5 py-0.5 rounded-sm mt-1 w-fit">
-                                                    ★ {(trainer as any).avg_rating?.toFixed(1) || '5.0'}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <p className="text-sm text-gray-600 line-clamp-3 flex-1 mb-4">
-                                            {trainer.bio || 'Chưa có thông tin giới thiệu.'}
-                                        </p>
-
-                                        {trainer.specialties && trainer.specialties.length > 0 && (
-                                            <div className="flex flex-wrap gap-2 mb-4">
-                                                {trainer.specialties.slice(0, 3).map(spec => (
-                                                    <span key={spec} className="inline-flex py-0.5 px-2 bg-gray-100 border border-gray-200 text-gray-700 text-xs font-medium rounded-xs">
-                                                        {spec}
-                                                    </span>
-                                                ))}
-                                                {trainer.specialties.length > 3 && (
-                                                    <span className="inline-flex py-0.5 px-2 bg-gray-50 border border-gray-200 text-gray-500 text-xs font-medium rounded-xs">
-                                                        +{trainer.specialties.length - 3}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        )}
-
-                                        <div className="pt-3 border-t border-gray-100 flex justify-between items-center text-sm font-medium text-black">
-                                            Xem hồ sơ chi tiết
-                                            <span className="group-hover:translate-x-1 transition-transform">→</span>
-                                        </div>
-                                    </Link>
-                                );
-                            })}
+                            {data?.trainers.map((trainer: any) => (
+                                <CoachCard key={trainer.id} trainer={trainer} />
+                            ))}
                         </div>
 
                         {/* Pagination */}
@@ -268,7 +319,7 @@ export default function Coaches() {
                                 >
                                     ← Trang trước
                                 </button>
-                                <span className="text-sm font-mono text-gray-600 min-w-[80px] text-center">
+                                <span className="text-sm tabular-nums text-gray-600 min-w-[80px] text-center">
                                     {page} / {totalPages}
                                 </span>
                                 <button

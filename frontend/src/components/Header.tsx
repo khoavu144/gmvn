@@ -1,7 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { Menu, X, LogOut, User, MessageSquare, Calendar, Dumbbell, ChevronRight } from 'lucide-react';
+import {
+    Menu, X, User, LogOut,
+    Dumbbell, Calendar, MessageSquare, Image as ImageIcon, ChevronRight
+} from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import type { RootState } from '../store/store';
 import { authApi } from '../services/auth';
@@ -12,33 +15,70 @@ export default function Header() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isScrolled, setIsScrolled] = useState(false);
-    const [lastScrollY, setLastScrollY] = useState(0);
+    const [, setIsScrolled] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
+
+    const lastScrollY = useRef(0);
+    const scrollRaf = useRef<number | null>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     const { isAuthenticated, user, refreshToken } = useSelector((state: RootState) => state.auth);
 
     // Scroll behavior: hide on scroll down, show on scroll up
     useEffect(() => {
+        lastScrollY.current = window.scrollY;
+
         const handleScroll = () => {
-            const currentScrollY = window.scrollY;
+            if (scrollRaf.current !== null) return;
 
-            // Add backdrop when scrolled
-            setIsScrolled(currentScrollY > 10);
+            scrollRaf.current = requestAnimationFrame(() => {
+                const currentScrollY = window.scrollY;
 
-            // Hide/show header based on scroll direction
-            if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                setIsHidden(true);
-            } else {
-                setIsHidden(false);
-            }
+                // Add backdrop when scrolled
+                setIsScrolled(currentScrollY > 10);
 
-            setLastScrollY(currentScrollY);
+                // Hide/show header based on scroll direction
+                if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+                    setIsHidden(true);
+                } else if (currentScrollY < lastScrollY.current) {
+                    setIsHidden(false);
+                }
+
+                lastScrollY.current = currentScrollY;
+                scrollRaf.current = null;
+            });
         };
 
         window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [lastScrollY, isScrolled]); // isScrolled is used in the effect
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            if (scrollRaf.current !== null) {
+                cancelAnimationFrame(scrollRaf.current);
+            }
+        };
+    }, []);
+
+    // Mobile menu accessibility & body scroll lock
+    useEffect(() => {
+        if (isMenuOpen) {
+            document.body.style.overflow = 'hidden';
+
+            if (menuRef.current) {
+                const focusable = menuRef.current.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') as HTMLElement;
+                if (focusable) setTimeout(() => focusable.focus(), 50);
+            }
+
+            const handleKeyDown = (e: KeyboardEvent) => {
+                if (e.key === 'Escape') closeMenu();
+            };
+            document.addEventListener('keydown', handleKeyDown);
+
+            return () => {
+                document.body.style.overflow = '';
+                document.removeEventListener('keydown', handleKeyDown);
+            };
+        }
+    }, [isMenuOpen]);
 
     const handleLogout = async () => {
         try {
@@ -79,17 +119,20 @@ export default function Header() {
 
                 {/* Desktop Nav */}
                 <nav className="hidden lg:flex items-center gap-6">
+                    <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                        Coach
+                    </Link>
+                    <Link to="/gallery" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                        Gallery
+                    </Link>
                     <Link
                         to="/gyms"
                         className="text-sm font-semibold px-4 py-2 bg-black text-white hover:bg-gray-800 rounded transition-colors"
                     >
                         Gym Center
                     </Link>
-                    <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
-                        Coach
-                    </Link>
-                    <Link to="/about" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
-                        Về chúng tôi
+                    <Link to="/coaches?type=athlete" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                        Vận động viên
                     </Link>
                     {isAuthenticated && (
                         <>
@@ -159,6 +202,7 @@ export default function Header() {
                         onClick={toggleMenu}
                         className="lg:hidden p-2 text-gray-700 hover:text-black transition-colors"
                         aria-label="Toggle menu"
+                        aria-expanded={isMenuOpen}
                     >
                         {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                     </button>
@@ -167,18 +211,29 @@ export default function Header() {
 
             {/* Mobile Menu */}
             {isMenuOpen && (
-                <div className="lg:hidden fixed inset-0 top-header bg-white z-modal overflow-y-auto">
+                <div
+                    ref={menuRef}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Mobile navigation"
+                    className="lg:hidden fixed inset-0 top-header bg-white z-modal overflow-y-auto"
+                >
                     <nav className="p-4 space-y-1">
-                        <MobileNavItem to="/gyms" onClick={closeMenu} highlight>
-                            <Dumbbell className="w-5 h-5" />
-                            Gym Center
-                        </MobileNavItem>
                         <MobileNavItem to="/coaches" onClick={closeMenu}>
                             <User className="w-5 h-5" />
                             Coach
                         </MobileNavItem>
-                        <MobileNavItem to="/about" onClick={closeMenu}>
-                            Về GYMERVIET
+                        <MobileNavItem to="/gallery" onClick={closeMenu}>
+                            <ImageIcon className="w-5 h-5" />
+                            Gallery
+                        </MobileNavItem>
+                        <MobileNavItem to="/gyms" onClick={closeMenu} highlight>
+                            <Dumbbell className="w-5 h-5" />
+                            Gym Center
+                        </MobileNavItem>
+                        <MobileNavItem to="/coaches?type=athlete" onClick={closeMenu}>
+                            <User className="w-5 h-5" />
+                            Vận động viên
                         </MobileNavItem>
 
                         {isAuthenticated ? (

@@ -15,6 +15,7 @@ export interface TrainerFilters {
     priceMax?: number;
     city?: string;
     sort?: 'newest' | 'price_asc' | 'price_desc';
+    user_type?: 'trainer' | 'athlete';
 }
 
 export const trainerService = {
@@ -30,6 +31,7 @@ export const trainerService = {
         if (filters.priceMax !== undefined) params.append('priceMax', String(filters.priceMax));
         if (filters.city) params.append('city', filters.city);
         if (filters.sort) params.append('sort', filters.sort);
+        if (filters.user_type) params.append('user_type', filters.user_type);
 
         const response = await api.get<ApiResponse<GetTrainersResponse>>(`/users/trainers?${params.toString()}`);
         return response.data.data!;

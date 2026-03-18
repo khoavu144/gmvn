@@ -47,10 +47,11 @@ class UserService {
         priceMin?: number,
         priceMax?: number,
         city?: string,
-        sort?: 'newest' | 'price_asc' | 'price_desc'
+        sort?: 'newest' | 'price_asc' | 'price_desc',
+        user_type?: 'trainer' | 'athlete'
     ) {
         const queryBuilder = this.repo.createQueryBuilder('user')
-            .where('user.user_type = :type', { type: 'trainer' });
+            .where('user.user_type = :type', { type: user_type || 'trainer' });
 
         if (search) {
             queryBuilder.andWhere(

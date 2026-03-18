@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addExperienceThunk, updateExperienceThunk, deleteExperienceThunk } from '../../store/slices/profileSlice';
 import type { AppDispatch, RootState } from '../../store/store';
 import type { TrainerExperience } from '../../types';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { PencilIcon, TrashIcon, PlusIcon, BriefcaseIcon, AcademicCapIcon, DocumentTextIcon, TrophyIcon } from '@heroicons/react/24/outline';
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';

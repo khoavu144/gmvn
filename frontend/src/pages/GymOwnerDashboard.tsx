@@ -4,6 +4,7 @@ import { useToast } from '../components/Toast';
 import { gymService } from '../services/gymService';
 import type { GymCenter, GymBranch } from '../types';
 import { Link } from 'react-router-dom';
+import { Menu, X, Upload, Star, Search, Link as LinkIcon, Users, Building2, CalendarDays, ArrowRight, Trash2, Settings } from 'lucide-react';
 import GymBranchEditor from '../components/GymBranchEditor';
 
 const LazyBarChart = lazy(() => import('recharts').then((m) => ({ default: m.BarChart })));
@@ -22,6 +23,7 @@ const GymOwnerDashboard: React.FC = () => {
     const [gym, setGym] = useState<GymCenter | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'overview' | 'branches' | 'trainers' | 'settings'>('overview');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Branch Editor state
     const [editingBranch, setEditingBranch] = useState<GymBranch | null>(null);
@@ -103,7 +105,7 @@ const GymOwnerDashboard: React.FC = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex">
-            {ToastComponent}
+                {ToastComponent}
                 <div className="w-64 bg-gray-50 border-r border-gray-200"></div>
                 <div className="flex-1 p-8"><div className="animate-pulse h-32 bg-gray-100 rounded-xl" /></div>
             </div>
@@ -125,17 +127,43 @@ const GymOwnerDashboard: React.FC = () => {
 
     return (
         <div className="min-h-[calc(100vh-4rem)] flex flex-col md:flex-row bg-white relative">
+            {/* Mobile Header Toggle */}
+            <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-30">
+                <div className="font-black uppercase tracking-tight truncate flex-1 mr-4">{gym.name}</div>
+                <button onClick={() => setIsSidebarOpen(true)} className="p-2 border border-black text-black rounded-sm hover:bg-black hover:text-white transition-colors">
+                    <Menu className="w-5 h-5" />
+                </button>
+            </div>
+
+            {/* Mobile Sidebar Overlay */}
+            {isSidebarOpen && (
+                <div className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity" onClick={() => setIsSidebarOpen(false)}></div>
+            )}
+
             {/* Sidebar */}
-            <div className="w-full md:w-64 bg-gray-50 border-r border-gray-200 flex-shrink-0">
-                <div className="p-6 border-b border-gray-200">
-                    <h2 className="font-black truncate uppercase tracking-tight">{gym.name}</h2>
-                    <p className="text-xs text-gray-500 uppercase tracking-widest mt-1">Gym Center</p>
+            <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-gray-50 border-r border-gray-200 flex-shrink-0 transform transition-transform duration-300 md:relative md:w-64 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-white md:bg-gray-50">
+                    <div className="min-w-0 pr-4">
+                        <h2 className="font-black truncate uppercase tracking-tight" title={gym.name}>{gym.name}</h2>
+                        <p className="text-xs text-gray-500 uppercase tracking-widest mt-1">Gym Center</p>
+                    </div>
+                    <button onClick={() => setIsSidebarOpen(false)} className="md:hidden p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors">
+                        <X className="w-5 h-5" />
+                    </button>
                 </div>
                 <nav className="p-4 space-y-2">
-                    <button onClick={() => setActiveTab('overview')} className={`w-full text-left px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'overview' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}>Tổng quan</button>
-                    <button onClick={() => setActiveTab('branches')} className={`w-full text-left px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'branches' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}>Chi nhánh</button>
-                    <button onClick={() => setActiveTab('trainers')} className={`w-full text-left px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'trainers' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}>Coach liên kết</button>
-                    <button onClick={() => setActiveTab('settings')} className={`w-full text-left px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'settings' ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'}`}>Cài đặt</button>
+                    <button onClick={() => { setActiveTab('overview'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'overview' ? 'bg-black text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}>
+                        <CalendarDays className="w-4 h-4" /> Tổng quan
+                    </button>
+                    <button onClick={() => { setActiveTab('branches'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'branches' ? 'bg-black text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}>
+                        <Building2 className="w-4 h-4" /> Chi nhánh
+                    </button>
+                    <button onClick={() => { setActiveTab('trainers'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'trainers' ? 'bg-black text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}>
+                        <Users className="w-4 h-4" /> Coach liên kết
+                    </button>
+                    <button onClick={() => { setActiveTab('settings'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'settings' ? 'bg-black text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}>
+                        <Settings className="w-4 h-4" /> Cài đặt
+                    </button>
                 </nav>
             </div>
 
@@ -213,6 +241,28 @@ const GymOwnerDashboard: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Recent Reviews (Mocked) */}
+                        <div className="mt-12">
+                            <h2 className="text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-2"><Star className="w-5 h-5 text-yellow-500 fill-yellow-500" /> Đánh giá gần đây</h2>
+                            <div className="grid md:grid-cols-3 gap-6">
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="p-5 rounded-xl border border-gray-200 bg-white shadow-sm hover:border-black transition-colors cursor-pointer group flex flex-col min-h-[160px]">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div className="flex gap-1">
+                                                {[...Array(5)].map((_, idx) => <Star key={idx} className={`w-3 h-3 ${idx === 4 && i === 3 ? 'text-gray-300' : 'text-yellow-400 fill-yellow-400'}`} />)}
+                                            </div>
+                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i} ngày trước</span>
+                                        </div>
+                                        <p className="text-sm text-gray-700 italic line-clamp-3 mb-4 flex-1">"Phòng tập sạch sẽ, cơ sở vật chất tuyệt vời. Rất đáng tiền đăng ký gói năm ở đây!"</p>
+                                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-t border-gray-100 pt-3 flex items-center justify-between mt-auto">
+                                            <span>Hội viên ẩn danh</span>
+                                            <span className="text-black opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Xem <ArrowRight className="w-3 h-3 inline" /></span>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -342,10 +392,51 @@ const GymOwnerDashboard: React.FC = () => {
                 )}
 
                 {activeTab === 'trainers' && (
-                    <div className="bg-white p-10 text-center rounded-xl border border-gray-200">
-                        <h2 className="text-2xl font-bold mb-2">Quản lý Coach liên kết</h2>
-                        <p className="text-gray-500 mb-6">Tính năng quản lý Coach hiện được quản lý trực tiếp tại từng chi nhánh phòng tập.</p>
-                        <button className="btn-primary" onClick={() => setActiveTab('branches')}>Truy cập Quản lý Chi nhánh</button>
+                    <div className="animate-fade-in">
+                        <div className="flex justify-between items-end mb-10">
+                            <div>
+                                <h1 className="text-3xl font-black uppercase tracking-tight mb-2">Quản lý Coach liên kết</h1>
+                                <p className="text-gray-500">Mời Coach tham gia chi nhánh và cấp quyền quản lý hội viên</p>
+                            </div>
+                            <button className="btn-primary py-2 px-4 shadow-none flex items-center gap-2">
+                                <LinkIcon className="w-4 h-4" /> Mời Coach Mới
+                            </button>
+                        </div>
+
+                        {/* Search and Filter */}
+                        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                            <div className="relative flex-1">
+                                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <input type="text" placeholder="Tìm kiếm tên, sđt Coach..." className="form-input pl-10 w-full" />
+                            </div>
+                            <select className="form-input w-full sm:w-48">
+                                <option>Tất cả chi nhánh</option>
+                                {branches.map(b => <option key={b.id}>{b.branch_name}</option>)}
+                            </select>
+                        </div>
+
+                        <div className="grid gap-4">
+                            {[1, 2, 3].map(i => (
+                                <div key={i} className="p-4 border border-gray-200 rounded-xl flex flex-col md:flex-row md:items-center justify-between hover:border-black transition-colors bg-white group">
+                                    <div className="flex items-center gap-4 mb-4 md:mb-0">
+                                        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-black text-gray-400 uppercase">C{i}</div>
+                                        <div>
+                                            <h3 className="font-bold text-base flex items-center gap-2">Coach Nguyễn Văn A {i === 1 && <span className="bg-green-100 text-green-700 text-[10px] uppercase font-bold px-2 py-0.5 rounded-sm">Premium</span>}</h3>
+                                            <p className="text-gray-500 text-xs mt-1">Chuyên môn: Thể hình, Giảm mỡ • 091234567{i}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between md:justify-end gap-6 text-sm">
+                                        <div className="text-left md:text-right">
+                                            <span className="block text-[10px] text-gray-400 uppercase font-bold tracking-widest">Chi nhánh chính</span>
+                                            <span className="font-semibold text-black">Gymerviet Quận {i}</span>
+                                        </div>
+                                        <button className="p-2 border border-gray-200 rounded-lg text-gray-400 hover:text-black hover:border-black transition-colors" title="Xóa liên kết">
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
 
@@ -353,33 +444,68 @@ const GymOwnerDashboard: React.FC = () => {
                     <div className="animate-fade-in">
                         <div className="mb-10">
                             <h1 className="text-3xl font-black uppercase tracking-tight mb-2">Hồ sơ Thương hiệu</h1>
-                            <p className="text-gray-500">Cập nhật thông tin hệ thống Gym Center</p>
+                            <p className="text-gray-500">Cập nhật thông tin hệ thống Gym Center và bộ nhận diện</p>
                         </div>
-                        <div className="max-w-2xl bg-white border border-gray-200 p-6 rounded-xl space-y-6">
-                            <div>
-                                <label className="form-label block mb-2">Tên Gym Center</label>
-                                <input
-                                    type="text"
-                                    className="form-input w-full"
-                                    value={settingsForm.name}
-                                    onChange={(e) => setSettingsForm(prev => ({ ...prev, name: e.target.value }))}
-                                />
+                        <div className="grid md:grid-cols-3 gap-8">
+                            <div className="md:col-span-2 space-y-6 bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
+                                <h3 className="text-lg font-black uppercase tracking-tight border-b border-gray-100 pb-3">Thông tin cơ bản</h3>
+                                <div>
+                                    <label className="form-label block mb-2 font-bold text-xs uppercase text-gray-500 tracking-widest">Tên Gym Center *</label>
+                                    <input
+                                        type="text"
+                                        className="form-input w-full"
+                                        value={settingsForm.name}
+                                        onChange={(e) => setSettingsForm(prev => ({ ...prev, name: e.target.value }))}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="form-label block mb-2 font-bold text-xs uppercase text-gray-500 tracking-widest">Giới thiệu tổng quan</label>
+                                    <textarea
+                                        className="form-input w-full h-32"
+                                        value={settingsForm.description}
+                                        onChange={(e) => setSettingsForm(prev => ({ ...prev, description: e.target.value }))}
+                                        placeholder="Mô tả về quy mô, các tiện ích và định hướng của hệ thống phòng tập..."
+                                    ></textarea>
+                                </div>
+
+                                <h3 className="text-lg font-black uppercase tracking-tight border-b border-gray-100 pb-3 mt-8">Liên kết MXH</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="form-label block mb-2 font-bold text-xs uppercase text-gray-500 tracking-widest">Fanpage Facebook</label>
+                                        <input type="text" className="form-input w-full placeholder-gray-300" placeholder="https://facebook.com/..." />
+                                    </div>
+                                    <div>
+                                        <label className="form-label block mb-2 font-bold text-xs uppercase text-gray-500 tracking-widest">Website / Tiktok</label>
+                                        <input type="text" className="form-input w-full placeholder-gray-300" placeholder="https://..." />
+                                    </div>
+                                </div>
+
+                                <button
+                                    className="btn-primary w-full py-4 text-sm mt-8 shadow-none border border-black hover:bg-black hover:text-white"
+                                    onClick={handleSaveSettings}
+                                    disabled={saving}
+                                >
+                                    {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+                                </button>
                             </div>
-                            <div>
-                                <label className="form-label block mb-2">Giới thiệu</label>
-                                <textarea
-                                    className="form-input w-full h-32"
-                                    value={settingsForm.description}
-                                    onChange={(e) => setSettingsForm(prev => ({ ...prev, description: e.target.value }))}
-                                ></textarea>
+
+                            <div className="col-span-1 space-y-6">
+                                <div className="bg-white border border-gray-200 p-6 rounded-xl shadow-sm text-center">
+                                    <h3 className="text-sm font-black uppercase tracking-tight mb-4">Logo Phòng Tập</h3>
+                                    <div className="w-32 h-32 mx-auto bg-gray-50 rounded-full border border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:bg-white hover:border-black hover:text-black cursor-pointer transition-colors mb-4 group">
+                                        <Upload className="w-6 h-6 mb-2 group-hover:scale-110 transition-transform" />
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-center px-4 leading-tight">Tải ảnh lên<br />(Tối đa 2MB)</span>
+                                    </div>
+                                </div>
+                                <div className="bg-gray-50 border border-gray-200 p-6 rounded-xl">
+                                    <h3 className="text-sm font-black uppercase tracking-tight mb-2">Public Profile</h3>
+                                    <p className="text-xs text-gray-500 mb-4 leading-relaxed">Hồ sơ sẽ hiển thị tới công chúng sau khi được admin GYMERVIET phê duyệt.</p>
+                                    <div className="flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-gray-200 shadow-sm">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Trạng thái</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-green-700 bg-green-100 px-2 py-1 rounded-sm">Đang hoạt động</span>
+                                    </div>
+                                </div>
                             </div>
-                            <button
-                                className="btn-primary w-full py-4 text-sm mt-6"
-                                onClick={handleSaveSettings}
-                                disabled={saving}
-                            >
-                                {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
-                            </button>
                         </div>
                     </div>
                 )}

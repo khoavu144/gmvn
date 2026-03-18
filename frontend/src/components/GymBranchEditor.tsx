@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useToast } from '../components/Toast';
 import { ConfirmModal } from '../components/ConfirmModal';
 import { gymService } from '../services/gymService';
+import { userService } from '../services/userService';
 import type { GymBranch, GymAmenity, GymEquipment, GymPricing, GymEvent, User } from '../types';
 
 interface GymBranchEditorProps {
@@ -210,12 +211,10 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
         if (!searchQuery.trim()) return;
         setSearching(true);
         try {
-            // Simplified search - assuming it returns users with type 'trainer'
-            // We'll use a generic search if dedicated one isn't clear
-            await gymService.listGyms({ search: searchQuery }); // Placeholder if specific user search not found
-            // Better to use dedicated user search if available
-            setSearchResults([]); // Defaulting until search integrated
-            toast.success('Tính năng tìm kiếm Coach đang được đồng bộ...');
+            const results = await userService.searchCoaches(searchQuery);
+            setSearchResults(results);
+        } catch (error) {
+            toast.error('Lỗi tìm kiếm Coach');
         } finally {
             setSearching(false);
         }
@@ -270,7 +269,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                     ].map(tab => (
                         <button
                             key={tab.id}
-                            onClick={() => setActiveTab(tab.id as any)}
+                            onClick={() => setActiveTab(tab.id as 'info' | 'gallery' | 'amenities' | 'equipment' | 'pricing' | 'events' | 'reviews' | 'stats' | 'coaches')}
                             className={`px-6 py-4 text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === tab.id ? 'text-black' : 'text-gray-400 hover:text-gray-600'
                                 }`}
                         >

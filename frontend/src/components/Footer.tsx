@@ -75,7 +75,7 @@ export default function Footer() {
                         <span className="text-gray-300">|</span>
                         <Link to="/contact" className="hover:text-black transition-colors">Liên hệ</Link>
                     </div>
-                    <div className="text-[10px] text-gray-300 mt-2 sm:mt-0 italic">bỵ khoavu.</div>
+                    <div className="text-[10px] text-gray-300 mt-2 sm:mt-0 italic">by khoavu.</div>
                 </div>
             </div>
         </footer>

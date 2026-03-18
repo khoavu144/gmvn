@@ -5,7 +5,8 @@ import { fetchMyProfile, clearProfileMessages } from '../store/slices/profileSli
 import type { AppDispatch, RootState } from '../store/store';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, User as UserIcon, Layout, Award, Image as ImageIcon, MessageCircle, Camera, ExternalLink, MapPin, CheckCircle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence, LazyMotion } from 'framer-motion';
+const loadFramerFeatures = () => import('framer-motion').then(res => res.domAnimation);
 
 import { ProfilePersonalTab } from '../components/profile/ProfilePersonalTab';
 import { ProfileCoachTab } from '../components/profile/ProfileCoachTab';
@@ -63,7 +64,7 @@ export default function Profile() {
     const tabs = (user.user_type === 'trainer' || user?.user_type === 'athlete') ? proTabs : normalTabs;
 
     return (
-        <>
+        <LazyMotion features={loadFramerFeatures} strict>
             <Helmet>
                 <title>Quản lý Hồ sơ — GYMERVIET</title>
                 <meta name="description" content="Quản lý hồ sơ cá nhân, kinh nghiệm, gallery và FAQ trên GYMERVIET." />
@@ -351,7 +352,7 @@ export default function Profile() {
                     dispatch(fetchMyProfile());
                     // Optionally refresh user data if avatar/name changed
                 }}
-            /> */}
-        </>
+            {/* <EditProfileModal ... /> */}
+        </LazyMotion>
     );
 }

@@ -27,8 +27,9 @@ export const userController = {
             const priceMax = req.query.priceMax !== undefined ? Number(req.query.priceMax) : undefined;
             const city = typeof req.query.city === 'string' ? req.query.city : undefined;
             const sort = (req.query.sort as 'newest' | 'price_asc' | 'price_desc') || 'newest';
+            const user_type = (req.query.user_type as 'trainer' | 'athlete') || 'trainer';
 
-            const result = await userService.getTrainers(page, limit, search, specialty, priceMin, priceMax, city, sort);
+            const result = await userService.getTrainers(page, limit, search, specialty, priceMin, priceMax, city, sort, user_type);
             return res.status(200).json({ success: true, data: result });
         } catch (error: any) {
             return res.status(500).json({

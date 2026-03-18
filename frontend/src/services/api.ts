@@ -1,18 +1,27 @@
 import axios from 'axios';
 
+const REQUEST_TIMEOUT_MS = 15_000;
+
+const normalizeApiUrl = (rawUrl: string) => {
+    if (rawUrl === '/api/v1') {
+        return rawUrl;
+    }
+
+    let normalized = rawUrl.replace(/\/$/, '');
+    if (!normalized.endsWith('/api/v1')) {
+        normalized += '/api/v1';
+    }
+
+    return normalized;
+};
+
 // 1) VITE_API_URL from build env
 // 2) Same-origin fallback for production if VITE_API_URL is missing
 // 3) Localhost strictly for local development
-let API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api/v1' : 'http://localhost:3001/api/v1');
+const RAW_API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api/v1' : 'http://localhost:3001/api/v1');
+const API_URL = normalizeApiUrl(RAW_API_URL);
 
 let refreshTokenPromise: Promise<string> | null = null;
-
-if (API_URL !== '/api/v1') {
-    API_URL = API_URL.replace(/\/$/, '');
-    if (!API_URL.endsWith('/api/v1')) {
-        API_URL += '/api/v1';
-    }
-}
 
 const clearStoredTokens = () => {
     localStorage.removeItem('access_token');
@@ -29,6 +38,7 @@ const isAuthEndpoint = (url?: string) => {
 
 export const apiClient = axios.create({
     baseURL: API_URL,
+    timeout: REQUEST_TIMEOUT_MS,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -96,6 +106,10 @@ apiClient.interceptors.response.use(
             if (window.location.pathname !== '/login') {
                 window.location.href = '/login';
             }
+        }
+
+        if (!error.response && error.code === 'ECONNABORTED') {
+            error.message = 'Yêu cầu đến máy chủ bị timeout. Vui lòng thử lại.';
         }
 
         return Promise.reject(error);

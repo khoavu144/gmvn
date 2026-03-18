@@ -10,9 +10,7 @@ export default function MainLayout() {
             <main className="flex-1 pt-header pb-nav lg:pb-0">
                 <Outlet />
             </main>
-            <div className="hidden lg:block">
-                <Footer />
-            </div>
+            <Footer />
             <BottomNav />
         </div>
     );

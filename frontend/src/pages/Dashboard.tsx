@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { Users, DollarSign, MessageSquare, ClipboardList, User, Search, Calendar, Star, Building2, ShieldAlert } from 'lucide-react';
 import { useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import type { RootState } from '../store/store';
 import apiClient from '../services/api';
 import AdminGymApproval from '../components/AdminGymApproval';
 import AdminReviewManagement from '../components/AdminReviewManagement';
+import AdminGalleryManagement from '../components/AdminGalleryManagement';
 import { gymService } from '../services/gymService';
 import type { GymTrainerLink } from '../types';
 import { useToast } from '../components/Toast';
+import QuickActionCard from '../components/dashboard/QuickActionCard';
+import StatCard from '../components/dashboard/StatCard';
 
 interface OverviewData {
     active_clients?: number;
@@ -80,16 +85,12 @@ const CoachDashboard = ({ overview }: { overview: OverviewData }) => {
             {/* Stats row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { label: 'Học viên đang học', value: overview.active_clients ?? '—', icon: '👥' },
-                    { label: 'Doanh thu/tháng', value: overview.monthly_revenue ? `${Number(overview.monthly_revenue).toLocaleString('vi-VN')} đ` : '—', icon: '💰' },
-                    { label: 'Tin nhắn chưa đọc', value: overview.unread_messages ?? 0, icon: '💬' },
-                    { label: 'Chương trình', value: `${overview.published_programs ?? 0}/${overview.total_programs ?? 0}`, icon: '📋' },
+                    { label: 'Học viên', value: overview.active_clients ?? '—', icon: <Users className="w-5 h-5" /> },
+                    { label: 'Doanh thu', value: overview.monthly_revenue ? `${Number(overview.monthly_revenue).toLocaleString('vi-VN')} đ` : '—', icon: <DollarSign className="w-5 h-5" /> },
+                    { label: 'Tin nhắn', value: overview.unread_messages ?? 0, icon: <MessageSquare className="w-5 h-5" /> },
+                    { label: 'Chương trình', value: `${overview.published_programs ?? 0}/${overview.total_programs ?? 0}`, icon: <ClipboardList className="w-5 h-5" /> },
                 ].map(stat => (
-                    <div key={stat.label} className="bg-white border border-gray-200 rounded-xs p-4 flex flex-col hover:border-gray-300 transition-colors">
-                        <div className="text-2xl mb-2 text-gray-500">{stat.icon}</div>
-                        <div className="text-xl font-bold text-black">{stat.value}</div>
-                        <div className="text-xs text-gray-600 mt-1">{stat.label}</div>
-                    </div>
+                    <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} />
                 ))}
             </div>
 
@@ -98,18 +99,17 @@ const CoachDashboard = ({ overview }: { overview: OverviewData }) => {
                 <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Lối tắt</h3>
                 <div className="grid md:grid-cols-3 gap-4">
                     {[
-                        { to: '/programs', icon: '📋', title: 'Quản lý Gói tập', desc: 'Tạo & publish chương trình' },
-                        { to: '/messages', icon: '💬', title: 'Tin nhắn', desc: 'Chat với học viên' },
-                        { to: '/profile', icon: '👤', title: 'Hồ sơ Coach', desc: 'Cập nhật thông tin chuyên môn' },
+                        { to: '/programs', icon: <ClipboardList className="w-5 h-5" />, title: 'QUẢN LÝ GÓI TẬP', desc: 'Tạo & publish chương trình' },
+                        { to: '/messages', icon: <MessageSquare className="w-5 h-5" />, title: 'TIN NHẮN', desc: 'Chat với học viên' },
+                        { to: '/profile', icon: <User className="w-5 h-5" />, title: 'HỒ SƠ COACH', desc: 'Cập nhật thông tin chuyên môn' },
                     ].map(card => (
-                        <Link key={card.to} to={card.to} className="card flex flex-col group">
-                            <div className="text-2xl mb-3 text-gray-700">{card.icon}</div>
-                            <h4 className="text-sm font-semibold text-black">{card.title}</h4>
-                            <p className="text-xs text-gray-600 mt-1 flex-1">{card.desc}</p>
-                            <span className="text-black text-sm font-medium group-hover:translate-x-1 transition-transform inline-block mt-3 border-t border-gray-100 pt-3">
-                                Mở →
-                            </span>
-                        </Link>
+                        <QuickActionCard
+                            key={card.to}
+                            to={card.to}
+                            icon={card.icon}
+                            title={card.title}
+                            description={card.desc}
+                        />
                     ))}
                 </div>
             </div>
@@ -117,62 +117,173 @@ const CoachDashboard = ({ overview }: { overview: OverviewData }) => {
     );
 };
 
-// Cards for Normal User role
-const UserDashboard = () => (
-    <div className="space-y-8">
-        <section className="page-header mb-0">
-            <p className="page-kicker">Lối tắt</p>
-            <h2 className="section-title">Bắt đầu từ những thao tác quan trọng nhất</h2>
-            <p className="page-description">
-                Khám phá coach, theo dõi tin nhắn và cập nhật hồ sơ cá nhân trong cùng một nơi.
-            </p>
-        </section>
+const UserDashboard = () => {
+    const user = useSelector((state: RootState) => state.auth.user);
 
-        <div className="grid md:grid-cols-3 gap-4">
-            {[
-                { to: '/coaches', icon: '🔍', title: 'Tìm Coach', desc: 'Khám phá Coach phù hợp với mục tiêu tập luyện của bạn' },
-                { to: '/messages', icon: '💬', title: 'Tin nhắn', desc: 'Nhắn tin với Coach hoặc phòng gym bạn đang quan tâm' },
-                { to: '/profile', icon: '👤', title: 'Hồ sơ', desc: 'Cập nhật thông tin cá nhân và trạng thái public profile' },
-            ].map(card => (
-                <Link key={card.to} to={card.to} className="card flex flex-col group">
-                    <div className="text-2xl mb-3 text-gray-700">{card.icon}</div>
-                    <h4 className="text-sm font-semibold text-black">{card.title}</h4>
-                    <p className="text-xs text-gray-600 mt-1 flex-1">{card.desc}</p>
-                    <span className="text-black text-sm font-medium group-hover:translate-x-1 transition-transform inline-block mt-3 border-t border-gray-100 pt-3">
-                        Mở →
-                    </span>
+    const getCompleteness = () => {
+        let score = 20; // base (name, email)
+        if (user?.avatar_url) score += 20;
+        if (user?.height_cm) score += 20;
+        if (user?.current_weight_kg) score += 20;
+        if (user?.bio) score += 20;
+        return score;
+    };
+
+    const completeness = getCompleteness();
+    const isComplete = completeness === 100;
+
+    return (
+        <div className="space-y-8">
+            {!isComplete && (
+                <div className="bg-gray-50 border border-gray-200 p-6 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex-1 w-full">
+                        <div className="flex items-center gap-3 mb-2">
+                            <h3 className="text-lg font-black uppercase tracking-tight">Hoàn thiện hồ sơ</h3>
+                            <span className="bg-black text-white text-xs font-bold px-2 py-0.5 rounded-full">{completeness}%</span>
+                        </div>
+                        <p className="text-sm text-gray-500">Cập nhật thêm chiều cao, cân nặng và ảnh đại diện để nhận báo cáo BMI & gợi ý lộ trình.</p>
+
+                        <div className="w-full bg-gray-200 h-1.5 mt-4 rounded-full overflow-hidden max-w-sm">
+                            <div className="bg-black h-full transition-all duration-1000" style={{ width: `${completeness}%` }}></div>
+                        </div>
+                    </div>
+                    <Link to="/profile" className="bg-black text-white px-6 py-3 rounded-sm text-sm font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors whitespace-nowrap mt-2 sm:mt-0">
+                        Cập nhật thông tin
+                    </Link>
+                </div>
+            )}
+
+            {/* Role Upgrade Prompt */}
+            <div className="bg-black text-white p-6 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+                <div>
+                    <h3 className="text-lg font-black uppercase tracking-tight mb-1">Mục tiêu của bạn là gì?</h3>
+                    <p className="text-sm text-gray-400">Bạn đang sử dụng tài khoản cơ bản. Hãy chọn vai trò (Người tập luyện / Coach) để mở khóa toàn bộ tính năng theo dõi.</p>
+                </div>
+                <Link to="/profile" className="bg-white text-black px-6 py-3 rounded-sm text-sm font-bold uppercase tracking-widest hover:bg-gray-100 transition-colors whitespace-nowrap">
+                    Trở thành Athlete
                 </Link>
-            ))}
+            </div>
+
+            <section className="page-header mb-0">
+                <p className="page-kicker">Bảng điều khiển</p>
+                <h2 className="section-title">Bắt đầu từ những thao tác quan trọng nhất</h2>
+                <p className="page-description">
+                    Khám phá coach, theo dõi tin nhắn và cập nhật hồ sơ cá nhân trong cùng một nơi.
+                </p>
+            </section>
+
+            <div className="grid md:grid-cols-3 gap-4">
+                {[
+                    { to: '/coaches', icon: <Search className="w-5 h-5" />, title: 'TÌM COACH', desc: 'Khám phá Coach phù hợp với mục tiêu tập luyện' },
+                    { to: '/messages', icon: <MessageSquare className="w-5 h-5" />, title: 'TIN NHẮN', desc: 'Nhắn tin với Coach hoặc phòng gym' },
+                    { to: '/profile', icon: <User className="w-5 h-5" />, title: 'HỒ SƠ', desc: 'Cập nhật thông tin cá nhân và tài khoản' },
+                ].map(card => (
+                    <QuickActionCard
+                        key={card.to}
+                        to={card.to}
+                        icon={card.icon}
+                        title={card.title}
+                        description={card.desc}
+                    />
+                ))}
+            </div>
+
+            {/* Discovery Feed Mock */}
+            <div>
+                <div className="flex justify-between items-end mb-4">
+                    <h3 className="text-h3 border-b border-gray-200 pb-2 flex-1">Khám phá GYMERVIET</h3>
+                    <Link to="/coaches" className="text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-black pb-2 ml-4">Xem tất cả</Link>
+                </div>
+                <div className="grid md:grid-cols-3 gap-4">
+                    {[
+                        {
+                            to: '/coaches',
+                            icon: <Search className="w-5 h-5" />,
+                            title: 'PRIVATE COACH',
+                            desc: 'Huấn luyện viên cho lộ trình cá nhân hóa',
+                        },
+                        {
+                            to: '/coaches?type=athlete',
+                            icon: <User className="w-5 h-5" />,
+                            title: 'ATHLETE PROFILE',
+                            desc: 'Khám phá cộng đồng vận động viên theo mục tiêu',
+                        },
+                        {
+                            to: '/gyms',
+                            icon: <Building2 className="w-5 h-5" />,
+                            title: 'GYM CENTER',
+                            desc: 'Tra cứu cơ sở vật chất và chi nhánh gần bạn',
+                        },
+                    ].map(card => (
+                        <QuickActionCard
+                            key={card.to}
+                            to={card.to}
+                            icon={card.icon}
+                            title={card.title}
+                            description={card.desc}
+                        />
+                    ))}
+                </div>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 // Cards for Pro Athlete role
-const AthleteDashboard = () => (
+const AthleteDashboard = ({ overview }: { overview: OverviewData }) => (
     <div className="space-y-8">
+        {/* Next Workout Hero Card */}
+        <div className="bg-black text-white p-8 md:p-10 rounded-xl relative overflow-hidden group shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10"></div>
+            <div className="relative z-20 max-w-2xl">
+                <span className="inline-block px-3 py-1 bg-white text-black text-[10px] font-black uppercase tracking-widest mb-4">Buổi tập tiếp theo</span>
+                <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-3">Chưa có lịch tập</h3>
+                <p className="text-gray-400 mb-8 max-w-md">Khám phá các Coach chuyên nghiệp trên GYMERVIET để thiết kế lộ trình tập luyện cá nhân hoá cho riêng bạn.</p>
+                <div className="flex gap-4">
+                    <Link to="/coaches" className="bg-white text-black px-6 py-3 font-bold uppercase tracking-widest text-sm hover:bg-gray-200 transition-colors inline-block rounded-sm">
+                        Tìm Coach ngay
+                    </Link>
+                    <Link to="/workouts" className="border border-gray-600 text-white px-6 py-3 font-bold uppercase tracking-widest text-sm hover:border-white transition-colors inline-block rounded-sm hidden md:inline-block">
+                        Lịch tập của tôi
+                    </Link>
+                </div>
+            </div>
+        </div>
+
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+                { label: 'Số buổi tập', value: overview.active_clients ?? '0', icon: <ClipboardList className="w-5 h-5" /> },
+                { label: 'Chuỗi ngày liên tục', value: '0', icon: <Star className="w-5 h-5" /> },
+                { label: 'Coach', value: overview.unread_messages ? '1' : '0', icon: <User className="w-5 h-5" /> },
+                { label: 'Gói tập active', value: overview.published_programs ?? '0', icon: <Calendar className="w-5 h-5" /> },
+            ].map(stat => (
+                <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} />
+            ))}
+        </div>
+
         <section className="page-header mb-0">
-            <p className="page-kicker">Athlete Workspace</p>
+            <p className="page-kicker">Không gian Luyện tập</p>
             <h2 className="section-title">Theo dõi lịch tập và xây dựng hồ sơ thi đấu</h2>
             <p className="page-description">
                 Tập trung vào lịch tập, hồ sơ vận động viên và kết nối với coach thay vì các công cụ quản trị chương trình.
             </p>
         </section>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             {[
-                { to: '/workouts', icon: '🏋️', title: 'Lịch tập của tôi', desc: 'Xem lịch tập theo tuần và đánh dấu hoàn thành từng buổi' },
-                { to: '/profile', icon: '🌟', title: 'Hồ sơ Portfolio', desc: 'Cập nhật profile vận động viên, gallery và thành tích' },
-                { to: '/coaches', icon: '🔍', title: 'Tìm Coach', desc: 'Khám phá coach phù hợp để đồng hành dài hạn' },
-                { to: '/messages', icon: '💬', title: 'Tin nhắn', desc: 'Trao đổi với coach về lộ trình tập luyện và tiến độ' },
+                { to: '/workouts', icon: <Calendar className="w-5 h-5" />, title: 'LỊCH TẬP', desc: 'Theo dõi lịch tập và điểm số tiến độ' },
+                { to: '/profile', icon: <Star className="w-5 h-5" />, title: 'PORTFOLIO', desc: 'Cập nhật thành tích thi đấu' },
+                { to: '/coaches', icon: <Search className="w-5 h-5" />, title: 'TÌM COACH', desc: 'Khám phá huấn luyện viên phù hợp' },
+                { to: '/messages', icon: <MessageSquare className="w-5 h-5" />, title: 'TIN NHẮN', desc: 'Trao đổi về lịch và giáo án' },
             ].map(card => (
-                <Link key={card.to} to={card.to} className="card flex flex-col group">
-                    <div className="text-2xl mb-3 text-gray-700">{card.icon}</div>
-                    <h4 className="text-sm font-semibold text-black">{card.title}</h4>
-                    <p className="text-xs text-gray-600 mt-1 flex-1">{card.desc}</p>
-                    <span className="text-black text-sm font-medium group-hover:translate-x-1 transition-transform inline-block mt-3 border-t border-gray-100 pt-3">
-                        Mở →
-                    </span>
-                </Link>
+                <QuickActionCard
+                    key={card.to}
+                    to={card.to}
+                    icon={card.icon}
+                    title={card.title}
+                    description={card.desc}
+                />
             ))}
         </div>
     </div>
@@ -180,7 +291,7 @@ const AthleteDashboard = () => (
 
 // Cards for Admin role
 const AdminDashboard = () => {
-    const [activeTab, setActiveTab] = useState<'overview' | 'gyms' | 'reviews'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'gyms' | 'reviews' | 'gallery'>('overview');
 
     return (
         <div className="space-y-8">
@@ -203,30 +314,44 @@ const AdminDashboard = () => {
                 >
                     Đánh giá
                 </button>
+                <button
+                    onClick={() => setActiveTab('gallery')}
+                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'gallery' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
+                >
+                    Gallery
+                </button>
             </div>
 
             {activeTab === 'overview' && (
-                <div>
-                    <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Quản trị Hệ thống</h3>
+                <div className="animate-fade-in">
+                    <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Tổng quan Hệ thống</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        {[
+                            { label: 'Người dùng', value: '—', icon: <Users className="w-5 h-5 text-blue-600" /> },
+                            { label: 'Huấn luyện viên', value: '—', icon: <User className="w-5 h-5 text-amber-600" /> },
+                            { label: 'Gym Center', value: '—', icon: <Building2 className="w-5 h-5 text-green-600" /> },
+                            { label: 'Hồ sơ chờ duyệt', value: '—', icon: <ShieldAlert className="w-5 h-5 text-red-600" /> },
+                        ].map(stat => (
+                            <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} tone="subtle" />
+                        ))}
+                    </div>
+
+                    <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Truy cập nhanh</h3>
                     <div className="grid md:grid-cols-3 gap-4">
                         {[
-                            { onClick: () => setActiveTab('gyms'), icon: '🏢', title: 'Phê duyệt Gym Center', desc: 'Duyệt hồ sơ Gym Owner mới' },
-                            { onClick: () => setActiveTab('reviews'), icon: '⭐', title: 'Quản lý Đánh giá Gym', desc: 'Kiểm duyệt review vi phạm' },
-                            { to: '#', icon: '👤', title: 'Quản trị Người dùng', desc: 'Xử lý báo cáo vi phạm' },
+                            { onClick: () => setActiveTab('gyms'), icon: <Building2 className="w-5 h-5" />, title: 'PHÊ DUYỆT GYM', desc: 'Duyệt hồ sơ Gym Owner mới' },
+                            { onClick: () => setActiveTab('reviews'), icon: <Star className="w-5 h-5" />, title: 'ĐÁNH GIÁ GYM', desc: 'Kiểm duyệt review vi phạm' },
+                            { onClick: () => setActiveTab('gallery'), icon: <Star className="w-5 h-5" />, title: 'GALLERY MẠNG LƯỚI', desc: 'Quản lý khoảnh khắc đẹp' },
+                            { to: '/profile', icon: <ShieldAlert className="w-5 h-5" />, title: 'NGƯỜI DÙNG', desc: 'Tính năng đang được phát triển' },
                         ].map(card => (
-                            card.onClick ? (
-                                <button key={card.title} onClick={card.onClick} className="card text-left flex flex-col group border-black hover:bg-black hover:text-white transition-colors">
-                                    <div className="text-2xl mb-3 text-gray-700 group-hover:text-white">{card.icon}</div>
-                                    <h4 className="text-sm font-semibold text-black group-hover:text-white">{card.title}</h4>
-                                    <p className="text-xs text-gray-600 group-hover:text-gray-300 mt-1 flex-1">{card.desc}</p>
-                                </button>
-                            ) : (
-                                <Link key={card.title} to={card.to || '#'} className="card flex flex-col group border-black hover:bg-black hover:text-white transition-colors">
-                                    <div className="text-2xl mb-3 text-gray-700 group-hover:text-white">{card.icon}</div>
-                                    <h4 className="text-sm font-semibold text-black group-hover:text-white">{card.title}</h4>
-                                    <p className="text-xs text-gray-600 group-hover:text-gray-300 mt-1 flex-1">{card.desc}</p>
-                                </Link>
-                            )
+                            <QuickActionCard
+                                key={card.title}
+                                to={card.to}
+                                onClick={card.onClick}
+                                icon={card.icon}
+                                title={card.title}
+                                description={card.desc}
+                            />
                         ))}
                     </div>
                 </div>
@@ -251,6 +376,16 @@ const AdminDashboard = () => {
                     <AdminReviewManagement />
                 </div>
             )}
+
+            {activeTab === 'gallery' && (
+                <div>
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-xl font-black uppercase">Quản lý Community Gallery</h3>
+                        <button onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-black">Quay lại</button>
+                    </div>
+                    <AdminGalleryManagement />
+                </div>
+            )}
         </div>
     );
 };
@@ -262,7 +397,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (!user) { navigate('/login'); return; }
-        if (user.user_type === 'trainer') {
+        if (user.user_type === 'trainer' || user.user_type === 'athlete') {
             apiClient.get('/dashboard/overview')
                 .then(res => setOverview(res.data.overview || {}))
                 .catch(() => { });
@@ -277,12 +412,16 @@ export default function Dashboard() {
 
     return (
         <div className="page-shell-muted">
+            <Helmet>
+                <title>Bảng điều khiển — GymViet</title>
+                <meta name="description" content="Quản lý hồ sơ, tin nhắn, và các tính năng nâng cao trên GYMERVIET." />
+            </Helmet>
             <div className="bg-white border-b border-gray-200">
                 <div className="page-container py-6">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div>
                             <p className="page-kicker mb-2">
-                                {roleLabel[user.user_type] ?? 'Dashboard'} Workspace
+                                Không gian làm việc {roleLabel[user.user_type] ?? 'của bạn'}
                             </p>
                             <h1 className="page-title">
                                 Xin chào, {user.full_name.split(' ').pop()} 👋
@@ -303,9 +442,10 @@ export default function Dashboard() {
 
             <div className="page-container">
                 {user.user_type === 'trainer' && <CoachDashboard overview={overview} />}
-                {user.user_type === 'athlete' && <AthleteDashboard />}
+                {user.user_type === 'athlete' && <AthleteDashboard overview={overview} />}
                 {user.user_type === 'user' && <UserDashboard />}
                 {user.user_type === 'admin' && <AdminDashboard />}
+                {user.user_type === 'gym_owner' && <Navigate to="/gym-owner" replace />}
             </div>
         </div>
     );
