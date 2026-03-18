@@ -126,6 +126,10 @@ app.get('/api/v1/health', async (_req, res) => {
     }
 });
 
+// Root health checks (for Render/platform checks)
+app.get('/', (_req, res) => res.status(200).send('API is running'));
+app.head('/', (_req, res) => res.status(200).end());
+
 // Error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
