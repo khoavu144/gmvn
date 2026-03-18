@@ -7,9 +7,16 @@ import { refreshTokenStore } from './services/refreshTokenStore';
 const bootstrap = async () => {
     try {
         const env = getEnv();
+        let redisConnected = false;
 
-        await refreshTokenStore.connect();
-        console.log('🔌 Redis connected successfully');
+        try {
+            await refreshTokenStore.connect();
+            redisConnected = true;
+            console.log('🔌 Redis connected successfully');
+        } catch (error) {
+            console.warn('⚠️ Redis unavailable. Continuing boot in degraded mode; refresh-token persistence and Redis-backed health checks will remain degraded until Redis is restored.');
+            console.warn('⚠️ Redis bootstrap error:', error);
+        }
 
         await assertNoPendingMigrations();
         await AppDataSource.initialize();
@@ -22,6 +29,10 @@ const bootstrap = async () => {
             console.log(`🚀 Server running on port ${env.PORT}`);
             console.log(`📡 API: http://localhost:${env.PORT}/api/v1`);
             console.log('💬 Socket.io enabled');
+
+            if (!redisConnected) {
+                console.warn('⚠️ Application is running in degraded mode without Redis.');
+            }
 
             if (env.RUN_SEED === 'true') {
                 console.log('🌱 RUN_SEED flag detected. Running comprehensive demo seed...');
