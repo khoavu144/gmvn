@@ -1,9 +1,13 @@
 import axios from 'axios';
 
-let API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
+// 1) VITE_API_URL from build env
+// 2) Same-origin fallback for production if VITE_API_URL is missing
+// 3) Localhost strictly for local development
+let API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api/v1' : 'http://localhost:3001/api/v1');
+
 let refreshTokenPromise: Promise<string> | null = null;
 
-if (API_URL) {
+if (API_URL !== '/api/v1') {
     API_URL = API_URL.replace(/\/$/, '');
     if (!API_URL.endsWith('/api/v1')) {
         API_URL += '/api/v1';

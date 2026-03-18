@@ -49,7 +49,7 @@ export default function AthleteDetailPage() {
         return identifier ? `/athletes/${identifier}` : '/athletes';
     }, [profile?.slug, profile?.trainer_id, identifier]);
 
-    const canonicalUrl = `http://localhost:5173${canonicalPath}`;
+    const canonicalUrl = `${window.location.origin}${canonicalPath}`;
 
     const seoTitle = useMemo(() => {
         const name = athlete?.full_name || profile?.headline || 'Athlete';

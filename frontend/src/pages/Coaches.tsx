@@ -44,7 +44,7 @@ export default function Coaches() {
         sort,
     }), [search, specialty, priceRange.min, priceRange.max, sort]);
 
-    const { data, isLoading, isError } = useQuery({
+    const { data, isLoading, isError, refetch } = useQuery({
         queryKey: ['trainers', page, filters],
         queryFn: () => trainerService.getTrainers(page, PAGE_SIZE, filters),
         staleTime: 60000,
@@ -187,8 +187,9 @@ export default function Coaches() {
                         ))}
                     </div>
                 ) : isError ? (
-                    <div className="empty-state">
-                        <p className="text-sm font-medium text-red-600">Đã xảy ra lỗi khi tải dữ liệu.</p>
+                    <div className="empty-state p-8 text-center border-dashed border-red-200">
+                        <p className="text-sm font-medium text-red-600 mb-4">Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.</p>
+                        <button onClick={() => refetch()} className="text-xs font-bold text-black border border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition">Thử lại</button>
                     </div>
                 ) : data?.trainers.length === 0 ? (
                     <div className="empty-state text-sm text-gray-500">

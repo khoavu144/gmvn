@@ -103,7 +103,7 @@ export default function ProfilePublic() {
             ? `${isAthleteProfile ? '/athletes' : '/profile/public'}/${trainerId}`
             : '/coaches';
 
-    const canonicalUrl = `http://localhost:5173${canonicalPath}`;
+    const canonicalUrl = `${window.location.origin}${canonicalPath}`;
 
     const seoTitle = useMemo(() => {
         return `${trainerName} | ${isAthleteProfile ? 'Athlete' : 'Coach'} Profile | GYMERVIET`;

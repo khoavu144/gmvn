@@ -1,8 +1,11 @@
 import { io, Socket } from 'socket.io-client';
 import { logger } from '../lib/logger';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-const SOCKET_URL = API_URL.replace('/api/v1', '');
+// 1) VITE_API_URL from build env
+// 2) Same-origin fallback for production if VITE_API_URL is missing
+// 3) Localhost strictly for local development
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001');
+const SOCKET_URL = API_URL.replace(/\/api\/v1\/?$/, '') || '/';
 
 class SocketService {
     private socket: Socket | null = null;
@@ -20,7 +23,7 @@ class SocketService {
         });
 
         this.socket.on('connect_error', (err) => {
-            logger.error('💬 Socket.io error:', err.message);
+            logger.error(`💬 Socket.io connection failed to origin [${SOCKET_URL}]. Reason: ${err.message}`);
         });
 
         return this.socket;

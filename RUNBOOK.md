@@ -32,6 +32,7 @@ Cuốn cẩm nang ghi lại tất cả các **Quy Trình Triển Khai (Deploymen
 1. **Kiểm tra Env (Env Validation)**: Rà soát biến môi trường của nền tảng Hosting (Ví dụ: Supabase Keys, RDS URL, JWT Secrets). Không bao giờ thay đổi khóa bảo mật JWT khi đang vận hành nếu không cấp thiết.
 2. **Kích hoạt Migration Guard (`Backend`)**: Chạy lệnh `npm run migrate:check`. Server backend sẽ bị block boot nếu DB không đồng bộ.
 3. **Build Frontend Bundle (`Frontend`)**: Chạy `npm run build` để đảm bảo bundle chuẩn.
+   - **LƯU Ý BẮT BUỘC:** Phải cấu hình biến môi trường `VITE_API_URL` (ví dụ: `https://api.gymerviet.com/api/v1`) trên Hosting Platform (Vercel/Netlify/Docker) **TRƯỚC** khi chạy lệnh build. Nếu thiếu, application sẽ tự fallback về same-origin. Chấm dứt tình trạng trỏ nhầm về localhost trên Online.
 4. **Smoke Test Nhanh (Post-deployment)**: Sau khi hệ thống Online, truy cập ngay URL:
    - Thử Login bằng tài khoản user/admin.
    - Truy cập vào Profile, ProgramsPage, Coaches đảm bảo UI load mượt với Skeleton.

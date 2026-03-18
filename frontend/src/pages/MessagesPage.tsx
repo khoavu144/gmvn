@@ -30,6 +30,7 @@ export default function MessagesPage() {
     const [activePartner, setActivePartner] = useState<string | null>(null);
     const [newMessage, setNewMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Keep activePartner in a ref to avoid stale closure without reconnecting socket on every switch
@@ -119,17 +120,25 @@ export default function MessagesPage() {
 
     const loadConversations = async () => {
         try {
+            setError(null);
             const res = await apiClient.get('/messages/conversations');
             setConversations(res.data.conversations || []);
-        } catch (err) { logger.error(err); }
+        } catch (err: any) { 
+            logger.error(err); 
+            setError('Lỗi tải danh sách đối thoại.'); 
+        }
     };
 
     const loadMessages = async (partnerId: string) => {
         setLoading(true);
+        setError(null);
         try {
             const res = await apiClient.get(`/messages/conversations/${partnerId}`);
             setMessages(res.data.messages || []);
-        } catch (err) { logger.error(err); } finally { setLoading(false); }
+        } catch (err: any) { 
+            logger.error(err); 
+            setError('Không thể tải tin nhắn.');
+        } finally { setLoading(false); }
     };
 
     const selectConversation = (partnerId: string) => {
@@ -191,7 +200,12 @@ export default function MessagesPage() {
                     <h2 className="font-bold text-lg text-black">Tin nhắn</h2>
                 </div>
                 <div className="flex-1 overflow-y-auto">
-                    {conversations.length === 0 ? (
+                    {error && conversations.length === 0 ? (
+                        <div className="p-8 text-center">
+                            <p className="text-red-500 text-sm mb-4">{error}</p>
+                            <button onClick={loadConversations} className="text-xs font-bold text-black border border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition">Thử lại</button>
+                        </div>
+                    ) : conversations.length === 0 ? (
                         <div className="p-8 text-center text-gray-400 text-sm">Chưa có tin nhắn nào</div>
                     ) : (
                         <div className="divide-y divide-gray-100">
@@ -247,6 +261,11 @@ export default function MessagesPage() {
                                     <div className="flex justify-start"><div className="h-10 w-48 bg-gray-200 rounded-2xl rounded-tl-sm"></div></div>
                                     <div className="flex justify-end"><div className="h-10 w-56 bg-gray-300 rounded-2xl rounded-tr-sm"></div></div>
                                     <div className="flex justify-start"><div className="h-10 w-36 bg-gray-200 rounded-2xl rounded-tl-sm"></div></div>
+                                </div>
+                            ) : error && messages.length === 0 ? (
+                                <div className="h-full flex flex-col items-center justify-center p-6 text-center">
+                                    <p className="text-red-500 text-sm mb-4">{error}</p>
+                                    <button onClick={() => activePartner && loadMessages(activePartner)} className="text-xs font-bold text-black border border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition">Thử lại</button>
                                 </div>
                             ) : messages.length === 0 ? (
                                 <div className="h-full flex items-center justify-center">

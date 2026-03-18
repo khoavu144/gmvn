@@ -96,6 +96,7 @@ export default function ProgramsPage() {
     const [form, setForm] = useState<FormData>(defaultForm);
     const [saving, setSaving] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     // Upload state
     const [isCropModalOpen, setIsCropModalOpen] = useState(false);
@@ -110,9 +111,13 @@ export default function ProgramsPage() {
 
     const loadPrograms = async () => {
         try {
+            setError(null);
             const res = await apiClient.get(`/programs/trainers/${user!.id}/programs`);
             setPrograms(res.data.programs || []);
-        } catch (err) { logger.error(err); } finally { setLoading(false); }
+        } catch (err: any) { 
+            logger.error(err); 
+            setError('Không thể tải danh sách gói tập.');
+        } finally { setLoading(false); }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -444,6 +449,11 @@ export default function ProgramsPage() {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        ) : error ? (
+                            <div className="card text-center py-16 border-dashed border-red-200">
+                                <p className="text-red-500 text-sm mb-4">{error}</p>
+                                <button onClick={() => { setLoading(true); loadPrograms(); }} className="text-xs font-bold text-black border border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition">Thử lại</button>
                             </div>
                         ) : programs.length === 0 ? (
                             <div className="card text-center py-16 border-dashed">

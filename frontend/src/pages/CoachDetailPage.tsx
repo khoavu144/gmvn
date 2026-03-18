@@ -178,7 +178,7 @@ export default function CoachDetailPage() {
     };
 
     const canonicalPath = trainer?.slug ? `/coach/${trainer.slug}` : `/coaches/${trainerId ?? ''}`;
-    const canonicalUrl = `http://localhost:5173${canonicalPath}`;
+    const canonicalUrl = `${window.location.origin}${canonicalPath}`;
 
     const seoTitle = useMemo(() => {
         if (!trainer?.full_name) return 'Coach Detail | GYMERVIET';
