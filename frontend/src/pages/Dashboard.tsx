@@ -85,9 +85,9 @@ const CoachDashboard = ({ overview }: { overview: OverviewData }) => {
             {/* Stats row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { label: 'Học viên', value: overview.active_clients ?? '—', icon: <Users className="w-5 h-5" /> },
+                    { label: 'Học viên', value: String(overview.active_clients ?? '—'), icon: <Users className="w-5 h-5" /> },
                     { label: 'Doanh thu', value: overview.monthly_revenue ? `${Number(overview.monthly_revenue).toLocaleString('vi-VN')} đ` : '—', icon: <DollarSign className="w-5 h-5" /> },
-                    { label: 'Tin nhắn', value: overview.unread_messages ?? 0, icon: <MessageSquare className="w-5 h-5" /> },
+                    { label: 'Tin nhắn', value: String(overview.unread_messages ?? 0), icon: <MessageSquare className="w-5 h-5" /> },
                     { label: 'Chương trình', value: `${overview.published_programs ?? 0}/${overview.total_programs ?? 0}`, icon: <ClipboardList className="w-5 h-5" /> },
                 ].map(stat => (
                     <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} />
@@ -253,10 +253,10 @@ const AthleteDashboard = ({ overview }: { overview: OverviewData }) => (
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-                { label: 'Số buổi tập', value: overview.active_clients ?? '0', icon: <ClipboardList className="w-5 h-5" /> },
+                { label: 'Số buổi tập', value: String(overview.active_clients ?? '0'), icon: <ClipboardList className="w-5 h-5" /> },
                 { label: 'Chuỗi ngày liên tục', value: '0', icon: <Star className="w-5 h-5" /> },
                 { label: 'Coach', value: overview.unread_messages ? '1' : '0', icon: <User className="w-5 h-5" /> },
-                { label: 'Gói tập active', value: overview.published_programs ?? '0', icon: <Calendar className="w-5 h-5" /> },
+                { label: 'Gói tập active', value: String(overview.published_programs ?? '0'), icon: <Calendar className="w-5 h-5" /> },
             ].map(stat => (
                 <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} />
             ))}

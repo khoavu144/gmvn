@@ -334,7 +334,8 @@ const profileSlice = createSlice({
             })
             .addCase(fetchPublicProfile.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload as string;
+                const payload = action.payload;
+                state.error = typeof payload === 'string' ? payload : (payload as any)?.message || 'Profile không tồn tại';
             });
 
         // ── updateProfile ────────────────────────────────────────────────────

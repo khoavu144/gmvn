@@ -5,9 +5,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchPublicProfile } from '../store/slices/profileSlice';
 import type { AppDispatch, RootState } from '../store/store';
 import { getSrcSet, getOptimizedUrl } from '../utils/image';
+import ShareButton from '../components/ShareButton';
 
 export default function AthleteDetailPage() {
-    const { identifier } = useParams<{ identifier: string }>();
+    const { identifier, slug } = useParams<{ identifier?: string; slug?: string }>();
+    const resolvedIdentifier = identifier || slug;
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: RootState) => state.auth);
@@ -20,10 +22,10 @@ export default function AthleteDetailPage() {
     } = useSelector((state: RootState) => state.profile);
 
     useEffect(() => {
-        if (identifier) {
-            dispatch(fetchPublicProfile(identifier));
+        if (resolvedIdentifier) {
+            dispatch(fetchPublicProfile(resolvedIdentifier));
         }
-    }, [identifier, dispatch]);
+    }, [resolvedIdentifier, dispatch]);
 
     const athlete = profile?.trainer;
     const isAthleteProfile = athlete?.user_type === 'athlete';
@@ -41,13 +43,13 @@ export default function AthleteDetailPage() {
 
     const canonicalPath = useMemo(() => {
         if (profile?.slug) {
-            return `/athletes/${profile.slug}`;
+            return `/athlete/${profile.slug}`;
         }
         if (profile?.trainer_id) {
             return `/athletes/${profile.trainer_id}`;
         }
-        return identifier ? `/athletes/${identifier}` : '/athletes';
-    }, [profile?.slug, profile?.trainer_id, identifier]);
+        return resolvedIdentifier ? `/athletes/${resolvedIdentifier}` : '/coaches';
+    }, [profile?.slug, profile?.trainer_id, resolvedIdentifier]);
 
     const canonicalUrl = `${window.location.origin}${canonicalPath}`;
 
@@ -124,8 +126,13 @@ export default function AthleteDetailPage() {
                     <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black">
                         ← Khám phá hồ sơ
                     </Link>
-                    <div className="text-xs uppercase tracking-wider font-semibold text-black">
-                        Athlete Profile
+                    <div className="flex items-center gap-3">
+                        {profile?.slug && (
+                            <Link to={`/athlete/${profile.slug}`} className="text-xs font-semibold uppercase tracking-wider text-black underline underline-offset-4">
+                                Permalink chuẩn SEO
+                            </Link>
+                        )}
+                        <ShareButton title={seoTitle} text={seoDescription} label="Chia sẻ" />
                     </div>
                 </div>
             </div>
