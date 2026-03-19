@@ -75,7 +75,12 @@ const apiLimiter = rateLimit({
 // Apply the rate limiting middleware to API calls only
 app.use('/api/v1/', apiLimiter);
 
-app.use(express.json());
+// P0-2: Need raw body for HMAC signature verification
+app.use(express.json({
+    verify: (req: any, _res, buf) => {
+        req.rawBody = buf;
+    }
+}));
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
@@ -98,32 +103,13 @@ app.use('/api/v1/notifications', notificationRoutes);
 // Community Gallery
 app.use('/api/v1/gallery', communityGalleryRoutes);
 
-// Health check with DB status
-app.get('/api/v1/health', async (_req, res) => {
-    try {
-        const userCount = await AppDataSource.getRepository(User).count();
-        const gymCount = await AppDataSource.getRepository(GymCenter).count();
-        const redisHealthy = await refreshTokenStore.ping();
-        res.status(200).json({
-            status: redisHealthy ? 'OK' : 'DEGRADED',
-            timestamp: new Date().toISOString(),
-            db: {
-                initialized: AppDataSource.isInitialized,
-                users: userCount,
-                gyms: gymCount
-            },
-            redis: {
-                connected: redisHealthy
-            },
-            env: process.env.NODE_ENV
-        });
-    } catch (error: any) {
-        res.status(500).json({
-            status: 'ERROR',
-            message: 'Database connection failed',
-            error: error.message
-        });
-    }
+// Health check (Public standard mode - P0-4 Security Fix)
+app.get('/api/v1/health', (_req, res) => {
+    res.status(200).json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        env: process.env.NODE_ENV
+    });
 });
 
 // Root health checks (for Render/platform checks)

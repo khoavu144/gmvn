@@ -62,7 +62,7 @@ export class TrainerProfile {
     trainer!: User;
 
     // === HEADER ===
-    @Column({ type: 'varchar', length: 20, nullable: true })
+    @Column({ type: 'varchar', length: 100, nullable: true })
     slug!: string | null; // SEO-friendly URL, e.g. 'john-strength-coach'
 
     @Column({ type: 'varchar', length: 20, default: 'card' })

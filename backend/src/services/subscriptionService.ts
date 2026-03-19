@@ -3,6 +3,8 @@ import { Subscription } from '../entities/Subscription';
 import { Program } from '../entities/Program';
 import { FinancialTransaction } from '../entities/FinancialTransaction';
 import { RevenueTier } from '../entities/RevenueTier';
+import { notificationService } from './notificationService';
+import { getIo } from '../socket';
 
 class SubscriptionService {
     private get subRepo() {
@@ -143,8 +145,27 @@ class SubscriptionService {
                 stripe_fee: stripeFee,
                 creator_amount: creatorAmount,
                 status: 'completed',
+                subscription_id: sub.id,
             })
         );
+
+        // P1-3: Notify trainer about new subscription
+        try {
+            const notif = await notificationService.create(
+                trainerId,
+                'system' as any,
+                'Học viên mới',
+                'Bạn có một học viên mới đăng ký chương trình',
+                '/dashboard'
+            );
+            
+            const io = getIo();
+            if (io) {
+                io.to(trainerId).emit('notification:new', notif);
+            }
+        } catch (e) {
+            console.error('Failed to notify trainer:', e);
+        }
 
         return { success: true };
     }

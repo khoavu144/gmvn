@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Users, DollarSign, MessageSquare, ClipboardList, User, Search, Calendar, Star, Building2, ShieldAlert } from 'lucide-react';
+import { Users, DollarSign, MessageSquare, ClipboardList, User, Search, Calendar, Star, Building2, ShieldAlert, CreditCard } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import type { RootState } from '../store/store';
@@ -172,9 +172,10 @@ const UserDashboard = () => {
                 </p>
             </section>
 
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid md:grid-cols-4 gap-4">
                 {[
-                    { to: '/coaches', icon: <Search className="w-5 h-5" />, title: 'TÌM COACH', desc: 'Khám phá Coach phù hợp với mục tiêu tập luyện' },
+                    { to: '/coaches', icon: <Search className="w-5 h-5" />, title: 'TÌM COACH', desc: 'Khám phá Coach phù hợp với mục tiêu' },
+                    { to: '/dashboard/subscriptions', icon: <CreditCard className="w-5 h-5" />, title: 'GÓI TẬP', desc: 'Quản lý lịch sử đăng ký' },
                     { to: '/messages', icon: <MessageSquare className="w-5 h-5" />, title: 'TIN NHẮN', desc: 'Nhắn tin với Coach hoặc phòng gym' },
                     { to: '/profile', icon: <User className="w-5 h-5" />, title: 'HỒ SƠ', desc: 'Cập nhật thông tin cá nhân và tài khoản' },
                 ].map(card => (

@@ -146,8 +146,10 @@ export class ProfileService {
     }
 
     async getFullPublicProfile(trainerId: string) {
-        const [profile, experience, gallery, faq, skills, packages, testimonials, highlights, mediaFeatures, pressMentions] = await Promise.all([
-            this.getPublicProfile(trainerId),
+        const profile = await this.getPublicProfile(trainerId);
+        if (!profile) return null;
+
+        const [experience, gallery, faq, skills, packages, testimonials, highlights, mediaFeatures, pressMentions] = await Promise.all([
             this.getExperience(trainerId),
             this.getGallery(trainerId),
             this.getFAQ(trainerId),
@@ -158,7 +160,7 @@ export class ProfileService {
             this.getMediaFeatures(trainerId),
             this.getPressMentions(trainerId),
         ]);
-        if (!profile) return null;
+
         return {
             profile,
             experience,

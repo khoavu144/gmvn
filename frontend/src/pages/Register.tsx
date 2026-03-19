@@ -37,7 +37,7 @@ export default function Register() {
         setStep(2);
     };
 
-    const handleSelectRoleAndSubmit = async (role: 'athlete' | 'trainer' | 'gym_owner') => {
+    const handleSelectRoleAndSubmit = async (role: 'user' | 'athlete' | 'trainer' | 'gym_owner') => {
         setForm(prev => ({ ...prev, user_type: role }));
         setError('');
         setLoadingState(true);
@@ -58,7 +58,7 @@ export default function Register() {
             if (result.user.user_type === 'gym_owner') {
                 navigate('/gym-owner/register');
             } else {
-                navigate('/dashboard');
+                navigate('/verify-email');
             }
         } catch (err: any) {
             setError(
@@ -176,7 +176,7 @@ export default function Register() {
                     ) : (
                         <div className="space-y-3">
                             <button
-                                onClick={() => handleSelectRoleAndSubmit('athlete')}
+                                onClick={() => handleSelectRoleAndSubmit('user')}
                                 disabled={loading}
                                 className="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
                             >

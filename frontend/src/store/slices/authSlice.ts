@@ -14,6 +14,7 @@ interface User {
     specialties?: string[] | null;
     base_price_monthly?: number | null;
     is_verified?: boolean;
+    onboarding_completed?: boolean;
     gym_owner_status?: 'pending_review' | 'approved' | 'rejected' | null;
     created_at: string;
     updated_at?: string;

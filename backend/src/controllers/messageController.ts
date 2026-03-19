@@ -1,5 +1,11 @@
 import { Request, Response } from 'express';
 import { messageService } from '../services/messageService';
+import { z } from 'zod';
+
+const sendMessageSchema = z.object({
+    receiver_id: z.string().uuid('Invalid receiver ID'),
+    content: z.string().trim().min(1, 'Nội dung tin nhắn không được để trống').max(2000, 'Nội dung tin nhắn vượt quá giới hạn 2000 ký tự')
+});
 
 export const getConversations = async (req: Request, res: Response) => {
     try {
@@ -28,10 +34,15 @@ export const getMessages = async (req: Request, res: Response) => {
 export const sendMessage = async (req: Request, res: Response) => {
     try {
         const userId = req.user!.user_id;
-        const { receiver_id, content } = req.body;
-        if (!receiver_id || !content) {
-            return res.status(400).json({ error: 'receiver_id and content are required' });
+        // P0-5: Validate message content length and format
+        const parseResult = sendMessageSchema.safeParse(req.body);
+        if (!parseResult.success) {
+            return res.status(400).json({ 
+                error: parseResult.error.issues ? parseResult.error.issues[0].message : 'Dữ liệu không hợp lệ'
+            });
         }
+        
+        const { receiver_id, content } = parseResult.data;
 
         const message = await messageService.sendMessage(userId, receiver_id, content);
         res.status(201).json({ success: true, message });

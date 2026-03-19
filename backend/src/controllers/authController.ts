@@ -51,4 +51,38 @@ export const authController = {
             throw new AppError(error.message || 'User not found', 404);
         }
     }),
+
+    sendVerification: asyncHandler(async (req: Request, res: Response) => {
+        const result = await authService.sendVerificationEmail(req.user!.user_id);
+        res.status(200).json({ success: true, data: result });
+    }),
+
+    verifyEmail: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const { token } = req.body;
+            const result = await authService.verifyEmail(req.user!.user_id, token);
+            res.status(200).json({ success: true, data: result });
+        } catch (error: any) {
+            throw new AppError(error.message || 'Verification failed', 400);
+        }
+    }),
+
+    completeOnboarding: asyncHandler(async (req: Request, res: Response) => {
+        const result = await authService.completeOnboarding(req.user!.user_id, req.body);
+        res.status(200).json({ success: true, data: { message: 'Onboarding completed', user: result } });
+    }),
+
+    forgotPassword: asyncHandler(async (req: Request, res: Response) => {
+        const result = await authService.forgotPassword(req.body.email);
+        res.status(200).json({ success: true, data: result });
+    }),
+
+    resetPassword: asyncHandler(async (req: Request, res: Response) => {
+        try {
+            const result = await authService.resetPassword(req.body);
+            res.status(200).json({ success: true, data: result });
+        } catch (error: any) {
+            throw new AppError(error.message || 'Reset password failed', 400);
+        }
+    }),
 };

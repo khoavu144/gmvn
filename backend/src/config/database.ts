@@ -44,6 +44,8 @@ import { TrainerProfileHighlight } from '../entities/TrainerProfileHighlight';
 import { TrainerMediaFeature } from '../entities/TrainerMediaFeature';
 import { TrainerPressMention } from '../entities/TrainerPressMention';
 import { CommunityGallery } from '../entities/CommunityGallery';
+import { EmailVerificationToken } from '../entities/EmailVerificationToken';
+import { PasswordResetToken } from '../entities/PasswordResetToken';
 
 const env = getEnv();
 
@@ -94,7 +96,9 @@ export const AppDataSource = new DataSource({
         TrainerPressMention,
         // Community Gallery
         CommunityGallery,
+        EmailVerificationToken,
+        PasswordResetToken,
     ],
     subscribers: [],
-    migrations: [],
+    migrations: [__dirname + '/../migrations/*.{js,ts}'],
 });

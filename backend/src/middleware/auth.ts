@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { verifyAccessToken, TokenPayload } from '../utils/jwt';
 import { AppDataSource } from '../config/database';
 import { AthleteAchievement } from '../entities/AthleteAchievement';
+import { User } from '../entities/User';
 
 // Extend Express Request to include user
 declare global {
@@ -12,7 +13,7 @@ declare global {
     }
 }
 
-export const authenticate: RequestHandler = (req, res, next) => {
+export const authenticate: RequestHandler = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     const token = authHeader?.split(' ')[1]; // Bearer {token}
 
@@ -23,6 +24,21 @@ export const authenticate: RequestHandler = (req, res, next) => {
 
     try {
         const payload = verifyAccessToken(token);
+        
+        // P0-1: Ban enforcement — check if user is active
+        const userRepo = AppDataSource.getRepository(User);
+        const user = await userRepo.findOne({ where: { id: payload.user_id } });
+        
+        if (!user) {
+            res.status(401).json({ success: false, error: 'User not found' });
+            return;
+        }
+        
+        if (!user.is_active) {
+            res.status(403).json({ success: false, error: 'Tài khoản của bạn đã bị khóa hoặc ngừng hoạt động' });
+            return;
+        }
+
         req.user = payload;
         next();
     } catch (error) {

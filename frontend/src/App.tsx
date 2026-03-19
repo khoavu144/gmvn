@@ -62,6 +62,12 @@ const lazyWithChunkRetry = <TProps extends Record<string, unknown> = Record<stri
 const Home = lazyWithChunkRetry(() => import('./pages/Home'), 'home');
 const Login = lazyWithChunkRetry(() => import('./pages/Login'), 'login');
 const Register = lazyWithChunkRetry(() => import('./pages/Register'), 'register');
+const OnboardingPage = lazyWithChunkRetry(() => import('./pages/OnboardingPage'), 'onboarding');
+const VerifyEmail = lazyWithChunkRetry(() => import('./pages/VerifyEmail'), 'verify-email');
+const ForgotPassword = lazyWithChunkRetry(() => import('./pages/ForgotPassword'), 'forgot-password');
+const ResetPassword = lazyWithChunkRetry(() => import('./pages/ResetPassword'), 'reset-password');
+const SubscriptionsPage = lazyWithChunkRetry(() => import('./pages/SubscriptionsPage'), 'subscriptions');
+
 const Dashboard = lazyWithChunkRetry(() => import('./pages/Dashboard'), 'dashboard');
 const Coaches = lazyWithChunkRetry(() => import('./pages/Coaches'), 'coaches');
 const CoachDetail = lazyWithChunkRetry(() => import('./pages/CoachDetailPage'), 'coach-detail');
@@ -216,7 +222,12 @@ const router = createBrowserRouter([
       { path: '/', element: lazyRoute(<Home />) },
       { path: '/login', element: lazyRoute(<Login />) },
       { path: '/register', element: lazyRoute(<Register />) },
+      { path: '/onboarding', element: lazyRoute(<ProtectedRoute><OnboardingPage /></ProtectedRoute>) },
+      { path: '/verify-email', element: lazyRoute(<ProtectedRoute><VerifyEmail /></ProtectedRoute>) },
+      { path: '/forgot-password', element: lazyRoute(<ForgotPassword />) },
+      { path: '/reset-password', element: lazyRoute(<ResetPassword />) },
       { path: '/dashboard', element: lazyRoute(<ProtectedRoute><Dashboard /></ProtectedRoute>) },
+      { path: '/dashboard/subscriptions', element: lazyRoute(<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>) },
       { path: '/coaches', element: lazyRoute(<Coaches />) },
       { path: '/coaches/:trainerId', element: lazyRoute(<CoachDetail />) },
       // SEO permalink route: fallback to coach detail by slug when public CV profile is not available

@@ -20,12 +20,21 @@ export class User {
     @Column({ type: 'varchar', length: 255 })
     full_name!: string;
 
+    @Column({ type: 'boolean', default: false })
+    is_email_verified!: boolean;
+
+    @Column({ type: 'boolean', default: false })
+    onboarding_completed!: boolean;
+
     @Column({
         type: 'enum',
         enum: ['user', 'athlete', 'trainer', 'gym_owner', 'admin'],
-        default: 'athlete',
+        default: 'user',
     })
     user_type!: 'user' | 'athlete' | 'trainer' | 'gym_owner' | 'admin';
+
+    @Column({ type: 'boolean', default: true })
+    is_active!: boolean;
 
     @Column({
         type: 'enum',

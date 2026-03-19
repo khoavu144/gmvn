@@ -26,7 +26,12 @@ export default function Login() {
                 access_token: result.access_token,
                 refresh_token: result.refresh_token,
             }));
-            navigate('/dashboard');
+            
+            if (!result.user.onboarding_completed) {
+                navigate('/onboarding');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err: any) {
             const statusCode = err.response?.status;
             const fallbackMessage = statusCode === 429
@@ -94,6 +99,12 @@ export default function Login() {
                                 className="form-input"
                                 placeholder="••••••••"
                             />
+                        </div>
+
+                        <div className="flex items-center justify-end">
+                            <Link to="/forgot-password" className="text-sm font-medium text-black hover:underline">
+                                Quên mật khẩu?
+                            </Link>
                         </div>
 
                         <button

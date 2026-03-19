@@ -3,6 +3,9 @@ import { adminService } from '../services/adminService';
 import { AppDataSource } from '../config/database';
 import { ProgramReport } from '../entities/ProgramReport';
 import { FinancialTransaction } from '../entities/FinancialTransaction';
+import { User } from '../entities/User';
+import { GymCenter } from '../entities/GymCenter';
+import { refreshTokenStore } from '../services/refreshTokenStore';
 
 export const getAuditLogs = async (req: Request, res: Response) => {
     try {
@@ -67,5 +70,28 @@ export const getFinancialTransactions = async (req: Request, res: Response) => {
         res.json({ success: true, transactions });
     } catch (err: any) {
         res.status(500).json({ error: err.message });
+    }
+};
+
+// P0-4: Secure health metrics endpoint
+export const getSystemHealth = async (_req: Request, res: Response) => {
+    try {
+        const userCount = await AppDataSource.getRepository(User).count();
+        const gymCount = await AppDataSource.getRepository(GymCenter).count();
+        const redisHealthy = await refreshTokenStore.ping();
+        res.status(200).json({
+            success: true,
+            status: redisHealthy ? 'OK' : 'DEGRADED',
+            timestamp: new Date().toISOString(),
+            db: {
+                users: userCount,
+                gyms: gymCount
+            },
+            redis: {
+                connected: redisHealthy
+            }
+        });
+    } catch (error: any) {
+        res.status(500).json({ success: false, error: error.message });
     }
 };

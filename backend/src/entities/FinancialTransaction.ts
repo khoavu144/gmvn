@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from './User';
 import { Program } from './Program';
+import { Subscription } from './Subscription';
 
 @Entity('financial_transactions')
 export class FinancialTransaction {
@@ -55,6 +56,13 @@ export class FinancialTransaction {
 
     @Column({ type: 'varchar', length: 255, nullable: true })
     refund_reason!: string | null;
+
+    @ManyToOne(() => Subscription, { nullable: true })
+    @JoinColumn({ name: 'subscription_id' })
+    subscription!: Subscription | null;
+
+    @Column({ type: 'uuid', nullable: true })
+    subscription_id!: string | null;
 
     @CreateDateColumn()
     transaction_date!: Date;

@@ -21,6 +21,22 @@ export const LogoutSchema = z.object({
     refresh_token: z.string().min(1, 'Refresh token is required').optional(),
 });
 
+export const SendVerificationSchema = z.object({}); // Just requires auth token
+
+export const VerifyEmailSchema = z.object({
+    token: z.string().length(6, 'Invalid verification code'),
+});
+
+export const ForgotPasswordSchema = z.object({
+    email: z.string().email('Invalid email'),
+});
+
+export const ResetPasswordSchema = z.object({
+    email: z.string().email('Invalid email'),
+    token: z.string().length(6, 'Invalid reset code'),
+    new_password: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
 // Generic validation middleware
 export const validateRequest = (schema: z.ZodSchema) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -41,3 +57,6 @@ export const validateRequest = (schema: z.ZodSchema) => {
 export type RegisterInput = z.infer<typeof RegisterSchema>;
 export type LoginInput = z.infer<typeof LoginSchema>;
 export type LogoutInput = z.infer<typeof LogoutSchema>;
+export type VerifyEmailInput = z.infer<typeof VerifyEmailSchema>;
+export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof ResetPasswordSchema>;

@@ -15,6 +15,7 @@ export type SubscriptionStatus = 'active' | 'paused' | 'cancelled';
 export type SubscriptionType = 'monthly' | 'one_time';
 
 @Entity('subscriptions')
+@Index('unique_active_subscription', ['user_id', 'program_id'], { unique: true, where: "status = 'active'" })
 @Index(['user_id'])
 @Index(['trainer_id'])
 export class Subscription {

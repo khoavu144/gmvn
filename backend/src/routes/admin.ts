@@ -6,7 +6,8 @@ import {
     approveAction,
     rejectAction,
     getReports,
-    getFinancialTransactions
+    getFinancialTransactions,
+    getSystemHealth
 } from '../controllers/adminDashboardController';
 
 const router = Router();
@@ -21,5 +22,6 @@ router.post('/approvals/:logId/reject', rejectAction);
 
 router.get('/reports', getReports);
 router.get('/transactions', getFinancialTransactions);
+router.get('/health', getSystemHealth);
 
 export default router;

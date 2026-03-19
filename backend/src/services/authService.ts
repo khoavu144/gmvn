@@ -1,7 +1,10 @@
 import { randomUUID } from 'crypto';
 import { AppDataSource } from '../config/database';
 import { User } from '../entities/User';
-import { RegisterInput, LoginInput } from '../schemas/auth';
+import { EmailVerificationToken } from '../entities/EmailVerificationToken';
+import { PasswordResetToken } from '../entities/PasswordResetToken';
+import { emailService } from './emailService';
+import { RegisterInput, LoginInput, ResetPasswordInput } from '../schemas/auth';
 import {
     generateAccessToken,
     generateRefreshToken,
@@ -14,6 +17,8 @@ import { hashPassword, verifyPassword } from '../utils/password';
 import { refreshTokenStore } from './refreshTokenStore';
 
 const getUserRepo = () => AppDataSource.getRepository(User);
+
+const generateCode = () => Math.floor(100000 + Math.random() * 900000).toString();
 
 class AuthService {
     private buildTokenPayload(user: User): TokenPayload {
@@ -33,6 +38,7 @@ class AuthService {
             avatar_url: user.avatar_url,
             gym_owner_status: user.gym_owner_status,
             is_verified: user.is_verified,
+            onboarding_completed: user.onboarding_completed,
             created_at: user.created_at,
             updated_at: user.updated_at,
         };
@@ -77,6 +83,13 @@ class AuthService {
 
         const tokens = await this.issueSessionTokens(newUser);
 
+        try {
+            // P1-1: Send verification email directly after successful creation
+            await this.sendVerificationEmail(newUser.id);
+        } catch (emailError) {
+            console.error('Failed to auto-send verification email:', emailError);
+        }
+
         return {
             ...tokens,
             user: this.buildAuthUser(newUser),
@@ -102,6 +115,102 @@ class AuthService {
         };
     }
 
+    async sendVerificationEmail(userId: string) {
+        const user = await getUserRepo().findOneBy({ id: userId });
+        if (!user) throw new Error('User not found');
+        if (user.is_email_verified) throw new Error('Email is already verified');
+
+        const tokenRepo = AppDataSource.getRepository(EmailVerificationToken);
+        await tokenRepo.delete({ user_id: userId });
+
+        const code = generateCode();
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+
+        const tokenEntity = tokenRepo.create({
+            user_id: userId,
+            token: code,
+            expires_at: expiresAt
+        });
+        await tokenRepo.save(tokenEntity);
+
+        await emailService.sendVerificationEmail(user.email, code);
+        return { message: 'Verification email sent' };
+    }
+
+    async verifyEmail(userId: string, token: string) {
+        const tokenRepo = AppDataSource.getRepository(EmailVerificationToken);
+        const record = await tokenRepo.findOneBy({ user_id: userId, token });
+
+        if (!record) throw new Error('Invalid verification code');
+        if (record.expires_at < new Date()) {
+            throw new Error('Verification code has expired');
+        }
+
+        await getUserRepo().update(userId, { is_email_verified: true });
+        await tokenRepo.delete({ user_id: userId });
+        return { message: 'Email verified successfully' };
+    }
+
+    async forgotPassword(email: string) {
+        const user = await getUserRepo().findOneBy({ email });
+        if (!user) {
+            // Prevent email enumeration
+            return { message: 'If the email exists, a reset code has been sent' };
+        }
+
+        const tokenRepo = AppDataSource.getRepository(PasswordResetToken);
+        await tokenRepo.delete({ user_id: user.id });
+
+        const code = generateCode();
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+        const tokenEntity = tokenRepo.create({
+            user_id: user.id,
+            token: code,
+            expires_at: expiresAt
+        });
+        await tokenRepo.save(tokenEntity);
+
+        await emailService.sendPasswordResetEmail(user.email, code);
+        return { message: 'If the email exists, a reset code has been sent' };
+    }
+
+    async completeOnboarding(userId: string, data: any) {
+        const user = await getUserRepo().findOneBy({ id: userId });
+        if (!user) throw new Error('User not found');
+
+        if (data.height_cm) user.height_cm = Number(data.height_cm);
+        if (data.current_weight_kg) user.current_weight_kg = Number(data.current_weight_kg);
+        if (data.experience_level) user.experience_level = String(data.experience_level);
+        if (data.bio) user.bio = String(data.bio);
+        if (data.specialties && Array.isArray(data.specialties)) user.specialties = data.specialties;
+
+        user.onboarding_completed = true;
+
+        await getUserRepo().save(user);
+
+        return this.buildAuthUser(user);
+    }
+
+    async resetPassword(input: ResetPasswordInput) {
+        const user = await getUserRepo().findOneBy({ email: input.email });
+        if (!user) throw new Error('Invalid email or code');
+
+        const tokenRepo = AppDataSource.getRepository(PasswordResetToken);
+        const record = await tokenRepo.findOneBy({ user_id: user.id, token: input.token });
+
+        if (!record) throw new Error('Invalid email or code');
+        if (record.expires_at < new Date()) {
+            throw new Error('Reset code has expired');
+        }
+
+        const hashedPassword = await hashPassword(input.new_password);
+        await getUserRepo().update(user.id, { password: hashedPassword });
+        await tokenRepo.delete({ user_id: user.id });
+
+        return { message: 'Password has been reset successfully' };
+    }
+
     async getProfile(userId: string) {
         const user = await getUserRepo().findOneBy({ id: userId });
         if (!user) {
@@ -116,6 +225,7 @@ class AuthService {
             avatar_url: user.avatar_url,
             bio: user.bio,
             is_verified: user.is_verified,
+            onboarding_completed: user.onboarding_completed,
             gym_owner_status: user.gym_owner_status,
             created_at: user.created_at,
             updated_at: user.updated_at,

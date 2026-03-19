@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import { subscriptionService } from '../services/subscriptionService';
 
 export const createCheckout = async (req: Request, res: Response) => {
@@ -52,12 +53,26 @@ export const cancelSubscription = async (req: Request, res: Response) => {
 export const sepayWebhook = async (req: Request, res: Response) => {
     try {
         const apiKey = req.headers['authorization'];
+        const signature = req.headers['x-sepay-signature'] as string;
         const secret = process.env.SEPAY_WEBHOOK_SECRET;
 
-        // Simple API Key check
-        if (secret && apiKey !== secret) {
-            console.warn('Unauthorized SePay webhook attempt');
-            return res.status(401).json({ error: 'Unauthorized' });
+        // P0-2: HMAC-SHA256 verify
+        if (secret) {
+            if (signature) {
+                const rawBody = (req as any).rawBody;
+                if (!rawBody) {
+                    return res.status(400).json({ error: 'Missing raw body for signature verification' });
+                }
+                const hmac = crypto.createHmac('sha256', secret);
+                const digest = hmac.update(rawBody).digest('hex');
+                if (signature !== digest) {
+                    console.warn('Invalid SePay signature');
+                    return res.status(401).json({ error: 'Invalid signature' });
+                }
+            } else if (apiKey !== secret) {
+                console.warn('Unauthorized SePay webhook attempt');
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
         }
 
         await subscriptionService.handleSepayWebhook(req.body);

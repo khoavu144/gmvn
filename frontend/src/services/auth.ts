@@ -9,6 +9,7 @@ interface AuthResponse {
         full_name: string;
         user_type: 'user' | 'athlete' | 'trainer' | 'admin' | 'gym_owner';
         avatar_url: string | null;
+        onboarding_completed?: boolean;
         created_at: string;
     };
 }
