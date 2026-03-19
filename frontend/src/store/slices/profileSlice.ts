@@ -121,6 +121,35 @@ export const fetchPublicProfile = createAsyncThunk(
                         premium?: ViewedPremiumProfile;
                     };
                 } catch (fallbackErr: any) {
+                    // FINAL FALLBACK: If TrainerProfile doesn't exist at all, fetch basic User record so UI doesn't 404
+                    if (fallbackErr.response?.status === 404) {
+                        try {
+                            const userRes = await apiClient.get(`/users/trainers/${identifier}`);
+                            const user = userRes.data.data;
+                            if (user) {
+                                return {
+                                    success: true,
+                                    profile: {
+                                        id: 'dummy-profile-id',
+                                        trainer_id: user.id,
+                                        is_profile_public: true,
+                                        is_featured_profile: false,
+                                        created_at: user.created_at,
+                                        updated_at: user.updated_at,
+                                        trainer: user // Embed user record as trainer
+                                    } as unknown as TrainerProfile,
+                                    experience: [],
+                                    gallery: [],
+                                    faq: [],
+                                    skills: [],
+                                    packages: [],
+                                    testimonials: []
+                                };
+                            }
+                        } catch (e) {
+                            // User not found at all
+                        }
+                    }
                     return rejectWithValue(fallbackErr.response?.data?.error || 'Profile không tồn tại');
                 }
             }

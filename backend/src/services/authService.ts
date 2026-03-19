@@ -46,7 +46,11 @@ class AuthService {
             session_id: sessionId,
         });
 
-        await refreshTokenStore.storeRefreshToken(user.id, sessionId, refresh_token);
+        try {
+            await refreshTokenStore.storeRefreshToken(user.id, sessionId, refresh_token);
+        } catch (error) {
+            console.warn(`[Degraded Mode] Failed to store refresh token in Redis for user ${user.id}:`, error instanceof Error ? error.message : error);
+        }
 
         return {
             access_token,
