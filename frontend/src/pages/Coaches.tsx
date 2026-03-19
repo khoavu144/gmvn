@@ -145,13 +145,13 @@ export default function Coaches() {
                     {/* Tab Switcher */}
                     <div className="flex bg-gray-100 p-1 rounded-full w-max mx-auto lg:mx-0 mb-6 border border-gray-200">
                         <button
-                            onClick={() => { setSearchParams({}); setPage(1); }}
+                            onClick={() => { setSearchParams({}); setPage(1); setSearch(''); setSpecialty(''); setPriceIdx(0); setSort('newest'); }}
                             className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${currentType === 'trainer' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-black'}`}
                         >
                             Coach
                         </button>
                         <button
-                            onClick={() => { setSearchParams({ type: 'athlete' }); setPage(1); }}
+                            onClick={() => { setSearchParams({ type: 'athlete' }); setPage(1); setSearch(''); setSpecialty(''); setPriceIdx(0); setSort('newest'); }}
                             className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${currentType === 'athlete' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-black'}`}
                         >
                             Vận động viên

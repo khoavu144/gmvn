@@ -67,7 +67,8 @@ const Coaches = lazyWithChunkRetry(() => import('./pages/Coaches'), 'coaches');
 const CoachDetail = lazyWithChunkRetry(() => import('./pages/CoachDetailPage'), 'coach-detail');
 const AthleteDetailPage = lazyWithChunkRetry(() => import('./pages/AthleteDetailPage'), 'athlete-detail');
 const Profile = lazyWithChunkRetry(() => import('./pages/Profile'), 'profile');
-const ProfilePublic = lazyWithChunkRetry(() => import('./pages/ProfilePublic'), 'profile-public');
+// ProfilePublic intentionally removed from routing — deprecated in favour of CoachDetailPage
+
 const ProgramsPage = lazyWithChunkRetry(() => import('./pages/ProgramsPage'), 'programs');
 const MessagesPage = lazyWithChunkRetry(() => import('./pages/MessagesPage'), 'messages');
 const WorkoutsPage = lazyWithChunkRetry(() => import('./pages/WorkoutsPage'), 'workouts');
@@ -95,6 +96,13 @@ function TrainerRedirect() {
   const { trainerId } = useParams();
   return <Navigate to={`/coaches/${trainerId}`} replace />;
 }
+
+// SEO redirect: /athletes/:identifier → /athlete/:identifier (canonical)
+function AthletesRedirect() {
+  const { identifier } = useParams();
+  return <Navigate to={`/athlete/${identifier}`} replace />;
+}
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -215,8 +223,8 @@ const router = createBrowserRouter([
       { path: '/coach/:slug', element: lazyRoute(<CoachDetail />) },
       // Athlete SEO permalink route (parity with /coach/:slug)
       { path: '/athlete/:slug', element: lazyRoute(<AthleteDetailPage />) },
-      { path: '/profile/public/:trainerId', element: lazyRoute(<ProfilePublic />) },
-      { path: '/athletes/:identifier', element: lazyRoute(<AthleteDetailPage />) },
+      // Redirect /athletes/:identifier → /athlete/:identifier for SEO
+      { path: '/athletes/:identifier', element: <AthletesRedirect /> },
       { path: '/profile', element: lazyRoute(<ProtectedRoute><Profile /></ProtectedRoute>) },
       { path: '/programs', element: lazyRoute(<ProtectedRoute requiredRole={['trainer', 'athlete']}><ProgramsPage /></ProtectedRoute>) },
       { path: '/messages', element: lazyRoute(<ProtectedRoute><MessagesPage /></ProtectedRoute>) },

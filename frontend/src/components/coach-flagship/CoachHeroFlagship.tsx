@@ -1,4 +1,6 @@
+import { useNavigate } from 'react-router-dom';
 import { getOptimizedUrl, getSrcSet } from '../../utils/image';
+
 
 interface HeroBadge { label: string; value?: string }
 interface HeroMetric { label: string; value: string }
@@ -27,6 +29,7 @@ export default function CoachHeroFlagship({
     basePriceMonthly,
     onMessage,
 }: Props) {
+    const navigate = useNavigate();
     // Derive a compelling headline from tagline or specialties
     const headline = tagline || (specialties?.length
         ? `${specialties.slice(0, 2).join(' · ')}`
@@ -47,7 +50,7 @@ export default function CoachHeroFlagship({
                 {/* Top nav bar */}
                 <div className="flex items-center justify-between h-14 border-b border-white/10">
                     <button
-                        onClick={() => window.history.back()}
+                        onClick={() => navigate('/coaches')}
                         className="text-sm text-white/50 hover:text-white transition-colors"
                     >
                         ← Huấn luyện viên

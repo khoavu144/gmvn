@@ -65,11 +65,25 @@ export const userController = {
         }
     },
 
+    async getUserBySlug(req: Request, res: Response) {
+        try {
+            const slug = req.params.slug as string;
+            const result = await userService.getUserBySlug(slug);
+            return res.status(200).json({ success: true, data: result });
+        } catch (error: any) {
+            return res.status(404).json({
+                success: false,
+                error: error.message,
+            });
+        }
+    },
+
     async getSimilarCoaches(req: Request, res: Response) {
         try {
             const trainerId = req.params.id as string;
             const limit = parseInt(req.query.limit as string) || 3;
-            const result = await userService.getSimilarCoaches(trainerId, limit);
+            const targetUserType = req.query.user_type as 'trainer' | 'athlete' | undefined;
+            const result = await userService.getSimilarCoaches(trainerId, limit, targetUserType);
             return res.status(200).json({ success: true, data: result });
         } catch (error: any) {
             return res.status(500).json({

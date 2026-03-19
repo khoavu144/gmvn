@@ -22,4 +22,8 @@ router.get('/trainers/:id/similar', userController.getSimilarCoaches);
 router.get('/trainers/:id/testimonials', userController.getTestimonials);
 router.get('/trainers/:id/before-after', userController.getBeforeAfterPhotos);
 
+// Generic user-by-slug lookup (returns trainer or athlete)
+router.get('/slug/:slug', userController.getUserBySlug);
+
+
 export default router;

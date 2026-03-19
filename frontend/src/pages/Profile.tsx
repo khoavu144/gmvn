@@ -165,7 +165,7 @@ export default function Profile() {
                                     {(user.user_type === 'trainer' || user.user_type === 'athlete') && myProfile?.is_profile_public && (
                                         <a
                                             href={user.user_type === 'athlete'
-                                                ? (myProfile.slug ? `/athletes/${myProfile.slug}` : `/athletes/${user.id}`)
+                                                ? (myProfile.slug ? `/athlete/${myProfile.slug}` : `/athletes/${user.id}`)
                                                 : (myProfile.slug ? `/coach/${myProfile.slug}` : `/profile/public/${user.id}`)
                                             }
                                             target="_blank"

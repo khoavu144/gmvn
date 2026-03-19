@@ -195,7 +195,7 @@ export default function CoachDetailPage() {
             navigate('/login');
             return;
         }
-        navigate(`/messages?to=${trainerId}`);
+        navigate(`/messages?to=${trainer?.id}`);
     };
 
     const canonicalPath = trainer?.slug ? `/coach/${trainer.slug}` : `/coaches/${trainerId ?? ''}`;

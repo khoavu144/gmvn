@@ -199,26 +199,74 @@ class UserService {
         };
     }
 
-    async getSimilarCoaches(trainerId: string, limit: number = 3) {
-        const trainer = await this.repo.findOneBy({ id: trainerId, user_type: 'trainer' });
-        if (!trainer) {
+    /** Generic slug lookup — returns ANY user_type (trainer or athlete). Used by CoachDetailPage to redirect athletes. */
+    async getUserBySlug(slug: string) {
+        // Try exact user slug first
+        let user = await this.repo.findOneBy({ slug });
+
+        if (!user) {
+            // Try trainer_profile.slug
+            const profileRow = await AppDataSource
+                .createQueryBuilder()
+                .select('profile.trainer_id', 'trainer_id')
+                .from('trainer_profiles', 'profile')
+                .where('profile.slug = :slug', { slug })
+                .getRawOne<{ trainer_id: string }>();
+
+            if (profileRow?.trainer_id) {
+                user = await this.repo.findOneBy({ id: profileRow.trainer_id });
+            }
+        }
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const profileSlugRow = await AppDataSource
+            .createQueryBuilder()
+            .select('profile.slug', 'slug')
+            .from('trainer_profiles', 'profile')
+            .where('profile.trainer_id = :id', { id: user.id })
+            .getRawOne<{ slug: string | null }>();
+
+        const resolvedSlug = profileSlugRow?.slug ?? user.slug ?? slug;
+
+        return {
+            id: user.id,
+            slug: resolvedSlug,
+            user_type: user.user_type,
+            full_name: user.full_name,
+            avatar_url: user.avatar_url,
+            bio: user.bio,
+            specialties: user.specialties,
+            base_price_monthly: user.base_price_monthly,
+            is_verified: user.is_verified,
+            created_at: user.created_at,
+        };
+    }
+
+    async getSimilarCoaches(trainerId: string, limit: number = 3, targetUserType?: 'trainer' | 'athlete') {
+        const user = await this.repo.findOneBy({ id: trainerId });
+        if (!user) {
             return [];
         }
 
+        const userType = targetUserType ?? (user.user_type === 'athlete' ? 'athlete' : 'trainer');
+
         let similarTrainers: User[] = [];
 
-        if (trainer.specialties && trainer.specialties.length > 0) {
-            // Find trainers with overlapping specialties
+        if (user.specialties && user.specialties.length > 0) {
+            // Find users with overlapping specialties
             const queryBuilder = this.repo.createQueryBuilder('user')
-                .where('user.user_type = :type', { type: 'trainer' })
+                .where('user.user_type = :type', { type: userType })
                 .andWhere('user.id != :trainerId', { trainerId });
 
-            const specialtyConditions = trainer.specialties.map((_, idx) =>
+            const specialtyConditions = user.specialties.map((_, idx) =>
                 `EXISTS (SELECT 1 FROM jsonb_array_elements_text(user.specialties) AS spec WHERE spec ILIKE :specialty${idx})`
             ).join(' OR ');
 
             const params: Record<string, string> = {};
-            trainer.specialties.forEach((spec, idx) => {
+            user.specialties.forEach((spec, idx) => {
                 params[`specialty${idx}`] = `%${spec}%`;
             });
 
@@ -229,10 +277,10 @@ class UserService {
                 .getMany();
         }
 
-        // Fallback: return newest trainers when specialty match is empty
+        // Fallback: return newest users of same type when specialty match is empty
         if (similarTrainers.length === 0) {
             similarTrainers = await this.repo.createQueryBuilder('user')
-                .where('user.user_type = :type', { type: 'trainer' })
+                .where('user.user_type = :type', { type: userType })
                 .andWhere('user.id != :trainerId', { trainerId })
                 .orderBy('user.created_at', 'DESC')
                 .limit(limit)
@@ -264,6 +312,7 @@ class UserService {
                 specialties: t.specialties,
                 base_price_monthly: t.base_price_monthly,
                 is_verified: t.is_verified,
+                user_type: t.user_type,
             };
         });
     }
