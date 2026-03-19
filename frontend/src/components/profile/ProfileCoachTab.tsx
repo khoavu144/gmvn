@@ -213,7 +213,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                             <label className="form-label">Profile URL slug</label>
                             <div className="flex border border-gray-200 rounded-xs bg-gray-50 focus-within:border-black focus-within:ring-1 focus-within:ring-black transition overflow-hidden">
                                 <span className="px-3 py-2.5 text-gray-500 text-sm border-r border-gray-200 select-none">{profilePathLabel}</span>
-                                <input type="text" {...regProfile('slug')} placeholder="ten-coach"
+                                <input type="text" {...regProfile('slug')} placeholder="ten-user"
                                     className="flex-1 bg-white outline-none px-3 text-sm text-black w-full" />
                             </div>
                             {errorsProfile.slug && <p className="form-helper text-red-600">{errorsProfile.slug.message}</p>}
@@ -255,7 +255,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                     {/* Template & Theme Settings */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-gray-200 mt-4">
                         <div>
-                            <label className="form-label">Giao diện CV</label>
+                            <label className="form-label">Giao diện Hồ sơ Public</label>
                             <div className="grid grid-cols-2 gap-2 mt-1">
                                 {[
                                     { value: 'card', label: 'Card Scroll', desc: 'Sticky nav + skill bars + pricing' },
@@ -272,7 +272,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                             </div>
                         </div>
                         <div>
-                            <label className="form-label">Màu nền CV</label>
+                            <label className="form-label">Màu nền Hồ sơ</label>
                             <div className="grid grid-cols-2 gap-2 mt-1">
                                 {[
                                     { value: 'light', label: 'Light', desc: 'Nền trắng, chữ đen' },

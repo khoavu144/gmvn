@@ -128,7 +128,7 @@ export default function Profile() {
                                         transition={{ delay: 0.1 }}
                                     >
                                         <div className="flex flex-wrap items-center gap-3 mb-2">
-                                            <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">{user?.full_name}</h1>
+                                            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">{user?.full_name}</h1>
                                             <span className="px-3 py-1 bg-black/5 backdrop-blur-md border border-black/10 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-600">
                                                 {user?.user_type === 'trainer' ? 'Certified Coach' : user?.user_type === 'athlete' ? 'Elite Athlete' : 'Member'}
                                             </span>

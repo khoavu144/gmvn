@@ -9,6 +9,7 @@ type FeaturedTrainer = Trainer & {
     is_verified?: boolean;
     created_at?: string;
     slug?: string;
+    user_type?: string;
 };
 
 export default function FeaturedCoaches() {
@@ -57,11 +58,14 @@ export default function FeaturedCoaches() {
                     ) : (
                         sortedAndCuratedCoaches.map((coach, index) => {
                             const identifier = coach.slug || coach.id;
+                            const detailLink = coach.user_type === 'athlete'
+                                ? (coach.slug ? `/athlete/${coach.slug}` : `/athletes/${coach.id}`)
+                                : (coach.slug ? `/coach/${coach.slug}` : `/coaches/${coach.id}`);
 
                             return (
                                 <Link
                                     key={`${coach.id}-${index}`}
-                                    to={`/coaches/${identifier}`}
+                                    to={detailLink}
                                     className="group relative block overflow-hidden rounded-xl bg-gray-900 border border-white/10 hover:border-white/30 transition-all duration-500"
                                     onMouseEnter={() => prefetchCoach(identifier)}
                                     onTouchStart={() => prefetchCoach(identifier)}

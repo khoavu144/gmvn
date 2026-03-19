@@ -7,6 +7,7 @@ interface SimilarCoach {
     avatar_url: string | null;
     specialties: string[] | null;
     base_price_monthly: number | null;
+    user_type?: string;
 }
 
 interface Props {
@@ -24,7 +25,9 @@ export default function CoachRelatedFooter({ coaches }: Props) {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {coaches.map(coach => {
-                        const link = coach.slug ? `/coach/${coach.slug}` : `/coaches/${coach.id}`;
+                        const link = coach.user_type === 'athlete'
+                            ? (coach.slug ? `/athlete/${coach.slug}` : `/athletes/${coach.id}`)
+                            : (coach.slug ? `/coach/${coach.slug}` : `/coaches/${coach.id}`);
                         return (
                             <Link
                                 key={coach.id}

@@ -137,16 +137,16 @@ export default function Header() {
                     {isAuthenticated && (
                         <>
                             {(user?.user_type === 'trainer' || user?.user_type === 'athlete') && (
-                                <Link to="/programs" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                                <Link to="/programs" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
                                     Khóa học
                                 </Link>
                             )}
                             {user?.user_type === 'athlete' && (
-                                <Link to="/workouts" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                                <Link to="/workouts" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
                                     Lịch tập
                                 </Link>
                             )}
-                            <Link to="/messages" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                            <Link to="/messages" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
                                 Tin nhắn
                             </Link>
                         </>
