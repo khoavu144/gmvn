@@ -13,7 +13,6 @@ interface Props {
     badges?: HeroBadge[];
     metrics?: HeroMetric[];
     basePriceMonthly: number | null;
-    gymCount: number;
     onMessage: () => void;
 }
 
@@ -26,7 +25,6 @@ export default function CoachHeroFlagship({
     tagline,
     metrics,
     basePriceMonthly,
-    gymCount,
     onMessage,
 }: Props) {
     // Derive a compelling headline from tagline or specialties

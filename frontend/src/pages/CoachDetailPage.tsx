@@ -285,7 +285,6 @@ export default function CoachDetailPage() {
                 tagline={premium?.hero?.tagline}
                 metrics={premium?.hero?.metrics}
                 basePriceMonthly={trainer.base_price_monthly}
-                gymCount={gymLinks.length}
                 onMessage={handleMessage}
             />
 
