@@ -32,6 +32,7 @@ interface SimilarCoach {
     avatar_url: string | null;
     specialties: string[] | null;
     base_price_monthly: number | null;
+    user_type?: string;
 }
 
 // ── Hooks ─────────────────────────────────────────────────────────────────────
@@ -245,8 +246,8 @@ export default function ProfileCV() {
     const trainer = profile.trainer;
     const isAthleteProfile = trainer?.user_type === 'athlete';
     const primaryDetailLink = isAthleteProfile
-        ? (profile.slug ? `/athletes/${profile.slug}` : `/athletes/${profile.trainer_id}`)
-        : `/coaches/${profile.trainer_id}`;
+        ? (profile.slug ? `/athlete/${profile.slug}` : `/athletes/${profile.trainer_id}`)
+        : (profile.slug ? `/coach/${profile.slug}` : `/coaches/${profile.trainer_id}`);
     const primaryCtaLabel = isAthleteProfile ? 'Xem hồ sơ athlete →' : 'Xem coach & gói tập →';
 
     const isDark = profile.theme_color === 'dark';
@@ -535,7 +536,7 @@ export default function ProfileCV() {
                                                         </ul>
                                                     )}
                                                     <Link
-                                                        to={`/coaches/${profile.trainer_id}`}
+                                                        to={primaryDetailLink}
                                                         className={`block text-center py-2.5 text-xs font-black uppercase tracking-wider transition-colors ${pkg.is_popular
                                                             ? 'bg-white text-black hover:bg-gray-200'
                                                             : isDark ? 'border border-gray-600 text-gray-300 hover:border-white hover:text-white' : 'border border-black text-black hover:bg-black hover:text-white'
@@ -648,7 +649,9 @@ export default function ProfileCV() {
                                         <h2 className={sectionHdr}>Huấn luyện viên tương tự</h2>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             {similarCoaches.map((coach) => {
-                                                const coachLink = coach.slug ? `/coach/${coach.slug}` : `/coaches/${coach.id}`;
+                                                const coachLink = coach.user_type === 'athlete'
+                                                    ? (coach.slug ? `/athlete/${coach.slug}` : `/athletes/${coach.id}`)
+                                                    : (coach.slug ? `/coach/${coach.slug}` : `/coaches/${coach.id}`);
                                                 return (
                                                     <Link
                                                         key={coach.id}

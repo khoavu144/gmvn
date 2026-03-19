@@ -13,6 +13,7 @@ interface SimilarCoach {
     avatar_url: string | null;
     specialties: string[] | null;
     base_price_monthly: number | null;
+    user_type?: string;
 }
 
 interface FallbackTrainer {
@@ -252,9 +253,9 @@ export default function ProfilePublic() {
                                 <div className="mt-5 space-y-2">
                                     <Link
                                         to={profile?.slug
-                                            ? `${isAthleteProfile ? '/athletes' : '/coach'}/${profile.slug}`
+                                            ? `${isAthleteProfile ? '/athlete' : '/coach'}/${profile.slug}`
                                             : trainerSlug
-                                                ? `${isAthleteProfile ? '/athletes' : '/coach'}/${trainerSlug}`
+                                                ? `${isAthleteProfile ? '/athlete' : '/coach'}/${trainerSlug}`
                                                 : `${isAthleteProfile ? '/athletes' : '/coaches'}/${trainerIdSource || trainerId}`
                                         }
                                         className="block w-full py-2.5 bg-black text-white text-center text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors"
@@ -441,7 +442,9 @@ export default function ProfilePublic() {
                                 <h2 className="card-header">Huấn luyện viên tương tự</h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                                     {similarCoaches.map((coach) => {
-                                        const coachLink = coach.slug ? `/coach/${coach.slug}` : `/coaches/${coach.id}`;
+                                        const coachLink = coach.user_type === 'athlete'
+                                            ? (coach.slug ? `/athlete/${coach.slug}` : `/athletes/${coach.id}`)
+                                            : (coach.slug ? `/coach/${coach.slug}` : `/coaches/${coach.id}`);
                                         return (
                                             <Link
                                                 to={coachLink}

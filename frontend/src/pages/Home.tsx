@@ -9,7 +9,7 @@ const HomeGymer = () => (
                 Xây dựng bản thân
             </span>
             <h2 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter leading-none mb-6 uppercase">
-                Kỷ<br />Luật.
+                GYM.
             </h2>
             <p className="text-sm md:text-base text-gray-400 max-w-sm mb-10 leading-relaxed">
                 Khởi tạo hành trình lột xác với hàng trăm giáo án cá nhân hóa từ chuyên gia hàng đầu.

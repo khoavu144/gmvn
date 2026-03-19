@@ -253,9 +253,9 @@ export default function CoachDetailPage() {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4 px-4 text-center">
                 <div className="text-5xl font-extrabold text-gray-100 mb-2">404</div>
-                <div className="text-gray-800 font-bold text-lg">Không tìm thấy Coach</div>
-                <p className="text-sm text-gray-500 max-w-sm">Huấn luyện viên này có thể đã thay đổi URL hoặc không còn hoạt động trên GYMERVIET.</p>
-                <a href="/coaches" className="btn-primary mt-4 px-6">← Về danh sách Coach</a>
+                <div className="text-gray-800 font-bold text-lg">Không tìm thấy Hồ sơ</div>
+                <p className="text-sm text-gray-500 max-w-sm">Người dùng này có thể đã thay đổi URL hoặc không còn hoạt động trên GYMERVIET.</p>
+                <a href="/coaches" className="btn-primary mt-4 px-6">← Về trang khám phá</a>
             </div>
         );
     }

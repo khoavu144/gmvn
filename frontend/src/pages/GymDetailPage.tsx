@@ -532,7 +532,7 @@ const GymDetailPage: React.FC = () => {
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                                             {gymTrainers.slice(0, 6).map((t: any) => (
-                                                <Link key={t.id} to={t.profile_slug ? `/coach/${t.profile_slug}` : `/coaches/${t.id}`}
+                                                <Link key={t.id} to={t.user_type === 'athlete' ? (t.profile_slug ? `/athlete/${t.profile_slug}` : `/athletes/${t.id}`) : (t.profile_slug ? `/coach/${t.profile_slug}` : `/coaches/${t.id}`)}
                                                     className="group flex items-center p-3.5 border border-white/10 bg-white/5 rounded-xl hover:bg-white/10 hover:border-white/30 transition-all gap-3.5 relative overflow-hidden">
                                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full duration-1000"></div>
                                                     <div className="w-14 h-14 shrink-0 rounded-full overflow-hidden bg-gray-800 border-2 border-transparent group-hover:border-white transition-colors">
