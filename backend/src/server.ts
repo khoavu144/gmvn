@@ -1,7 +1,7 @@
 import { httpServer } from './app';
 import { AppDataSource } from './config/database';
 import { getEnv } from './config/env';
-import { assertNoPendingMigrations } from './services/sqlMigrationService';
+import { runPendingMigrations } from './services/sqlMigrationService';
 import { refreshTokenStore } from './services/refreshTokenStore';
 
 const bootstrap = async () => {
@@ -18,7 +18,10 @@ const bootstrap = async () => {
             console.warn('⚠️ Redis bootstrap error:', error);
         }
 
-        await assertNoPendingMigrations();
+        const applied = await runPendingMigrations();
+        if (applied.length > 0) {
+            console.log(`✅ Applied ${applied.length} pending migration(s): ${applied.map(m => m.name).join(', ')}`);
+        }
         await AppDataSource.initialize();
         console.log('📦 Database connected successfully');
 
