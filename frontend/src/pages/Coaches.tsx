@@ -31,7 +31,7 @@ const CoachCard = memo(({ trainer }: { trainer: any }) => {
     const { prefetchCoach, prefetchAthlete } = usePrefetchProfile();
 
     const detailLink = trainer.user_type === 'athlete'
-        ? (trainer.profile_slug ? `/athletes/${trainer.profile_slug}` : `/athletes/${trainer.id}`)
+        ? (trainer.profile_slug ? `/athlete/${trainer.profile_slug}` : `/athletes/${trainer.id}`)
         : (trainer.profile_slug ? `/coach/${trainer.profile_slug}` : `/coaches/${trainer.id}`);
 
     const handlePrefetch = () => {

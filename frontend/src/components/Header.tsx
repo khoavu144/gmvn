@@ -107,31 +107,31 @@ export default function Header() {
         >
             <div className="max-w-page mx-auto px-4 sm:px-6 h-full flex justify-between items-center">
                 {/* Logo */}
-                <Link to="/" onClick={closeMenu} className="flex items-center">
+                <Link to="/" onClick={closeMenu} className="flex items-center shrink-0">
                     <img
                         src="/logo.png"
                         alt="GYMERVIET"
-                        className="h-8 sm:h-9 object-contain"
+                        className="h-8 sm:h-9 w-auto object-contain"
                         decoding="async"
                         fetchPriority="high"
                     />
                 </Link>
 
                 {/* Desktop Nav */}
-                <nav className="hidden lg:flex items-center gap-6">
-                    <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                <nav className="hidden lg:flex items-center gap-1">
+                    <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
                         Coach
                     </Link>
-                    <Link to="/gallery" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                    <Link to="/gallery" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
                         Gallery
                     </Link>
                     <Link
                         to="/gyms"
-                        className="text-sm font-semibold px-4 py-2 bg-black text-white hover:bg-gray-800 rounded transition-colors"
+                        className="text-sm font-semibold px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-sm transition-colors"
                     >
                         Gym Center
                     </Link>
-                    <Link to="/coaches?type=athlete" className="text-sm font-medium text-gray-600 hover:text-black transition-colors">
+                    <Link to="/coaches?type=athlete" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
                         Vận động viên
                     </Link>
                     {isAuthenticated && (

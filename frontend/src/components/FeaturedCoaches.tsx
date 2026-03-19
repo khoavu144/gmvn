@@ -47,24 +47,22 @@ export default function FeaturedCoaches() {
                     <p className="text-gray-400 mt-3 text-sm md:text-base">Những chuyên gia hàng đầu kiến tạo sự thay đổi</p>
                 </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[280px] md:auto-rows-[320px]">
                     {isLoading ? (
                         Array.from({ length: 6 }).map((_, idx) => (
-                            <div key={`skeleton-${idx}`} className={`bg-white/5 rounded-xl overflow-hidden animate-pulse ${idx === 0 || idx === 3 ? 'row-span-2 aspect-[3/5]' : 'aspect-square'}`}>
+                            <div key={`skeleton-${idx}`} className="bg-white/5 rounded-xl overflow-hidden animate-pulse">
                                 <div className="w-full h-full bg-white/10"></div>
                             </div>
                         ))
                     ) : (
                         sortedAndCuratedCoaches.map((coach, index) => {
-                            // Make 1st and 4th items larger (row-span-2) to create asymmetry
-                            const isLarge = index === 0 || index === 3;
                             const identifier = coach.slug || coach.id;
 
                             return (
                                 <Link
                                     key={`${coach.id}-${index}`}
                                     to={`/coaches/${identifier}`}
-                                    className={`group relative block overflow-hidden rounded-xl bg-gray-900 border border-white/10 hover:border-white/30 transition-all duration-500 ${isLarge ? 'row-span-2 aspect-[3/5]' : 'aspect-square'}`}
+                                    className="group relative block overflow-hidden rounded-xl bg-gray-900 border border-white/10 hover:border-white/30 transition-all duration-500"
                                     onMouseEnter={() => prefetchCoach(identifier)}
                                     onTouchStart={() => prefetchCoach(identifier)}
                                 >

@@ -33,7 +33,9 @@ export default function Login() {
                 ? 'Bạn đã thử đăng nhập quá nhiều lần. Vui lòng đợi vài phút rồi thử lại.'
                 : 'Đăng nhập thất bại. Vui lòng thử lại.';
 
-            setError(err.response?.data?.error || fallbackMessage);
+            const apiError = err.response?.data?.error;
+            const errorMsg = typeof apiError === 'string' ? apiError : apiError?.message || fallbackMessage;
+            setError(errorMsg);
             dispatch(setLoading(false));
         }
     };

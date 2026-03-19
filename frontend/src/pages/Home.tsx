@@ -60,18 +60,18 @@ export default function Home() {
 
             {/* 1. HERO SECTION (Split Screen) */}
             <section className="relative w-full">
-                <div className="grid md:grid-cols-2 relative">
+                <div className="grid grid-cols-1 md:grid-cols-2 relative min-h-0">
                     <HomeGymer />
                     <HomeGymCenter />
                     {/* The Intersecting Brand Badge — desktop: floating circle, mobile: banner strip */}
-                    <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-32 h-32 bg-white rounded-full items-center justify-center border-8 border-black shadow-2xl hover:scale-105 transition-transform duration-500">
-                        <span className="font-black text-xs tracking-[0.2em] text-center leading-tight">
+                    <div className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-28 h-28 lg:w-32 lg:h-32 bg-white rounded-full items-center justify-center border-[6px] border-black shadow-2xl">
+                        <span className="font-black text-[10px] lg:text-xs tracking-[0.2em] text-center leading-tight select-none">
                             GYMER<br />VIET
                         </span>
                     </div>
-                    <div className="md:hidden absolute left-0 right-0 top-1/2 -translate-y-1/2 z-20 flex justify-center">
-                        <div className="bg-white border-4 border-black shadow-xl px-6 py-2 rounded-full">
-                            <span className="font-black text-[10px] tracking-[0.25em]">GYMERVIET</span>
+                    <div className="md:hidden absolute left-0 right-0 top-1/2 -translate-y-1/2 z-20 flex justify-center pointer-events-none">
+                        <div className="bg-white border-4 border-black shadow-xl px-6 py-2 rounded-full pointer-events-auto">
+                            <span className="font-black text-[10px] tracking-[0.25em] select-none">GYMERVIET</span>
                         </div>
                     </div>
                 </div>
@@ -90,12 +90,12 @@ export default function Home() {
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
-                        
+
                         {/* THE COACH CARD (Large, asymmetric focus) */}
                         <div className="md:col-span-7 bg-gradient-to-br from-black to-gray-900 rounded-2xl p-8 md:p-14 flex flex-col justify-end min-h-[400px] md:min-h-[600px] relative overflow-hidden group">
                             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070')] bg-cover bg-center opacity-40 group-hover:opacity-50 transition-opacity duration-700 mix-blend-luminosity"></div>
                             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
-                            
+
                             <div className="relative z-10">
                                 <span className="inline-block px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-widest text-white mb-6 border border-white/20">
                                     Dành cho Huấn luyện viên
@@ -114,7 +114,7 @@ export default function Home() {
 
                         {/* STACKED SMALLER CARDS */}
                         <div className="md:col-span-5 flex flex-col gap-4 md:gap-6">
-                            
+
                             {/* ATHLETE CARD */}
                             <div className="flex-1 bg-gray-50 rounded-2xl p-8 md:p-10 flex flex-col justify-between group hover:bg-gray-100 transition-colors border border-gray-200">
                                 <div>
@@ -134,7 +134,7 @@ export default function Home() {
                                     </Link>
                                 </div>
                             </div>
-                            
+
                             {/* GYM CENTER CARD */}
                             <div className="flex-1 bg-black rounded-2xl p-8 md:p-10 flex flex-col justify-between group hover:bg-gray-900 transition-colors">
                                 <div>

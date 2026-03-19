@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, Navigate, useParams, useRouteError, isRouteErrorResponse } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate, useParams, useRouteError, isRouteErrorResponse, useLocation, useNavigationType } from 'react-router-dom';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
@@ -33,12 +33,28 @@ const lazyWithChunkRetry = <TProps extends Record<string, unknown> = Record<stri
       const reloadKey = `lazy-chunk-reload:${chunkKey}`;
       const alreadyReloaded = sessionStorage.getItem(reloadKey) === '1';
 
+      // eslint-disable-next-line no-console
+      console.warn('[lazy-chunk-retry] dynamic import failed', {
+        chunkKey,
+        message,
+        alreadyReloaded,
+        reloadKey,
+        href: window.location.href,
+      });
+
       if (!alreadyReloaded) {
         sessionStorage.setItem(reloadKey, '1');
+        // eslint-disable-next-line no-console
+        console.warn('[lazy-chunk-retry] forcing hard reload to recover chunk mismatch', {
+          chunkKey,
+          href: window.location.href,
+        });
         window.location.reload();
       }
     }
 
+    // eslint-disable-next-line no-console
+    console.warn('[lazy-chunk-retry] rethrowing import error', { chunkKey, message });
     throw error;
   }
 });
@@ -90,11 +106,26 @@ const queryClient = new QueryClient({
   },
 });
 
-const RouteFallback = () => (
-  <div className="min-h-[70vh] flex items-center justify-center">
-    <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-black" />
-  </div>
-);
+const RouteFallback = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.warn('[route-fallback] suspense fallback visible', {
+      pathname: location.pathname,
+      search: location.search,
+      hash: location.hash,
+      href: window.location.href,
+      ts: new Date().toISOString(),
+    });
+  }, [location.pathname, location.search, location.hash]);
+
+  return (
+    <div className="min-h-[70vh] flex items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-black" />
+    </div>
+  );
+};
 
 const lazyRoute = (element: React.ReactNode) => (
   <Suspense fallback={<RouteFallback />}>
@@ -145,9 +176,33 @@ const RouteErrorFallback = () => {
   );
 };
 
+function RouteDiagnostics() {
+  const location = useLocation();
+  const navigationType = useNavigationType();
+
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.warn('[route-diagnostics] navigation event', {
+      pathname: location.pathname,
+      search: location.search,
+      hash: location.hash,
+      navigationType,
+      href: window.location.href,
+      ts: new Date().toISOString(),
+    });
+  }, [location.pathname, location.search, location.hash, navigationType]);
+
+  return null;
+}
+
 const router = createBrowserRouter([
   {
-    element: <MainLayout />,
+    element: (
+      <>
+        <RouteDiagnostics />
+        <MainLayout />
+      </>
+    ),
     errorElement: <RouteErrorFallback />,
     children: [
       { path: '/', element: lazyRoute(<Home />) },
@@ -158,6 +213,8 @@ const router = createBrowserRouter([
       { path: '/coaches/:trainerId', element: lazyRoute(<CoachDetail />) },
       // SEO permalink route: fallback to coach detail by slug when public CV profile is not available
       { path: '/coach/:slug', element: lazyRoute(<CoachDetail />) },
+      // Athlete SEO permalink route (parity with /coach/:slug)
+      { path: '/athlete/:slug', element: lazyRoute(<AthleteDetailPage />) },
       { path: '/profile/public/:trainerId', element: lazyRoute(<ProfilePublic />) },
       { path: '/athletes/:identifier', element: lazyRoute(<AthleteDetailPage />) },
       { path: '/profile', element: lazyRoute(<ProtectedRoute><Profile /></ProtectedRoute>) },

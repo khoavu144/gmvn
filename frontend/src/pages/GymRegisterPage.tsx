@@ -59,7 +59,8 @@ const GymRegisterPage: React.FC = () => {
                 setError(res.error || 'Đăng ký phòng tập thất bại');
             }
         } catch (err: any) {
-            setError(err.response?.data?.error || err.message || 'Lỗi kết nối server');
+            const apiError = err.response?.data?.error;
+            setError(typeof apiError === 'string' ? apiError : apiError?.message || err.message || 'Lỗi kết nối server');
         } finally {
             setLoading(false);
         }
