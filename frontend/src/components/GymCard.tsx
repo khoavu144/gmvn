@@ -4,9 +4,10 @@ import type { GymCenter } from '../types';
 
 interface GymCardProps {
     gym: GymCenter;
+    index?: number; // used to set fetchpriority=high on first card (LCP)
 }
 
-const GymCard: React.FC<GymCardProps> = ({ gym }) => {
+const GymCard: React.FC<GymCardProps> = ({ gym, index = 0 }) => {
     const branches = gym.branches || [];
     const cities = Array.from(new Set(branches.map(b => b.city).filter(Boolean)));
     const primaryCity = cities[0] || null;
@@ -20,6 +21,11 @@ const GymCard: React.FC<GymCardProps> = ({ gym }) => {
                     <img
                         src={gym.cover_image_url || gym.logo_url!}
                         alt={gym.name}
+                        width={400}
+                        height={300}
+                        loading={index < 4 ? 'eager' : 'lazy'}
+                        decoding={index < 4 ? 'sync' : 'async'}
+                        fetchPriority={index === 0 ? 'high' : 'auto'}
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
                     />
                 ) : (

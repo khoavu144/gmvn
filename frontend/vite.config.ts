@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [react()],
   build: {
     cssCodeSplit: true,
+    // Raise chunk warning threshold — our manual splits keep everything reasonable
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -13,18 +15,30 @@ export default defineConfig({
             return undefined
           }
 
+          // ── Core React runtime (~45kb gz) — cached forever, changes rarely
           if (
             id.includes('/react/') ||
             id.includes('/react-dom/') ||
-            id.includes('/scheduler/') ||
-            id.includes('react-router') ||
-            id.includes('@reduxjs') ||
-            id.includes('react-redux') ||
-            id.includes('@tanstack/react-query')
+            id.includes('/scheduler/')
           ) {
-            return 'framework'
+            return 'react-runtime'
           }
 
+          // ── Router + state management (~35kb gz)
+          if (
+            id.includes('react-router') ||
+            id.includes('@reduxjs') ||
+            id.includes('react-redux')
+          ) {
+            return 'router-state'
+          }
+
+          // ── Data fetching (~20kb gz)
+          if (id.includes('@tanstack/react-query')) {
+            return 'query'
+          }
+
+          // ── Heavy optional libraries — loaded only when needed
           if (id.includes('recharts')) {
             return 'charts'
           }
@@ -45,9 +59,15 @@ export default defineConfig({
             return 'socket'
           }
 
+          // ── react-helmet-async — small but shared
+          if (id.includes('react-helmet')) {
+            return 'seo'
+          }
+
           return undefined
         },
       },
     },
   },
 })
+

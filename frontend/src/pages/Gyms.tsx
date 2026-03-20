@@ -88,8 +88,15 @@ const Gyms: React.FC = () => {
     return (
         <>
             <Helmet>
-                <title>Khám phá Gym — GymViet</title>
-                <meta name="description" content="Tìm kiếm phòng tập thể dục, gym cao cấp tại Việt Nam. Hệ thống đối tác uy tín của GymViet." />
+                <title>Khám phá Phòng tập Gym — GYMERVIET</title>
+                <meta name="description" content="Tìm kiếm phòng tập thể dục, gym cao cấp tại Việt Nam. Đối tác uy tín được xác minh trên GYMERVIET." />
+                <link rel="canonical" href="https://gymerviet.vn/gyms" />
+                <meta property="og:type" content="website" />
+                <meta property="og:title" content="Khám phá Phòng tập Gym — GYMERVIET" />
+                <meta property="og:url" content="https://gymerviet.vn/gyms" />
+                <meta property="og:image" content="https://gymerviet.vn/og-default.jpg" />
+                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:site" content="@gymerviet" />
             </Helmet>
 
             <div className="bg-gray-50 min-h-screen pb-16">
@@ -217,8 +224,8 @@ const Gyms: React.FC = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {filteredGyms.map(gym => (
-                                <GymCard key={gym.id} gym={gym} />
+                            {filteredGyms.map((gym, idx) => (
+                                <GymCard key={gym.id} gym={gym} index={idx} />
                             ))}
                         </div>
                     )}
