@@ -6,9 +6,11 @@ import {
     UpdateDateColumn,
     ManyToOne,
     JoinColumn,
+    Index,
 } from 'typeorm';
 import { GymBranch } from './GymBranch';
-import { Index } from 'typeorm';
+
+export type VisitType = 'member' | 'drop_in' | 'trial' | 'guest';
 
 @Entity('gym_reviews')
 @Index(['branch_id', 'user_id'], { unique: true })
@@ -29,22 +31,46 @@ export class GymReview {
     @Column({ type: 'text', nullable: true })
     comment!: string | null;
 
-    // Điều kiện review: user phải có subscription với trainer thuộc gym này
     @Column({ type: 'uuid', nullable: true })
     verified_via_subscription_id!: string | null;
 
     @Column({ type: 'boolean', default: true })
-    is_visible!: boolean; // Admin có thể ẩn
+    is_visible!: boolean;
 
-    // ── Sprint 3: Review Reply (Gym Owner / Trainer can reply) ──
     @Column({ type: 'text', nullable: true })
     reply_text!: string | null;
 
     @Column({ type: 'uuid', nullable: true })
-    replied_by_id!: string | null; // FK → users.id (gym_owner / trainer)
+    replied_by_id!: string | null;
 
     @Column({ type: 'timestamptz', nullable: true })
     replied_at!: Date | null;
+
+    // ── Trust dimension fields (added migration 009) ──
+
+    @Column({ type: 'smallint', nullable: true })
+    equipment_rating!: number | null; // 1-5
+
+    @Column({ type: 'smallint', nullable: true })
+    cleanliness_rating!: number | null;
+
+    @Column({ type: 'smallint', nullable: true })
+    coaching_rating!: number | null;
+
+    @Column({ type: 'smallint', nullable: true })
+    atmosphere_rating!: number | null;
+
+    @Column({ type: 'smallint', nullable: true })
+    value_rating!: number | null;
+
+    @Column({ type: 'smallint', nullable: true })
+    crowd_rating!: number | null;
+
+    @Column({ type: 'varchar', length: 30, nullable: true })
+    visit_type!: VisitType | null;
+
+    @Column({ type: 'boolean', default: false })
+    is_verified_visit!: boolean;
 
     @CreateDateColumn()
     created_at!: Date;

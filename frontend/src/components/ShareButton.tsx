@@ -8,18 +8,38 @@ interface ShareButtonProps {
     /** Custom label */
     label?: string;
     className?: string;
+    /** default: Web Share API + copy fallback, facebook: open Facebook sharer directly */
+    variant?: 'default' | 'facebook';
+    titleAttr?: string;
 }
 
 /**
  * Sprint 2 · Share Button
  * Uses Web Share API on mobile, falls back to copy-link on desktop.
  */
-export default function ShareButton({ url, title, text, label = 'Chia sẻ', className = '' }: ShareButtonProps) {
+export default function ShareButton({
+    url,
+    title,
+    text,
+    label = 'Chia sẻ',
+    className = '',
+    variant = 'default',
+    titleAttr = 'Chia sẻ hồ sơ này',
+}: ShareButtonProps) {
     const [copied, setCopied] = useState(false);
 
     const shareUrl = url ?? window.location.href;
 
     const handleShare = async () => {
+        if (variant === 'facebook') {
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+            const popup = window.open(facebookUrl, '_blank', 'noopener,noreferrer,width=640,height=720');
+            if (!popup) {
+                window.location.href = facebookUrl;
+            }
+            return;
+        }
+
         if (navigator.share) {
             try {
                 await navigator.share({ url: shareUrl, title, text });
@@ -39,7 +59,7 @@ export default function ShareButton({ url, title, text, label = 'Chia sẻ', cla
             type="button"
             onClick={handleShare}
             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:border-black hover:text-black transition-colors ${className}`}
-            title="Chia sẻ hồ sơ này"
+            title={titleAttr}
         >
             {copied ? (
                 <>✓ Đã sao chép!</>

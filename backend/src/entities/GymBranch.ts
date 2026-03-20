@@ -7,6 +7,7 @@ import {
     ManyToOne,
     JoinColumn,
     OneToMany,
+    Index,
 } from 'typeorm';
 import { GymCenter } from './GymCenter';
 import { GymGallery } from './GymGallery';
@@ -16,7 +17,9 @@ import { GymEquipment } from './GymEquipment';
 import { GymPricing } from './GymPricing';
 import { GymEvent } from './GymEvent';
 import { GymReview } from './GymReview';
-import { Index } from 'typeorm';
+import { GymZone } from './GymZone';
+import { GymProgram } from './GymProgram';
+import { GymLeadRoute } from './GymLeadRoute';
 
 @Entity('gym_branches')
 @Index(['gym_center_id'])
@@ -77,6 +80,59 @@ export class GymBranch {
     @Column({ type: 'int', default: 0 })
     view_count!: number;
 
+    // ── Decision-making fields (added migration 009) ──
+
+    @Column({ type: 'varchar', length: 150, nullable: true })
+    neighborhood_label!: string | null; // 'Quận 7, gần Phú Mỹ Hưng'
+
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    parking_summary!: string | null;
+
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    locker_summary!: string | null;
+
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    shower_summary!: string | null;
+
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    towel_service_summary!: string | null;
+
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    crowd_level_summary!: string | null;
+
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    best_visit_time_summary!: string | null;
+
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    accessibility_summary!: string | null;
+
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    women_only_summary!: string | null;
+
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    child_friendly_summary!: string | null;
+
+    @Column({ type: 'text', nullable: true })
+    check_in_instructions!: string | null;
+
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    branch_tagline!: string | null;
+
+    @Column({ type: 'varchar', length: 30, nullable: true })
+    whatsapp_number!: string | null;
+
+    @Column({ type: 'varchar', length: 500, nullable: true })
+    messenger_url!: string | null;
+
+    @Column({ type: 'varchar', length: 30, nullable: true })
+    consultation_phone!: string | null;
+
+    @Column({ type: 'uuid', nullable: true })
+    cover_media_id!: string | null; // FK → gym_gallery.id (set after gallery exists)
+
+    @Column({ type: 'jsonb', nullable: true })
+    branch_status_badges!: string[] | null; // ['New', 'Popular', 'Renovated']
+
     @CreateDateColumn()
     created_at!: Date;
 
@@ -108,4 +164,13 @@ export class GymBranch {
 
     @OneToMany(() => GymReview, r => r.branch)
     reviews!: GymReview[];
+
+    @OneToMany(() => GymZone, z => z.branch)
+    zones!: GymZone[];
+
+    @OneToMany(() => GymProgram, prog => prog.branch)
+    programs!: GymProgram[];
+
+    @OneToMany(() => GymLeadRoute, lr => lr.branch)
+    lead_routes!: GymLeadRoute[];
 }

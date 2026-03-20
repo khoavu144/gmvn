@@ -9,9 +9,15 @@ import {
 } from 'typeorm';
 import { GymBranch } from './GymBranch';
 
+export type PositioningTier = 'budget' | 'mid' | 'premium' | 'luxury';
+export type PriceBillingCycle = 'per_day' | 'per_month' | 'per_quarter' | 'per_year' | 'per_session';
+export type CtaType = 'consultation' | 'visit_booking' | 'class_trial' | 'membership' | 'private_training' | 'corporate';
+
 @Entity('gym_centers')
 @Index(['owner_id'])
 @Index(['slug'])
+@Index(['featured_weight'])
+@Index(['primary_venue_type_slug'])
 export class GymCenter {
     @PrimaryGeneratedColumn('uuid')
     id!: string;
@@ -47,7 +53,7 @@ export class GymCenter {
     total_equipment_count!: number | null;
 
     @Column({ type: 'jsonb', nullable: true })
-    highlights!: string[] | null; // ['Open 24h', '5 chi nhánh', 'Hồ bơi Olympic']
+    highlights!: string[] | null;
 
     @Column({ type: 'jsonb', nullable: true })
     social_links!: {
@@ -66,6 +72,56 @@ export class GymCenter {
 
     @Column({ type: 'int', default: 0 })
     view_count!: number;
+
+    // ── Marketplace discovery fields (added migration 009) ──
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    primary_venue_type_slug!: string | null; // e.g. 'gym' | 'yoga_studio' | 'pilates_studio'
+
+    @Column({ type: 'decimal', precision: 14, scale: 0, nullable: true })
+    price_from_amount!: number | null; // VND – denormalised from lowest branch pricing
+
+    @Column({ type: 'varchar', length: 30, nullable: true })
+    price_from_billing_cycle!: PriceBillingCycle | null;
+
+    @Column({ type: 'varchar', length: 30, nullable: true })
+    positioning_tier!: PositioningTier | null;
+
+    @Column({ type: 'boolean', nullable: true })
+    beginner_friendly!: boolean | null;
+
+    @Column({ type: 'boolean', nullable: true })
+    women_friendly!: boolean | null;
+
+    @Column({ type: 'boolean', nullable: true })
+    family_friendly!: boolean | null;
+
+    @Column({ type: 'boolean', nullable: true })
+    athlete_friendly!: boolean | null;
+
+    @Column({ type: 'boolean', nullable: true })
+    recovery_focused!: boolean | null;
+
+    @Column({ type: 'varchar', length: 300, nullable: true })
+    discovery_blurb!: string | null; // ≤ 2 sentence card summary
+
+    @Column({ type: 'jsonb', nullable: true })
+    hero_value_props!: string[] | null; // ['Pool Olympic', 'Open 24h', ...]
+
+    @Column({ type: 'smallint', default: 0 })
+    profile_completeness_score!: number; // 0–100
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    response_sla_text!: string | null; // 'Phản hồi trong 2 giờ'
+
+    @Column({ type: 'varchar', length: 50, nullable: true })
+    default_primary_cta!: CtaType | null;
+
+    @Column({ type: 'varchar', length: 50, nullable: true })
+    default_secondary_cta!: CtaType | null;
+
+    @Column({ type: 'smallint', default: 0 })
+    featured_weight!: number; // 0 = organic, higher = editorial boost
 
     @CreateDateColumn()
     created_at!: Date;

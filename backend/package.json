@@ -19,6 +19,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@supabase/supabase-js": "^2.98.0",
     "axios": "^1.13.6",
     "bcryptjs": "^3.0.3",
@@ -49,8 +50,8 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^25.3.3",
-    "@types/nodemailer": "^6.4.14",
     "@types/node-cron": "^3.0.11",
+    "@types/nodemailer": "^6.4.14",
     "@types/pg": "^8.18.0",
     "@types/supertest": "^7.2.0",
     "@types/uuid": "^10.0.0",

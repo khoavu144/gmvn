@@ -10,6 +10,14 @@ import { GymGallery } from '../entities/GymGallery';
 import { GymReview } from '../entities/GymReview';
 import { Subscription } from '../entities/Subscription';
 import { In, Like } from 'typeorm';
+// Marketplace extension imports
+import { GymTaxonomyTerm } from '../entities/GymTaxonomyTerm';
+import { GymCenterTaxonomyTerm } from '../entities/GymCenterTaxonomyTerm';
+import { GymZone } from '../entities/GymZone';
+import { GymProgram } from '../entities/GymProgram';
+import { GymProgramSession } from '../entities/GymProgramSession';
+import { GymLeadRoute } from '../entities/GymLeadRoute';
+import { GymTrainerAvailability } from '../entities/GymTrainerAvailability';
 
 export const gymService = {
     // ── PUBLIC LISTING ──────────────────────────────────────────────
