@@ -166,52 +166,60 @@ export default function Home() {
                             height: 480,
                         }}>
                             {isLoading
-                                ? Array.from({ length: 4 }).map((_, i) => (
+                                ? [
+                                    { col: '1', row: '1 / 3' },
+                                    { col: '2', row: '1' },
+                                    { col: '2', row: '2' },
+                                ].map((pos, i) => (
                                     <div key={i} style={{
                                         background: 'rgba(255,255,255,0.06)',
                                         borderRadius: 16,
-                                        gridRow: i === 0 ? '1 / 3' : 'auto',
+                                        gridColumn: pos.col,
+                                        gridRow: pos.row,
                                     }} />
                                 ))
-                                : heroBento.length > 0
-                                    ? heroBento.map((coach, i) => {
-                                        const link = coachLink(coach);
-                                        const identifier = coach.slug || coach.id;
-                                        return (
-                                            <Link
-                                                key={coach.id}
-                                                to={link}
-                                                onMouseEnter={() => prefetchCoach(identifier)}
-                                                style={{
-                                                    display: 'block',
-                                                    borderRadius: 16, overflow: 'hidden',
-                                                    position: 'relative',
-                                                    background: '#1a1a1a',
-                                                    textDecoration: 'none',
-                                                    // FIX: first card spans 2 rows; no aspectRatio (let parent grid control height)
-                                                    gridRow: i === 0 ? '1 / 3' : 'auto',
-                                                }}
-                                            >
-                                                {coach.avatar_url && (
-                                                    <img
-                                                        src={coach.avatar_url}
-                                                        alt={coach.full_name}
-                                                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }}
-                                                    />
+                                : heroBento.slice(0, 3).map((coach, i) => {
+                                    const link = coachLink(coach);
+                                    const identifier = coach.slug || coach.id;
+                                    // Explicit positions: card 0 = left full-height, card 1 = top-right, card 2 = bottom-right
+                                    const gridPositions = [
+                                        { gridColumn: '1', gridRow: '1 / 3' },
+                                        { gridColumn: '2', gridRow: '1' },
+                                        { gridColumn: '2', gridRow: '2' },
+                                    ];
+                                    return (
+                                        <Link
+                                            key={coach.id}
+                                            to={link}
+                                            onMouseEnter={() => prefetchCoach(identifier)}
+                                            style={{
+                                                display: 'block',
+                                                borderRadius: 16, overflow: 'hidden',
+                                                position: 'relative',
+                                                background: '#1a1a1a',
+                                                textDecoration: 'none',
+                                                ...gridPositions[i],
+                                            }}
+                                        >
+                                            {coach.avatar_url && (
+                                                <img
+                                                    src={coach.avatar_url}
+                                                    alt={coach.full_name}
+                                                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }}
+                                                />
+                                            )}
+                                            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)', pointerEvents: 'none' }} />
+                                            <div style={{ position: 'absolute', bottom: 14, left: 14, right: 14, color: 'white' }}>
+                                                <div style={{ fontSize: i === 0 ? '0.95rem' : '0.78rem', fontWeight: 700, lineHeight: 1.2, fontFamily: "'Roboto Condensed', sans-serif" }}>{coach.full_name}</div>
+                                                {coach.specialties?.[0] && (
+                                                    <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                                                        {coach.specialties[0]}
+                                                    </div>
                                                 )}
-                                                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)', pointerEvents: 'none' }} />
-                                                <div style={{ position: 'absolute', bottom: 14, left: 14, right: 14, color: 'white' }}>
-                                                    <div style={{ fontSize: i === 0 ? '0.95rem' : '0.78rem', fontWeight: 700, lineHeight: 1.2, fontFamily: "'Roboto Condensed', sans-serif" }}>{coach.full_name}</div>
-                                                    {coach.specialties?.[0] && (
-                                                        <div style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.5)', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                                                            {coach.specialties[0]}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </Link>
-                                        );
-                                    })
-                                    : null
+                                            </div>
+                                        </Link>
+                                    );
+                                })
                             }
                         </div>
                     </div>
