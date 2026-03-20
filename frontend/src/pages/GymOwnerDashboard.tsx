@@ -1,3 +1,4 @@
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { logger } from '../lib/logger';
 import { useToast } from '../components/Toast';
@@ -96,7 +97,7 @@ const GymOwnerDashboard: React.FC = () => {
         try {
             const res = await gymService.updateGymCenter(gym.id, settingsForm);
             if (res.success) {
-                setGym(prev => prev ? { ...prev, ...settingsForm } : prev);
+                setGym((prev: GymCenter | null) => prev ? { ...prev, ...settingsForm } : prev);
                 toast.success('Đã cập nhật thông tin thành công!');
             }
         } catch (error) {
@@ -306,7 +307,7 @@ const GymOwnerDashboard: React.FC = () => {
                                             className="form-input w-full"
                                             placeholder="VD: GYMERVIET - Quận 3"
                                             value={newBranchForm.branch_name}
-                                            onChange={e => setNewBranchForm(p => ({ ...p, branch_name: e.target.value }))}
+                                            onChange={e => setNewBranchForm((p: typeof newBranchForm) => ({ ...p, branch_name: e.target.value }))}
                                         />
                                     </div>
                                     <div>
@@ -316,7 +317,7 @@ const GymOwnerDashboard: React.FC = () => {
                                             className="form-input w-full"
                                             placeholder="0987 654 321"
                                             value={newBranchForm.phone}
-                                            onChange={e => setNewBranchForm(p => ({ ...p, phone: e.target.value }))}
+                                            onChange={e => setNewBranchForm((p: typeof newBranchForm) => ({ ...p, phone: e.target.value }))}
                                         />
                                     </div>
                                     <div>
@@ -326,7 +327,7 @@ const GymOwnerDashboard: React.FC = () => {
                                             className="form-input w-full"
                                             placeholder="Số nhà, tên đường..."
                                             value={newBranchForm.address}
-                                            onChange={e => setNewBranchForm(p => ({ ...p, address: e.target.value }))}
+                                            onChange={e => setNewBranchForm((p: typeof newBranchForm) => ({ ...p, address: e.target.value }))}
                                         />
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
@@ -337,7 +338,7 @@ const GymOwnerDashboard: React.FC = () => {
                                                 className="form-input w-full"
                                                 placeholder="Quận 3"
                                                 value={newBranchForm.district}
-                                                onChange={e => setNewBranchForm(p => ({ ...p, district: e.target.value }))}
+                                                onChange={e => setNewBranchForm((p: typeof newBranchForm) => ({ ...p, district: e.target.value }))}
                                             />
                                         </div>
                                         <div>
@@ -347,7 +348,7 @@ const GymOwnerDashboard: React.FC = () => {
                                                 className="form-input w-full"
                                                 placeholder="TP HCM"
                                                 value={newBranchForm.city}
-                                                onChange={e => setNewBranchForm(p => ({ ...p, city: e.target.value }))}
+                                                onChange={e => setNewBranchForm((p: typeof newBranchForm) => ({ ...p, city: e.target.value }))}
                                             />
                                         </div>
                                     </div>
@@ -358,7 +359,7 @@ const GymOwnerDashboard: React.FC = () => {
                                         className="form-input w-full h-20"
                                         placeholder="Đặc điểm nổi bật của chi nhánh này..."
                                         value={newBranchForm.description}
-                                        onChange={e => setNewBranchForm(p => ({ ...p, description: e.target.value }))}
+                                        onChange={e => setNewBranchForm((p: typeof newBranchForm) => ({ ...p, description: e.target.value }))}
                                     />
                                 </div>
                                 <div className="flex gap-3">
@@ -380,7 +381,7 @@ const GymOwnerDashboard: React.FC = () => {
                         )}
 
                         <div className="grid gap-6">
-                            {branches.map(branch => (
+                            {branches.map((branch: GymBranch) => (
                                 <div key={branch.id} className="p-6 border border-gray-200 rounded-xl flex items-center justify-between hover:border-black transition-colors cursor-pointer group" onClick={() => setEditingBranch(branch)}>
                                     <div>
                                         <h3 className="font-bold text-lg">{branch.branch_name}</h3>
@@ -422,7 +423,7 @@ const GymOwnerDashboard: React.FC = () => {
                             </div>
                             <select className="form-input w-full sm:w-48">
                                 <option>Tất cả chi nhánh</option>
-                                {branches.map(b => <option key={b.id}>{b.branch_name}</option>)}
+                                {branches.map((b: GymBranch) => <option key={b.id}>{b.branch_name}</option>)}
                             </select>
                         </div>
 
@@ -466,7 +467,7 @@ const GymOwnerDashboard: React.FC = () => {
                                         type="text"
                                         className="form-input w-full"
                                         value={settingsForm.name}
-                                        onChange={(e) => setSettingsForm(prev => ({ ...prev, name: e.target.value }))}
+                                        onChange={(e) => setSettingsForm((prev: typeof settingsForm) => ({ ...prev, name: e.target.value }))}
                                     />
                                 </div>
                                 <div>
@@ -474,7 +475,7 @@ const GymOwnerDashboard: React.FC = () => {
                                     <textarea
                                         className="form-input w-full h-32"
                                         value={settingsForm.description}
-                                        onChange={(e) => setSettingsForm(prev => ({ ...prev, description: e.target.value }))}
+                                        onChange={(e) => setSettingsForm((prev: typeof settingsForm) => ({ ...prev, description: e.target.value }))}
                                         placeholder="Mô tả về quy mô, các tiện ích và định hướng của hệ thống phòng tập..."
                                     ></textarea>
                                 </div>
@@ -548,7 +549,7 @@ const GymOwnerDashboard: React.FC = () => {
                                     className="form-input w-full" 
                                     placeholder="coach@example.com"
                                     value={inviteForm.email}
-                                    onChange={e => setInviteForm(prev => ({ ...prev, email: e.target.value }))}
+                                    onChange={e => setInviteForm((prev: typeof inviteForm) => ({ ...prev, email: e.target.value }))}
                                 />
                             </div>
                             <div>
@@ -556,7 +557,7 @@ const GymOwnerDashboard: React.FC = () => {
                                 <select 
                                     className="form-input w-full"
                                     value={inviteForm.role}
-                                    onChange={e => setInviteForm(prev => ({ ...prev, role: e.target.value }))}
+                                    onChange={e => setInviteForm((prev: typeof inviteForm) => ({ ...prev, role: e.target.value }))}
                                 >
                                     <option value="Coach">Coach (Huấn luyện viên)</option>
                                     <option value="Head Coach">Head Coach (HLV Trưởng)</option>
