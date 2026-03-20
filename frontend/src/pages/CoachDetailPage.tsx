@@ -274,8 +274,10 @@ export default function CoachDetailPage() {
     }
 
     const sidebarSocialLinks = useMemo(() => {
-        try { return typeof trainerProfile?.social_links === 'object' ? trainerProfile.social_links : {}; }
-        catch { return {}; }
+        try {
+            const sl = trainerProfile?.social_links;
+            return (sl !== null && sl !== undefined && typeof sl === 'object') ? sl : {};
+        } catch { return {}; }
     }, [trainerProfile?.social_links]);
 
     const profileSkills = useMemo(() => profileSkillsData, [profileSkillsData]);
