@@ -38,10 +38,10 @@ const bootstrap = async () => {
             }
 
             if (env.RUN_SEED === 'true') {
-                console.log('🌱 RUN_SEED flag detected. Running comprehensive demo seed...');
+                console.log('🌱 RUN_SEED flag detected. Running full seed...');
                 try {
-                    const { seedRemote } = await import('./seeds/comprehensiveDemo');
-                    await seedRemote();
+                    const { fullSeed } = await import('./seeds/fullSeed');
+                    await fullSeed();
                     console.log('✨ Seed completed successfully via boot flag.');
                 } catch (seedError) {
                     console.error('❌ Remote seed failed:', seedError);
