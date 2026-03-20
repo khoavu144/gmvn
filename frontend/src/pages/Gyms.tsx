@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import GymCard from '../components/GymCard';
 import { gymService } from '../services/gymService';
-import type { GymCenter, GymTaxonomyTerm } from '../types';
+import type { GymCenter } from '../types';
 
 const GymMapView = lazy(() => import('../components/GymMapView'));
 
@@ -54,28 +54,13 @@ function getPrimaryVenueLabel(gym: GymCenter) {
     return primaryTerm?.label || gym.primary_venue_type_slug || 'Venue';
 }
 
-function getAudienceTerms(gym: GymCenter) {
-    return (gym.taxonomy_terms || [])
-        .map((item) => item.term)
-        .filter((term): term is GymTaxonomyTerm => Boolean(term) && term.term_type === 'audience')
-        .map((term) => term.label);
-}
+
 
 function getSignatureText(gym: GymCenter) {
     return gym.discovery_blurb || gym.tagline || gym.description || 'Không gian luyện tập được biên tập để giúp bạn chọn nhanh hơn.';
 }
 
-function getPriceText(gym: GymCenter) {
-    if (!gym.price_from_amount) return 'Liên hệ để nhận bảng giá';
-    const billingMap: Record<string, string> = {
-        per_day: '/ ngày',
-        per_month: '/ tháng',
-        per_quarter: '/ quý',
-        per_year: '/ năm',
-        per_session: '/ buổi',
-    };
-    return `Từ ${Number(gym.price_from_amount).toLocaleString('vi-VN')}₫ ${gym.price_from_billing_cycle ? billingMap[gym.price_from_billing_cycle] || '' : ''}`.trim();
-}
+
 
 const Gyms: React.FC = () => {
     const [viewMode, setViewMode] = useState<ViewMode>('grid');

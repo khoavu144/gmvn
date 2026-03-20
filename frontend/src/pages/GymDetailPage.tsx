@@ -7,7 +7,6 @@ import type {
     GymBranch,
     GymCenter,
     GymGallery,
-    GymLeadRoute,
     GymPricing,
     GymProgram,
     GymProgramSession,
@@ -20,15 +19,7 @@ import GymReviewForm from '../components/GymReviewForm';
 import GymReviewList from '../components/GymReviewList';
 import ShareButton from '../components/ShareButton';
 
-const DAY_VI: Record<string, string> = {
-    mon: 'Thứ 2',
-    tue: 'Thứ 3',
-    wed: 'Thứ 4',
-    thu: 'Thứ 5',
-    fri: 'Thứ 6',
-    sat: 'Thứ 7',
-    sun: 'CN',
-};
+
 
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 const TODAY_KEY = DAY_KEYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
