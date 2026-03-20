@@ -81,7 +81,7 @@ function StatCounter({ value, label, dark }: { value: number; label: string; dar
             <span className={`text-3xl sm:text-4xl font-black tabular-nums transition-all duration-300 ${dark ? 'text-white' : 'text-black'}`}>
                 {count}+
             </span>
-            <span className={`text-[10px] uppercase tracking-widest mt-1 ${dark ? 'text-gray-400' : 'text-gray-500'}`}>
+            <span className={`text-[10px] uppercase tracking-widest mt-1 ${dark ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-muted)]'}`}>
                 {label}
             </span>
         </div>
@@ -105,10 +105,10 @@ function SkillBar({ name, level, dark }: { name: string; level: number; dark: bo
     return (
         <div ref={ref} className="space-y-1.5">
             <div className="flex justify-between items-baseline">
-                <span className={`text-sm font-medium ${dark ? 'text-gray-200' : 'text-gray-800'}`}>{name}</span>
-                <span className={`text-xs font-mono ${dark ? 'text-gray-400' : 'text-gray-500'}`}>{level}%</span>
+                <span className={`text-sm font-medium ${dark ? 'text-gray-200' : 'text-[color:var(--mk-text)]'}`}>{name}</span>
+                <span className={`text-xs font-mono ${dark ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-muted)]'}`}>{level}%</span>
             </div>
-            <div className={`h-[3px] w-full rounded-full ${dark ? 'bg-gray-700' : 'bg-gray-200'}`}>
+            <div className={`h-[3px] w-full rounded-full ${dark ? 'bg-gray-700' : 'bg-[color:var(--mk-paper-strong)]'}`}>
                 <div
                     className={`h-full rounded-full transition-all duration-1000 ease-out ${dark ? 'bg-white' : 'bg-black'}`}
                     style={{ width: inView ? `${level}%` : '0%' }}
@@ -205,26 +205,26 @@ export default function ProfileCV() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 animate-pulse pb-20">
-                <div className="h-12 bg-white border-b border-gray-200 w-full" />
-                <div className="w-full h-52 sm:h-72 bg-gray-200" />
+            <div className="min-h-screen bg-[color:var(--mk-paper)] animate-pulse pb-20">
+                <div className="h-12 bg-white border-b border-[color:var(--mk-line)] w-full" />
+                <div className="w-full h-52 sm:h-72 bg-[color:var(--mk-paper-strong)]" />
                 <div className="max-w-5xl mx-auto px-4">
-                    <div className="relative -mt-16 sm:-mt-20 border bg-white border-gray-200 p-5 sm:p-7 shadow-sm">
+                    <div className="relative -mt-16 sm:-mt-20 border bg-white border-[color:var(--mk-line)] p-5 sm:p-7 shadow-sm">
                         <div className="flex flex-col sm:flex-row gap-5 items-start">
-                            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-sm bg-gray-300 -mt-14 sm:-mt-16 border-4 border-white" />
+                            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-sm bg-[color:var(--mk-paper-strong)] -mt-14 sm:-mt-16 border-4 border-white" />
                             <div className="flex-1 space-y-3 w-full mt-2">
-                                <div className="h-8 bg-gray-300 w-1/3 rounded-sm" />
-                                <div className="h-4 bg-gray-200 w-1/4 rounded-sm" />
-                                <div className="h-4 bg-gray-200 w-1/5 rounded-sm" />
+                                <div className="h-8 bg-[color:var(--mk-paper-strong)] w-1/3 rounded-sm" />
+                                <div className="h-4 bg-[color:var(--mk-paper-strong)] w-1/4 rounded-sm" />
+                                <div className="h-4 bg-[color:var(--mk-paper-strong)] w-1/5 rounded-sm" />
                             </div>
                         </div>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
                         <div className="lg:col-span-2 space-y-6">
-                            <div className="h-40 bg-gray-200 rounded-sm w-full" />
-                            <div className="h-64 bg-gray-200 rounded-sm w-full" />
+                            <div className="h-40 bg-[color:var(--mk-paper-strong)] rounded-sm w-full" />
+                            <div className="h-64 bg-[color:var(--mk-paper-strong)] rounded-sm w-full" />
                         </div>
-                        <div className="h-80 bg-gray-200 rounded-sm w-full" />
+                        <div className="h-80 bg-[color:var(--mk-paper-strong)] rounded-sm w-full" />
                     </div>
                 </div>
             </div>
@@ -233,10 +233,10 @@ export default function ProfileCV() {
 
     if (error || !profile) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-gray-50 text-center px-4">
+            <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[color:var(--mk-paper)] text-center px-4">
                 <div className="text-4xl font-black text-gray-200">404</div>
-                <p className="text-gray-700 font-medium">Profile không tồn tại hoặc chưa được công khai.</p>
-                <Link to="/coaches" className="text-sm font-medium text-black underline underline-offset-4 hover:text-gray-600 transition-colors">
+                <p className="text-[color:var(--mk-text-soft)] font-medium">Profile không tồn tại hoặc chưa được công khai.</p>
+                <Link to="/coaches" className="text-sm font-medium text-black underline underline-offset-4 hover:text-[color:var(--mk-text-soft)] transition-colors">
                     ← Xem danh sách Coach
                 </Link>
             </div>
@@ -251,12 +251,12 @@ export default function ProfileCV() {
     const primaryCtaLabel = isAthleteProfile ? 'Xem hồ sơ athlete →' : 'Xem coach & gói tập →';
 
     const isDark = profile.theme_color === 'dark';
-    const bg = isDark ? 'bg-gray-950' : 'bg-gray-50';
-    const card = isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200';
-    const text = isDark ? 'text-gray-100' : 'text-gray-900';
-    const muted = isDark ? 'text-gray-400' : 'text-gray-500';
-    const border = isDark ? 'border-gray-800' : 'border-gray-200';
-    const sectionHdr = isDark ? 'text-white font-bold text-xs uppercase tracking-widest border-b border-gray-800 pb-2 mb-5' : 'text-black font-bold text-xs uppercase tracking-widest border-b border-gray-200 pb-2 mb-5';
+    const bg = isDark ? 'bg-gray-950' : 'bg-[color:var(--mk-paper)]';
+    const card = isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-[color:var(--mk-line)]';
+    const text = isDark ? 'text-gray-100' : 'text-[color:var(--mk-text)]';
+    const muted = isDark ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-muted)]';
+    const border = isDark ? 'border-gray-800' : 'border-[color:var(--mk-line)]';
+    const sectionHdr = isDark ? 'text-white font-bold text-xs uppercase tracking-widest border-b border-gray-800 pb-2 mb-5' : 'text-black font-bold text-xs uppercase tracking-widest border-b border-[color:var(--mk-line)] pb-2 mb-5';
 
     // SEO
     const seoTitle = `${trainer?.full_name} — ${profile.headline || 'Personal Trainer'} | GymViet`;
@@ -325,14 +325,14 @@ export default function ProfileCV() {
                             >
                                 ← Coaches
                             </Link>
-                            <div className="w-px h-4 bg-gray-300 shrink-0" />
+                            <div className="w-px h-4 bg-[color:var(--mk-paper-strong)] shrink-0" />
                             {visibleSections.map(({ id, label }) => (
                                 <button
                                     key={id}
                                     onClick={() => scrollTo(id)}
                                     className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider whitespace-nowrap rounded-sm transition-all duration-200 shrink-0 ${activeSection === id
                                         ? isDark ? 'bg-white text-black' : 'bg-black text-white'
-                                        : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-black'
+                                        : isDark ? 'text-[color:var(--mk-muted)] hover:text-white' : 'text-[color:var(--mk-muted)] hover:text-black'
                                         }`}
                                 >
                                     {label}
@@ -342,7 +342,7 @@ export default function ProfileCV() {
                         {slug && (
                             <Link
                                 to={`/coach/${slug}`}
-                                className={`text-[10px] font-semibold uppercase tracking-wider underline underline-offset-4 whitespace-nowrap shrink-0 ${isDark ? 'text-gray-300 hover:text-white' : 'text-black hover:text-gray-700'}`}
+                                className={`text-[10px] font-semibold uppercase tracking-wider underline underline-offset-4 whitespace-nowrap shrink-0 ${isDark ? 'text-gray-300 hover:text-white' : 'text-black hover:text-[color:var(--mk-text-soft)]'}`}
                             >
                                 Permalink chuẩn SEO
                             </Link>
@@ -353,7 +353,7 @@ export default function ProfileCV() {
                 {/* ── HERO: COVER + AVATAR + STATS ────────────────────────── */}
                 <div className="relative">
                     {/* Cover */}
-                    <div className={`w-full h-52 sm:h-72 ${isDark ? 'bg-gray-800' : 'bg-gray-200'} overflow-hidden`}>
+                    <div className={`w-full h-52 sm:h-72 ${isDark ? 'bg-gray-800' : 'bg-[color:var(--mk-paper-strong)]'} overflow-hidden`}>
                         {profile.cover_image_url ? (
                             <img
                                 src={profile.cover_image_url}
@@ -371,7 +371,7 @@ export default function ProfileCV() {
                             <div className="flex flex-col sm:flex-row gap-5 sm:gap-7 items-start">
                                 {/* Avatar */}
                                 <div className="shrink-0 mx-auto sm:mx-0 -mt-14 sm:-mt-16">
-                                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-sm overflow-hidden border-4 border-white shadow-md bg-gray-100">
+                                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-sm overflow-hidden border-4 border-white shadow-md bg-[color:var(--mk-paper)]">
                                         <img
                                             src={trainer?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(trainer?.full_name || 'T')}&background=000&color=fff&size=200`}
                                             alt={trainer?.full_name}
@@ -390,13 +390,13 @@ export default function ProfileCV() {
                                             </span>
                                         )}
                                         {profile.is_accepting_clients && (
-                                            <span className={`text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 border ${isDark ? 'border-gray-600 text-gray-400' : 'border-gray-300 text-gray-600'}`}>
+                                            <span className={`text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 border ${isDark ? 'border-gray-600 text-[color:var(--mk-muted)]' : 'border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)]'}`}>
                                                 AVAILABLE
                                             </span>
                                         )}
                                     </div>
                                     {profile.headline && (
-                                        <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-1`}>{profile.headline}</p>
+                                        <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-[color:var(--mk-text-soft)]'} mb-1`}>{profile.headline}</p>
                                     )}
                                     {profile.location && (
                                         <p className={`text-xs ${muted} capitalize`}>{profile.location}</p>
@@ -404,7 +404,7 @@ export default function ProfileCV() {
                                     {trainer?.specialties && trainer.specialties.length > 0 && (
                                         <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 mt-3">
                                             {trainer.specialties.slice(0, 4).map(s => (
-                                                <span key={s} className={`text-[10px] font-medium px-2 py-0.5 border ${isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-600'}`}>
+                                                <span key={s} className={`text-[10px] font-medium px-2 py-0.5 border ${isDark ? 'border-gray-700 text-[color:var(--mk-muted)]' : 'border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)]'}`}>
                                                     {s}
                                                 </span>
                                             ))}
@@ -441,7 +441,7 @@ export default function ProfileCV() {
                                 <FadeSection>
                                     <section ref={setRef('about')} id="about" className={`border ${card} p-5 sm:p-6`}>
                                         <h2 className={sectionHdr}>Giới thiệu</h2>
-                                        <p className={`text-sm leading-7 whitespace-pre-line ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        <p className={`text-sm leading-7 whitespace-pre-line ${isDark ? 'text-gray-300' : 'text-[color:var(--mk-text-soft)]'}`}>
                                             {profile.bio_long || profile.bio_short}
                                         </p>
                                     </section>
@@ -477,12 +477,12 @@ export default function ProfileCV() {
                                                             <span className={`text-[9px] font-black tracking-widest px-1.5 py-0.5 ${isDark ? 'bg-white text-black' : 'bg-black text-white'}`}>NOW</span>
                                                         )}
                                                     </div>
-                                                    <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{exp.organization}</p>
+                                                    <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-[color:var(--mk-text-soft)]'}`}>{exp.organization}</p>
                                                     <p className={`text-[10px] uppercase tracking-widest ${muted} mt-0.5`}>
                                                         {typeLabels[exp.experience_type]} · {exp.start_date?.slice(0, 7)} — {exp.is_current ? 'Hiện tại' : (exp.end_date?.slice(0, 7) || '?')}
                                                     </p>
                                                     {exp.description && (
-                                                        <p className={`text-xs leading-6 mt-2 ${isDark ? 'text-gray-400 bg-gray-800' : 'text-gray-600 bg-gray-50'} p-3 border ${border}`}>
+                                                        <p className={`text-xs leading-6 mt-2 ${isDark ? 'text-[color:var(--mk-muted)] bg-gray-800' : 'text-[color:var(--mk-text-soft)] bg-[color:var(--mk-paper)]'} p-3 border ${border}`}>
                                                             {exp.description}
                                                         </p>
                                                     )}
@@ -504,7 +504,7 @@ export default function ProfileCV() {
                                                     key={pkg.id}
                                                     className={`relative border p-4 flex flex-col transition-all duration-200 hover:-translate-y-0.5 ${pkg.is_popular
                                                         ? isDark ? 'border-white bg-gray-800' : 'border-black bg-gray-950 text-white'
-                                                        : isDark ? 'border-gray-700 hover:border-gray-500' : 'border-gray-200 hover:border-gray-400'
+                                                        : isDark ? 'border-gray-700 hover:border-gray-500' : 'border-[color:var(--mk-line)] hover:border-[color:var(--mk-line)]'
                                                         }`}
                                                 >
                                                     {pkg.is_popular && (
@@ -512,7 +512,7 @@ export default function ProfileCV() {
                                                             PHỔ BIẾN NHẤT
                                                         </span>
                                                     )}
-                                                    <div className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${pkg.is_popular ? (isDark ? 'text-gray-400' : 'text-gray-400') : muted}`}>
+                                                    <div className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${pkg.is_popular ? (isDark ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-muted)]') : muted}`}>
                                                         {pkg.duration_months} THÁNG
                                                     </div>
                                                     <div className={`font-black mb-0.5 ${pkg.is_popular ? 'text-white' : text}`}>
@@ -520,7 +520,7 @@ export default function ProfileCV() {
                                                         <span className="text-xs ml-1">₫</span>
                                                     </div>
                                                     {pkg.sessions_per_week && (
-                                                        <p className={`text-[10px] ${pkg.is_popular ? 'text-gray-400' : muted} mb-3`}>
+                                                        <p className={`text-[10px] ${pkg.is_popular ? 'text-[color:var(--mk-muted)]' : muted} mb-3`}>
                                                             {pkg.sessions_per_week} buổi / tuần
                                                         </p>
                                                     )}
@@ -528,7 +528,7 @@ export default function ProfileCV() {
                                                     {pkg.features.length > 0 && (
                                                         <ul className="space-y-1.5 flex-1 mb-4">
                                                             {pkg.features.map((f, i) => (
-                                                                <li key={i} className={`text-xs flex gap-2 ${pkg.is_popular ? 'text-gray-300' : isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                                <li key={i} className={`text-xs flex gap-2 ${pkg.is_popular ? 'text-gray-300' : isDark ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-text-soft)]'}`}>
                                                                     <span className={`shrink-0 font-bold ${pkg.is_popular ? 'text-white' : text}`}>—</span>
                                                                     {f}
                                                                 </li>
@@ -538,7 +538,7 @@ export default function ProfileCV() {
                                                     <Link
                                                         to={primaryDetailLink}
                                                         className={`block text-center py-2.5 text-xs font-black uppercase tracking-wider transition-colors ${pkg.is_popular
-                                                            ? 'bg-white text-black hover:bg-gray-200'
+                                                            ? 'bg-white text-black hover:bg-[color:var(--mk-paper-strong)]'
                                                             : isDark ? 'border border-gray-600 text-gray-300 hover:border-white hover:text-white' : 'border border-black text-black hover:bg-black hover:text-white'
                                                             }`}
                                                     >
@@ -558,9 +558,9 @@ export default function ProfileCV() {
                                         <h2 className={sectionHdr}>Học viên nói gì</h2>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             {testimonials.map(t => (
-                                                <div key={t.id} className={`p-4 border ${isDark ? 'border-gray-800 bg-gray-800/50' : 'border-gray-100 bg-gray-50'}`}>
+                                                <div key={t.id} className={`p-4 border ${isDark ? 'border-gray-800 bg-gray-800/50' : 'border-[color:var(--mk-line)] bg-[color:var(--mk-paper)]'}`}>
                                                     <div className="flex items-center gap-3 mb-3">
-                                                        <div className={`w-9 h-9 rounded-full overflow-hidden shrink-0 ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                                                        <div className={`w-9 h-9 rounded-full overflow-hidden shrink-0 ${isDark ? 'bg-gray-700' : 'bg-[color:var(--mk-paper-strong)]'}`}>
                                                             {t.client_avatar ? (
                                                                 <img src={t.client_avatar} alt={t.client_name} className="w-full h-full object-cover" />
                                                             ) : (
@@ -577,13 +577,13 @@ export default function ProfileCV() {
                                                         </div>
                                                         <div className="ml-auto flex gap-0.5">
                                                             {Array.from({ length: 5 }).map((_, i) => (
-                                                                <span key={i} className={`text-xs ${i < t.rating ? (isDark ? 'text-white' : 'text-black') : (isDark ? 'text-gray-700' : 'text-gray-300')}`}>
+                                                                <span key={i} className={`text-xs ${i < t.rating ? (isDark ? 'text-white' : 'text-black') : (isDark ? 'text-[color:var(--mk-text-soft)]' : 'text-gray-300')}`}>
                                                                     ★
                                                                 </span>
                                                             ))}
                                                         </div>
                                                     </div>
-                                                    <p className={`text-xs leading-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{t.comment}</p>
+                                                    <p className={`text-xs leading-6 ${isDark ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-text-soft)]'}`}>{t.comment}</p>
                                                 </div>
                                             ))}
                                         </div>
@@ -598,7 +598,7 @@ export default function ProfileCV() {
                                         <h2 className={sectionHdr}>Gallery</h2>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
                                             {gallery.map(img => (
-                                                <div key={img.id} className="group relative aspect-square overflow-hidden bg-gray-100">
+                                                <div key={img.id} className="group relative aspect-square overflow-hidden bg-[color:var(--mk-paper)]">
                                                     <img
                                                         src={img.image_url}
                                                         alt={img.caption || 'gallery'}
@@ -632,7 +632,7 @@ export default function ProfileCV() {
                                                         <span className={`font-mono text-xs shrink-0 transition-transform duration-200 ${openFaqId === item.id ? 'rotate-45' : ''} ${muted}`}>+</span>
                                                     </button>
                                                     <div className={`overflow-hidden transition-all duration-300 ${openFaqId === item.id ? 'max-h-96 pb-4' : 'max-h-0'}`}>
-                                                        <p className={`text-sm leading-6 ${isDark ? 'text-gray-400' : 'text-gray-600'} whitespace-pre-line`}>
+                                                        <p className={`text-sm leading-6 ${isDark ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-text-soft)]'} whitespace-pre-line`}>
                                                             {item.answer}
                                                         </p>
                                                     </div>
@@ -656,13 +656,13 @@ export default function ProfileCV() {
                                                     <Link
                                                         key={coach.id}
                                                         to={coachLink}
-                                                        className={`border p-4 transition-colors ${isDark ? 'border-gray-800 hover:border-white' : 'border-gray-200 hover:border-black'}`}
+                                                        className={`border p-4 transition-colors ${isDark ? 'border-gray-800 hover:border-white' : 'border-[color:var(--mk-line)] hover:border-black'}`}
                                                     >
                                                         <div className="flex items-center gap-3 mb-3">
                                                             {coach.avatar_url ? (
-                                                                <img src={coach.avatar_url} alt={coach.full_name} className="w-11 h-11 rounded-full object-cover border border-gray-200" />
+                                                                <img src={coach.avatar_url} alt={coach.full_name} className="w-11 h-11 rounded-full object-cover border border-[color:var(--mk-line)]" />
                                                             ) : (
-                                                                <div className={`w-11 h-11 rounded-full border flex items-center justify-center text-sm font-bold ${isDark ? 'border-gray-700 bg-gray-800 text-gray-300' : 'border-gray-200 bg-gray-100 text-gray-500'}`}>
+                                                                <div className={`w-11 h-11 rounded-full border flex items-center justify-center text-sm font-bold ${isDark ? 'border-gray-700 bg-gray-800 text-gray-300' : 'border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] text-[color:var(--mk-muted)]'}`}>
                                                                     {coach.full_name.charAt(0)}
                                                                 </div>
                                                             )}
@@ -676,7 +676,7 @@ export default function ProfileCV() {
                                                         {!!coach.specialties?.length && (
                                                             <div className="flex flex-wrap gap-1.5">
                                                                 {coach.specialties.slice(0, 2).map((s) => (
-                                                                    <span key={s} className={`text-[10px] px-2 py-0.5 border ${isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-700'}`}>
+                                                                    <span key={s} className={`text-[10px] px-2 py-0.5 border ${isDark ? 'border-gray-700 text-[color:var(--mk-muted)]' : 'border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)]'}`}>
                                                                         {s}
                                                                     </span>
                                                                 ))}
@@ -698,23 +698,23 @@ export default function ProfileCV() {
 
                                 {/* CTA CARD */}
                                 <div className={`border p-5 ${isDark ? 'border-white bg-white text-black' : 'border-black bg-black text-white'}`}>
-                                    <div className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                                    <div className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${isDark ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-muted)]'}`}>
                                         Đăng ký tập luyện
                                     </div>
                                     {trainer?.base_price_monthly ? (
                                         <div className="mb-4">
-                                            <div className={`text-[10px] uppercase tracking-widest mb-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>Giá từ</div>
+                                            <div className={`text-[10px] uppercase tracking-widest mb-0.5 ${isDark ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-muted)]'}`}>Giá từ</div>
                                             <div className="text-3xl font-black">
                                                 {Number(trainer.base_price_monthly).toLocaleString('vi-VN')}₫
                                             </div>
-                                            <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>/ tháng</div>
+                                            <div className={`text-xs ${isDark ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-muted)]'}`}>/ tháng</div>
                                         </div>
                                     ) : (
-                                        <p className={`text-sm mb-4 ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>Liên hệ để nhận báo giá.</p>
+                                        <p className={`text-sm mb-4 ${isDark ? 'text-[color:var(--mk-text-soft)]' : 'text-[color:var(--mk-muted)]'}`}>Liên hệ để nhận báo giá.</p>
                                     )}
                                     <Link
                                         to={primaryDetailLink}
-                                        className={`block w-full py-3 text-center text-xs font-black uppercase tracking-wider transition-colors ${isDark ? 'bg-black text-white hover:bg-gray-900' : 'bg-white text-black hover:bg-gray-200'}`}
+                                        className={`block w-full py-3 text-center text-xs font-black uppercase tracking-wider transition-colors ${isDark ? 'bg-black text-white hover:bg-gray-900' : 'bg-white text-black hover:bg-[color:var(--mk-paper-strong)]'}`}
                                     >
                                         {primaryCtaLabel}
                                     </Link>
@@ -732,13 +732,13 @@ export default function ProfileCV() {
                                                             <p className={`text-xs font-bold ${text}`}>{cert.name}</p>
                                                             <p className={`text-[10px] ${muted} mt-0.5`}>{cert.issuer}</p>
                                                         </div>
-                                                        <span className={`text-[10px] font-mono shrink-0 ${isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'} px-1.5 py-0.5`}>
+                                                        <span className={`text-[10px] font-mono shrink-0 ${isDark ? 'bg-gray-800 text-[color:var(--mk-muted)]' : 'bg-[color:var(--mk-paper)] text-[color:var(--mk-text-soft)]'} px-1.5 py-0.5`}>
                                                             {cert.year}
                                                         </span>
                                                     </div>
                                                     {cert.url && (
                                                         <a href={cert.url} target="_blank" rel="noopener noreferrer"
-                                                            className={`inline-block mt-1.5 text-[10px] font-medium underline underline-offset-2 ${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-black'} transition-colors`}>
+                                                            className={`inline-block mt-1.5 text-[10px] font-medium underline underline-offset-2 ${isDark ? 'text-[color:var(--mk-muted)] hover:text-white' : 'text-[color:var(--mk-muted)] hover:text-black'} transition-colors`}>
                                                             Xác thực ↗
                                                         </a>
                                                     )}
@@ -754,7 +754,7 @@ export default function ProfileCV() {
                                         <h2 className={sectionHdr}>Ngôn ngữ</h2>
                                         <div className="flex flex-wrap gap-1.5">
                                             {profile.languages.map(lang => (
-                                                <span key={lang} className={`text-[10px] font-medium px-2 py-1 border ${isDark ? 'border-gray-700 text-gray-400' : 'border-gray-200 text-gray-600'}`}>
+                                                <span key={lang} className={`text-[10px] font-medium px-2 py-1 border ${isDark ? 'border-gray-700 text-[color:var(--mk-muted)]' : 'border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)]'}`}>
                                                     {lang}
                                                 </span>
                                             ))}
@@ -771,7 +771,7 @@ export default function ProfileCV() {
                                                 if (!url) return null;
                                                 return (
                                                     <a key={platform} href={url as string} target="_blank" rel="noopener noreferrer"
-                                                        className={`flex justify-between items-center px-3 py-2.5 border text-xs font-medium capitalize transition-colors group ${isDark ? 'border-gray-800 text-gray-400 hover:border-white hover:text-white' : 'border-gray-200 text-gray-700 hover:border-black hover:text-black'}`}>
+                                                        className={`flex justify-between items-center px-3 py-2.5 border text-xs font-medium capitalize transition-colors group ${isDark ? 'border-gray-800 text-[color:var(--mk-muted)] hover:border-white hover:text-white' : 'border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)] hover:border-black hover:text-black'}`}>
                                                         {platform}
                                                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">↗</span>
                                                     </a>
@@ -787,7 +787,7 @@ export default function ProfileCV() {
                 </div>
 
                 {/* ── STICKY BOTTOM CTA (mobile) ───────────────────────────── */}
-                <div className={`lg:hidden fixed bottom-0 inset-x-0 border-t ${isDark ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'} p-3 z-30`}>
+                <div className={`lg:hidden fixed bottom-0 inset-x-0 border-t ${isDark ? 'bg-gray-950 border-gray-800' : 'bg-white border-[color:var(--mk-line)]'} p-3 z-30`}>
                     <Link
                         to={primaryDetailLink}
                         className={`block w-full py-3 text-center text-xs font-black uppercase tracking-wider ${isDark ? 'bg-white text-black' : 'bg-black text-white'} transition-opacity active:opacity-80`}

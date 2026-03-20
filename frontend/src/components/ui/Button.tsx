@@ -21,9 +21,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                     'disabled:pointer-events-none disabled:opacity-40 select-none',
                     // Variants
-                    variant === 'primary' && 'bg-black text-white hover:bg-gray-800 focus-visible:ring-black dark:bg-white dark:text-black dark:hover:bg-gray-100 dark:focus-visible:ring-white',
-                    variant === 'secondary' && 'border border-gray-300 bg-transparent text-gray-800 hover:bg-gray-100 hover:border-gray-400 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800',
-                    variant === 'ghost' && 'bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100',
+                    variant === 'primary' && 'bg-black text-white hover:bg-gray-800 focus-visible:ring-black dark:bg-white dark:text-black dark:hover:bg-[color:var(--mk-paper)] dark:focus-visible:ring-white',
+                    variant === 'secondary' && 'border border-[color:var(--mk-line)] bg-transparent text-[color:var(--mk-text)] hover:bg-[color:var(--mk-paper)] hover:border-[color:var(--mk-line)] dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800',
+                    variant === 'ghost' && 'bg-transparent text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] hover:text-[color:var(--mk-text)] dark:text-[color:var(--mk-muted)] dark:hover:bg-gray-800 dark:hover:text-gray-100',
                     variant === 'danger' && 'bg-transparent border border-red-300 text-red-600 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950',
                     // Sizes
                     size === 'sm' && 'h-8 px-3 text-xs',

@@ -29,13 +29,13 @@ export default function LegalPageLayout({
     }[maxWidth];
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[color:var(--mk-paper)]">
             {/* Page header */}
-            <div className="bg-white border-b border-gray-200">
+            <div className="bg-white border-b border-[color:var(--mk-line)]">
                 <div className={`${widthClass} mx-auto px-4 py-10 sm:py-14`}>
                     {/* Breadcrumb */}
                     {breadcrumbs && breadcrumbs.length > 0 && (
-                        <nav className="flex items-center gap-2 text-xs text-gray-500 mb-6">
+                        <nav className="flex items-center gap-2 text-xs text-[color:var(--mk-muted)] mb-6">
                             <Link to="/" className="hover:text-black transition-colors">Trang chủ</Link>
                             {breadcrumbs.map((crumb, i) => (
                                 <span key={i} className="flex items-center gap-2">
@@ -45,7 +45,7 @@ export default function LegalPageLayout({
                                             {crumb.label}
                                         </Link>
                                     ) : (
-                                        <span className="text-gray-700 font-medium">{crumb.label}</span>
+                                        <span className="text-[color:var(--mk-text-soft)] font-medium">{crumb.label}</span>
                                     )}
                                 </span>
                             ))}
@@ -54,10 +54,10 @@ export default function LegalPageLayout({
 
                     <h1 className="text-2xl sm:text-3xl font-bold text-black tracking-tight">{title}</h1>
                     {subtitle && (
-                        <p className="text-base text-gray-600 mt-3 leading-relaxed max-w-xl">{subtitle}</p>
+                        <p className="text-base text-[color:var(--mk-text-soft)] mt-3 leading-relaxed max-w-xl">{subtitle}</p>
                     )}
                     {lastUpdated && (
-                        <p className="text-xs text-gray-400 mt-4 uppercase tracking-wider">
+                        <p className="text-xs text-[color:var(--mk-muted)] mt-4 uppercase tracking-wider">
                             Cập nhật lần cuối: {lastUpdated}
                         </p>
                     )}
@@ -77,8 +77,8 @@ export default function LegalPageLayout({
 export function LegalSection({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="mb-10">
-            <h2 className="text-lg font-bold text-black mb-4 pb-3 border-b border-gray-200">{title}</h2>
-            <div className="space-y-3 text-sm text-gray-700 leading-relaxed">
+            <h2 className="text-lg font-bold text-black mb-4 pb-3 border-b border-[color:var(--mk-line)]">{title}</h2>
+            <div className="space-y-3 text-sm text-[color:var(--mk-text-soft)] leading-relaxed">
                 {children}
             </div>
         </section>
@@ -106,8 +106,8 @@ export function LegalCallout({
     children: React.ReactNode;
 }) {
     const styles = {
-        info: 'border-gray-300 bg-gray-50 text-gray-700',
-        warning: 'border-gray-400 bg-gray-100 text-gray-800',
+        info: 'border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] text-[color:var(--mk-text-soft)]',
+        warning: 'border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] text-[color:var(--mk-text)]',
         danger: 'border-black bg-black text-white',
     }[type];
 

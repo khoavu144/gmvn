@@ -5,33 +5,33 @@
 @layer base {
   :root {
     /* Background */
-    --bg-page: #F9F9F9;
-    --bg-surface: #FFFFFF;
-    --bg-elevated: #FFFFFF;
-    --bg-muted: #F4F4F4;
+    --bg-page: var(--mk-bg);
+    --bg-surface: var(--mk-paper);
+    --bg-elevated: var(--mk-bg-elevated);
+    --bg-muted: var(--mk-paper-strong);
     --bg-overlay: rgba(0, 0, 0, 0.5);
 
     /* Border */
-    --border: #E5E5E5;
-    --border-strong: #CACACA;
-    --border-focus: #0A0A0A;
+    --border: var(--mk-line);
+    --border-strong: color-mix(in oklab, var(--mk-accent-soft) 40%, var(--mk-line));
+    --border-focus: var(--mk-text);
 
     /* Text */
-    --text-primary: #0A0A0A;
-    --text-secondary: #666666;
-    --text-muted: #999999;
-    --text-disabled: #CCCCCC;
-    --text-on-dark: #F0F0F0;
+    --text-primary: var(--mk-text);
+    --text-secondary: var(--mk-text-soft);
+    --text-muted: var(--mk-muted);
+    --text-disabled: color-mix(in oklab, var(--mk-muted) 50%, var(--mk-bg));
+    --text-on-dark: var(--mk-bg);
 
     /* Semantic */
-    --color-success: #16A34A;
-    --color-success-bg: #DCFCE7;
+    --color-success: var(--mk-forest);
+    --color-success-bg: color-mix(in oklab, var(--mk-forest) 12%, var(--bg-surface) 88%);
     --color-warning: #D97706;
     --color-warning-bg: #FEF3C7;
     --color-error: #DC2626;
     --color-error-bg: #FEE2E2;
-    --color-info: #2563EB;
-    --color-info-bg: #DBEAFE;
+    --color-info: var(--mk-accent);
+    --color-info-bg: color-mix(in oklab, var(--mk-accent) 12%, var(--bg-surface) 88%);
 
     /* Radius */
     --radius-sm: 4px;
@@ -40,8 +40,24 @@
     --radius-xl: 16px;
     --radius-full: 9999px;
 
+    /* Spacing */
+    --sp-1: 0.25rem;
+    --sp-2: 0.5rem;
+    --sp-3: 0.75rem;
+    --sp-4: 1rem;
+    --sp-5: 1.25rem;
+    --sp-6: 1.5rem;
+    --sp-8: 2rem;
+    --sp-10: 2.5rem;
+    --sp-12: 3rem;
+
+    /* Motion */
+    --duration-fast: 120ms;
+    --duration-base: 200ms;
+    --duration-slow: 350ms;
+
     /* Shadow */
-    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-card: var(--mk-shadow-soft);
     --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
     --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.14);
     --shadow-focus: 0 0 0 3px rgba(10, 10, 10, 0.12);

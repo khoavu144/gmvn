@@ -10,12 +10,15 @@ const NAV_ITEMS = [
   { id: 'contact', label: 'Liên hệ' },
 ];
 
+interface CtaProps { text: string; action: () => void; }
+
 interface CoachMobileNavProps {
   name: string;
   onMessage: () => void;
+  primaryCta?: CtaProps;
 }
 
-export default function CoachMobileNav({ name, onMessage }: CoachMobileNavProps) {
+export default function CoachMobileNav({ name, onMessage, primaryCta }: CoachMobileNavProps) {
   const [activeSection, setActiveSection] = useState('about');
   const [show, setShow] = useState(false);
 
@@ -66,9 +69,15 @@ export default function CoachMobileNav({ name, onMessage }: CoachMobileNavProps)
                 </button>
               ))}
             </nav>
-            <button onClick={onMessage} className="coach-mobile-nav-message-btn">
-              💬 Nhắn tin để tư vấn
-            </button>
+            {primaryCta ? (
+              <button onClick={primaryCta.action} className="coach-mobile-nav-message-btn" style={{ background: 'var(--mk-text)', color: 'white' }}>
+                {primaryCta.text}
+              </button>
+            ) : (
+              <button onClick={onMessage} className="coach-mobile-nav-message-btn">
+                💬 Nhắn tin để tư vấn
+              </button>
+            )}
           </>
         )}
       </div>

@@ -60,10 +60,10 @@ export default function GymMapView({ gyms }: Props) {
 
     if (pins.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-[520px] bg-gray-50 rounded-xl border border-dashed border-gray-300">
+            <div className="flex flex-col items-center justify-center h-[520px] bg-[color:var(--mk-paper)] rounded-xl border border-dashed border-[color:var(--mk-line)]">
                 <span className="text-5xl mb-4">🗺️</span>
-                <p className="text-gray-500 font-medium">Chưa có cơ sở nào có tọa độ bản đồ.</p>
-                <p className="text-xs text-gray-400 mt-1">Gym owner cần cập nhật latitude/longitude trong cài đặt chi nhánh.</p>
+                <p className="text-[color:var(--mk-muted)] font-medium">Chưa có cơ sở nào có tọa độ bản đồ.</p>
+                <p className="text-xs text-[color:var(--mk-muted)] mt-1">Gym owner cần cập nhật latitude/longitude trong cài đặt chi nhánh.</p>
             </div>
         );
     }
@@ -73,7 +73,7 @@ export default function GymMapView({ gyms }: Props) {
             center={center}
             zoom={12}
             style={{ height: '520px', width: '100%', borderRadius: '12px' }}
-            className="border border-gray-200"
+            className="border border-[color:var(--mk-line)]"
         >
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -84,8 +84,8 @@ export default function GymMapView({ gyms }: Props) {
                     <Popup>
                         <div className="text-sm" style={{ minWidth: 180 }}>
                             <p className="font-bold text-base mb-0.5">{pin.gymName}</p>
-                            <p className="text-gray-600 text-xs mb-1">{pin.branchName}</p>
-                            <p className="text-gray-500 text-xs">{pin.address}{pin.city ? `, ${pin.city}` : ''}</p>
+                            <p className="text-[color:var(--mk-text-soft)] text-xs mb-1">{pin.branchName}</p>
+                            <p className="text-[color:var(--mk-muted)] text-xs">{pin.address}{pin.city ? `, ${pin.city}` : ''}</p>
                             <a
                                 href={`/gyms/${pin.gymId}`}
                                 className="inline-block mt-2 text-xs font-bold text-black underline"

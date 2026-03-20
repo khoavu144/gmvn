@@ -40,13 +40,13 @@ export default function VerifyEmail() {
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+    <div className="flex min-h-[80vh] items-center justify-center bg-[color:var(--mk-paper)] px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-sm border border-[color:var(--mk-line)]">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-[color:var(--mk-text)]">
             Xác thực Email
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-[color:var(--mk-text-soft)]">
             Mã xác thực 6 chữ số đã được gửi tới email của bạn.
           </p>
         </div>
@@ -62,7 +62,7 @@ export default function VerifyEmail() {
                 maxLength={6}
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="relative block w-full rounded-md border-0 py-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 text-center text-2xl tracking-[0.5em] font-mono"
+                className="relative block w-full rounded-md border-0 py-3 text-[color:var(--mk-text)] ring-1 ring-inset ring-gray-300 placeholder:text-[color:var(--mk-muted)] focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 text-center text-2xl tracking-[0.5em] font-mono"
                 placeholder="000000"
               />
             </div>

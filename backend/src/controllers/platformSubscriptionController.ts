@@ -100,40 +100,11 @@ export const sepayPlatformWebhook = async (req: Request, res: Response): Promise
             }
         }
 
-        // Fallback to old substring regex if Redis miss (for backwards compatibility)
-        if (!targetUserId) {
-            const match = content?.match(/GYMERVIET-PLAN-([A-Z_]+)-([A-Z0-9]+)/i);
-            if (!match) {
-                res.json({ success: true, ignored: true });
-                return;
-            }
-
-            const planRaw = match[1].toLowerCase() as PlatformPlan;
-            if (!VALID_PLANS.includes(planRaw)) {
-                res.status(400).json({ error: 'Unknown plan in webhook' });
-                return;
-            }
-            targetPlan = planRaw;
-
-            const { AppDataSource } = await import('../config/database');
-            const { User } = await import('../entities/User');
-            const userShort = match[2].toUpperCase();
-            const users = await AppDataSource
-                .getRepository(User)
-                .createQueryBuilder('u')
-                .where("REPLACE(u.id::text, '-', '') ILIKE :prefix", { prefix: `${userShort}%` })
-                .getMany();
-
-            if (users.length !== 1) {
-                console.error('[platform-webhook] ambiguous user match:', userShort, users.length);
-                res.status(400).json({ error: 'Cannot uniquely identify user from transaction' });
-                return;
-            }
-            targetUserId = users[0].id;
-        }
-
+        // If Redis miss, ignore the transaction — do not attempt heuristic user matching
+        // This prevents payment misattribution from short-ID prefix collisions
         if (!targetUserId || !targetPlan) {
-            res.status(400).json({ error: 'Failed to resolve user and plan' });
+            console.warn('[platform-webhook] No checkout found in Redis for content:', content);
+            res.json({ success: true, ignored: true });
             return;
         }
 

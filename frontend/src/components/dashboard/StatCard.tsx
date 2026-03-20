@@ -12,13 +12,13 @@ interface StatCardProps {
 export default function StatCard({ label, value, icon, tone = 'default' }: StatCardProps) {
     if (tone === 'subtle') {
         return (
-            <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-5 flex flex-col justify-between hover:border-black transition-colors shadow-sm">
+            <div className="bg-white border border-[color:var(--mk-line)] rounded-lg p-4 md:p-5 flex flex-col justify-between hover:border-black transition-colors shadow-sm">
                 <div className="flex justify-between items-start mb-2">
-                    <div className="bg-gray-50 p-2 rounded-md">{icon}</div>
+                    <div className="bg-[color:var(--mk-paper)] p-2 rounded-md">{icon}</div>
                 </div>
                 <div>
                     <div className="text-2xl font-black text-black">{value}</div>
-                    <div className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-widest mt-1 truncate">{label}</div>
+                    <div className="text-[10px] sm:text-xs font-bold text-[color:var(--mk-muted)] uppercase tracking-widest mt-1 truncate">{label}</div>
                 </div>
             </div>
         );
@@ -27,11 +27,11 @@ export default function StatCard({ label, value, icon, tone = 'default' }: StatC
     return (
         <div className="bg-white border-l-4 border-black rounded-r-lg shadow-sm p-4 md:p-5 flex flex-col justify-between hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-2">
-                <div className="text-gray-400">{icon}</div>
+                <div className="text-[color:var(--mk-muted)]">{icon}</div>
             </div>
             <div>
                 <div className="text-2xl font-black text-black">{value}</div>
-                <div className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-widest mt-1 truncate">{label}</div>
+                <div className="text-[10px] sm:text-xs font-bold text-[color:var(--mk-muted)] uppercase tracking-widest mt-1 truncate">{label}</div>
             </div>
         </div>
     );

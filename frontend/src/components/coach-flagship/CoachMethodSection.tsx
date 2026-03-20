@@ -25,20 +25,20 @@ export default function CoachMethodSection({ bio, specialties, highlights, gymCo
                 <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-10 lg:gap-16">
                     {/* Left: Narrative */}
                     <div>
-                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)] mb-2">
                             Phương pháp huấn luyện
                         </div>
                         <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black mb-6">
                             Triết lý & Phong cách
                         </h2>
                         {bio && (
-                            <div className="text-base text-gray-600 leading-[1.8] whitespace-pre-line">
+                            <div className="text-base text-[color:var(--mk-text-soft)] leading-[1.8] whitespace-pre-line">
                                 {bio}
                             </div>
                         )}
                         {gymCount > 0 && (
-                            <div className="mt-6 pt-6 border-t border-gray-100">
-                                <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <div className="mt-6 pt-6 border-t border-[color:var(--mk-line)]">
+                                <div className="flex items-center gap-2 text-sm text-[color:var(--mk-muted)]">
                                     <span>🏋️</span>
                                     <span>Đang hoạt động tại <strong className="text-black">{gymCount}</strong> phòng gym</span>
                                 </div>
@@ -52,7 +52,7 @@ export default function CoachMethodSection({ bio, specialties, highlights, gymCo
                             {pillars.map((pillar, i) => (
                                 <div
                                     key={pillar.id}
-                                    className="relative p-5 rounded-lg border border-gray-100 bg-gray-50/50 hover:border-gray-300 transition-colors group"
+                                    className="relative p-5 rounded-lg border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)]/50 hover:border-[color:var(--mk-line)] transition-colors group"
                                 >
                                     <div className="absolute top-4 right-4 text-4xl font-extrabold text-gray-100 group-hover:text-gray-200 transition-colors select-none">
                                         {String(i + 1).padStart(2, '0')}
@@ -61,7 +61,7 @@ export default function CoachMethodSection({ bio, specialties, highlights, gymCo
                                         <h3 className="text-sm font-bold text-black mb-2 uppercase tracking-wide">
                                             {pillar.title}
                                         </h3>
-                                        <p className="text-sm text-gray-500 leading-relaxed">
+                                        <p className="text-sm text-[color:var(--mk-muted)] leading-relaxed">
                                             {pillar.value}
                                         </p>
                                     </div>

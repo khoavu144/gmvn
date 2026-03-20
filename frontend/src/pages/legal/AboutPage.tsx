@@ -40,7 +40,7 @@ export default function AboutPage() {
                 {stats.map((stat) => (
                     <div key={stat.label} className="card text-center !p-5">
                         <div className="text-2xl font-bold text-black">{stat.value}</div>
-                        <div className="text-xs text-gray-500 mt-1 uppercase tracking-wide">{stat.label}</div>
+                        <div className="text-xs text-[color:var(--mk-muted)] mt-1 uppercase tracking-wide">{stat.label}</div>
                     </div>
                 ))}
             </div>
@@ -62,7 +62,7 @@ export default function AboutPage() {
                     {values.map((v) => (
                         <div key={v.title} className="card !hover:border-black">
                             <h3 className="font-bold text-black text-sm mb-2">{v.title}</h3>
-                            <p className="text-gray-600 text-sm leading-relaxed">{v.desc}</p>
+                            <p className="text-[color:var(--mk-text-soft)] text-sm leading-relaxed">{v.desc}</p>
                         </div>
                     ))}
                 </div>
@@ -76,11 +76,11 @@ export default function AboutPage() {
                         { step: '03', title: 'Đăng ký gói tập', desc: 'Chọn gói phù hợp, thanh toán qua chuyển khoản (QR Code tự động). Nhận xác nhận tức thì.' },
                         { step: '04', title: 'Tập luyện & Theo dõi', desc: 'Nhận lịch tập cá nhân hóa, hoàn thành buổi tập, ghi nhật ký tiến trình.' },
                     ].map((item) => (
-                        <div key={item.step} className="flex gap-4 p-4 border border-gray-200 rounded-xs bg-white">
-                            <span className="text-xs font-bold font-mono text-gray-400 pt-0.5 w-6 flex-shrink-0">{item.step}</span>
+                        <div key={item.step} className="flex gap-4 p-4 border border-[color:var(--mk-line)] rounded-xs bg-white">
+                            <span className="text-xs font-bold font-mono text-[color:var(--mk-muted)] pt-0.5 w-6 flex-shrink-0">{item.step}</span>
                             <div>
                                 <h4 className="font-semibold text-black text-sm">{item.title}</h4>
-                                <p className="text-sm text-gray-600 mt-1">{item.desc}</p>
+                                <p className="text-sm text-[color:var(--mk-text-soft)] mt-1">{item.desc}</p>
                             </div>
                         </div>
                     ))}

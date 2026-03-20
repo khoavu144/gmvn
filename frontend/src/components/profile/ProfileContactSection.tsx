@@ -1,8 +1,11 @@
+interface CtaProps { text: string; action: () => void; }
+
 interface ProfileContactSectionProps {
   coachName: string;
   location: string | null;
   socialLinks: Record<string, string>;
   onMessage: () => void;
+  primaryCta?: CtaProps;
 }
 
 const SOCIAL_LABELS: Record<string, string> = {
@@ -10,7 +13,7 @@ const SOCIAL_LABELS: Record<string, string> = {
   facebook: 'Facebook', website: 'Trang web',
 };
 
-export default function ProfileContactSection({ coachName, location, socialLinks, onMessage }: ProfileContactSectionProps) {
+export default function ProfileContactSection({ coachName, location, socialLinks, onMessage, primaryCta }: ProfileContactSectionProps) {
   const firstName = coachName.split(' ').slice(-1)[0];
   const validSocialLinks = Object.entries(socialLinks).filter(([, url]) => Boolean(url));
   const hasSocial = validSocialLinks.length > 0;
@@ -33,11 +36,11 @@ export default function ProfileContactSection({ coachName, location, socialLinks
               Nhắn tin để được tư vấn miễn phí và nhận lộ trình phù hợp với mục tiêu của bạn.
             </p>
             <button
-              onClick={onMessage}
+              onClick={primaryCta?.action || onMessage}
               className="profile-contact-cta-btn"
-              aria-label={`Nhắn tin với ${coachName} để được tư vấn`}
+              aria-label={primaryCta?.text || `Nhắn tin với ${coachName} để được tư vấn`}
             >
-              💬 Nhắn tin để tư vấn
+              {primaryCta ? primaryCta.text : '💬 Nhắn tin để tư vấn'}
             </button>
           </div>
 

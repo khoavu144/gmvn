@@ -223,8 +223,8 @@ export default function AthleteDetailPage() {
 
     if (error || !profile || !athlete) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4 px-4 text-center">
-                <p className="text-gray-800 font-medium">Không tìm thấy hồ sơ vận động viên.</p>
+            <div className="min-h-screen bg-[color:var(--mk-paper)] flex flex-col items-center justify-center gap-4 px-4 text-center">
+                <p className="text-[color:var(--mk-text)] font-medium">Không tìm thấy hồ sơ vận động viên.</p>
                 <Link to="/coaches?type=athlete" className="btn-primary mt-4 px-6">← Về danh sách Vận động viên</Link>
             </div>
         );

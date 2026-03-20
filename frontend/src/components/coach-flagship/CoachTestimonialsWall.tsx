@@ -19,7 +19,7 @@ export default function CoachTestimonialsWall({ testimonials }: Props) {
     return (
         <section className="py-12 sm:py-16 bg-white">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2">
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)] mb-2">
                     Phản hồi từ học viên
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black mb-8">
@@ -57,20 +57,20 @@ export default function CoachTestimonialsWall({ testimonials }: Props) {
                 {gridTestimonials.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {gridTestimonials.map(t => (
-                            <div key={t.id} className="border border-gray-200 rounded-lg p-5 bg-gray-50/50">
+                            <div key={t.id} className="border border-[color:var(--mk-line)] rounded-lg p-5 bg-[color:var(--mk-paper)]/50">
                                 <div className="text-yellow-500 text-xs mb-3">
                                     {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
                                 </div>
-                                <p className="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-4">{t.comment}</p>
-                                <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                                <p className="text-sm text-[color:var(--mk-text-soft)] leading-relaxed mb-4 line-clamp-4">{t.comment}</p>
+                                <div className="flex items-center gap-2 pt-3 border-t border-[color:var(--mk-line)]">
                                     {t.client_avatar ? (
                                         <img src={t.client_avatar} alt={t.client_name} className="w-7 h-7 rounded-full object-cover" />
                                     ) : (
-                                        <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold">
+                                        <div className="w-7 h-7 rounded-full bg-[color:var(--mk-paper-strong)] flex items-center justify-center text-xs font-bold">
                                             {t.client_name.charAt(0)}
                                         </div>
                                     )}
-                                    <span className="text-xs font-semibold text-gray-800">{t.client_name}</span>
+                                    <span className="text-xs font-semibold text-[color:var(--mk-text)]">{t.client_name}</span>
                                 </div>
                             </div>
                         ))}

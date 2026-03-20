@@ -12,6 +12,8 @@ const BUDGETS = {
         maps: 190_000,
         select: 90_000,
         index: 150_000,
+        motion: 80_000,
+        socket: 50_000,
     },
 };
 

@@ -1,6 +1,7 @@
 import React, { useMemo, useState, lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
+import { Filter } from 'lucide-react';
 import GymCard from '../components/GymCard';
 import { gymService } from '../services/gymService';
 import type { GymCenter } from '../types';
@@ -70,6 +71,7 @@ const Gyms: React.FC = () => {
     const [venueType, setVenueType] = useState('');
     const [audienceTag, setAudienceTag] = useState('');
     const [sortBy, setSortBy] = useState<SortValue>('featured');
+    const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
     const {
         data,
@@ -168,19 +170,6 @@ const Gyms: React.FC = () => {
                                         fitness club cao cấp, yoga studio, pilates reformer và không gian recovery.
                                     </p>
                                 </div>
-
-                                <div className="marketplace-chip-row">
-                                    {QUICK_VENUES.map((item) => (
-                                        <button
-                                            key={item.label}
-                                            type="button"
-                                            className={`marketplace-chip ${venueType === item.key ? 'is-active' : ''}`}
-                                            onClick={() => setVenueType(item.key)}
-                                        >
-                                            {item.label}
-                                        </button>
-                                    ))}
-                                </div>
                             </div>
 
                             <div className="marketplace-stat-strip">
@@ -203,88 +192,124 @@ const Gyms: React.FC = () => {
 
                 <section className="marketplace-container">
                     <div className="marketplace-panel marketplace-filter-bar">
-                        <div className="marketplace-filter-grid">
-                            <div className="marketplace-field">
-                                <label htmlFor="marketplace-search">Tìm theo tên, địa điểm, cảm giác</label>
-                                <input
-                                    id="marketplace-search"
-                                    className="marketplace-input"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder="Ví dụ: reformer quận 2, gym có sauna, yoga yên tĩnh..."
-                                />
-                            </div>
-
-                            <div className="marketplace-field">
-                                <label htmlFor="marketplace-city">Tỉnh / thành</label>
-                                <select
-                                    id="marketplace-city"
-                                    className="marketplace-select"
-                                    value={cityFilter}
-                                    onChange={(e) => {
-                                        setCityFilter(e.target.value);
-                                        setDistrictFilter('');
-                                    }}
-                                >
-                                    <option value="">Tất cả thành phố</option>
-                                    {allCities.map((city) => (
-                                        <option key={city} value={city}>
-                                            {city}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="marketplace-field">
-                                <label htmlFor="marketplace-district">Quận / huyện</label>
-                                <select
-                                    id="marketplace-district"
-                                    className="marketplace-select"
-                                    value={districtFilter}
-                                    disabled={!cityFilter}
-                                    onChange={(e) => setDistrictFilter(e.target.value)}
-                                >
-                                    <option value="">Tất cả khu vực</option>
-                                    {availableDistricts.map((district) => (
-                                        <option key={district} value={district}>
-                                            {district}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="marketplace-field">
-                                <label htmlFor="marketplace-sort">Xếp theo</label>
-                                <select
-                                    id="marketplace-sort"
-                                    className="marketplace-select"
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value as SortValue)}
-                                >
-                                    {SORT_OPTIONS.map((option) => (
-                                        <option key={option.value} value={option.value}>
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                            <div className="marketplace-chip-row">
-                                {NEED_CHIPS.map((chip) => (
-                                    <button
-                                        key={chip.key}
-                                        type="button"
-                                        className={`marketplace-chip ${audienceTag === chip.key ? 'is-active' : ''}`}
-                                        onClick={() => setAudienceTag((current) => current === chip.key ? '' : chip.key)}
+                        <div className="flex flex-col gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="marketplace-field">
+                                    <label htmlFor="marketplace-venue">Loại hình</label>
+                                    <select
+                                        id="marketplace-venue"
+                                        className="marketplace-select"
+                                        value={venueType}
+                                        onChange={(e) => setVenueType(e.target.value)}
                                     >
-                                        {chip.label}
+                                        {QUICK_VENUES.map((item) => (
+                                            <option key={item.key} value={item.key}>{item.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="marketplace-field">
+                                    <label htmlFor="marketplace-city">Tỉnh / thành</label>
+                                    <select
+                                        id="marketplace-city"
+                                        className="marketplace-select"
+                                        value={cityFilter}
+                                        onChange={(e) => {
+                                            setCityFilter(e.target.value);
+                                            setDistrictFilter('');
+                                        }}
+                                    >
+                                        <option value="">Tất cả thành phố</option>
+                                        {allCities.map((city) => (
+                                            <option key={city} value={city}>
+                                                {city}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="marketplace-field">
+                                    <label htmlFor="marketplace-sort">Xếp theo</label>
+                                    <select
+                                        id="marketplace-sort"
+                                        className="marketplace-select"
+                                        value={sortBy}
+                                        onChange={(e) => setSortBy(e.target.value as SortValue)}
+                                    >
+                                        {SORT_OPTIONS.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="marketplace-field flex items-end">
+                                    <button
+                                        type="button"
+                                        className={`w-full h-11 px-4 flex items-center justify-center gap-2 rounded-lg border font-bold text-sm transition-colors ${showAdvancedFilters ? 'bg-black text-white border-black' : 'bg-white text-[color:var(--mk-text)] border-[color:var(--mk-line)] hover:border-[color:var(--mk-line)]'}`}
+                                        onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                                    >
+                                        <Filter className="w-4 h-4" />
+                                        Lọc thêm
                                     </button>
-                                ))}
+                                </div>
                             </div>
 
-                            <div className="flex items-center gap-3">
+                            {/* Advanced Filters */}
+                            {showAdvancedFilters && (
+                                <div className="pt-4 border-t border-[color:var(--mk-line)] animate-fade-in space-y-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="marketplace-field">
+                                            <label htmlFor="marketplace-search">Tìm theo tên, đặc điểm</label>
+                                            <input
+                                                id="marketplace-search"
+                                                className="marketplace-input"
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                placeholder="Ví dụ: reformer quận 2, gym có sauna..."
+                                            />
+                                        </div>
+
+                                        <div className="marketplace-field">
+                                            <label htmlFor="marketplace-district">Quận / huyện</label>
+                                            <select
+                                                id="marketplace-district"
+                                                className="marketplace-select"
+                                                value={districtFilter}
+                                                disabled={!cityFilter}
+                                                onChange={(e) => setDistrictFilter(e.target.value)}
+                                            >
+                                                <option value="">Tất cả khu vực</option>
+                                                {availableDistricts.map((district) => (
+                                                    <option key={district} value={district}>
+                                                        {district}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="marketplace-field">
+                                        <label>Phù hợp cho</label>
+                                        <div className="marketplace-chip-row mt-2">
+                                            {NEED_CHIPS.map((chip) => (
+                                                <button
+                                                    key={chip.key}
+                                                    type="button"
+                                                    className={`marketplace-chip ${audienceTag === chip.key ? 'is-active' : ''}`}
+                                                    onClick={() => setAudienceTag((current) => current === chip.key ? '' : chip.key)}
+                                                >
+                                                    {chip.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Options & Reset */}
+                            <div className="flex flex-wrap items-center gap-3 pt-2">
                                 <div className="inline-flex overflow-hidden rounded-full border border-[color:var(--mk-line)] bg-white/70 p-1">
                                     <button
                                         type="button"
@@ -312,6 +337,7 @@ const Gyms: React.FC = () => {
                                             setDistrictFilter('');
                                             setVenueType('');
                                             setAudienceTag('');
+                                            setShowAdvancedFilters(false);
                                         }}
                                     >
                                         Reset filters
@@ -349,7 +375,7 @@ const Gyms: React.FC = () => {
                         </div>
                     ) : viewMode === 'map' ? (
                         <div className="marketplace-panel overflow-hidden p-3">
-                            <Suspense fallback={<div className="h-[560px] animate-pulse rounded-[1.25rem] bg-[color:var(--mk-paper-strong)]" />}>
+                            <Suspense fallback={<div className="h-[560px] animate-pulse rounded-xl bg-[color:var(--mk-paper-strong)]" />}>
                                 <GymMapView gyms={gyms} />
                             </Suspense>
                         </div>
@@ -458,7 +484,7 @@ const Gyms: React.FC = () => {
                                         { title: 'Mức chi phí', body: 'Đừng chỉ nhìn mức giá tối đa. Hãy xem điểm giá khởi điểm để bắt đầu nhanh.' },
                                         { title: 'Phù hợp mục tiêu', body: 'Các thẻ như người mới, ưu tiên nữ giới hay dân thể thao giúp loại bớt lựa chọn sai.' },
                                     ].map((item) => (
-                                        <div key={item.title} className="rounded-[1.25rem] border border-[color:var(--mk-line)] bg-white/70 p-4">
+                                        <div key={item.title} className="rounded-xl border border-[color:var(--mk-line)] bg-white/70 p-4">
                                             <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{item.title}</div>
                                             <p className="mt-2 text-sm leading-6 text-[color:var(--mk-muted)]">{item.body}</p>
                                         </div>

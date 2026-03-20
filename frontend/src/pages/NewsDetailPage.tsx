@@ -49,12 +49,12 @@ export default function NewsDetailPage() {
         return (
             <div className="marketplace-shell min-h-screen animate-pulse">
                 <div className="marketplace-container max-w-3xl pt-10 pb-24 space-y-4">
-                    <div className="h-8 bg-gray-200 rounded-xl w-3/4" />
-                    <div className="h-4 bg-gray-100 rounded-xl w-1/2" />
-                    <div className="mt-6 aspect-[16/9] rounded-2xl bg-gray-200" />
+                    <div className="h-8 bg-[color:var(--mk-paper-strong)] rounded-xl w-3/4" />
+                    <div className="h-4 bg-[color:var(--mk-paper)] rounded-xl w-1/2" />
+                    <div className="mt-6 aspect-[16/9] rounded-2xl bg-[color:var(--mk-paper-strong)]" />
                     <div className="mt-6 space-y-3">
                         {Array.from({ length: 8 }).map((_, i) => (
-                            <div key={i} className="h-4 bg-gray-100 rounded-md" style={{ width: `${75 + Math.random() * 25}%` }} />
+                            <div key={i} className="h-4 bg-[color:var(--mk-paper)] rounded-lg" style={{ width: `${75 + Math.random() * 25}%` }} />
                         ))}
                     </div>
                 </div>
@@ -174,7 +174,7 @@ export default function NewsDetailPage() {
 
                     {/* Hero image */}
                     {article.thumbnail_url && (
-                        <figure className="mb-8 overflow-hidden rounded-[1.6rem]">
+                        <figure className="mb-8 overflow-hidden rounded-2xl">
                             <img
                                 src={article.thumbnail_url}
                                 alt={article.og_image_alt || article.title}

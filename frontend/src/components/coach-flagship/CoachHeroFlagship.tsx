@@ -99,7 +99,7 @@ export default function CoachHeroFlagship({
                         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                             <button
                                 onClick={onMessage}
-                                className="h-12 px-7 bg-white text-black font-bold text-sm tracking-wide rounded-sm hover:bg-gray-100 transition-all active:scale-[0.98]"
+                                className="h-12 px-7 bg-white text-black font-bold text-sm tracking-wide rounded-sm hover:bg-[color:var(--mk-paper)] transition-all active:scale-[0.98]"
                             >
                                 Nhắn tin ngay
                             </button>
@@ -152,10 +152,10 @@ export default function CoachHeroFlagship({
                             {/* Price anchor */}
                             {basePriceMonthly && (
                                 <div className="absolute -bottom-4 -left-4 bg-white text-black px-4 py-2 rounded-sm shadow-lg">
-                                    <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Từ</div>
+                                    <div className="text-[10px] font-bold uppercase tracking-wider text-[color:var(--mk-muted)]">Từ</div>
                                     <div className="text-lg font-extrabold">
                                         {Number(basePriceMonthly).toLocaleString('vi-VN')}₫
-                                        <span className="text-xs font-normal text-gray-500">/tháng</span>
+                                        <span className="text-xs font-normal text-[color:var(--mk-muted)]">/tháng</span>
                                     </div>
                                 </div>
                             )}

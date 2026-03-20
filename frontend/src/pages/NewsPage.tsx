@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import apiClient from '../services/api';
-import { Clock, Tag } from 'lucide-react';
+import { Clock } from 'lucide-react';
+import { Skeleton } from '../components/ui/Skeleton';
+import { EmptyState } from '../components/ui/EmptyState';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -47,7 +49,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
     return (
         <Link
             to={`/news/${article.slug}`}
-            className="group flex flex-col overflow-hidden rounded-[1.6rem] border border-[color:var(--mk-line)] bg-white shadow-[0_4px_24px_rgba(53,41,26,0.04)] hover:-translate-y-1 hover:shadow-[0_18px_50px_rgba(53,41,26,0.12)] transition-all duration-300"
+            className="group flex flex-col overflow-hidden rounded-2xl border border-[color:var(--mk-line)] bg-white shadow-[0_4px_24px_rgba(53,41,26,0.04)] hover:-translate-y-1 hover:shadow-[0_18px_50px_rgba(53,41,26,0.12)] transition-all duration-300"
         >
             {/* Thumbnail */}
             <div className="relative aspect-[16/9] overflow-hidden bg-[color:var(--mk-paper-strong)]">
@@ -91,12 +93,6 @@ function NewsCard({ article }: { article: NewsArticle }) {
                         )}
                         {dateStr && <span>{dateStr}</span>}
                     </div>
-                    {article.tags && article.tags.length > 0 && (
-                        <span className="flex items-center gap-1 text-[0.72rem] text-[color:var(--mk-muted)]">
-                            <Tag className="w-3 h-3" />
-                            {article.tags[0]}
-                        </span>
-                    )}
                 </div>
             </div>
         </Link>
@@ -183,12 +179,12 @@ export default function NewsPage() {
                     {loading && (
                         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                             {Array.from({ length: 6 }).map((_, i) => (
-                                <div key={i} className="rounded-[1.6rem] border border-[color:var(--mk-line)] overflow-hidden animate-pulse">
-                                    <div className="aspect-[16/9] bg-gray-200" />
+                                <div key={i} className="rounded-2xl border border-[color:var(--mk-line)] overflow-hidden">
+                                    <Skeleton className="aspect-[16/9] w-full rounded-none" />
                                     <div className="p-5 space-y-3">
-                                        <div className="h-5 bg-gray-200 rounded-md w-full" />
-                                        <div className="h-5 bg-gray-100 rounded-md w-3/4" />
-                                        <div className="h-3 bg-gray-100 rounded-md w-1/2 mt-2" />
+                                        <Skeleton className="h-5 w-full" />
+                                        <Skeleton className="h-5 w-3/4" />
+                                        <Skeleton className="h-3 w-1/2 mt-2" />
                                     </div>
                                 </div>
                             ))}
@@ -197,19 +193,17 @@ export default function NewsPage() {
 
                     {/* Error state */}
                     {error && !loading && (
-                        <div className="rounded-[1.5rem] border border-red-100 bg-red-50 px-5 py-6 text-center text-sm text-red-600">
+                        <div className="rounded-2xl border border-red-100 bg-red-50 px-5 py-6 text-center text-sm text-red-600">
                             {error}
                         </div>
                     )}
 
                     {/* Empty state */}
                     {!loading && !error && articles.length === 0 && (
-                        <div className="empty-state">
-                            <div className="empty-state-number">0</div>
-                            <p className="mt-3 text-sm text-[color:var(--mk-muted)]">
-                                Chưa có bài viết trong danh mục này. Hệ thống sẽ tự động cập nhật hàng ngày.
-                            </p>
-                        </div>
+                        <EmptyState 
+                            numberIcon={0}
+                            description="Chưa có bài viết trong danh mục này. Hệ thống sẽ tự động cập nhật hàng ngày."
+                        />
                     )}
 
                     {/* Article grid */}
@@ -228,7 +222,7 @@ export default function NewsPage() {
                                 type="button"
                                 disabled={page === 1}
                                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                className="rounded-[0.9rem] border border-[color:var(--mk-line)] px-4 py-2 text-sm font-semibold text-[color:var(--mk-text)] disabled:opacity-40 transition hover:border-[color:var(--mk-text)]"
+                                className="rounded-xl border border-[color:var(--mk-line)] px-4 py-2 text-sm font-semibold text-[color:var(--mk-text)] disabled:opacity-40 transition hover:border-[color:var(--mk-text)]"
                             >
                                 ← Trang trước
                             </button>
@@ -239,7 +233,7 @@ export default function NewsPage() {
                                 type="button"
                                 disabled={page === totalPages}
                                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                className="rounded-[0.9rem] border border-[color:var(--mk-line)] px-4 py-2 text-sm font-semibold text-[color:var(--mk-text)] disabled:opacity-40 transition hover:border-[color:var(--mk-text)]"
+                                className="rounded-xl border border-[color:var(--mk-line)] px-4 py-2 text-sm font-semibold text-[color:var(--mk-text)] disabled:opacity-40 transition hover:border-[color:var(--mk-text)]"
                             >
                                 Trang sau →
                             </button>

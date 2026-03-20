@@ -32,7 +32,7 @@ export function ProfileFAQTab() {
     return (
         <div className="space-y-6">
             {successMsg && (
-                <div className="bg-gray-50 border border-black text-black px-4 py-3 rounded-xs text-sm">
+                <div className="bg-[color:var(--mk-paper)] border border-black text-black px-4 py-3 rounded-xs text-sm">
                     {successMsg}
                 </div>
             )}
@@ -54,7 +54,7 @@ export function ProfileFAQTab() {
                             required placeholder="Trả lời chi tiết..."
                             className="form-input resize-none" />
                     </div>
-                    <div className="flex gap-3 pt-2 border-t border-gray-200">
+                    <div className="flex gap-3 pt-2 border-t border-[color:var(--mk-line)]">
                         <button type="submit" className="btn-primary">
                             {editingId ? 'Cập nhật' : 'Thêm mới'}
                         </button>
@@ -69,22 +69,22 @@ export function ProfileFAQTab() {
             {faq.length > 0 && (
                 <div className="card">
                     <h3 className="card-header">Danh sách câu hỏi thường gặp ({faq.length})</h3>
-                    <div className="border border-gray-200 rounded-xs divide-y divide-gray-200">
+                    <div className="border border-[color:var(--mk-line)] rounded-xs divide-y divide-gray-200">
                         {faq.map(item => (
                             <div key={item.id} className="bg-white">
                                 <button
                                     onClick={() => setOpenId(openId === item.id ? null : item.id)}
-                                    className="w-full flex justify-between items-center px-4 py-3 text-left hover:bg-gray-50 transition-colors focus:outline-none focus:bg-gray-50"
+                                    className="w-full flex justify-between items-center px-4 py-3 text-left hover:bg-[color:var(--mk-paper)] transition-colors focus:outline-none focus:bg-[color:var(--mk-paper)]"
                                 >
                                     <span className="text-sm text-black font-medium">{item.question}</span>
-                                    <span className="text-gray-500 font-mono text-xs">{openId === item.id ? '-' : '+'}</span>
+                                    <span className="text-[color:var(--mk-muted)] font-mono text-xs">{openId === item.id ? '-' : '+'}</span>
                                 </button>
                                 {openId === item.id && (
-                                    <div className="px-4 pb-4 pt-1 bg-gray-50">
-                                        <p className="text-gray-700 text-sm whitespace-pre-line mb-3">{item.answer}</p>
+                                    <div className="px-4 pb-4 pt-1 bg-[color:var(--mk-paper)]">
+                                        <p className="text-[color:var(--mk-text-soft)] text-sm whitespace-pre-line mb-3">{item.answer}</p>
                                         <div className="flex gap-4">
                                             <button onClick={() => startEdit(item)} className="text-sm font-medium text-black hover:underline">Sửa</button>
-                                            <button onClick={() => dispatch(deleteFAQThunk(item.id))} className="text-sm font-medium text-gray-500 hover:text-black hover:underline">Xóa</button>
+                                            <button onClick={() => dispatch(deleteFAQThunk(item.id))} className="text-sm font-medium text-[color:var(--mk-muted)] hover:text-black hover:underline">Xóa</button>
                                         </div>
                                     </div>
                                 )}

@@ -87,8 +87,8 @@ function DesktopDropdown({ group, isActive, onToggle }: {
                 className={cn(
                     'flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                     isActive
-                        ? 'text-black bg-gray-100'
-                        : 'text-gray-600 hover:text-black hover:bg-gray-50'
+                        ? 'text-black bg-[color:var(--mk-paper)]'
+                        : 'text-[color:var(--mk-text-soft)] hover:text-black hover:bg-[color:var(--mk-paper)]'
                 )}
                 aria-expanded={isActive}
                 aria-haspopup="true"
@@ -98,23 +98,18 @@ function DesktopDropdown({ group, isActive, onToggle }: {
             </button>
 
             {isActive && (
-                <div className="absolute left-0 top-full mt-2 min-w-[22rem] rounded-xl border border-gray-100 bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute left-0 top-full mt-2 min-w-[16rem] rounded-xl border border-[color:var(--mk-line)] bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                     {group.children.map((child) => (
                         <Link
                             key={child.to}
                             to={child.to}
                             onClick={() => onToggle(null)}
-                            className="flex items-start gap-3 px-4 py-3.5 hover:bg-gray-50 transition-colors group"
+                            className="flex items-center gap-3 px-4 py-2.5 hover:bg-[color:var(--mk-paper)] transition-colors group"
                         >
-                            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600 group-hover:bg-black/5 transition-colors">
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[color:var(--mk-paper)] text-[color:var(--mk-text-soft)] group-hover:bg-black/5 transition-colors">
                                 {child.icon}
                             </span>
-                            <div>
-                                <div className="text-sm font-semibold text-gray-900">{child.label}</div>
-                                {child.description && (
-                                    <div className="mt-0.5 text-xs text-gray-500 leading-5">{child.description}</div>
-                                )}
-                            </div>
+                            <div className="text-sm font-semibold text-[color:var(--mk-text)]">{child.label}</div>
                         </Link>
                     ))}
                 </div>
@@ -132,34 +127,34 @@ function MobileAccordion({ group, isOpen, onToggle, onClose }: {
     onClose: () => void;
 }) {
     return (
-        <div className="border-b border-gray-100 last:border-0">
+        <div className="border-b border-[color:var(--mk-line)] last:border-0">
             <button
                 type="button"
                 onClick={onToggle}
-                className="w-full flex items-center justify-between px-4 py-3.5 text-sm font-semibold text-gray-800"
+                className="w-full flex items-center justify-between px-4 py-3.5 text-sm font-semibold text-[color:var(--mk-text)]"
                 aria-expanded={isOpen}
             >
                 <span className="flex items-center gap-2.5">
-                    <span className="text-gray-500">{group.icon}</span>
+                    <span className="text-[color:var(--mk-muted)]">{group.icon}</span>
                     {group.label}
                 </span>
-                <ChevronDown className={cn('w-4 h-4 text-gray-400 transition-transform duration-200', isOpen && 'rotate-180')} />
+                <ChevronDown className={cn('w-4 h-4 text-[color:var(--mk-muted)] transition-transform duration-200', isOpen && 'rotate-180')} />
             </button>
 
             {isOpen && (
-                <div className="pb-2 space-y-0.5 bg-gray-50/60">
+                <div className="pb-2 space-y-0.5 bg-[color:var(--mk-paper)]/60">
                     {group.children.map((child) => (
                         <Link
                             key={child.to}
                             to={child.to}
                             onClick={onClose}
-                            className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:text-black hover:bg-gray-100 transition-colors ml-6 border-l border-gray-200 pl-6"
+                            className="flex items-center justify-between px-4 py-3 text-sm text-[color:var(--mk-text-soft)] hover:text-black hover:bg-[color:var(--mk-paper)] transition-colors ml-6 border-l border-[color:var(--mk-line)] pl-6"
                         >
                             <span className="flex items-center gap-2.5">
-                                <span className="text-gray-400">{child.icon}</span>
+                                <span className="text-[color:var(--mk-muted)]">{child.icon}</span>
                                 {child.label}
                             </span>
-                            <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                            <ChevronRight className="w-3.5 h-3.5 text-[color:var(--mk-muted)]" />
                         </Link>
                     ))}
                 </div>
@@ -204,8 +199,8 @@ function UserDropdown({ user, onLogout, isActive, onToggle }: {
                 className={cn(
                     'flex items-center gap-2 px-2.5 py-1.5 rounded-lg border transition-colors text-sm',
                     isActive
-                        ? 'border-gray-300 bg-gray-50'
-                        : 'border-transparent hover:border-gray-200 hover:bg-gray-50'
+                        ? 'border-[color:var(--mk-line)] bg-[color:var(--mk-paper)]'
+                        : 'border-transparent hover:border-[color:var(--mk-line)] hover:bg-[color:var(--mk-paper)]'
                 )}
                 aria-expanded={isActive}
             >
@@ -213,55 +208,55 @@ function UserDropdown({ user, onLogout, isActive, onToggle }: {
                     {user.full_name.charAt(0).toUpperCase()}
                 </div>
                 <div className="text-left hidden xl:block">
-                    <div className="font-semibold text-gray-900 leading-tight max-w-[120px] truncate">{user.full_name}</div>
-                    <div className="text-[10px] uppercase tracking-wider text-gray-500 leading-tight">
+                    <div className="font-semibold text-[color:var(--mk-text)] leading-tight max-w-[120px] truncate">{user.full_name}</div>
+                    <div className="text-[10px] uppercase tracking-wider text-[color:var(--mk-muted)] leading-tight">
                         {roleLabel[user.user_type] || user.user_type}
                     </div>
                 </div>
-                <ChevronDown className={cn('w-3.5 h-3.5 text-gray-400 transition-transform duration-200', isActive && 'rotate-180')} />
+                <ChevronDown className={cn('w-3.5 h-3.5 text-[color:var(--mk-muted)] transition-transform duration-200', isActive && 'rotate-180')} />
             </button>
 
             {isActive && (
-                <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-gray-100 bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-                    <div className="px-4 py-3 border-b border-gray-100">
-                        <div className="text-sm font-semibold text-gray-900 truncate">{user.full_name}</div>
-                        <div className="text-[11px] text-gray-500 mt-0.5">{roleLabel[user.user_type] || user.user_type}</div>
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-[color:var(--mk-line)] bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="px-4 py-3 border-b border-[color:var(--mk-line)]">
+                        <div className="text-sm font-semibold text-[color:var(--mk-text)] truncate">{user.full_name}</div>
+                        <div className="text-[11px] text-[color:var(--mk-muted)] mt-0.5">{roleLabel[user.user_type] || user.user_type}</div>
                     </div>
 
                     <div className="py-1">
-                        <Link to={dashboardLink} onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
-                            <LayoutDashboard className="w-4 h-4 text-gray-400" />
+                        <Link to={dashboardLink} onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] hover:text-black transition-colors">
+                            <LayoutDashboard className="w-4 h-4 text-[color:var(--mk-muted)]" />
                             {user.user_type === 'gym_owner' ? 'Quản lý Phòng Tập' : 'Dashboard'}
                         </Link>
-                        <Link to="/profile" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
-                            <UserCog className="w-4 h-4 text-gray-400" />
+                        <Link to="/profile" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] hover:text-black transition-colors">
+                            <UserCog className="w-4 h-4 text-[color:var(--mk-muted)]" />
                             Cài đặt Hồ sơ
                         </Link>
-                        <Link to="/messages" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
-                            <MessageSquare className="w-4 h-4 text-gray-400" />
+                        <Link to="/messages" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] hover:text-black transition-colors">
+                            <MessageSquare className="w-4 h-4 text-[color:var(--mk-muted)]" />
                             Tin nhắn
                         </Link>
                         {(user.user_type === 'trainer' || user.user_type === 'athlete') && (
-                            <Link to="/programs" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
-                                <Calendar className="w-4 h-4 text-gray-400" />
+                            <Link to="/programs" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] hover:text-black transition-colors">
+                                <Calendar className="w-4 h-4 text-[color:var(--mk-muted)]" />
                                 Khóa học
                             </Link>
                         )}
                         {user.user_type === 'athlete' && (
-                            <Link to="/workouts" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
-                                <Dumbbell className="w-4 h-4 text-gray-400" />
+                            <Link to="/workouts" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] hover:text-black transition-colors">
+                                <Dumbbell className="w-4 h-4 text-[color:var(--mk-muted)]" />
                                 Lịch Tập
                             </Link>
                         )}
                         {user.user_type === 'admin' && (
-                            <Link to="/dashboard" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
-                                <ShieldCheck className="w-4 h-4 text-gray-400" />
+                            <Link to="/dashboard" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] hover:text-black transition-colors">
+                                <ShieldCheck className="w-4 h-4 text-[color:var(--mk-muted)]" />
                                 Admin Panel
                             </Link>
                         )}
                     </div>
 
-                    <div className="border-t border-gray-100 py-1">
+                    <div className="border-t border-[color:var(--mk-line)] py-1">
                         <button
                             type="button"
                             onClick={onLogout}
@@ -366,7 +361,7 @@ export default function Header() {
             className={cn(
                 'fixed top-0 left-0 right-0 z-header h-header',
                 'bg-white/95 backdrop-blur-sm',
-                'border-b border-gray-200',
+                'border-b border-[color:var(--mk-line)]',
                 'transition-transform duration-150',
                 isHidden && '-translate-y-full'
             )}
@@ -411,7 +406,7 @@ export default function Header() {
                         <div className="hidden lg:flex items-center gap-2">
                             <Link
                                 to="/login"
-                                className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-1.5"
+                                className="text-sm font-medium text-[color:var(--mk-text-soft)] hover:text-black transition-colors px-3 py-1.5"
                             >
                                 Đăng nhập
                             </Link>
@@ -428,7 +423,7 @@ export default function Header() {
                     <button
                         type="button"
                         onClick={() => setMobileOpen((v) => !v)}
-                        className="lg:hidden p-2 text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-100"
+                        className="lg:hidden p-2 text-[color:var(--mk-text-soft)] hover:text-black transition-colors rounded-lg hover:bg-[color:var(--mk-paper)]"
                         aria-label="Mở menu"
                         aria-expanded={mobileOpen}
                         aria-controls="mobile-menu"
@@ -463,33 +458,33 @@ export default function Header() {
 
                     {/* Authenticated quick links */}
                     {isAuthenticated && user ? (
-                        <div className="mt-2 border-t border-gray-200 pt-3">
+                        <div className="mt-2 border-t border-[color:var(--mk-line)] pt-3">
                             <div className="px-4 py-2">
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Của Tôi</p>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--mk-muted)]">Của Tôi</p>
                             </div>
-                            <Link to={user.user_type === 'gym_owner' ? '/gym-owner' : '/dashboard'} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors">
-                                <LayoutDashboard className="w-4 h-4 text-gray-400" />
+                            <Link to={user.user_type === 'gym_owner' ? '/gym-owner' : '/dashboard'} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-[color:var(--mk-text)] hover:bg-[color:var(--mk-paper)] transition-colors">
+                                <LayoutDashboard className="w-4 h-4 text-[color:var(--mk-muted)]" />
                                 {user.user_type === 'gym_owner' ? 'Quản lý Gym' : 'Dashboard'}
                                 <ChevronRight className="w-4 h-4 text-gray-300 ml-auto" />
                             </Link>
-                            <Link to="/messages" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors">
-                                <MessageSquare className="w-4 h-4 text-gray-400" />
+                            <Link to="/messages" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-[color:var(--mk-text)] hover:bg-[color:var(--mk-paper)] transition-colors">
+                                <MessageSquare className="w-4 h-4 text-[color:var(--mk-muted)]" />
                                 Tin nhắn
                                 <ChevronRight className="w-4 h-4 text-gray-300 ml-auto" />
                             </Link>
-                            <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors">
-                                <UserCog className="w-4 h-4 text-gray-400" />
+                            <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-[color:var(--mk-text)] hover:bg-[color:var(--mk-paper)] transition-colors">
+                                <UserCog className="w-4 h-4 text-[color:var(--mk-muted)]" />
                                 Hồ sơ cá nhân
                                 <ChevronRight className="w-4 h-4 text-gray-300 ml-auto" />
                             </Link>
                             {user.user_type === 'athlete' && (
-                                <Link to="/workouts" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors">
-                                    <Dumbbell className="w-4 h-4 text-gray-400" />
+                                <Link to="/workouts" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-[color:var(--mk-text)] hover:bg-[color:var(--mk-paper)] transition-colors">
+                                    <Dumbbell className="w-4 h-4 text-[color:var(--mk-muted)]" />
                                     Lịch Tập
                                     <ChevronRight className="w-4 h-4 text-gray-300 ml-auto" />
                                 </Link>
                             )}
-                            <div className="mt-2 px-4 pb-4 border-t border-gray-100 pt-3">
+                            <div className="mt-2 px-4 pb-4 border-t border-[color:var(--mk-line)] pt-3">
                                 <button
                                     type="button"
                                     onClick={handleLogout}
@@ -501,11 +496,11 @@ export default function Header() {
                             </div>
                         </div>
                     ) : (
-                        <div className="mt-2 border-t border-gray-200 p-4 space-y-3">
+                        <div className="mt-2 border-t border-[color:var(--mk-line)] p-4 space-y-3">
                             <Link
                                 to="/login"
                                 onClick={() => setMobileOpen(false)}
-                                className="flex w-full items-center justify-center rounded-lg border border-gray-200 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition-colors"
+                                className="flex w-full items-center justify-center rounded-lg border border-[color:var(--mk-line)] py-3 text-sm font-semibold text-[color:var(--mk-text)] hover:bg-[color:var(--mk-paper)] transition-colors"
                             >
                                 Đăng nhập
                             </Link>
@@ -519,8 +514,8 @@ export default function Header() {
                         </div>
                     )}
 
-                    <div className="px-4 py-6 border-t border-gray-100">
-                        <p className="text-xs text-gray-400">GYMERVIET — Hệ sinh thái Thể thao Số 1 Việt Nam</p>
+                    <div className="px-4 py-6 border-t border-[color:var(--mk-line)]">
+                        <p className="text-xs text-[color:var(--mk-muted)]">GYMERVIET — Hệ sinh thái Thể thao Số 1 Việt Nam</p>
                     </div>
                 </div>
             )}

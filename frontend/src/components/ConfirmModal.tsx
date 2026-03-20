@@ -51,16 +51,16 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         >
-                            <Dialog.Panel className="relative transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-gray-100 p-6">
+                            <Dialog.Panel className="relative transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-[color:var(--mk-line)] p-6">
                                 <div className="sm:flex sm:items-start">
                                     <div className={`mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10 ${isDestructive ? 'bg-red-100 text-red-600' : 'bg-black text-white'}`}>
                                         <AlertTriangle className="h-6 w-6" aria-hidden="true" />
                                     </div>
                                     <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                                        <Dialog.Title as="h3" className="text-lg font-bold leading-6 text-gray-900">
+                                        <Dialog.Title as="h3" className="text-lg font-bold leading-6 text-[color:var(--mk-text)]">
                                             {title}
                                         </Dialog.Title>
-                                        <div className="mt-2 text-sm text-gray-500">
+                                        <div className="mt-2 text-sm text-[color:var(--mk-muted)]">
                                             {description}
                                         </div>
                                     </div>
@@ -79,7 +79,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
                                     </button>
                                     <button
                                         type="button"
-                                        className="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
+                                        className="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-4 py-2 text-sm font-semibold text-[color:var(--mk-text)] shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-[color:var(--mk-paper)] sm:mt-0 sm:w-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
                                         onClick={onCancel}
                                         ref={cancelButtonRef}
                                     >

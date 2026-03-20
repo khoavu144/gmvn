@@ -105,8 +105,8 @@ export default function Profile() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     className="relative group shrink-0"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
-                                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-[2.5rem] overflow-hidden border-[6px] border-white shadow-2xl bg-white">
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+                                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-3xl overflow-hidden border-[6px] border-white shadow-md bg-white">
                                         <img
                                             src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || 'U')}&background=000&color=fff&size=200`}
                                             alt={user?.full_name}
@@ -115,7 +115,7 @@ export default function Profile() {
                                         />
                                     </div>
                                     {((user?.user_type === 'trainer' || user?.user_type === 'athlete') && user?.is_verified) && (
-                                        <div className="absolute bottom-2 right-2 bg-blue-500 text-white p-1.5 rounded-2xl border-4 border-white shadow-lg" title="Verified Professional">
+                                        <div className="absolute bottom-2 right-2 bg-blue-500 text-white p-1.5 rounded-2xl border-4 border-white shadow-md" title="Verified Professional">
                                             <CheckCircle className="w-5 h-5 fill-current" />
                                         </div>
                                     )}
@@ -130,20 +130,20 @@ export default function Profile() {
                                     >
                                         <div className="flex flex-wrap items-center gap-3 mb-2">
                                             <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">{user?.full_name}</h1>
-                                            <span className="px-3 py-1 bg-black/5 backdrop-blur-md border border-black/10 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-600">
+                                            <span className="px-3 py-1 bg-black/5 backdrop-blur-md border border-black/10 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[color:var(--mk-text-soft)]">
                                                 {user?.user_type === 'trainer' ? 'Certified Coach' : user?.user_type === 'athlete' ? 'Elite Athlete' : 'Member'}
                                             </span>
                                         </div>
-                                        <p className="text-gray-500 font-medium text-sm sm:text-lg max-w-2xl leading-relaxed">
+                                        <p className="text-[color:var(--mk-muted)] font-medium text-sm sm:text-lg max-w-2xl leading-relaxed">
                                             {myProfile?.headline || "Chưa thiết lập tiêu đề giới thiệu."}
                                         </p>
 
-                                        <div className="flex flex-wrap items-center gap-4 mt-4 text-xs sm:text-sm font-semibold text-gray-400">
+                                        <div className="flex flex-wrap items-center gap-4 mt-4 text-xs sm:text-sm font-semibold text-[color:var(--mk-muted)]">
                                             <div className="flex items-center gap-1.5">
                                                 <MapPin className="w-4 h-4 text-red-500" />
                                                 <span>{myProfile?.location || 'Chưa cập nhật vị trí'}</span>
                                             </div>
-                                            <div className="w-1 h-1 rounded-full bg-gray-300 hidden sm:block"></div>
+                                            <div className="w-1 h-1 rounded-full bg-[color:var(--mk-paper-strong)] hidden sm:block"></div>
                                             <div className="flex items-center gap-1.5 hover:text-black transition-colors cursor-default">
                                                 <Award className="w-4 h-4 text-yellow-500" />
                                                 <span>{myProfile?.years_experience || 0} năm kinh nghiệm</span>
@@ -157,7 +157,7 @@ export default function Profile() {
                                     {/* TODO: Re-enable when EditProfileModal is implemented */}
                                     {/* <button
                                         onClick={() => setShowEditModal(true)}
-                                        className="flex-1 md:flex-none px-6 py-3 bg-black text-white rounded-2xl font-bold text-sm hover:bg-gray-800 transition-all shadow-lg shadow-black/10 flex items-center justify-center gap-2 group"
+                                        className="flex-1 md:flex-none px-6 py-3 bg-black text-white rounded-2xl font-bold text-sm hover:bg-gray-800 transition-all shadow-md shadow-black/10 flex items-center justify-center gap-2 group"
                                     >
                                         Chỉnh sửa hồ sơ
                                         <ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform" />
@@ -171,7 +171,7 @@ export default function Profile() {
                                             }
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="p-3 bg-white border border-gray-200 text-gray-600 rounded-2xl hover:border-black hover:text-black transition-all shadow-sm group"
+                                            className="p-3 bg-white border border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)] rounded-2xl hover:border-black hover:text-black transition-all shadow-sm group"
                                             title="Xem trang công khai"
                                         >
                                             <ExternalLink className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -184,20 +184,20 @@ export default function Profile() {
                 </div>
 
                 {/* Internal Navigation / Breadcrumbs (Modern Styled) */}
-                <div className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-16 z-30">
+                <div className="bg-white/80 backdrop-blur-md border-b border-[color:var(--mk-line)] sticky top-16 z-30">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
                         <div className="flex items-center gap-4 overflow-x-auto no-scrollbar after:content-[''] after:block after:w-4 after:shrink-0">
-                            <Link to="/dashboard" className="shrink-0 p-2 hover:bg-gray-100 rounded-xl transition-colors">
-                                <ArrowLeft className="w-5 h-5 text-gray-500" />
+                            <Link to="/dashboard" className="shrink-0 p-2 hover:bg-[color:var(--mk-paper)] rounded-xl transition-colors">
+                                <ArrowLeft className="w-5 h-5 text-[color:var(--mk-muted)]" />
                             </Link>
-                            <div className="h-6 w-px bg-gray-200 shrink-0"></div>
+                            <div className="h-6 w-px bg-[color:var(--mk-paper-strong)] shrink-0"></div>
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key)}
                                     className={`shrink-0 px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === tab.key
                                         ? 'bg-black text-white shadow-md'
-                                        : 'text-gray-500 hover:text-black hover:bg-gray-50'
+                                        : 'text-[color:var(--mk-muted)] hover:text-black hover:bg-[color:var(--mk-paper)]'
                                         }`}
                                 >
                                     {tab.label}
@@ -212,7 +212,7 @@ export default function Profile() {
                     <div className="flex flex-col lg:flex-row gap-8 items-start">
 
                         {/* LEFT COLUMN: Profile Card Sidebar */}
-                        <div className="w-full lg:w-[320px] shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-[120px]">
+                        <div className="w-full lg:w-[320px] shrink-0 bg-white rounded-2xl shadow-sm border border-[color:var(--mk-line)] overflow-hidden sticky top-[120px]">
                             {/* Cover Image Area */}
                             <div className="h-32 bg-gray-900 relative">
                                 {myProfile?.cover_image_url ? (
@@ -224,7 +224,7 @@ export default function Profile() {
                                         decoding="async"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gradient-to-br from-gray-800 to-gray-900 gap-1">
+                                    <div className="w-full h-full flex flex-col items-center justify-center text-[color:var(--mk-muted)] bg-gradient-to-br from-gray-800 to-gray-900 gap-1">
                                         <span className="text-xl op-40 font-bold tracking-widest text-white/20">GYMERVIET</span>
                                     </div>
                                 )}
@@ -249,11 +249,11 @@ export default function Profile() {
                                     )}
                                 </div>
 
-                                <h1 className="text-xl font-bold text-gray-900">{user?.full_name || 'Người dùng'}</h1>
-                                <p className="text-xs font-medium text-gray-500 mt-1 uppercase tracking-widest">{myProfile?.headline || user?.user_type || 'Chưa thiết lập'}</p>
+                                <h1 className="text-xl font-bold text-[color:var(--mk-text)]">{user?.full_name || 'Người dùng'}</h1>
+                                <p className="text-xs font-medium text-[color:var(--mk-muted)] mt-1 uppercase tracking-widest">{myProfile?.headline || user?.user_type || 'Chưa thiết lập'}</p>
 
                                 {myProfile?.location && (
-                                    <div className="flex justify-center items-center gap-1.5 mt-3 text-sm text-gray-500">
+                                    <div className="flex justify-center items-center gap-1.5 mt-3 text-sm text-[color:var(--mk-muted)]">
                                         <MapPin className="w-4 h-4" />
                                         <span>{myProfile.location}</span>
                                     </div>
@@ -261,20 +261,20 @@ export default function Profile() {
 
                                 {/* Quick Stats */}
                                 {(user.user_type === 'trainer' || user.user_type === 'athlete') && (
-                                    <div className="flex items-center justify-center gap-6 mt-6 pt-6 border-t border-gray-100">
+                                    <div className="flex items-center justify-center gap-6 mt-6 pt-6 border-t border-[color:var(--mk-line)]">
                                         <div className="text-center">
                                             <div className="text-xl font-bold text-black">{myProfile?.years_experience || 0}</div>
-                                            <div className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mt-1">Năm K.N</div>
+                                            <div className="text-[10px] text-[color:var(--mk-muted)] uppercase tracking-wider font-medium mt-1">Năm K.N</div>
                                         </div>
-                                        <div className="w-px h-8 bg-gray-200"></div>
+                                        <div className="w-px h-8 bg-[color:var(--mk-paper-strong)]"></div>
                                         <div className="text-center">
                                             <div className="text-xl font-bold text-black">{myProfile?.clients_trained || 0}</div>
-                                            <div className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mt-1">Học viên</div>
+                                            <div className="text-[10px] text-[color:var(--mk-muted)] uppercase tracking-wider font-medium mt-1">Học viên</div>
                                         </div>
-                                        <div className="w-px h-8 bg-gray-200"></div>
+                                        <div className="w-px h-8 bg-[color:var(--mk-paper-strong)]"></div>
                                         <div className="text-center">
                                             <div className="text-xl font-bold text-black">{myProfile?.success_stories || 0}</div>
-                                            <div className="text-[10px] text-gray-500 uppercase tracking-wider font-medium mt-1">Thành công</div>
+                                            <div className="text-[10px] text-[color:var(--mk-muted)] uppercase tracking-wider font-medium mt-1">Thành công</div>
                                         </div>
                                     </div>
                                 )}
@@ -287,11 +287,11 @@ export default function Profile() {
                                             onClick={() => setActiveTab(tab.key)}
                                             className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all font-medium text-sm group ${activeTab === tab.key
                                                 ? 'bg-black text-white shadow-md'
-                                                : 'text-gray-600 hover:bg-gray-50 hover:text-black'
+                                                : 'text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] hover:text-black'
                                                 }`}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <tab.icon className={`w-5 h-5 ${activeTab === tab.key ? 'text-white' : 'text-gray-400 group-hover:text-black'}`} />
+                                                <tab.icon className={`w-5 h-5 ${activeTab === tab.key ? 'text-white' : 'text-[color:var(--mk-muted)] group-hover:text-black'}`} />
                                                 {tab.label}
                                             </div>
                                             {activeTab === tab.key && <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm"></div>}
@@ -300,9 +300,9 @@ export default function Profile() {
                                 </div>
 
                                 {(user.user_type === 'gym_owner') && (
-                                    <div className="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-xl text-left">
-                                        <p className="text-sm font-bold text-gray-900">Quản lý phòng tập</p>
-                                        <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+                                    <div className="mt-8 p-4 bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] rounded-xl text-left">
+                                        <p className="text-sm font-bold text-[color:var(--mk-text)]">Quản lý phòng tập</p>
+                                        <p className="text-xs text-[color:var(--mk-muted)] mt-1.5 leading-relaxed">
                                             Thông tin chi nhánh, huấn luyện viên và hệ thống đánh giá được quản lý tại trang riêng.
                                         </p>
                                         <Link to="/gym-owner/dashboard" className="block w-full py-2.5 mt-4 bg-black text-white text-center text-xs font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors rounded-lg">

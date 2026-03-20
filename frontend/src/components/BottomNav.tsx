@@ -36,7 +36,7 @@ export default function BottomNav() {
     const items = [...publicItems, ...authItems].slice(0, 5);
 
     return (
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-header h-bottom-nav bg-white/95 backdrop-blur-md border-t border-gray-200 safe-bottom">
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-header h-bottom-nav bg-white/95 backdrop-blur-md border-t border-[color:var(--mk-line)] safe-bottom">
             <div className="flex items-center justify-around h-full max-w-page mx-auto">
                 {items.map((item) => {
                     const isActive = location.pathname === item.to;

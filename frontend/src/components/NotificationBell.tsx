@@ -81,7 +81,7 @@ export default function NotificationBell() {
             {/* Bell button */}
             <button
                 onClick={handleOpen}
-                className="relative p-2 text-gray-600 hover:text-black transition-colors"
+                className="relative p-2 text-[color:var(--mk-text-soft)] hover:text-black transition-colors"
                 aria-label="Thông báo"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -96,14 +96,14 @@ export default function NotificationBell() {
 
             {/* Dropdown */}
             {open && (
-                <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-xl shadow-xl z-[200] overflow-hidden">
+                <div className="absolute right-0 mt-2 w-80 bg-white border border-[color:var(--mk-line)] rounded-xl shadow-xl z-[200] overflow-hidden">
                     {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-[color:var(--mk-line)]">
                         <span className="font-black text-sm uppercase tracking-wider">Thông báo</span>
                         {unreadCount > 0 && (
                             <button
                                 onClick={handleMarkAll}
-                                className="text-xs text-gray-500 hover:text-black transition-colors font-medium"
+                                className="text-xs text-[color:var(--mk-muted)] hover:text-black transition-colors font-medium"
                             >
                                 Đánh dấu tất cả đã đọc
                             </button>
@@ -113,9 +113,9 @@ export default function NotificationBell() {
                     {/* List */}
                     <div className="max-h-96 overflow-y-auto">
                         {loading && notifications.length === 0 ? (
-                            <div className="py-8 text-center text-gray-400 text-sm">Đang tải...</div>
+                            <div className="py-8 text-center text-[color:var(--mk-muted)] text-sm">Đang tải...</div>
                         ) : notifications.length === 0 ? (
-                            <div className="py-8 text-center text-gray-400 text-sm">
+                            <div className="py-8 text-center text-[color:var(--mk-muted)] text-sm">
                                 <span className="text-3xl block mb-2">🔔</span>
                                 Chưa có thông báo nào
                             </div>
@@ -124,18 +124,18 @@ export default function NotificationBell() {
                                 <button
                                     key={notif.id}
                                     onClick={() => handleClickNotif(notif)}
-                                    className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors flex gap-3 items-start ${!notif.is_read ? 'bg-blue-50/40' : ''}`}
+                                    className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-[color:var(--mk-paper)] transition-colors flex gap-3 items-start ${!notif.is_read ? 'bg-blue-50/40' : ''}`}
                                 >
                                     {/* Unread dot */}
                                     <span className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${!notif.is_read ? 'bg-blue-500' : 'bg-transparent'}`} />
                                     <div className="flex-1 min-w-0">
-                                        <p className={`text-sm font-semibold leading-tight truncate ${!notif.is_read ? 'text-black' : 'text-gray-600'}`}>
+                                        <p className={`text-sm font-semibold leading-tight truncate ${!notif.is_read ? 'text-black' : 'text-[color:var(--mk-text-soft)]'}`}>
                                             {notif.title}
                                         </p>
                                         {notif.body && (
-                                            <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{notif.body}</p>
+                                            <p className="text-xs text-[color:var(--mk-muted)] mt-0.5 line-clamp-2">{notif.body}</p>
                                         )}
-                                        <p className="text-[10px] text-gray-400 mt-1">
+                                        <p className="text-[10px] text-[color:var(--mk-muted)] mt-1">
                                             {new Date(notif.created_at).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
                                         </p>
                                     </div>
@@ -145,10 +145,10 @@ export default function NotificationBell() {
                     </div>
 
                     {notifications.length > 0 && (
-                        <div className="px-4 py-2 border-t border-gray-100 text-center">
+                        <div className="px-4 py-2 border-t border-[color:var(--mk-line)] text-center">
                             <button
                                 onClick={() => setOpen(false)}
-                                className="text-xs text-gray-400 hover:text-black transition-colors"
+                                className="text-xs text-[color:var(--mk-muted)] hover:text-black transition-colors"
                             >
                                 Đóng
                             </button>

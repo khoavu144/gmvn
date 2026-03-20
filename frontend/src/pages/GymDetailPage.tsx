@@ -13,11 +13,14 @@ import type {
     GymTaxonomyTerm,
     GymTrainerLink,
     GymZone,
+    GymAmenity,
+    GymEquipment,
 } from '../types';
 import GymCard from '../components/GymCard';
 import GymReviewForm from '../components/GymReviewForm';
 import GymReviewList from '../components/GymReviewList';
 import ShareButton from '../components/ShareButton';
+import { Skeleton } from '../components/ui/Skeleton';
 
 
 
@@ -106,7 +109,7 @@ function SectionHeading({
 
 function SummaryPill({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-[1.25rem] border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
+        <div className="rounded-xl border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
             <div className="text-[0.66rem] font-black uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">{label}</div>
             <div className="mt-1 text-sm font-bold text-[color:var(--mk-text)]">{value}</div>
         </div>
@@ -292,12 +295,9 @@ const GymDetailPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [activeBranchId, setActiveBranchId] = useState<string | null>(null);
     const [activeSection, setActiveSection] = useState('overview');
-    const [activeProgramId, setActiveProgramId] = useState<string | null>(null);
-    const [programSessions, setProgramSessions] = useState<GymProgramSession[]>([]);
-    const [sessionsLoading, setSessionsLoading] = useState(false);
+
     const [similarGyms, setSimilarGyms] = useState<GymCenter[]>([]);
-    const [canReview, setCanReview] = useState(false);
-    const [refreshTick, setRefreshTick] = useState(0);
+
     const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
 
     const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -353,13 +353,6 @@ const GymDetailPage: React.FC = () => {
         };
     }, [gym?.id]);
 
-    useEffect(() => {
-        if (!gym?.id) return;
-
-        gymService.checkReviewEligibility(gym.id)
-            .then((response) => setCanReview(Boolean(response.success && response.canReview)))
-            .catch(() => setCanReview(false));
-    }, [gym?.id]);
 
     const branches = gym?.branches || [];
     const branchDetail = useMemo(() => {
@@ -404,52 +397,14 @@ const GymDetailPage: React.FC = () => {
 
     const activeImage = lightboxIdx !== null ? gallery[lightboxIdx] : null;
     const heroImage = gallery.find((item) => item.is_hero) || gallery[0] || null;
-    const activeProgram = branchPrograms.find((program) => program.id === activeProgramId) || branchPrograms[0] || null;
+
     const todayHours = getTodayHours(branchDetail);
     const lowestPrice = useMemo(() => {
         const values = branchPricing.map((plan) => Number(plan.price)).filter((value) => value > 0);
         return values.length > 0 ? Math.min(...values) : null;
     }, [branchPricing]);
 
-    useEffect(() => {
-        if (!branchPrograms.length) {
-            setActiveProgramId(null);
-            return;
-        }
 
-        setActiveProgramId((current) => {
-            if (current && branchPrograms.some((program) => program.id === current)) {
-                return current;
-            }
-            return branchPrograms[0].id;
-        });
-    }, [branchPrograms]);
-
-    useEffect(() => {
-        if (!gym?.id || !branchDetail?.id || !activeProgramId) {
-            setProgramSessions([]);
-            return;
-        }
-
-        let mounted = true;
-        setSessionsLoading(true);
-
-        gymService.getProgramSessions(gym.id, branchDetail.id, activeProgramId)
-            .then((response) => {
-                if (!mounted) return;
-                setProgramSessions(response.success ? (response.sessions || []) : []);
-            })
-            .catch(() => {
-                if (mounted) setProgramSessions([]);
-            })
-            .finally(() => {
-                if (mounted) setSessionsLoading(false);
-            });
-
-        return () => {
-            mounted = false;
-        };
-    }, [activeProgramId, branchDetail?.id, gym?.id]);
 
     const overviewBadges = useMemo(() => {
         const labels = [
@@ -506,7 +461,7 @@ const GymDetailPage: React.FC = () => {
         });
 
         return () => observers.forEach((observer) => observer.disconnect());
-    }, [visibleSections, branchDetail, similarGyms, refreshTick, programSessions.length]);
+    }, [visibleSections, branchDetail, similarGyms]);
 
     const setRef = useCallback((sectionId: string) => (node: HTMLElement | null) => {
         sectionRefs.current[sectionId] = node;
@@ -516,19 +471,42 @@ const GymDetailPage: React.FC = () => {
         sectionRefs.current[sectionId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, []);
 
+    useEffect(() => {
+        if (lightboxIdx === null) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setLightboxIdx(null);
+            } else if (e.key === 'ArrowLeft' && gallery.length > 1) {
+                setLightboxIdx((current) => current === null ? 0 : (current - 1 + gallery.length) % gallery.length);
+            } else if (e.key === 'ArrowRight' && gallery.length > 1) {
+                setLightboxIdx((current) => current === null ? 0 : (current + 1) % gallery.length);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        // Prevent body scroll when lightbox is open
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = '';
+        };
+    }, [lightboxIdx, gallery.length]);
+
     if (loading) {
         return (
-            <div className="marketplace-shell min-h-screen animate-pulse pb-20">
+            <div className="marketplace-shell min-h-screen pb-20">
                 <div className="marketplace-container pt-8">
-                    <div className="h-[28rem] rounded-[2rem] bg-[color:var(--mk-paper-strong)]" />
+                    <Skeleton className="h-[28rem] w-full rounded-3xl" />
                     <div className="mt-6 grid gap-4 lg:grid-cols-[1.45fr_0.55fr]">
                         <div className="space-y-4">
-                            <div className="h-6 w-40 rounded-full bg-[color:var(--mk-line)]" />
-                            <div className="h-16 w-3/4 rounded-[1.5rem] bg-[color:var(--mk-line)]" />
-                            <div className="h-5 w-full rounded-full bg-[color:var(--mk-line)]" />
-                            <div className="h-5 w-4/5 rounded-full bg-[color:var(--mk-line)]" />
+                            <Skeleton className="h-6 w-40 rounded-full" />
+                            <Skeleton className="h-16 w-3/4 rounded-2xl" />
+                            <Skeleton className="h-5 w-full rounded-full" />
+                            <Skeleton className="h-5 w-4/5 rounded-full" />
                         </div>
-                        <div className="rounded-[2rem] bg-[color:var(--mk-paper-strong)] p-6" />
+                        <Skeleton className="h-40 w-full rounded-3xl" />
                     </div>
                 </div>
             </div>
@@ -576,28 +554,6 @@ const GymDetailPage: React.FC = () => {
         },
     ];
 
-    useEffect(() => {
-        if (lightboxIdx === null) return;
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                setLightboxIdx(null);
-            } else if (e.key === 'ArrowLeft' && gallery.length > 1) {
-                setLightboxIdx((current) => current === null ? 0 : (current - 1 + gallery.length) % gallery.length);
-            } else if (e.key === 'ArrowRight' && gallery.length > 1) {
-                setLightboxIdx((current) => current === null ? 0 : (current + 1) % gallery.length);
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        // Prevent body scroll when lightbox is open
-        document.body.style.overflow = 'hidden';
-
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = '';
-        };
-    }, [lightboxIdx, gallery.length]);
 
     return (
         <>
@@ -741,7 +697,7 @@ const GymDetailPage: React.FC = () => {
                                                 key={item.id}
                                                 type="button"
                                                 onClick={() => setLightboxIdx(index)}
-                                                className="relative h-20 w-24 shrink-0 overflow-hidden rounded-[1rem] border border-white/14 bg-black/20 transition hover:-translate-y-0.5 hover:border-white/35"
+                                                className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl border border-white/14 bg-black/20 transition hover:-translate-y-0.5 hover:border-white/35"
                                             >
                                                 <img
                                                     src={getOptimizedUrl(item.image_url, 320) || item.image_url}
@@ -790,7 +746,7 @@ const GymDetailPage: React.FC = () => {
                 </div>
 
                 <div className="marketplace-container mt-6">
-                    <div className="sticky top-0 z-30 rounded-[1.4rem] border border-[color:var(--mk-line)] bg-[rgba(255,251,244,0.82)] px-3 py-2 backdrop-blur-xl">
+                    <div className="sticky top-0 z-30 rounded-2xl border border-[color:var(--mk-line)] bg-[rgba(255,251,244,0.82)] px-3 py-2 backdrop-blur-xl">
                         <div className="flex items-center gap-2 overflow-x-auto">
                             {visibleSections.map((section) => (
                                 <button
@@ -850,355 +806,30 @@ const GymDetailPage: React.FC = () => {
                             </section>
                         </FadeIn>
 
-                        {branchZones.length > 0 && (
-                            <FadeIn>
-                                <section ref={setRef('zones')} id="zones" className="marketplace-panel p-6 sm:p-8">
-                                    <SectionHeading
-                                        kicker="Khu vực nổi bật"
-                                        title="Những không gian quyết định cảm giác tập"
-                                        description="Không chỉ là danh sách máy móc — đây là các khu vực giúp bạn đánh giá ngay cơ sở này hợp thói quen tập của mình đến đâu."
-                                    />
-
-                                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                                        {branchZones.map((zone: GymZone) => (
-                                            <article key={zone.id} className={`rounded-[1.4rem] border p-5 ${zone.is_signature_zone ? 'border-[color:var(--mk-accent)]/55 bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/75'}`}>
-                                                <div className="flex items-start justify-between gap-3">
-                                                    <div>
-                                                        <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">{zone.zone_type.replace(/_/g, ' ')}</div>
-                                                        <h3 className="mt-2 text-lg font-black tracking-[-0.04em] text-[color:var(--mk-text)]">{zone.name}</h3>
-                                                    </div>
-                                                    {zone.is_signature_zone && <span className="marketplace-badge marketplace-badge--accent">Signature</span>}
-                                                </div>
-
-                                                {zone.description && (
-                                                    <p className="mt-3 text-sm leading-7 text-[color:var(--mk-text-soft)]">{zone.description}</p>
-                                                )}
-
-                                                <div className="mt-4 flex flex-wrap gap-2">
-                                                    {zone.capacity && <span className="marketplace-badge marketplace-badge--neutral">{zone.capacity} người</span>}
-                                                    {zone.area_sqm && <span className="marketplace-badge marketplace-badge--neutral">{zone.area_sqm} m²</span>}
-                                                    {zone.temperature_mode && <span className="marketplace-badge marketplace-badge--neutral">{zone.temperature_mode}</span>}
-                                                    {zone.sound_profile && <span className="marketplace-badge marketplace-badge--neutral">{zone.sound_profile}</span>}
-                                                    {zone.booking_required && <span className="marketplace-badge marketplace-badge--neutral">Đặt trước</span>}
-                                                </div>
-                                            </article>
-                                        ))}
-                                    </div>
-                                </section>
-                            </FadeIn>
-                        )}
+                        {branchZones.length > 0 && <GymZonesSection branchZones={branchZones} setRef={setRef} />}
 
                         {(branchAmenities.length > 0 || branchEquipment.length > 0) && (
-                            <FadeIn>
-                                <section ref={setRef('facilities')} id="facilities" className="marketplace-panel p-6 sm:p-8">
-                                    <SectionHeading
-                                        kicker="Tiện ích"
-                                        title="Tiện ích và thiết bị hỗ trợ quyết định"
-                                        description="Những chi tiết nhỏ như tủ để đồ, phòng tắm, dịch vụ khăn hay chất lượng trang thiết bị thường là thứ quyết định bạn có duy trì thói quen tạp luyện hay không."
-                                    />
-
-                                    <div className="space-y-8">
-                                        {branchAmenities.length > 0 && (
-                                            <div>
-                                                <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Danh sách tiện ích</div>
-                                                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                                                    {branchAmenities.map((item) => (
-                                                        <div key={item.id} className={`rounded-[1.2rem] border px-4 py-4 ${item.is_available ? 'border-[color:var(--mk-line)] bg-white/80' : 'border-[color:var(--mk-line)]/70 bg-[color:var(--mk-paper-strong)]/60 opacity-70'}`}>
-                                                            <div className="text-sm font-bold text-[color:var(--mk-text)]">{item.name}</div>
-                                                            {item.note && <p className="mt-2 text-sm leading-6 text-[color:var(--mk-muted)]">{item.note}</p>}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {branchEquipment.length > 0 && (
-                                            <div>
-                                                <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Thư viện thiết bị</div>
-                                                <div className="grid gap-4 md:grid-cols-2">
-                                                    {Object.entries(branchEquipmentGroups).map(([category, items]) => (
-                                                        <div key={category} className="rounded-[1.3rem] border border-[color:var(--mk-line)] bg-white/75 p-4">
-                                                            <div className="mb-3 flex items-center justify-between gap-3">
-                                                                <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{category}</div>
-                                                                <span className="marketplace-badge marketplace-badge--neutral">{items.length} items</span>
-                                                            </div>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {items.map((item) => (
-                                                                    <span key={item.id} className="rounded-full border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] px-3 py-1.5 text-[0.8rem] font-semibold text-[color:var(--mk-text-soft)]">
-                                                                        {item.name}{item.quantity && item.quantity > 1 ? ` ×${item.quantity}` : ''}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </section>
-                            </FadeIn>
+                            <GymFacilitiesSection 
+                                branchAmenities={branchAmenities} 
+                                branchEquipment={branchEquipment} 
+                                branchEquipmentGroups={branchEquipmentGroups} 
+                                setRef={setRef} 
+                            />
                         )}
 
                         {branchTrainerLinks.length > 0 && (
-                            <FadeIn>
-                                <section ref={setRef('trainers')} id="trainers" className="marketplace-panel p-6 sm:p-8">
-                                    <SectionHeading
-                                        kicker="Chuyên gia"
-                                        title="Ai đang dẫn dắt trải nghiệm tại chi nhánh này"
-                                        description="Không chỉ là danh sách Huấn luyện viên — hãy nhìn chuyên môn, ngôn ngữ và nền tảng của họ để đánh giá độ phù hợp với cá nhân bạn."
-                                    />
-
-                                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                                        {branchTrainerLinks.map((link) => {
-                                            const trainerPath = getTrainerLinkPath(link);
-                                            const cardClass = 'group rounded-[1.4rem] border border-[color:var(--mk-line)] bg-white/80 p-5 transition hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(53,41,26,0.08)]';
-                                            const cardContent = (
-                                                <>
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="h-14 w-14 overflow-hidden rounded-full border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
-                                                            {link.trainer?.avatar_url ? (
-                                                                <img src={link.trainer.avatar_url} alt={link.trainer.full_name} className="h-full w-full object-cover" />
-                                                            ) : (
-                                                                <div className="flex h-full w-full items-center justify-center text-sm font-black uppercase text-[color:var(--mk-muted)]">
-                                                                    {(link.trainer?.full_name || 'T').slice(0, 1)}
-                                                                </div>
-                                                            )}
-                                                        </div>
-
-                                                        <div className="min-w-0 flex-1">
-                                                            <div className="text-base font-black tracking-[-0.03em] text-[color:var(--mk-text)]">
-                                                                {link.trainer?.full_name || 'Đối tác huấn luyện'}
-                                                            </div>
-                                                            <div className="mt-1 text-sm text-[color:var(--mk-muted)]">
-                                                                {link.specialization_summary || link.role_at_gym || 'Huấn luyện viên tại cơ sở này'}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="mt-4 flex flex-wrap gap-2">
-                                                        {link.featured_at_branch && <span className="marketplace-badge marketplace-badge--accent">Huấn luyện viên nổi bật</span>}
-                                                        {link.accepts_private_clients && <span className="marketplace-badge marketplace-badge--neutral">Có nhận học viên riêng</span>}
-                                                        {(link.languages || []).slice(0, 2).map((language) => (
-                                                            <span key={language} className="marketplace-badge marketplace-badge--neutral">{language}</span>
-                                                        ))}
-                                                    </div>
-
-                                                    {link.branch_intro && (
-                                                        <p className="mt-4 text-sm leading-7 text-[color:var(--mk-text-soft)]">{link.branch_intro}</p>
-                                                    )}
-                                                </>
-                                            );
-
-                                            return trainerPath ? (
-                                                <Link key={link.id} to={trainerPath} className={cardClass}>
-                                                    {cardContent}
-                                                </Link>
-                                            ) : (
-                                                <div key={link.id} className={cardClass}>
-                                                    {cardContent}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </section>
-                            </FadeIn>
+                            <GymTrainersSection branchTrainerLinks={branchTrainerLinks} setRef={setRef} />
                         )}
 
                         {branchPricing.length > 0 && (
-                            <FadeIn>
-                                <section ref={setRef('pricing')} id="pricing" className="marketplace-panel p-6 sm:p-8">
-                                    <SectionHeading
-                                        kicker="Bảng giá"
-                                        title="Các gói vào cửa và cách bắt đầu"
-                                        description="Đừng chỉ nhìn gói nổi bật. Hãy nhìn gói khởi điểm, các dịch vụ đi kèm và chính sách để biết chi phí thực sự của việc tập luyện."
-                                    />
-
-                                    <div className="grid gap-4 xl:grid-cols-3">
-                                        {branchPricing.map((plan: GymPricing) => (
-                                            <article
-                                                key={plan.id}
-                                                className={`flex h-full flex-col rounded-[1.55rem] border p-5 ${plan.is_highlighted ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80'}`}
-                                            >
-                                                <div className="flex items-start justify-between gap-3">
-                                                    <div>
-                                                        <div className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">
-                                                            {plan.plan_type || 'membership'}
-                                                        </div>
-                                                        <h3 className="mt-2 text-xl font-black tracking-[-0.05em] text-[color:var(--mk-text)]">{plan.plan_name}</h3>
-                                                    </div>
-                                                    {plan.is_highlighted && <span className="marketplace-badge marketplace-badge--accent">Recommended</span>}
-                                                </div>
-
-                                                <div className="mt-5 flex items-end gap-2">
-                                                    <div className="text-[2rem] font-black leading-none tracking-[-0.06em] text-[color:var(--mk-text)]">
-                                                        {Number(plan.price).toLocaleString('vi-VN')}₫
-                                                    </div>
-                                                    <div className="pb-1 text-sm font-semibold text-[color:var(--mk-muted)]">
-                                                        {BILLING_LABELS[plan.billing_cycle] || plan.billing_cycle}
-                                                    </div>
-                                                </div>
-
-                                                {plan.description && (
-                                                    <p className="mt-4 text-sm leading-7 text-[color:var(--mk-text-soft)]">{plan.description}</p>
-                                                )}
-
-                                                {(plan.included_services || []).length > 0 && (
-                                                    <div className="mt-4 flex flex-wrap gap-2">
-                                                        {(plan.included_services || []).slice(0, 4).map((item) => (
-                                                            <span key={item} className="marketplace-badge marketplace-badge--neutral">{item}</span>
-                                                        ))}
-                                                    </div>
-                                                )}
-
-                                                <div className="mt-5 space-y-2 text-sm text-[color:var(--mk-text-soft)]">
-                                                    {plan.highlighted_reason && <div>• {plan.highlighted_reason}</div>}
-                                                    {plan.trial_available && <div>• Có trial {plan.trial_price ? `${Number(plan.trial_price).toLocaleString('vi-VN')}₫` : ''}</div>}
-                                                    {plan.freeze_policy_summary && <div>• Freeze: {plan.freeze_policy_summary}</div>}
-                                                    {plan.cancellation_policy_summary && <div>• Cancel: {plan.cancellation_policy_summary}</div>}
-                                                </div>
-
-                                                <div className="mt-auto pt-6">
-                                                    {renderActionButton(
-                                                        leadAction,
-                                                        'block w-full rounded-[1rem] bg-[color:var(--mk-text)] px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-white transition hover:translate-y-[-1px] hover:bg-[color:var(--mk-accent-ink)]'
-                                                    )}
-                                                </div>
-                                            </article>
-                                        ))}
-                                    </div>
-                                </section>
-                            </FadeIn>
+                            <GymPricingSection branchPricing={branchPricing} setRef={setRef} leadAction={leadAction} />
                         )}
 
                         {branchPrograms.length > 0 && (
-                            <FadeIn>
-                                <section ref={setRef('schedule')} id="schedule" className="marketplace-panel p-6 sm:p-8">
-                                    <SectionHeading
-                                        kicker="Lịch tập"
-                                        title="Lịch lớp và nhịp hoạt động tại chi nhánh"
-                                        description="Một cơ sở tốt không chỉ hiển thị đẹp trên hình ảnh — lịch lớp phải đủ rõ để bạn hình dung ngay tuần đầu tiên tập luyện của mình sẽ trông như thế nào."
-                                    />
-
-                                    <div className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
-                                        <div className="space-y-3">
-                                            {branchPrograms.map((program) => (
-                                                <button
-                                                    key={program.id}
-                                                    type="button"
-                                                    onClick={() => setActiveProgramId(program.id)}
-                                                    className={`w-full rounded-[1.3rem] border px-4 py-4 text-left transition ${activeProgram?.id === program.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80 hover:border-[color:var(--mk-accent)]/45'}`}
-                                                >
-                                                    <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{program.title}</div>
-                                                    <div className="mt-1 text-sm text-[color:var(--mk-muted)]">{formatProgramSubtitle(program)}</div>
-                                                    {program.description && (
-                                                        <p className="mt-3 line-clamp-2 text-sm leading-6 text-[color:var(--mk-text-soft)]">{program.description}</p>
-                                                    )}
-                                                </button>
-                                            ))}
-                                        </div>
-
-                                        <div className="rounded-[1.5rem] border border-[color:var(--mk-line)] bg-white/78 p-5">
-                                            {activeProgram ? (
-                                                <>
-                                                    <div className="flex flex-wrap items-start justify-between gap-3">
-                                                        <div>
-                                                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chương trình đã chọn</div>
-                                                            <h3 className="mt-2 text-2xl font-black tracking-[-0.05em] text-[color:var(--mk-text)]">{activeProgram.title}</h3>
-                                                            <p className="mt-2 text-sm leading-7 text-[color:var(--mk-text-soft)]">{activeProgram.description || 'Chưa có mô tả chi tiết cho lớp này.'}</p>
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            <span className="marketplace-badge marketplace-badge--neutral">{activeProgram.capacity} chỗ</span>
-                                                            <span className="marketplace-badge marketplace-badge--neutral">{activeProgram.duration_minutes} phút</span>
-                                                        </div>
-                                                    </div>
-
-                                                    {(activeProgram.equipment_required || []).length > 0 && (
-                                                        <div className="mt-4 flex flex-wrap gap-2">
-                                                            {(activeProgram.equipment_required || []).map((item) => (
-                                                                <span key={item} className="marketplace-badge marketplace-badge--neutral">{item}</span>
-                                                            ))}
-                                                        </div>
-                                                    )}
-
-                                                    <div className="mt-6">
-                                                        <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Các buổi học sắp tới</div>
-                                                        {sessionsLoading ? (
-                                                            <div className="space-y-3 animate-pulse">
-                                                                <div className="h-16 rounded-[1rem] bg-[color:var(--mk-paper-strong)]" />
-                                                                <div className="h-16 rounded-[1rem] bg-[color:var(--mk-paper-strong)]" />
-                                                            </div>
-                                                        ) : programSessions.length > 0 ? (
-                                                            <div className="space-y-3">
-                                                                {programSessions.slice(0, 6).map((session: GymProgramSession) => (
-                                                                    <div key={session.id} className="flex flex-wrap items-center justify-between gap-3 rounded-[1rem] border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] px-4 py-3">
-                                                                        <div>
-                                                                            <div className="text-sm font-bold text-[color:var(--mk-text)]">{formatSessionDate(session.starts_at)}</div>
-                                                                            <div className="text-sm text-[color:var(--mk-muted)]">{session.session_note || 'Đang mở đăng ký'}</div>
-                                                                        </div>
-                                                                        <div className="text-right">
-                                                                            <div className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[color:var(--mk-muted)]">Còn chỗ</div>
-                                                                            <div className="mt-1 text-sm font-black text-[color:var(--mk-text)]">{session.seats_remaining}/{session.seats_total}</div>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        ) : (
-                                                            <div className="rounded-[1rem] border border-dashed border-[color:var(--mk-line)] px-4 py-5 text-sm text-[color:var(--mk-muted)]">
-                                                                Lịch chi tiết cho lớp này đang được cập nhật. Bạn vẫn có thể dùng CTA bên phải để nhận tư vấn nhanh từ chi nhánh.
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <div className="rounded-[1rem] border border-dashed border-[color:var(--mk-line)] px-4 py-5 text-sm text-[color:var(--mk-muted)]">
-                                                    Chưa có chương trình lớp cho chi nhánh này.
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </section>
-                            </FadeIn>
+                            <GymProgramsSection branchPrograms={branchPrograms} gymId={gym.id} branchId={branchDetail?.id} setRef={setRef} />
                         )}
 
-                        <FadeIn>
-                            <section ref={setRef('reviews')} id="reviews" className="rounded-[2rem] border border-black/10 bg-[linear-gradient(180deg,rgba(32,25,20,1),rgba(24,18,15,1))] p-6 text-white sm:p-8">
-                                <SectionHeading
-                                    kicker="Trust"
-                                    title="Cộng đồng nói gì về nơi này"
-                                    description="Trust block này kết hợp review tổng, dimension ratings và phản hồi từ venue để bạn đỡ phải đoán mò trước khi thử buổi đầu tiên."
-                                />
-
-                                <div className="mb-6 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-                                    {[
-                                        { label: 'Tổng quan', value: gym.trust_summary?.avg_rating ? `★ ${gym.trust_summary.avg_rating.toFixed(1)}` : '—' },
-                                        { label: 'Thiết bị', value: gym.trust_summary?.dimensions.equipment_rating ? gym.trust_summary.dimensions.equipment_rating.toFixed(1) : '—' },
-                                        { label: 'Sạch sẽ', value: gym.trust_summary?.dimensions.cleanliness_rating ? gym.trust_summary.dimensions.cleanliness_rating.toFixed(1) : '—' },
-                                        { label: 'Hướng dẫn', value: gym.trust_summary?.dimensions.coaching_rating ? gym.trust_summary.dimensions.coaching_rating.toFixed(1) : '—' },
-                                        { label: 'Không gian', value: gym.trust_summary?.dimensions.atmosphere_rating ? gym.trust_summary.dimensions.atmosphere_rating.toFixed(1) : '—' },
-                                        { label: 'Chi phí', value: gym.trust_summary?.dimensions.value_rating ? gym.trust_summary.dimensions.value_rating.toFixed(1) : '—' },
-                                    ].map((item) => (
-                                        <div key={item.label} className="rounded-[1.2rem] border border-white/10 bg-white/6 px-4 py-4">
-                                            <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/55">{item.label}</div>
-                                            <div className="mt-2 text-lg font-black tracking-[-0.04em] text-white">{item.value}</div>
-                                        </div>
-                                    ))}
-                                </div>
-
-                                <GymReviewList gymId={gym.id} refreshTick={refreshTick} />
-
-                                {branchId && canReview && (
-                                    <div className="mt-8 border-t border-white/10 pt-8">
-                                        <GymReviewForm gymId={gym.id} branchId={branchId} onSuccess={() => setRefreshTick((current) => current + 1)} />
-                                    </div>
-                                )}
-
-                                {branchId && !canReview && (
-                                    <div className="mt-8 rounded-[1.2rem] border border-white/10 bg-white/5 px-5 py-4 text-sm text-white/68">
-                                        Bạn cần có gói tập hoặc từng tương tác tư vấn với cơ sở này để để lại một review hợp lệ trên marketplace.
-                                    </div>
-                                )}
-                            </section>
-                        </FadeIn>
+                        <GymReviewsSection gymId={gym.id} branchId={branchId} gymTrustSummary={gym.trust_summary} setRef={setRef} />
 
                         {similarGyms.length > 0 && (
                             <FadeIn>
@@ -1235,7 +866,7 @@ const GymDetailPage: React.FC = () => {
                                         </div>
 
                                         {branchMapEmbedUrl ? (
-                                            <div className="overflow-hidden rounded-[1.5rem] border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
+                                            <div className="overflow-hidden rounded-2xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
                                                 <iframe
                                                     src={branchMapEmbedUrl}
                                                     width="100%"
@@ -1247,7 +878,7 @@ const GymDetailPage: React.FC = () => {
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="overflow-hidden rounded-[1.5rem] border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
+                                            <div className="overflow-hidden rounded-2xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
                                                 <iframe
                                                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(branchLongitude) - 0.01},${Number(branchLatitude) - 0.01},${Number(branchLongitude) + 0.01},${Number(branchLatitude) + 0.01}&layer=mapnik&marker=${Number(branchLatitude)},${Number(branchLongitude)}`}
                                                     width="100%"
@@ -1264,7 +895,7 @@ const GymDetailPage: React.FC = () => {
                         )}
                     </div>
 
-                    <aside className="marketplace-sticky-rail space-y-4">
+                    <aside className="marketplace-sticky-rail space-y-4" style={{ contain: 'layout paint' }}>
                         <div className="marketplace-panel p-5 sm:p-6">
                             <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Quyết định nhanh</div>
                             <div className="mt-3 text-sm font-semibold text-[color:var(--mk-text-soft)]">Chi nhánh đang xem</div>
@@ -1275,7 +906,7 @@ const GymDetailPage: React.FC = () => {
                                 {branchDetail?.branch_tagline || branchDetail?.description || gym.discovery_blurb || 'Chọn đúng chi nhánh trước khi đặt hẹn tư vấn để nhận thông tin chuẩn nhất về giá mở cửa, lịch và trải nghiệm thực tế tại đó.'}
                             </p>
 
-                            <div className="mt-5 rounded-[1.5rem] bg-[color:var(--mk-text)] px-5 py-5 text-white">
+                            <div className="mt-5 rounded-2xl bg-[color:var(--mk-text)] px-5 py-5 text-white">
                                 <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-white/55">Đầu tư ban đầu</div>
                                 <div className="mt-2 text-[2.3rem] font-black leading-none tracking-[-0.07em]">
                                     {lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫` : 'Liên hệ'}
@@ -1288,12 +919,12 @@ const GymDetailPage: React.FC = () => {
                             <div className="mt-5 space-y-3">
                                 {renderActionButton(
                                     leadAction,
-                                    'block w-full rounded-[1rem] bg-[color:var(--mk-accent)] px-4 py-4 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)] transition hover:translate-y-[-1px]'
+                                    'block w-full rounded-xl bg-[color:var(--mk-accent)] px-4 py-4 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)] transition hover:translate-y-[-1px]'
                                 )}
                                 <button
                                     type="button"
                                     onClick={() => scrollToSection(branchPrograms.length > 0 ? 'schedule' : 'pricing')}
-                                    className="block w-full rounded-[1rem] border border-[color:var(--mk-line)] bg-white/70 px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/55"
+                                    className="block w-full rounded-xl border border-[color:var(--mk-line)] bg-white/70 px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/55"
                                 >
                                     {branchPrograms.length > 0 ? 'Xem lịch lớp' : 'Xem bảng giá'}
                                 </button>
@@ -1311,7 +942,7 @@ const GymDetailPage: React.FC = () => {
                                             key={branch.id}
                                             type="button"
                                             onClick={() => setActiveBranchId(branch.id)}
-                                            className={`w-full rounded-[1rem] border px-4 py-3 text-left transition ${branch.id === branchDetail?.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/70 hover:border-[color:var(--mk-accent)]/45'}`}
+                                            className={`w-full rounded-xl border px-4 py-3 text-left transition ${branch.id === branchDetail?.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/70 hover:border-[color:var(--mk-accent)]/45'}`}
                                         >
                                             <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{branch.branch_name}</div>
                                             <div className="mt-1 text-sm text-[color:var(--mk-muted)]">{[branch.district, branch.city].filter(Boolean).join(', ') || branch.address}</div>
@@ -1338,17 +969,17 @@ const GymDetailPage: React.FC = () => {
                             <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Liên hệ nhanh</div>
                             <div className="mt-4 grid gap-2">
                                 {branchPhone && (
-                                    <a href={`tel:${normalizePhone(branchPhone)}`} className="rounded-[1rem] border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
+                                    <a href={`tel:${normalizePhone(branchPhone)}`} className="rounded-xl border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
                                         Hotline · {branchPhone}
                                     </a>
                                 )}
                                 {branchWhatsapp && (
-                                    <a href={buildWhatsappUrl(branchWhatsapp, `Xin chào, tôi muốn hỏi thêm về ${branchName}.`) || '#'} target="_blank" rel="noopener noreferrer" className="rounded-[1rem] border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
+                                    <a href={buildWhatsappUrl(branchWhatsapp, `Xin chào, tôi muốn hỏi thêm về ${branchName}.`) || '#'} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
                                         WhatsApp · {branchWhatsapp}
                                     </a>
                                 )}
                                 {branchEmail && (
-                                    <a href={`mailto:${branchEmail}`} className="rounded-[1rem] border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
+                                    <a href={`mailto:${branchEmail}`} className="rounded-xl border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
                                         Email · {branchEmail}
                                     </a>
                                 )}
@@ -1364,7 +995,7 @@ const GymDetailPage: React.FC = () => {
                                     text={seoDescription}
                                     label="Share Facebook"
                                     variant="facebook"
-                                    className="!rounded-[1rem] !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
+                                    className="!rounded-xl !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
                                     titleAttr="Chia sẻ venue này lên Facebook"
                                 />
                                 <ShareButton
@@ -1372,7 +1003,7 @@ const GymDetailPage: React.FC = () => {
                                     title={seoTitle}
                                     text={seoDescription}
                                     label="Sao chép Link"
-                                    className="!rounded-[1rem] !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
+                                    className="!rounded-xl !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
                                     titleAttr="Sao chép liên kết cơ sở"
                                 />
                             </div>
@@ -1380,8 +1011,8 @@ const GymDetailPage: React.FC = () => {
                     </aside>
                 </div>
 
-                <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden">
-                    <div className="rounded-[1.35rem] border border-white/14 bg-[rgba(29,22,18,0.94)] px-4 py-3 text-white shadow-[0_18px_50px_rgba(0,0,0,0.26)] backdrop-blur-xl">
+                <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden" style={{ contain: 'layout paint' }}>
+                    <div className="rounded-xl border border-white/14 bg-[rgba(29,22,18,0.94)] px-4 py-3 text-white shadow-[color:var(--mk-shadow-soft)] backdrop-blur-xl">
                         <div className="flex items-center justify-between gap-3">
                             <div>
                                 <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/48">Chí phí ước tính từ</div>
@@ -1391,7 +1022,7 @@ const GymDetailPage: React.FC = () => {
                             </div>
                             {renderActionButton(
                                 leadAction,
-                                'rounded-[0.95rem] bg-[color:var(--mk-accent)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)]'
+                                'rounded-lg bg-[color:var(--mk-accent)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)]'
                             )}
                         </div>
                     </div>
@@ -1402,3 +1033,443 @@ const GymDetailPage: React.FC = () => {
 };
 
 export default GymDetailPage;
+
+const GymProgramsSection = React.memo(function GymProgramsSection({
+    branchPrograms, gymId, branchId, setRef
+}: {
+    branchPrograms: GymProgram[], gymId: string, branchId?: string | null, setRef: (id: string) => (node: HTMLElement | null) => void
+}) {
+    const [activeProgramId, setActiveProgramId] = useState<string | null>(null);
+    const [programSessions, setProgramSessions] = useState<GymProgramSession[]>([]);
+    const [sessionsLoading, setSessionsLoading] = useState(false);
+
+    const activeProgram = branchPrograms.find((p) => p.id === activeProgramId) || branchPrograms[0] || null;
+
+    useEffect(() => {
+        if (!branchPrograms.length) {
+            setActiveProgramId(null);
+            return;
+        }
+        setActiveProgramId((current) => {
+            if (current && branchPrograms.some((program) => program.id === current)) return current;
+            return branchPrograms[0].id;
+        });
+    }, [branchPrograms]);
+
+    useEffect(() => {
+        if (!gymId || !branchId || !activeProgramId) {
+            setProgramSessions([]);
+            return;
+        }
+        let mounted = true;
+        setSessionsLoading(true);
+
+        gymService.getProgramSessions(gymId, branchId, activeProgramId)
+            .then((response) => {
+                if (!mounted) return;
+                setProgramSessions(response.success ? (response.sessions || []) : []);
+            })
+            .catch(() => {
+                if (mounted) setProgramSessions([]);
+            })
+            .finally(() => {
+                if (mounted) setSessionsLoading(false);
+            });
+
+        return () => { mounted = false; };
+    }, [activeProgramId, branchId, gymId]);
+
+    if (branchPrograms.length === 0) return null;
+
+    return (
+        <FadeIn>
+            <section ref={setRef('schedule')} id="schedule" className="marketplace-panel p-6 sm:p-8">
+                <SectionHeading
+                    kicker="Lịch tập"
+                    title="Lịch lớp và nhịp hoạt động tại chi nhánh"
+                    description="Một cơ sở tốt không chỉ hiển thị đẹp trên hình ảnh — lịch lớp phải đủ rõ để bạn hình dung ngay tuần đầu tiên tập luyện của mình sẽ trông như thế nào."
+                />
+
+                <div className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
+                    <div className="space-y-3">
+                        {branchPrograms.map((program) => (
+                            <button
+                                key={program.id}
+                                type="button"
+                                onClick={() => setActiveProgramId(program.id)}
+                                className={`w-full rounded-2xl border px-4 py-4 text-left transition ${activeProgram?.id === program.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80 hover:border-[color:var(--mk-accent)]/45'}`}
+                            >
+                                <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{program.title}</div>
+                                <div className="mt-1 text-sm text-[color:var(--mk-muted)]">{formatProgramSubtitle(program)}</div>
+                                {program.description && (
+                                    <p className="mt-3 line-clamp-2 text-sm leading-6 text-[color:var(--mk-text-soft)]">{program.description}</p>
+                                )}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="rounded-2xl border border-[color:var(--mk-line)] bg-white/78 p-5">
+                        {activeProgram ? (
+                            <>
+                                <div className="flex flex-wrap items-start justify-between gap-3">
+                                    <div>
+                                        <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chương trình đã chọn</div>
+                                        <h3 className="mt-2 text-2xl font-black tracking-[-0.05em] text-[color:var(--mk-text)]">{activeProgram.title}</h3>
+                                        <p className="mt-2 text-sm leading-7 text-[color:var(--mk-text-soft)]">{activeProgram.description || 'Chưa có mô tả chi tiết cho lớp này.'}</p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className="marketplace-badge marketplace-badge--neutral">{activeProgram.capacity} chỗ</span>
+                                        <span className="marketplace-badge marketplace-badge--neutral">{activeProgram.duration_minutes} phút</span>
+                                    </div>
+                                </div>
+
+                                {(activeProgram.equipment_required || []).length > 0 && (
+                                    <div className="mt-4 flex flex-wrap gap-2">
+                                        {(activeProgram.equipment_required || []).map((item) => (
+                                            <span key={item} className="marketplace-badge marketplace-badge--neutral">{item}</span>
+                                        ))}
+                                    </div>
+                                )}
+
+                                <div className="mt-6">
+                                    <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Các buổi học sắp tới</div>
+                                    {sessionsLoading ? (
+                                        <div className="space-y-3">
+                                            <Skeleton className="h-16 w-full rounded-xl" />
+                                            <Skeleton className="h-16 w-full rounded-xl" />
+                                        </div>
+                                    ) : programSessions.length > 0 ? (
+                                        <div className="space-y-3">
+                                            {programSessions.slice(0, 6).map((session: GymProgramSession) => (
+                                                <div key={session.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] px-4 py-3">
+                                                    <div>
+                                                        <div className="text-sm font-bold text-[color:var(--mk-text)]">{formatSessionDate(session.starts_at)}</div>
+                                                        <div className="text-sm text-[color:var(--mk-muted)]">{session.session_note || 'Đang mở đăng ký'}</div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <div className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[color:var(--mk-muted)]">Còn chỗ</div>
+                                                        <div className="mt-1 text-sm font-black text-[color:var(--mk-text)]">{session.seats_remaining}/{session.seats_total}</div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="rounded-xl border border-dashed border-[color:var(--mk-line)] px-4 py-5 text-sm text-[color:var(--mk-muted)]">
+                                            Lịch chi tiết cho lớp này đang được cập nhật. Bạn vẫn có thể dùng CTA bên phải để nhận tư vấn nhanh từ chi nhánh.
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        ) : (
+                            <div className="rounded-xl border border-dashed border-[color:var(--mk-line)] px-4 py-5 text-sm text-[color:var(--mk-muted)]">
+                                Chưa có chương trình lớp cho chi nhánh này.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </section>
+        </FadeIn>
+    );
+});
+
+const GymReviewsSection = React.memo(function GymReviewsSection({
+    gymId, branchId, gymTrustSummary, setRef
+}: {
+    gymId: string, branchId: string | null, gymTrustSummary?: any, setRef: (id: string) => (node: HTMLElement | null) => void
+}) {
+    const [canReview, setCanReview] = useState(false);
+    const [refreshTick, setRefreshTick] = useState(0);
+
+    useEffect(() => {
+        if (!gymId) return;
+        gymService.checkReviewEligibility(gymId)
+            .then((response) => setCanReview(Boolean(response.success && response.canReview)))
+            .catch(() => setCanReview(false));
+    }, [gymId]);
+
+    return (
+        <FadeIn>
+            <section ref={setRef('reviews')} id="reviews" className="rounded-3xl border border-black/10 bg-[linear-gradient(180deg,rgba(32,25,20,1),rgba(24,18,15,1))] p-6 text-white sm:p-8">
+                <SectionHeading
+                    kicker="Trust"
+                    title="Cộng đồng nói gì về nơi này"
+                    description="Trust block này kết hợp review tổng, dimension ratings và phản hồi từ venue để bạn đỡ phải đoán mò trước khi thử buổi đầu tiên."
+                />
+
+                <div className="mb-6 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+                    {[
+                        { label: 'Tổng quan', value: gymTrustSummary?.avg_rating ? `★ ${gymTrustSummary.avg_rating.toFixed(1)}` : '—' },
+                        { label: 'Thiết bị', value: gymTrustSummary?.dimensions?.equipment_rating ? gymTrustSummary.dimensions.equipment_rating.toFixed(1) : '—' },
+                        { label: 'Sạch sẽ', value: gymTrustSummary?.dimensions?.cleanliness_rating ? gymTrustSummary.dimensions.cleanliness_rating.toFixed(1) : '—' },
+                        { label: 'Hướng dẫn', value: gymTrustSummary?.dimensions?.coaching_rating ? gymTrustSummary.dimensions.coaching_rating.toFixed(1) : '—' },
+                        { label: 'Không gian', value: gymTrustSummary?.dimensions?.atmosphere_rating ? gymTrustSummary.dimensions.atmosphere_rating.toFixed(1) : '—' },
+                        { label: 'Chi phí', value: gymTrustSummary?.dimensions?.value_rating ? gymTrustSummary.dimensions.value_rating.toFixed(1) : '—' },
+                    ].map((item) => (
+                        <div key={item.label} className="rounded-xl border border-white/10 bg-white/6 px-4 py-4">
+                            <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/55">{item.label}</div>
+                            <div className="mt-2 text-lg font-black tracking-[-0.04em] text-white">{item.value}</div>
+                        </div>
+                    ))}
+                </div>
+
+                <GymReviewList gymId={gymId} refreshTick={refreshTick} />
+
+                {branchId && canReview && (
+                    <div className="mt-8 border-t border-white/10 pt-8">
+                        <GymReviewForm gymId={gymId} branchId={branchId} onSuccess={() => setRefreshTick((current) => current + 1)} />
+                    </div>
+                )}
+
+                {branchId && !canReview && (
+                    <div className="mt-8 rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-sm text-white/68">
+                        Bạn cần có gói tập hoặc từng tương tác tư vấn với cơ sở này để để lại một review hợp lệ trên marketplace.
+                    </div>
+                )}
+            </section>
+        </FadeIn>
+    );
+});
+
+const GymZonesSection = React.memo(function GymZonesSection({ branchZones, setRef }: { branchZones: GymZone[], setRef: (id: string) => (node: HTMLElement | null) => void }) {
+    if (branchZones.length === 0) return null;
+    return (
+        <FadeIn>
+            <section ref={setRef('zones')} id="zones" className="marketplace-panel p-6 sm:p-8">
+                <SectionHeading
+                    kicker="Khu vực nổi bật"
+                    title="Những không gian quyết định cảm giác tập"
+                    description="Không chỉ là danh sách máy móc — đây là các khu vực giúp bạn đánh giá ngay cơ sở này hợp thói quen tập của mình đến đâu."
+                />
+
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {branchZones.map((zone: GymZone) => (
+                        <article key={zone.id} className={`rounded-2xl border p-5 ${zone.is_signature_zone ? 'border-[color:var(--mk-accent)]/55 bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/75'}`}>
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">{zone.zone_type.replace(/_/g, ' ')}</div>
+                                    <h3 className="mt-2 text-lg font-black tracking-[-0.04em] text-[color:var(--mk-text)]">{zone.name}</h3>
+                                </div>
+                                {zone.is_signature_zone && <span className="marketplace-badge marketplace-badge--accent">Signature</span>}
+                            </div>
+
+                            {zone.description && (
+                                <p className="mt-3 text-sm leading-7 text-[color:var(--mk-text-soft)]">{zone.description}</p>
+                            )}
+
+                            <div className="mt-4 flex flex-wrap gap-2">
+                                {zone.capacity && <span className="marketplace-badge marketplace-badge--neutral">{zone.capacity} người</span>}
+                                {zone.area_sqm && <span className="marketplace-badge marketplace-badge--neutral">{zone.area_sqm} m²</span>}
+                                {zone.temperature_mode && <span className="marketplace-badge marketplace-badge--neutral">{zone.temperature_mode}</span>}
+                                {zone.sound_profile && <span className="marketplace-badge marketplace-badge--neutral">{zone.sound_profile}</span>}
+                                {zone.booking_required && <span className="marketplace-badge marketplace-badge--neutral">Đặt trước</span>}
+                            </div>
+                        </article>
+                    ))}
+                </div>
+            </section>
+        </FadeIn>
+    );
+});
+
+const GymFacilitiesSection = React.memo(function GymFacilitiesSection({
+    branchAmenities, branchEquipment, branchEquipmentGroups, setRef
+}: {
+    branchAmenities: GymAmenity[], 
+    branchEquipment: GymEquipment[], 
+    branchEquipmentGroups: Record<string, GymEquipment[]>, 
+    setRef: (id: string) => (node: HTMLElement | null) => void
+}) {
+    if (branchAmenities.length === 0 && branchEquipment.length === 0) return null;
+    return (
+        <FadeIn>
+            <section ref={setRef('facilities')} id="facilities" className="marketplace-panel p-6 sm:p-8">
+                <SectionHeading
+                    kicker="Tiện ích"
+                    title="Tiện ích và thiết bị hỗ trợ quyết định"
+                    description="Những chi tiết nhỏ như tủ để đồ, phòng tắm, dịch vụ khăn hay chất lượng trang thiết bị thường là thứ quyết định bạn có duy trì thói quen tạp luyện hay không."
+                />
+
+                <div className="space-y-8">
+                    {branchAmenities.length > 0 && (
+                        <div>
+                            <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Danh sách tiện ích</div>
+                            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                                {branchAmenities.map((item) => (
+                                    <div key={item.id} className={`rounded-xl border px-4 py-4 ${item.is_available ? 'border-[color:var(--mk-line)] bg-white/80' : 'border-[color:var(--mk-line)]/70 bg-[color:var(--mk-paper-strong)]/60 opacity-70'}`}>
+                                        <div className="text-sm font-bold text-[color:var(--mk-text)]">{item.name}</div>
+                                        {item.note && <p className="mt-2 text-sm leading-6 text-[color:var(--mk-muted)]">{item.note}</p>}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {branchEquipment.length > 0 && (
+                        <details className="mt-6 rounded-2xl border border-[color:var(--mk-line)] bg-white/70 group">
+                            <summary className="flex cursor-pointer select-none items-center justify-between px-5 py-4 text-sm font-black uppercase tracking-[0.1em] text-[color:var(--mk-text)] transition hover:bg-white/90">
+                                Thư viện thiết bị ({Object.values(branchEquipmentGroups).flat().length} items)
+                                <span className="text-xl transition-transform group-open:rotate-180">↓</span>
+                            </summary>
+                            <div className="border-t border-[color:var(--mk-line)] p-5">
+                                <div className="grid gap-4 md:grid-cols-2 animate-fade-in">
+                                    {Object.entries(branchEquipmentGroups).map(([category, items]) => (
+                                        <div key={category} className="rounded-2xl border border-[color:var(--mk-line)] bg-white/75 p-4">
+                                            <div className="mb-3 flex items-center justify-between gap-3">
+                                                <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{category}</div>
+                                                <span className="marketplace-badge marketplace-badge--neutral">{items.length} items</span>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {items.map((item) => (
+                                                    <span key={item.id} className="rounded-full border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] px-3 py-1.5 text-[0.8rem] font-semibold text-[color:var(--mk-text)]">
+                                                        {item.name}{item.quantity && item.quantity > 1 ? ` ×${item.quantity}` : ''}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </details>
+                    )}
+                </div>
+            </section>
+        </FadeIn>
+    );
+});
+
+const GymTrainersSection = React.memo(function GymTrainersSection({ branchTrainerLinks, setRef }: { branchTrainerLinks: GymTrainerLink[], setRef: (id: string) => (node: HTMLElement | null) => void }) {
+    if (branchTrainerLinks.length === 0) return null;
+    return (
+        <FadeIn>
+            <section ref={setRef('trainers')} id="trainers" className="marketplace-panel p-6 sm:p-8">
+                <SectionHeading
+                    kicker="Chuyên gia"
+                    title="Ai đang dẫn dắt trải nghiệm tại chi nhánh này"
+                    description="Không chỉ là danh sách Huấn luyện viên — hãy nhìn chuyên môn, ngôn ngữ và nền tảng của họ để đánh giá độ phù hợp với cá nhân bạn."
+                />
+
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    {branchTrainerLinks.map((link) => {
+                        const trainerPath = getTrainerLinkPath(link);
+                        const cardClass = 'group rounded-2xl border border-[color:var(--mk-line)] bg-white/80 p-5 transition hover:-translate-y-1 hover:shadow-[color:var(--mk-shadow-soft)]';
+                        const cardContent = (
+                            <>
+                                <div className="flex items-center gap-4">
+                                    <div className="h-14 w-14 overflow-hidden rounded-full border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
+                                        {link.trainer?.avatar_url ? (
+                                            <img src={link.trainer.avatar_url} alt={link.trainer.full_name} className="h-full w-full object-cover" />
+                                        ) : (
+                                            <div className="flex h-full w-full items-center justify-center text-sm font-black uppercase text-[color:var(--mk-muted)]">
+                                                {(link.trainer?.full_name || 'T').slice(0, 1)}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="min-w-0 flex-1">
+                                        <div className="text-base font-black tracking-[-0.03em] text-[color:var(--mk-text)]">
+                                            {link.trainer?.full_name || 'Đối tác huấn luyện'}
+                                        </div>
+                                        <div className="mt-1 text-sm text-[color:var(--mk-muted)]">
+                                            {link.specialization_summary || link.role_at_gym || 'Huấn luyện viên tại cơ sở này'}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4 flex flex-wrap gap-2">
+                                    {link.featured_at_branch && <span className="marketplace-badge marketplace-badge--accent">Huấn luyện viên nổi bật</span>}
+                                    {link.accepts_private_clients && <span className="marketplace-badge marketplace-badge--neutral">Có nhận học viên riêng</span>}
+                                    {(link.languages || []).slice(0, 2).map((language) => (
+                                        <span key={language} className="marketplace-badge marketplace-badge--neutral">{language}</span>
+                                    ))}
+                                </div>
+
+                                {link.branch_intro && (
+                                    <p className="mt-4 text-sm leading-7 text-[color:var(--mk-text-soft)]">{link.branch_intro}</p>
+                                )}
+                            </>
+                        );
+
+                        return trainerPath ? (
+                            <Link key={link.id} to={trainerPath} className={cardClass}>
+                                {cardContent}
+                            </Link>
+                        ) : (
+                            <div key={link.id} className={cardClass}>
+                                {cardContent}
+                            </div>
+                        );
+                    })}
+                </div>
+            </section>
+        </FadeIn>
+    );
+});
+
+const GymPricingSection = React.memo(function GymPricingSection({ branchPricing, setRef, leadAction }: { branchPricing: GymPricing[], setRef: (id: string) => (node: HTMLElement | null) => void, leadAction: any }) {
+    if (branchPricing.length === 0) return null;
+    return (
+        <FadeIn>
+            <section ref={setRef('pricing')} id="pricing" className="marketplace-panel p-6 sm:p-8">
+                <SectionHeading
+                    kicker="Bảng giá"
+                    title="Các gói vào cửa và cách bắt đầu"
+                    description="Đừng chỉ nhìn gói nổi bật. Hãy nhìn gói khởi điểm, các dịch vụ đi kèm và chính sách để biết chi phí thực sự của việc tập luyện."
+                />
+
+                <div className="grid gap-4 xl:grid-cols-3">
+                    {branchPricing.map((plan: GymPricing) => (
+                        <article
+                            key={plan.id}
+                            className={`flex h-full flex-col rounded-2xl border p-5 ${plan.is_highlighted ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80'}`}
+                        >
+                            <div className="flex items-start justify-between gap-3">
+                                <div>
+                                    <div className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">
+                                        {plan.plan_type || 'membership'}
+                                    </div>
+                                    <h3 className="mt-2 text-xl font-black tracking-[-0.05em] text-[color:var(--mk-text)]">{plan.plan_name}</h3>
+                                </div>
+                                {plan.is_highlighted && <span className="marketplace-badge marketplace-badge--accent">Recommended</span>}
+                            </div>
+
+                            <div className="mt-5 flex items-end gap-2">
+                                <div className="text-[2rem] font-black leading-none tracking-[-0.06em] text-[color:var(--mk-text)]">
+                                    {Number(plan.price).toLocaleString('vi-VN')}₫
+                                </div>
+                                <div className="pb-1 text-sm font-semibold text-[color:var(--mk-muted)]">
+                                    {BILLING_LABELS[plan.billing_cycle] || plan.billing_cycle}
+                                </div>
+                            </div>
+
+                            {plan.description && (
+                                <p className="mt-4 text-sm leading-7 text-[color:var(--mk-text-soft)]">{plan.description}</p>
+                            )}
+
+                            {(plan.included_services || []).length > 0 && (
+                                <div className="mt-4 flex flex-wrap gap-2">
+                                    {(plan.included_services || []).slice(0, 4).map((item) => (
+                                        <span key={item} className="marketplace-badge marketplace-badge--neutral">{item}</span>
+                                    ))}
+                                </div>
+                            )}
+
+                            <div className="mt-5 space-y-2 text-sm text-[color:var(--mk-text-soft)]">
+                                {plan.highlighted_reason && <div>• {plan.highlighted_reason}</div>}
+                                {plan.trial_available && <div>• Có trial {plan.trial_price ? `${Number(plan.trial_price).toLocaleString('vi-VN')}₫` : ''}</div>}
+                                {plan.freeze_policy_summary && <div>• Freeze: {plan.freeze_policy_summary}</div>}
+                                {plan.cancellation_policy_summary && <div>• Cancel: {plan.cancellation_policy_summary}</div>}
+                            </div>
+
+                            <div className="mt-auto pt-6">
+                                {renderActionButton(
+                                    leadAction,
+                                    'block w-full rounded-xl bg-[color:var(--mk-text)] px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-white transition hover:translate-y-[-1px] hover:bg-[color:var(--mk-accent-ink)]'
+                                )}
+                            </div>
+                        </article>
+                    ))}
+                </div>
+            </section>
+        </FadeIn>
+    );
+});

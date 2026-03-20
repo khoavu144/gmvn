@@ -65,19 +65,19 @@ export default function CoachTrustRibbon({
     if (proofs.length === 0) return null;
 
     return (
-        <div className="bg-white border-b border-gray-200">
+        <div className="bg-white border-b border-[color:var(--mk-line)]">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="flex overflow-x-auto gap-0 py-0 scrollbar-hide -mx-4 sm:mx-0">
                     {proofs.slice(0, 6).map((proof, i) => (
                         <div
                             key={i}
                             className={`flex items-center gap-3 px-5 py-4 shrink-0 ${
-                                i > 0 ? 'border-l border-gray-100' : ''
+                                i > 0 ? 'border-l border-[color:var(--mk-line)]' : ''
                             }`}
                         >
                             <span className="text-base">{proof.icon}</span>
                             <div className="min-w-0">
-                                <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-gray-400">
+                                <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-[color:var(--mk-muted)]">
                                     {proof.label}
                                 </div>
                                 <div className="text-sm font-semibold text-black truncate">

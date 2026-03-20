@@ -7,19 +7,21 @@ import { Subscription } from '../entities/Subscription';
 import { In } from 'typeorm';
 
 export const gymReviewService = {
-    // Kiểm tra quyền viết review
-    async canUserReviewGym(userId: string, gymCenterId: string): Promise<{ canReview: boolean; subscriptionId?: string }> {
+    // Kiểm tra quyền viết review — scope: branch-level
+    // User phải có active subscription với trainer thuộc đúng branch đó
+    async canUserReviewGym(userId: string, gymCenterId: string, branchId?: string): Promise<{ canReview: boolean; subscriptionId?: string }> {
         const linkRepo = AppDataSource.getRepository(GymTrainerLink);
         const subscriptionRepo = AppDataSource.getRepository(Subscription);
 
-        // 1. Tìm tất cả trainer thuộc gym này (active links)
-        const trainerLinks = await linkRepo.find({
-            where: { gym_center_id: gymCenterId, status: 'active' },
-        });
+        // 1. Tìm trainer có active link — scope theo branch nếu có, ngược lại fall back về center
+        const whereClause: Record<string, any> = { gym_center_id: gymCenterId, status: 'active' };
+        if (branchId) whereClause.branch_id = branchId;
+
+        const trainerLinks = await linkRepo.find({ where: whereClause });
         const trainerIds = trainerLinks.map(l => l.trainer_id);
         if (trainerIds.length === 0) return { canReview: false };
 
-        // 2. Kiểm tra user có subscription active với bất kỳ trainer nào không
+        // 2. Kiểm tra user có subscription active với trainer thuộc branch này
         const subscription = await subscriptionRepo.findOne({
             where: {
                 user_id: userId,
@@ -38,9 +40,9 @@ export const gymReviewService = {
     async createReview(userId: string, gymCenterId: string, branchId: string, data: { rating: number; comment?: string }) {
         const reviewRepo = AppDataSource.getRepository(GymReview);
 
-        // Check quyền
-        const { canReview, subscriptionId } = await this.canUserReviewGym(userId, gymCenterId);
-        if (!canReview) throw new Error('Bạn cần có subscription với HLV tại gym này để đánh giá');
+        // Check quyền (branch-scope: chỉ reviewer đã tương tác với trainer tại đúng chi nhánh này)
+        const { canReview, subscriptionId } = await this.canUserReviewGym(userId, gymCenterId, branchId);
+        if (!canReview) throw new Error('Bạn cần có subscription với HLV tại chi nhánh này để đánh giá');
 
         // Check đã review chưa
         const existing = await reviewRepo.findOne({ where: { branch_id: branchId, user_id: userId } });

@@ -87,7 +87,7 @@ export default function Register() {
                 </div>
 
                 {/* Card */}
-                <div className="card border border-gray-200 shadow-sm">
+                <div className="card border border-[color:var(--mk-line)] shadow-sm">
                     {error && (
                         <div role="alert" aria-live="assertive" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4 font-medium">
                             {error}
@@ -178,52 +178,52 @@ export default function Register() {
                             <button
                                 onClick={() => handleSelectRoleAndSubmit('user')}
                                 disabled={loading}
-                                className="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
+                                className="w-full text-left p-4 rounded-xl border-2 border-[color:var(--mk-line)] hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
                             >
                                 <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🏋️</div>
                                 <div>
-                                    <div className="font-bold text-gray-900">Tôi muốn tập luyện</div>
-                                    <div className="text-xs text-gray-500 font-medium">Tìm coach, phòng tập và kết nối cộng đồng</div>
+                                    <div className="font-bold text-[color:var(--mk-text)]">Tôi muốn tập luyện</div>
+                                    <div className="text-xs text-[color:var(--mk-muted)] font-medium">Tìm coach, phòng tập và kết nối cộng đồng</div>
                                 </div>
                             </button>
 
                             <button
                                 onClick={() => handleSelectRoleAndSubmit('trainer')}
                                 disabled={loading}
-                                className="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
+                                className="w-full text-left p-4 rounded-xl border-2 border-[color:var(--mk-line)] hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
                             >
                                 <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🎯</div>
                                 <div>
-                                    <div className="font-bold text-gray-900">Tôi là Coach / HLV</div>
-                                    <div className="text-xs text-gray-500 font-medium">Tạo hồ sơ chuyên nghiệp và quản lý học viên</div>
+                                    <div className="font-bold text-[color:var(--mk-text)]">Tôi là Coach / HLV</div>
+                                    <div className="text-xs text-[color:var(--mk-muted)] font-medium">Tạo hồ sơ chuyên nghiệp và quản lý học viên</div>
                                 </div>
                             </button>
 
                             <button
                                 onClick={() => handleSelectRoleAndSubmit('gym_owner')}
                                 disabled={loading}
-                                className="w-full text-left p-4 rounded-xl border-2 border-gray-100 hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
+                                className="w-full text-left p-4 rounded-xl border-2 border-[color:var(--mk-line)] hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
                             >
                                 <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🏢</div>
                                 <div>
-                                    <div className="font-bold text-gray-900">Tôi quản lý Gym</div>
-                                    <div className="text-xs text-gray-500 font-medium">Đưa Gym lên bản đồ và quản lý nhân sự</div>
+                                    <div className="font-bold text-[color:var(--mk-text)]">Tôi quản lý Gym</div>
+                                    <div className="text-xs text-[color:var(--mk-muted)] font-medium">Đưa Gym lên bản đồ và quản lý nhân sự</div>
                                 </div>
                             </button>
 
-                            {loading && <div className="text-center text-sm font-medium text-gray-500 mt-4 animate-pulse">Đang xử lý...</div>}
+                            {loading && <div className="text-center text-sm font-medium text-[color:var(--mk-muted)] mt-4 animate-pulse">Đang xử lý...</div>}
 
                             <button 
                                 onClick={() => setStep(1)} 
                                 disabled={loading}
-                                className="mt-6 text-sm text-gray-500 font-medium hover:text-black w-full text-center flex items-center justify-center gap-1"
+                                className="mt-6 text-sm text-[color:var(--mk-muted)] font-medium hover:text-black w-full text-center flex items-center justify-center gap-1"
                             >
                                 ← Quay lại
                             </button>
                         </div>
                     )}
 
-                    <div className="mt-6 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">
+                    <div className="mt-6 pt-6 border-t border-[color:var(--mk-line)] text-center text-sm text-[color:var(--mk-text-soft)]">
                         Đã có tài khoản?{' '}
                         <Link
                             to="/login"

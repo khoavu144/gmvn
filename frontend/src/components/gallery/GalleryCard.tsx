@@ -79,14 +79,14 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
                                     </h4>
                                     {item.linked_user.user_type === 'trainer' && <CheckCircle2 size={12} className="text-blue-400 flex-shrink-0" />}
                                 </div>
-                                <p className="text-xs text-gray-400 uppercase tracking-widest mt-0.5">
+                                <p className="text-xs text-[color:var(--mk-muted)] uppercase tracking-widest mt-0.5">
                                     {item.linked_user.user_type === 'trainer' ? 'Coach' : 'Athlete'}
                                 </p>
                             </Link>
                         </div>
                         <Link 
                             to={`/coach/${item.linked_user.slug}`}
-                            className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-200 transition-colors"
+                            className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:bg-[color:var(--mk-paper-strong)] transition-colors"
                         >
                             <ArrowRight size={14} />
                         </Link>

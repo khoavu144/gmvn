@@ -23,7 +23,7 @@ export default function CoachResultsShowcase({ photos }: Props) {
         <section className="py-12 sm:py-16">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="mb-8">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-2">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)] mb-2">
                         Kết quả thực tế
                     </div>
                     <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black">
@@ -32,9 +32,9 @@ export default function CoachResultsShowcase({ photos }: Props) {
                 </div>
 
                 {/* Lead transformation — large editorial */}
-                <div className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
-                    <div className="grid grid-cols-2 gap-px bg-gray-100">
-                        <div className="relative bg-gray-50">
+                <div className="bg-white border border-[color:var(--mk-line)] rounded-lg overflow-hidden mb-6">
+                    <div className="grid grid-cols-2 gap-px bg-[color:var(--mk-paper)]">
+                        <div className="relative bg-[color:var(--mk-paper)]">
                             <div className="absolute top-3 left-3 z-10 text-[10px] font-bold uppercase tracking-[0.15em] bg-black/70 text-white px-2 py-1 rounded-sm">
                                 Trước
                             </div>
@@ -48,7 +48,7 @@ export default function CoachResultsShowcase({ photos }: Props) {
                                 decoding="async"
                             />
                         </div>
-                        <div className="relative bg-gray-50">
+                        <div className="relative bg-[color:var(--mk-paper)]">
                             <div className="absolute top-3 left-3 z-10 text-[10px] font-bold uppercase tracking-[0.15em] bg-white text-black px-2 py-1 rounded-sm shadow-sm">
                                 Sau
                             </div>
@@ -70,13 +70,13 @@ export default function CoachResultsShowcase({ photos }: Props) {
                                     <span className="font-bold text-sm text-black">{lead.client_name}</span>
                                 )}
                                 {lead.duration_weeks && (
-                                    <span className="text-xs font-semibold text-gray-500 border border-gray-200 px-2 py-0.5 rounded-sm">
+                                    <span className="text-xs font-semibold text-[color:var(--mk-muted)] border border-[color:var(--mk-line)] px-2 py-0.5 rounded-sm">
                                         {lead.duration_weeks} tuần
                                     </span>
                                 )}
                             </div>
                             {lead.story && (
-                                <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">{lead.story}</p>
+                                <p className="text-sm text-[color:var(--mk-text-soft)] leading-relaxed line-clamp-3">{lead.story}</p>
                             )}
                         </div>
                     )}
@@ -86,8 +86,8 @@ export default function CoachResultsShowcase({ photos }: Props) {
                 {rest.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {rest.map(photo => (
-                            <div key={photo.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                                <div className="grid grid-cols-2 gap-px bg-gray-100">
+                            <div key={photo.id} className="bg-white border border-[color:var(--mk-line)] rounded-lg overflow-hidden">
+                                <div className="grid grid-cols-2 gap-px bg-[color:var(--mk-paper)]">
                                     <img
                                         src={getOptimizedUrl(photo.before_url, 300)}
                                         alt="Ảnh trước"
@@ -106,7 +106,7 @@ export default function CoachResultsShowcase({ photos }: Props) {
                                         <span className="text-xs font-bold text-black">{photo.client_name}</span>
                                     )}
                                     {photo.duration_weeks && (
-                                        <span className="text-[10px] text-gray-500">{photo.duration_weeks} tuần</span>
+                                        <span className="text-[10px] text-[color:var(--mk-muted)]">{photo.duration_weeks} tuần</span>
                                     )}
                                 </div>
                             </div>

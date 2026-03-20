@@ -45,7 +45,7 @@ export default function FeaturedCoaches() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="mb-12 md:mb-16">
                     <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">Danh Sách Nổi Bật</h2>
-                    <p className="text-gray-400 mt-3 text-sm md:text-base">Những chuyên gia hàng đầu kiến tạo sự thay đổi</p>
+                    <p className="text-[color:var(--mk-muted)] mt-3 text-sm md:text-base">Những chuyên gia hàng đầu kiến tạo sự thay đổi</p>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[280px] md:auto-rows-[320px]">
@@ -96,7 +96,7 @@ export default function FeaturedCoaches() {
                                                 </div>
                                             )}
                                             <h3 className="font-black text-xl md:text-2xl mb-1 uppercase tracking-tight line-clamp-1">{coach.full_name}</h3>
-                                            <p className="text-xs uppercase tracking-widest text-gray-400 font-medium line-clamp-1">
+                                            <p className="text-xs uppercase tracking-widest text-[color:var(--mk-muted)] font-medium line-clamp-1">
                                                 {coach.headline || 'Fitness Coach'}
                                             </p>
                                         </div>

@@ -17,7 +17,7 @@ const LazyResponsiveContainer = lazy(() => import('recharts').then((m) => ({ def
 const LazyRadialBarChart = lazy(() => import('recharts').then((m) => ({ default: m.RadialBarChart })));
 const LazyRadialBar = lazy(() => import('recharts').then((m) => ({ default: m.RadialBar })));
 
-const ChartFallback = () => <div className="h-full w-full animate-pulse rounded-lg bg-gray-100" />;
+const ChartFallback = () => <div className="h-full w-full animate-pulse rounded-lg bg-[color:var(--mk-paper)]" />;
 
 const GymOwnerDashboard: React.FC = () => {
     const { toast, ToastComponent } = useToast();
@@ -111,8 +111,8 @@ const GymOwnerDashboard: React.FC = () => {
         return (
             <div className="min-h-screen flex">
                 {ToastComponent}
-                <div className="w-64 bg-gray-50 border-r border-gray-200"></div>
-                <div className="flex-1 p-8"><div className="animate-pulse h-32 bg-gray-100 rounded-xl" /></div>
+                <div className="w-64 bg-[color:var(--mk-paper)] border-r border-[color:var(--mk-line)]"></div>
+                <div className="flex-1 p-8"><div className="animate-pulse h-32 bg-[color:var(--mk-paper)] rounded-xl" /></div>
             </div>
         );
     }
@@ -137,7 +137,7 @@ const GymOwnerDashboard: React.FC = () => {
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             {/* Mobile Header Toggle */}
-            <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-30">
+            <div className="md:hidden flex items-center justify-between p-4 border-b border-[color:var(--mk-line)] bg-white sticky top-0 z-30">
                 <div className="font-black uppercase tracking-tight truncate flex-1 mr-4">{gym.name}</div>
                 <button onClick={() => setIsSidebarOpen(true)} className="p-2 border border-black text-black rounded-sm hover:bg-black hover:text-white transition-colors">
                     <Menu className="w-5 h-5" />
@@ -150,27 +150,27 @@ const GymOwnerDashboard: React.FC = () => {
             )}
 
             {/* Sidebar */}
-            <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-gray-50 border-r border-gray-200 flex-shrink-0 transform transition-transform duration-300 md:relative md:w-64 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-white md:bg-gray-50">
+            <div className={`fixed inset-y-0 left-0 z-50 w-72 bg-[color:var(--mk-paper)] border-r border-[color:var(--mk-line)] flex-shrink-0 transform transition-transform duration-300 md:relative md:w-64 md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="p-6 border-b border-[color:var(--mk-line)] flex justify-between items-center bg-white md:bg-[color:var(--mk-paper)]">
                     <div className="min-w-0 pr-4">
                         <h2 className="font-black truncate uppercase tracking-tight" title={gym.name}>{gym.name}</h2>
-                        <p className="text-xs text-gray-500 uppercase tracking-widest mt-1">Gym Center</p>
+                        <p className="text-xs text-[color:var(--mk-muted)] uppercase tracking-widest mt-1">Gym Center</p>
                     </div>
-                    <button onClick={() => setIsSidebarOpen(false)} className="md:hidden p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors">
+                    <button onClick={() => setIsSidebarOpen(false)} className="md:hidden p-2 text-[color:var(--mk-muted)] hover:text-black hover:bg-[color:var(--mk-paper)] rounded-lg transition-colors">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
                 <nav className="p-4 space-y-2">
-                    <button onClick={() => { setActiveTab('overview'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'overview' ? 'bg-black text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}>
+                    <button onClick={() => { setActiveTab('overview'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'overview' ? 'bg-black text-white shadow-md' : 'text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper-strong)]'}`}>
                         <CalendarDays className="w-4 h-4" /> Tổng quan
                     </button>
-                    <button onClick={() => { setActiveTab('branches'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'branches' ? 'bg-black text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}>
+                    <button onClick={() => { setActiveTab('branches'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'branches' ? 'bg-black text-white shadow-md' : 'text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper-strong)]'}`}>
                         <Building2 className="w-4 h-4" /> Chi nhánh
                     </button>
-                    <button onClick={() => { setActiveTab('trainers'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'trainers' ? 'bg-black text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}>
+                    <button onClick={() => { setActiveTab('trainers'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'trainers' ? 'bg-black text-white shadow-md' : 'text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper-strong)]'}`}>
                         <Users className="w-4 h-4" /> Coach liên kết
                     </button>
-                    <button onClick={() => { setActiveTab('settings'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'settings' ? 'bg-black text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'}`}>
+                    <button onClick={() => { setActiveTab('settings'); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors ${activeTab === 'settings' ? 'bg-black text-white shadow-md' : 'text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper-strong)]'}`}>
                         <Settings className="w-4 h-4" /> Cài đặt
                     </button>
                 </nav>
@@ -182,7 +182,7 @@ const GymOwnerDashboard: React.FC = () => {
                     <div className="animate-fade-in">
                         <div className="mb-10">
                             <h1 className="text-3xl font-black uppercase tracking-tight mb-2">Thống Kê Tổng Quan</h1>
-                            <p className="text-gray-500">Giám sát hoạt động trên hệ thống GYMERVIET</p>
+                            <p className="text-[color:var(--mk-muted)]">Giám sát hoạt động trên hệ thống GYMERVIET</p>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-12">
@@ -192,16 +192,16 @@ const GymOwnerDashboard: React.FC = () => {
                                 { label: 'Đánh giá', val: stats?.avg_rating ? `★ ${stats.avg_rating.toFixed(1)}` : 'N/A' },
                                 { label: 'HLV liên kết', val: stats?.total_trainers ?? 0 },
                             ].map((item, i) => (
-                                <div key={i} className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm">
-                                    <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-2">{item.label}</p>
+                                <div key={i} className="p-6 rounded-xl border border-[color:var(--mk-line)] bg-white shadow-sm">
+                                    <p className="text-xs text-[color:var(--mk-muted)] font-bold uppercase tracking-widest mb-2">{item.label}</p>
                                     <p className="text-3xl font-black">{item.val}</p>
                                 </div>
                             ))}
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-                            <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm h-80 col-span-1 lg:col-span-2 flex flex-col">
-                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-6">Phân bổ đánh giá</p>
+                            <div className="p-6 rounded-xl border border-[color:var(--mk-line)] bg-white shadow-sm h-80 col-span-1 lg:col-span-2 flex flex-col">
+                                <p className="text-xs text-[color:var(--mk-muted)] font-bold uppercase tracking-widest mb-6">Phân bổ đánh giá</p>
                                 <div className="flex-1 min-h-0">
                                     <Suspense fallback={<ChartFallback />}>
                                         <LazyResponsiveContainer width="100%" height="100%">
@@ -224,8 +224,8 @@ const GymOwnerDashboard: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm h-80 col-span-1 flex flex-col">
-                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mb-2">Tỷ lệ lấp đầy HLV</p>
+                            <div className="p-6 rounded-xl border border-[color:var(--mk-line)] bg-white shadow-sm h-80 col-span-1 flex flex-col">
+                                <p className="text-xs text-[color:var(--mk-muted)] font-bold uppercase tracking-widest mb-2">Tỷ lệ lấp đầy HLV</p>
                                 <div className="flex-1 min-h-0 relative">
                                     <Suspense fallback={<ChartFallback />}>
                                         <LazyResponsiveContainer width="100%" height="100%">
@@ -258,15 +258,15 @@ const GymOwnerDashboard: React.FC = () => {
                             <h2 className="text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-2"><Star className="w-5 h-5 text-yellow-500 fill-yellow-500" /> Đánh giá gần đây</h2>
                             <div className="grid md:grid-cols-3 gap-6">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="p-5 rounded-xl border border-gray-200 bg-white shadow-sm hover:border-black transition-colors cursor-pointer group flex flex-col min-h-[160px]">
+                                    <div key={i} className="p-5 rounded-xl border border-[color:var(--mk-line)] bg-white shadow-sm hover:border-black transition-colors cursor-pointer group flex flex-col min-h-[160px]">
                                         <div className="flex justify-between items-start mb-3">
                                             <div className="flex gap-1">
                                                 {[...Array(5)].map((_, idx) => <Star key={idx} className={`w-3 h-3 ${idx === 4 && i === 3 ? 'text-gray-300' : 'text-yellow-400 fill-yellow-400'}`} />)}
                                             </div>
-                                            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{i} ngày trước</span>
+                                            <span className="text-[10px] text-[color:var(--mk-muted)] font-bold uppercase tracking-widest">{i} ngày trước</span>
                                         </div>
-                                        <p className="text-sm text-gray-700 italic line-clamp-3 mb-4 flex-1">"Phòng tập sạch sẽ, cơ sở vật chất tuyệt vời. Rất đáng tiền đăng ký gói năm ở đây!"</p>
-                                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest border-t border-gray-100 pt-3 flex items-center justify-between mt-auto">
+                                        <p className="text-sm text-[color:var(--mk-text-soft)] italic line-clamp-3 mb-4 flex-1">"Phòng tập sạch sẽ, cơ sở vật chất tuyệt vời. Rất đáng tiền đăng ký gói năm ở đây!"</p>
+                                        <div className="text-[10px] font-bold text-[color:var(--mk-muted)] uppercase tracking-widest border-t border-[color:var(--mk-line)] pt-3 flex items-center justify-between mt-auto">
                                             <span>Hội viên ẩn danh</span>
                                             <span className="text-black opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Xem <ArrowRight className="w-3 h-3 inline" /></span>
                                         </div>
@@ -282,7 +282,7 @@ const GymOwnerDashboard: React.FC = () => {
                         <div className="flex justify-between items-end mb-10">
                             <div>
                                 <h1 className="text-3xl font-black uppercase tracking-tight mb-2">Quản lý Chi Nhánh</h1>
-                                <p className="text-gray-500">Thêm, sửa thông tin chi tiết từng cơ sở</p>
+                                <p className="text-[color:var(--mk-muted)]">Thêm, sửa thông tin chi tiết từng cơ sở</p>
                             </div>
                             <button
                                 className="btn-primary py-2 px-4 shadow-none"
@@ -294,14 +294,14 @@ const GymOwnerDashboard: React.FC = () => {
 
                         {/* ─── NEW BRANCH FORM ─── */}
                         {showNewBranchForm && (
-                            <div className="mb-8 p-6 border-2 border-black rounded-xl bg-gray-50 animate-fade-in">
+                            <div className="mb-8 p-6 border-2 border-black rounded-xl bg-[color:var(--mk-paper)] animate-fade-in">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="text-lg font-black uppercase tracking-tight">Thêm Chi Nhánh Mới</h2>
-                                    <button onClick={() => setShowNewBranchForm(false)} className="text-gray-400 hover:text-black text-2xl font-black transition-colors">×</button>
+                                    <button onClick={() => setShowNewBranchForm(false)} className="text-[color:var(--mk-muted)] hover:text-black text-2xl font-black transition-colors">×</button>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Tên chi nhánh <span className="text-red-500">*</span></label>
+                                        <label className="text-xs font-bold text-[color:var(--mk-muted)] uppercase tracking-wider block mb-1">Tên chi nhánh <span className="text-red-500">*</span></label>
                                         <input
                                             type="text"
                                             className="form-input w-full"
@@ -311,7 +311,7 @@ const GymOwnerDashboard: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Số điện thoại</label>
+                                        <label className="text-xs font-bold text-[color:var(--mk-muted)] uppercase tracking-wider block mb-1">Số điện thoại</label>
                                         <input
                                             type="text"
                                             className="form-input w-full"
@@ -321,7 +321,7 @@ const GymOwnerDashboard: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Địa chỉ <span className="text-red-500">*</span></label>
+                                        <label className="text-xs font-bold text-[color:var(--mk-muted)] uppercase tracking-wider block mb-1">Địa chỉ <span className="text-red-500">*</span></label>
                                         <input
                                             type="text"
                                             className="form-input w-full"
@@ -332,7 +332,7 @@ const GymOwnerDashboard: React.FC = () => {
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Quận/Huyện</label>
+                                            <label className="text-xs font-bold text-[color:var(--mk-muted)] uppercase tracking-wider block mb-1">Quận/Huyện</label>
                                             <input
                                                 type="text"
                                                 className="form-input w-full"
@@ -342,7 +342,7 @@ const GymOwnerDashboard: React.FC = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Thành phố</label>
+                                            <label className="text-xs font-bold text-[color:var(--mk-muted)] uppercase tracking-wider block mb-1">Thành phố</label>
                                             <input
                                                 type="text"
                                                 className="form-input w-full"
@@ -354,7 +354,7 @@ const GymOwnerDashboard: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="mb-4">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-1">Giới thiệu ngắn</label>
+                                    <label className="text-xs font-bold text-[color:var(--mk-muted)] uppercase tracking-wider block mb-1">Giới thiệu ngắn</label>
                                     <textarea
                                         className="form-input w-full h-20"
                                         placeholder="Đặc điểm nổi bật của chi nhánh này..."
@@ -371,7 +371,7 @@ const GymOwnerDashboard: React.FC = () => {
                                         {creatingBranch ? 'Đang tạo...' : 'Tạo chi nhánh'}
                                     </button>
                                     <button
-                                        className="px-8 py-3 border border-gray-300 rounded-lg font-bold text-sm text-gray-600 hover:border-black transition-colors"
+                                        className="px-8 py-3 border border-[color:var(--mk-line)] rounded-lg font-bold text-sm text-[color:var(--mk-text-soft)] hover:border-black transition-colors"
                                         onClick={() => setShowNewBranchForm(false)}
                                     >
                                         Huỷ
@@ -382,17 +382,17 @@ const GymOwnerDashboard: React.FC = () => {
 
                         <div className="grid gap-6">
                             {branches.map((branch: GymBranch) => (
-                                <div key={branch.id} className="p-6 border border-gray-200 rounded-xl flex items-center justify-between hover:border-black transition-colors cursor-pointer group" onClick={() => setEditingBranch(branch)}>
+                                <div key={branch.id} className="p-6 border border-[color:var(--mk-line)] rounded-xl flex items-center justify-between hover:border-black transition-colors cursor-pointer group" onClick={() => setEditingBranch(branch)}>
                                     <div>
                                         <h3 className="font-bold text-lg">{branch.branch_name}</h3>
-                                        <p className="text-gray-500 text-sm mt-1">{branch.address}, {branch.district}, {branch.city}</p>
+                                        <p className="text-[color:var(--mk-muted)] text-sm mt-1">{branch.address}, {branch.district}, {branch.city}</p>
                                     </div>
-                                    <button className="text-sm font-bold text-gray-400 group-hover:text-black uppercase tracking-wider">Cập nhật</button>
+                                    <button className="text-sm font-bold text-[color:var(--mk-muted)] group-hover:text-black uppercase tracking-wider">Cập nhật</button>
                                 </div>
                             ))}
                             {branches.length === 0 && (
-                                <div className="py-16 text-center border-2 border-dashed border-gray-200 rounded-xl">
-                                    <p className="text-gray-400 font-bold uppercase text-sm">Chưa có chi nhánh nào</p>
+                                <div className="py-16 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-xl">
+                                    <p className="text-[color:var(--mk-muted)] font-bold uppercase text-sm">Chưa có chi nhánh nào</p>
                                     <button className="mt-4 btn-primary py-2 px-6" onClick={() => setShowNewBranchForm(true)}>Thêm chi nhánh đầu tiên</button>
                                 </div>
                             )}
@@ -405,7 +405,7 @@ const GymOwnerDashboard: React.FC = () => {
                         <div className="flex justify-between items-end mb-10">
                             <div>
                                 <h1 className="text-3xl font-black uppercase tracking-tight mb-2">Quản lý Coach liên kết</h1>
-                                <p className="text-gray-500">Mời Coach tham gia chi nhánh và cấp quyền quản lý hội viên</p>
+                                <p className="text-[color:var(--mk-muted)]">Mời Coach tham gia chi nhánh và cấp quyền quản lý hội viên</p>
                             </div>
                             <button 
                                 className="btn-primary py-2 px-4 shadow-none flex items-center gap-2"
@@ -418,7 +418,7 @@ const GymOwnerDashboard: React.FC = () => {
                         {/* Search and Filter */}
                         <div className="flex flex-col sm:flex-row gap-4 mb-6">
                             <div className="relative flex-1">
-                                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <Search className="w-4 h-4 text-[color:var(--mk-muted)] absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input type="text" placeholder="Tìm kiếm tên, sđt Coach..." className="form-input pl-10 w-full" />
                             </div>
                             <select className="form-input w-full sm:w-48">
@@ -429,20 +429,20 @@ const GymOwnerDashboard: React.FC = () => {
 
                         <div className="grid gap-4">
                             {[1, 2, 3].map(i => (
-                                <div key={i} className="p-4 border border-gray-200 rounded-xl flex flex-col md:flex-row md:items-center justify-between hover:border-black transition-colors bg-white group">
+                                <div key={i} className="p-4 border border-[color:var(--mk-line)] rounded-xl flex flex-col md:flex-row md:items-center justify-between hover:border-black transition-colors bg-white group">
                                     <div className="flex items-center gap-4 mb-4 md:mb-0">
-                                        <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-black text-gray-400 uppercase">C{i}</div>
+                                        <div className="w-12 h-12 rounded-full bg-[color:var(--mk-paper)] flex items-center justify-center font-black text-[color:var(--mk-muted)] uppercase">C{i}</div>
                                         <div>
                                             <h3 className="font-bold text-base flex items-center gap-2">Coach Nguyễn Văn A {i === 1 && <span className="bg-green-100 text-green-700 text-[10px] uppercase font-bold px-2 py-0.5 rounded-sm">Premium</span>}</h3>
-                                            <p className="text-gray-500 text-xs mt-1">Chuyên môn: Thể hình, Giảm mỡ • 091234567{i}</p>
+                                            <p className="text-[color:var(--mk-muted)] text-xs mt-1">Chuyên môn: Thể hình, Giảm mỡ • 091234567{i}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between md:justify-end gap-6 text-sm">
                                         <div className="text-left md:text-right">
-                                            <span className="block text-[10px] text-gray-400 uppercase font-bold tracking-widest">Chi nhánh chính</span>
+                                            <span className="block text-[10px] text-[color:var(--mk-muted)] uppercase font-bold tracking-widest">Chi nhánh chính</span>
                                             <span className="font-semibold text-black">Gymerviet Quận {i}</span>
                                         </div>
-                                        <button className="p-2 border border-gray-200 rounded-lg text-gray-400 hover:text-black hover:border-black transition-colors" title="Xóa liên kết">
+                                        <button className="p-2 border border-[color:var(--mk-line)] rounded-lg text-[color:var(--mk-muted)] hover:text-black hover:border-black transition-colors" title="Xóa liên kết">
                                             <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
@@ -456,13 +456,13 @@ const GymOwnerDashboard: React.FC = () => {
                     <div className="animate-fade-in">
                         <div className="mb-10">
                             <h1 className="text-3xl font-black uppercase tracking-tight mb-2">Hồ sơ Thương hiệu</h1>
-                            <p className="text-gray-500">Cập nhật thông tin hệ thống Gym Center và bộ nhận diện</p>
+                            <p className="text-[color:var(--mk-muted)]">Cập nhật thông tin hệ thống Gym Center và bộ nhận diện</p>
                         </div>
                         <div className="grid md:grid-cols-3 gap-8">
-                            <div className="md:col-span-2 space-y-6 bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
-                                <h3 className="text-lg font-black uppercase tracking-tight border-b border-gray-100 pb-3">Thông tin cơ bản</h3>
+                            <div className="md:col-span-2 space-y-6 bg-white border border-[color:var(--mk-line)] p-6 rounded-xl shadow-sm">
+                                <h3 className="text-lg font-black uppercase tracking-tight border-b border-[color:var(--mk-line)] pb-3">Thông tin cơ bản</h3>
                                 <div>
-                                    <label className="form-label block mb-2 font-bold text-xs uppercase text-gray-500 tracking-widest">Tên Gym Center *</label>
+                                    <label className="form-label block mb-2 font-bold text-xs uppercase text-[color:var(--mk-muted)] tracking-widest">Tên Gym Center *</label>
                                     <input
                                         type="text"
                                         className="form-input w-full"
@@ -471,7 +471,7 @@ const GymOwnerDashboard: React.FC = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="form-label block mb-2 font-bold text-xs uppercase text-gray-500 tracking-widest">Giới thiệu tổng quan</label>
+                                    <label className="form-label block mb-2 font-bold text-xs uppercase text-[color:var(--mk-muted)] tracking-widest">Giới thiệu tổng quan</label>
                                     <textarea
                                         className="form-input w-full h-32"
                                         value={settingsForm.description}
@@ -480,14 +480,14 @@ const GymOwnerDashboard: React.FC = () => {
                                     ></textarea>
                                 </div>
 
-                                <h3 className="text-lg font-black uppercase tracking-tight border-b border-gray-100 pb-3 mt-8">Liên kết MXH</h3>
+                                <h3 className="text-lg font-black uppercase tracking-tight border-b border-[color:var(--mk-line)] pb-3 mt-8">Liên kết MXH</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="form-label block mb-2 font-bold text-xs uppercase text-gray-500 tracking-widest">Fanpage Facebook</label>
+                                        <label className="form-label block mb-2 font-bold text-xs uppercase text-[color:var(--mk-muted)] tracking-widest">Fanpage Facebook</label>
                                         <input type="text" className="form-input w-full placeholder-gray-300" placeholder="https://facebook.com/..." />
                                     </div>
                                     <div>
-                                        <label className="form-label block mb-2 font-bold text-xs uppercase text-gray-500 tracking-widest">Website / Tiktok</label>
+                                        <label className="form-label block mb-2 font-bold text-xs uppercase text-[color:var(--mk-muted)] tracking-widest">Website / Tiktok</label>
                                         <input type="text" className="form-input w-full placeholder-gray-300" placeholder="https://..." />
                                     </div>
                                 </div>
@@ -502,18 +502,18 @@ const GymOwnerDashboard: React.FC = () => {
                             </div>
 
                             <div className="col-span-1 space-y-6">
-                                <div className="bg-white border border-gray-200 p-6 rounded-xl shadow-sm text-center">
+                                <div className="bg-white border border-[color:var(--mk-line)] p-6 rounded-xl shadow-sm text-center">
                                     <h3 className="text-sm font-black uppercase tracking-tight mb-4">Logo Phòng Tập</h3>
-                                    <div className="w-32 h-32 mx-auto bg-gray-50 rounded-full border border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:bg-white hover:border-black hover:text-black cursor-pointer transition-colors mb-4 group">
+                                    <div className="w-32 h-32 mx-auto bg-[color:var(--mk-paper)] rounded-full border border-dashed border-[color:var(--mk-line)] flex flex-col items-center justify-center text-[color:var(--mk-muted)] hover:bg-white hover:border-black hover:text-black cursor-pointer transition-colors mb-4 group">
                                         <Upload className="w-6 h-6 mb-2 group-hover:scale-110 transition-transform" />
                                         <span className="text-[10px] font-bold uppercase tracking-widest text-center px-4 leading-tight">Tải ảnh lên<br />(Tối đa 2MB)</span>
                                     </div>
                                 </div>
-                                <div className="bg-gray-50 border border-gray-200 p-6 rounded-xl">
+                                <div className="bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] p-6 rounded-xl">
                                     <h3 className="text-sm font-black uppercase tracking-tight mb-2">Public Profile</h3>
-                                    <p className="text-xs text-gray-500 mb-4 leading-relaxed">Hồ sơ sẽ hiển thị tới công chúng sau khi được admin GYMERVIET phê duyệt.</p>
-                                    <div className="flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-gray-200 shadow-sm">
-                                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Trạng thái</span>
+                                    <p className="text-xs text-[color:var(--mk-muted)] mb-4 leading-relaxed">Hồ sơ sẽ hiển thị tới công chúng sau khi được admin GYMERVIET phê duyệt.</p>
+                                    <div className="flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-[color:var(--mk-line)] shadow-sm">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--mk-muted)]">Trạng thái</span>
                                         <span className="text-[10px] font-black uppercase tracking-widest text-green-700 bg-green-100 px-2 py-1 rounded-sm">Đang hoạt động</span>
                                     </div>
                                 </div>
@@ -539,11 +539,11 @@ const GymOwnerDashboard: React.FC = () => {
                 <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onClick={() => setShowInviteModal(false)}>
                     <div className="bg-white rounded-xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
                         <h3 className="text-xl font-black uppercase tracking-tight mb-4">Mời Coach Tham Gia</h3>
-                        <p className="text-sm text-gray-500 mb-6">Gửi lời mời liên kết đến huấn luyện viên thông qua email.</p>
+                        <p className="text-sm text-[color:var(--mk-muted)] mb-6">Gửi lời mời liên kết đến huấn luyện viên thông qua email.</p>
                         
                         <div className="space-y-4 mb-6">
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-1">Email của Coach</label>
+                                <label className="text-xs font-bold text-[color:var(--mk-muted)] uppercase tracking-widest block mb-1">Email của Coach</label>
                                 <input 
                                     type="email" 
                                     className="form-input w-full" 
@@ -553,7 +553,7 @@ const GymOwnerDashboard: React.FC = () => {
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-1">Vai trò</label>
+                                <label className="text-xs font-bold text-[color:var(--mk-muted)] uppercase tracking-widest block mb-1">Vai trò</label>
                                 <select 
                                     className="form-input w-full"
                                     value={inviteForm.role}
@@ -590,7 +590,7 @@ const GymOwnerDashboard: React.FC = () => {
                             >
                                 Gửi lời mời
                             </button>
-                            <button className="flex-1 py-3 border border-gray-300 rounded-lg font-bold text-sm text-gray-600 hover:border-black transition-colors" onClick={() => setShowInviteModal(false)}>
+                            <button className="flex-1 py-3 border border-[color:var(--mk-line)] rounded-lg font-bold text-sm text-[color:var(--mk-text-soft)] hover:border-black transition-colors" onClick={() => setShowInviteModal(false)}>
                                 Huỷ
                             </button>
                         </div>

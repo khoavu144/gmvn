@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import { useToast } from '../components/Toast';
 import '../styles/coachProfile.css';
+import { Skeleton } from '../components/ui/Skeleton';
 
 // Layout / sidebar
 import ProfileSidebar from '../components/profile/ProfileSidebar';
@@ -226,6 +227,17 @@ export default function CoachDetailPage() {
         navigate(`/messages?to=${trainer?.id}`);
     };
 
+    const primaryCta = useMemo(() => {
+        if (!user) return { text: 'Đăng nhập để đặt lịch', action: () => navigate('/login') };
+        if (user.user_type === 'gym_owner') return { text: 'Mời về phòng tập', action: () => toast.success('Tính năng "Mời về phòng tập" đang được phát triển!') };
+        return { text: 'Đặt lịch tập', action: () => {
+            const el = document.getElementById('section-packages');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } };
+    }, [user, navigate, toast]);
+
+    const secondaryCta = { text: 'Nhắn tin để tư vấn', action: handleMessage };
+
     const BASE_URL = import.meta.env.VITE_CANONICAL_BASE_URL ?? 'https://gymerviet.com';
     const canonicalPath = trainer?.slug ? `/coach/${trainer.slug}` : `/coaches/${trainerId ?? ''}`;
     const canonicalUrl = `${BASE_URL}${canonicalPath}`;
@@ -262,33 +274,14 @@ export default function CoachDetailPage() {
     // Loading skeleton — section-aware
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0a0a0a]">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20 animate-pulse">
-                    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-16">
-                        <div className="space-y-6">
-                            <div className="h-4 w-24 bg-white/10 rounded" />
-                            <div className="h-14 w-3/4 bg-white/10 rounded" />
-                            <div className="h-5 w-2/3 bg-white/5 rounded" />
-                            <div className="flex gap-4 mt-8">
-                                <div className="h-12 w-36 bg-white/10 rounded" />
-                                <div className="h-12 w-32 bg-white/5 rounded" />
-                            </div>
+            <div className="min-h-screen bg-white">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
+                    <div className="flex gap-10">
+                        <div className="flex-1">
+                            <Skeleton className="h-[28rem] w-full rounded-3xl" />
                         </div>
-                        <div className="h-[400px] bg-white/5 rounded-lg" />
-                    </div>
-                </div>
-                <div className="bg-white">
-                    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
-                        <div className="flex gap-10 animate-pulse">
-                            {[1, 2, 3, 4].map(i => (
-                                <div key={i} className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-gray-100 rounded" />
-                                    <div className="space-y-1">
-                                        <div className="h-2 w-12 bg-gray-100 rounded" />
-                                        <div className="h-3 w-20 bg-gray-100 rounded" />
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="w-[320px] hidden lg:block">
+                            <Skeleton className="h-[28rem] w-full rounded-3xl" />
                         </div>
                     </div>
                 </div>
@@ -298,10 +291,10 @@ export default function CoachDetailPage() {
 
     if (!trainer) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4 px-4 text-center">
+            <div className="min-h-screen bg-[color:var(--mk-paper)] flex flex-col items-center justify-center gap-4 px-4 text-center">
                 <div className="text-5xl font-extrabold text-gray-100 mb-2">404</div>
-                <div className="text-gray-800 font-bold text-lg">Không tìm thấy Hồ sơ</div>
-                <p className="text-sm text-gray-500 max-w-sm">Người dùng này có thể đã thay đổi URL hoặc không còn hoạt động trên GYMERVIET.</p>
+                <div className="text-[color:var(--mk-text)] font-bold text-lg">Không tìm thấy Hồ sơ</div>
+                <p className="text-sm text-[color:var(--mk-muted)] max-w-sm">Người dùng này có thể đã thay đổi URL hoặc không còn hoạt động trên GYMERVIET.</p>
                 {/* FIX: use Link not <a href> for SPA-smooth navigation */}
                 <Link to="/coaches" className="btn-primary mt-4 px-6">← Về trang khám phá</Link>
             </div>
@@ -358,7 +351,7 @@ export default function CoachDetailPage() {
             {ToastComponent}
 
             {/* Mobile sticky nav (visible only < 1024px) */}
-            <CoachMobileNav name={trainer.full_name} onMessage={handleMessage} />
+            <CoachMobileNav name={trainer.full_name} onMessage={handleMessage} primaryCta={primaryCta} />
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-0">
                 <div className="flex items-center justify-end">
@@ -387,6 +380,8 @@ export default function CoachDetailPage() {
                     socialLinks={sidebarSocialLinks}
                     location={trainerProfile?.location || null}
                     onContactClick={handleMessage}
+                    primaryCta={primaryCta}
+                    secondaryCta={secondaryCta}
                 />
 
                 {/* Scrollable main content */}
@@ -408,6 +403,8 @@ export default function CoachDetailPage() {
                             highlights={premium?.highlights || []}
                             basePriceMonthly={trainer.base_price_monthly}
                             onMessage={handleMessage}
+                            primaryCta={primaryCta}
+                            secondaryCta={secondaryCta}
                         />
                     </div>
 
@@ -454,6 +451,7 @@ export default function CoachDetailPage() {
                             location={trainerProfile?.location || null}
                             socialLinks={sidebarSocialLinks}
                             onMessage={handleMessage}
+                            primaryCta={primaryCta}
                         />
                     </div>
 
@@ -471,30 +469,30 @@ export default function CoachDetailPage() {
                     aria-modal="true"
                     aria-labelledby="payment-dialog-title"
                 >
-                    <div className="bg-white rounded-xl p-6 sm:p-8 max-w-sm w-full space-y-6 shadow-2xl">
-                        <div className="flex justify-between items-center border-b border-gray-100 pb-4">
+                    <div className="bg-white rounded-xl p-6 sm:p-8 max-w-sm w-full space-y-6 shadow-md">
+                        <div className="flex justify-between items-center border-b border-[color:var(--mk-line)] pb-4">
                             <h3 id="payment-dialog-title" className="text-xl font-extrabold">Thanh Toán</h3>
                             <button
                                 ref={paymentCloseRef}
                                 onClick={() => setPendingPayment(null)}
-                                className="text-gray-400 hover:text-black text-lg"
+                                className="text-[color:var(--mk-muted)] hover:text-black text-lg"
                                 aria-label="Đóng hộp thoại thanh toán"
                             >✕</button>
                         </div>
                         <div className="text-center space-y-4">
-                            <p className="text-sm text-gray-600">Chuyển khoản với nội dung chính xác bên dưới.</p>
+                            <p className="text-sm text-[color:var(--mk-text-soft)]">Chuyển khoản với nội dung chính xác bên dưới.</p>
                             <img
                                 src={`https://img.vietqr.io/image/970436-${import.meta.env.VITE_PLATFORM_BANK_ACCOUNT || '0987654321'}-compact2.png?amount=${pendingPayment.amount}&addInfo=${encodeURIComponent(pendingPayment.transfer_content)}&accountName=GYMERVIET`}
                                 alt="QR Code"
-                                className="mx-auto border border-gray-200 rounded-lg w-48 h-48 object-contain"
+                                className="mx-auto border border-[color:var(--mk-line)] rounded-lg w-48 h-48 object-contain"
                             />
-                            <div className="bg-gray-50 p-4 rounded-lg text-left text-sm space-y-2 font-mono">
+                            <div className="bg-[color:var(--mk-paper)] p-4 rounded-lg text-left text-sm space-y-2 font-mono">
                                 <div className="flex justify-between">
-                                    <span className="text-gray-500">Số tiền:</span>
+                                    <span className="text-[color:var(--mk-muted)]">Số tiền:</span>
                                     <span className="font-bold text-black">{pendingPayment.amount.toLocaleString('vi-VN')} VND</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-500">Nội dung:</span>
+                                    <span className="text-[color:var(--mk-muted)]">Nội dung:</span>
                                     <span className="font-bold text-black border-b border-black">{pendingPayment.transfer_content}</span>
                                 </div>
                             </div>

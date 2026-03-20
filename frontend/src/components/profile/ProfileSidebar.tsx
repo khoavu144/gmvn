@@ -8,6 +8,11 @@ interface SocialLinks {
   website?: string;
 }
 
+interface CtaProps {
+  text: string;
+  action: () => void;
+}
+
 interface ProfileSidebarProps {
   name: string;
   avatarUrl: string | null;
@@ -16,7 +21,9 @@ interface ProfileSidebarProps {
   isAcceptingClients: boolean;
   socialLinks: SocialLinks;
   location: string | null;
-  onContactClick: () => void;
+  onContactClick?: () => void;
+  primaryCta?: CtaProps;
+  secondaryCta?: CtaProps;
 }
 
 const NAV_ITEMS = [
@@ -52,7 +59,7 @@ const NAV_ITEMS = [
 
 export default function ProfileSidebar({
   name, avatarUrl, headline, isVerified, isAcceptingClients,
-  socialLinks, location, onContactClick,
+  socialLinks, location, onContactClick, primaryCta, secondaryCta
 }: ProfileSidebarProps) {
   const [activeSection, setActiveSection] = useState('about');
   // Guard: social_links from DB can be null even if typed as SocialLinks
@@ -166,12 +173,23 @@ export default function ProfileSidebar({
         </div>
       )}
 
+      {primaryCta && (
+        <button
+          onClick={primaryCta.action}
+          className="sidebar-cta-btn"
+          style={{ marginBottom: '8px', background: 'var(--mk-text)', color: 'white' }}
+          aria-label={primaryCta.text}
+        >
+          {primaryCta.text}
+        </button>
+      )}
       <button
-        onClick={onContactClick}
+        onClick={secondaryCta ? secondaryCta.action : onContactClick}
         className="sidebar-cta-btn"
-        aria-label={`Nhắn tin với ${name} để được tư vấn`}
+        style={primaryCta ? { background: 'white', border: '1px solid var(--mk-line)', color: 'var(--mk-text)' } : undefined}
+        aria-label={secondaryCta ? secondaryCta.text : `Nhắn tin với ${name} để được tư vấn`}
       >
-        Nhắn tin để tư vấn
+        {secondaryCta ? `💬 ${secondaryCta.text}` : 'Nhắn tin để tư vấn'}
       </button>
     </aside>
   );

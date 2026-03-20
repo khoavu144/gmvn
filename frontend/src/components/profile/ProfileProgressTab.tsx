@@ -128,21 +128,21 @@ export function ProfileProgressTab() {
             </div>
 
             {isLoading ? (
-                <div className="text-gray-500">Đang tải ảnh...</div>
+                <div className="text-[color:var(--mk-muted)]">Đang tải ảnh...</div>
             ) : photos && photos.length > 0 ? (
                 <div className="card">
                     <h3 className="card-header">Lịch sử thay đổi ({photos.length} ảnh)</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {photos.map(p => (
-                            <div key={p.id} className="relative group border border-gray-200 rounded-xs overflow-hidden aspect-[3/4] bg-gray-50">
+                            <div key={p.id} className="relative group border border-[color:var(--mk-line)] rounded-xs overflow-hidden aspect-[3/4] bg-[color:var(--mk-paper)]">
                                 <img src={p.image_url} alt={p.caption || 'progress'} className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-white/90 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3 border border-black m-1">
                                     <div>
                                         <span className="text-xs font-semibold text-black uppercase tracking-wider">
                                             {p.taken_at ? new Date(p.taken_at).toLocaleDateString('vi-VN') : 'Không rõ ngày'}
                                         </span>
-                                        {p.weight_kg && <p className="text-sm text-gray-800 mt-1 font-medium">{p.weight_kg} kg</p>}
-                                        {p.caption && <p className="text-sm text-gray-700 mt-1 line-clamp-3">{p.caption}</p>}
+                                        {p.weight_kg && <p className="text-sm text-[color:var(--mk-text)] mt-1 font-medium">{p.weight_kg} kg</p>}
+                                        {p.caption && <p className="text-sm text-[color:var(--mk-text-soft)] mt-1 line-clamp-3">{p.caption}</p>}
                                     </div>
                                     <button
                                         onClick={() => {
@@ -158,7 +158,7 @@ export function ProfileProgressTab() {
                     </div>
                 </div>
             ) : (
-                <div className="text-gray-500 italic">Chưa có ảnh nào. Hãy tải lên để theo dõi sự phát triển của bạn!</div>
+                <div className="text-[color:var(--mk-muted)] italic">Chưa có ảnh nào. Hãy tải lên để theo dõi sự phát triển của bạn!</div>
             )}
 
             <ConfirmModal

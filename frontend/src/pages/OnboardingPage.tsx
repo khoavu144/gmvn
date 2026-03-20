@@ -82,7 +82,7 @@ export default function OnboardingPage() {
                     <h1 className="text-4xl font-black uppercase tracking-tight leading-none mb-6">
                         {isCoach ? 'Trở thành Huấn luyện viên hàng đầu' : 'Bắt đầu hành trình biến đổi cơ thể'}
                     </h1>
-                    <p className="text-gray-400 max-w-md text-lg">
+                    <p className="text-[color:var(--mk-muted)] max-w-md text-lg">
                         {isCoach 
                             ? 'Thiết lập hồ sơ chuyên nghiệp để bắt đầu nhận học viên và quản lý lớp học của bạn trên nền tảng GymViet.' 
                             : 'Cung cấp một số thông tin cơ bản để chúng tôi có thể cá nhân hóa lộ trình tập luyện tốt nhất dành cho bạn.'}
@@ -105,7 +105,7 @@ export default function OnboardingPage() {
                         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                             <div>
                                 <h2 className="text-3xl font-black uppercase tracking-tight text-black mb-2">Chỉ số cơ thể</h2>
-                                <p className="text-gray-500 text-sm">Thông tin này giúp tính toán năng lượng (TDEE) và BMI của bạn.</p>
+                                <p className="text-[color:var(--mk-muted)] text-sm">Thông tin này giúp tính toán năng lượng (TDEE) và BMI của bạn.</p>
                             </div>
                             <div className="mt-8 space-y-6">
                                 <div>
@@ -116,7 +116,7 @@ export default function OnboardingPage() {
                                     <input 
                                         type="range" min="140" max="220" 
                                         value={height} onChange={(e) => setHeight(Number(e.target.value))}
-                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" 
+                                        className="w-full h-2 bg-[color:var(--mk-paper-strong)] rounded-lg appearance-none cursor-pointer accent-black" 
                                     />
                                 </div>
                                 <div>
@@ -127,7 +127,7 @@ export default function OnboardingPage() {
                                     <input 
                                         type="range" min="30" max="150" 
                                         value={weight} onChange={(e) => setWeight(Number(e.target.value))}
-                                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-black" 
+                                        className="w-full h-2 bg-[color:var(--mk-paper-strong)] rounded-lg appearance-none cursor-pointer accent-black" 
                                     />
                                 </div>
                                 <button onClick={handleNext} className="btn-primary w-full group flex justify-between items-center mt-8">
@@ -141,7 +141,7 @@ export default function OnboardingPage() {
                         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                             <div>
                                 <h2 className="text-3xl font-black uppercase tracking-tight text-black mb-2">Kinh nghiệm</h2>
-                                <p className="text-gray-500 text-sm">Bạn đã từng tập luyện nghiêm túc bao giờ chưa?</p>
+                                <p className="text-[color:var(--mk-muted)] text-sm">Bạn đã từng tập luyện nghiêm túc bao giờ chưa?</p>
                             </div>
                             <div className="mt-8 space-y-4">
                                 {[
@@ -152,14 +152,14 @@ export default function OnboardingPage() {
                                     <div 
                                         key={lvl.id}
                                         onClick={() => setExperience(lvl.id)}
-                                        className={`border-2 p-5 rounded-2xl cursor-pointer transition-all ${experience === lvl.id ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-300'}`}
+                                        className={`border-2 p-5 rounded-2xl cursor-pointer transition-all ${experience === lvl.id ? 'border-black bg-[color:var(--mk-paper)]' : 'border-[color:var(--mk-line)] hover:border-[color:var(--mk-line)]'}`}
                                     >
                                         <div className="flex justify-between items-center">
                                             <div>
                                                 <h3 className="font-bold text-black">{lvl.title}</h3>
-                                                <p className="text-xs text-gray-500 mt-1">{lvl.desc}</p>
+                                                <p className="text-xs text-[color:var(--mk-muted)] mt-1">{lvl.desc}</p>
                                             </div>
-                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${experience === lvl.id ? 'border-black bg-black text-white' : 'border-gray-300'}`}>
+                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${experience === lvl.id ? 'border-black bg-black text-white' : 'border-[color:var(--mk-line)]'}`}>
                                                 {experience === lvl.id && <Check className="w-4 h-4" />}
                                             </div>
                                         </div>
@@ -181,7 +181,7 @@ export default function OnboardingPage() {
                         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                             <div>
                                 <h2 className="text-3xl font-black uppercase tracking-tight text-black mb-2">Chuyên môn</h2>
-                                <p className="text-gray-500 text-sm">Điểm mạnh huấn luyện của bạn là gì? (Chọn ít nhất 1)</p>
+                                <p className="text-[color:var(--mk-muted)] text-sm">Điểm mạnh huấn luyện của bạn là gì? (Chọn ít nhất 1)</p>
                             </div>
                             <div className="mt-8 grid grid-cols-2 gap-3">
                                 {['Tăng cơ', 'Giảm mỡ', 'Powerlifting', 'Yoga', 'Pilates', 'Phục hồi chấn thương', 'Calisthenics', 'Thể lực (Endurance)'].map(sp => {
@@ -189,7 +189,7 @@ export default function OnboardingPage() {
                                     return (
                                         <div 
                                             key={sp} onClick={() => toggleSpecialty(sp)}
-                                            className={`border rounded-xl p-4 cursor-pointer text-center text-sm font-semibold transition-all ${selected ? 'bg-black text-white border-black' : 'bg-white text-black hover:bg-gray-50 border-gray-200'}`}
+                                            className={`border rounded-xl p-4 cursor-pointer text-center text-sm font-semibold transition-all ${selected ? 'bg-black text-white border-black' : 'bg-white text-black hover:bg-[color:var(--mk-paper)] border-[color:var(--mk-line)]'}`}
                                         >
                                             {sp}
                                         </div>
@@ -210,7 +210,7 @@ export default function OnboardingPage() {
                         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                             <div>
                                 <h2 className="text-3xl font-black uppercase tracking-tight text-black mb-2">Giới thiệu bản thân</h2>
-                                <p className="text-gray-500 text-sm">Thông tin này sẽ xuất hiện trên hồ sơ huấn luyện viên của bạn.</p>
+                                <p className="text-[color:var(--mk-muted)] text-sm">Thông tin này sẽ xuất hiện trên hồ sơ huấn luyện viên của bạn.</p>
                             </div>
                             <div className="mt-8 space-y-6">
                                 <div>

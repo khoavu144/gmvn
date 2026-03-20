@@ -36,13 +36,13 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+    <div className="flex min-h-[80vh] items-center justify-center bg-[color:var(--mk-paper)] px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-sm border border-[color:var(--mk-line)]">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-[color:var(--mk-text)]">
             Tạo mật khẩu mới
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-[color:var(--mk-text-soft)]">
             Nhập email, mã khôi phục và mật khẩu mới của bạn.
           </p>
         </div>
@@ -56,7 +56,7 @@ export default function ResetPassword() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="relative block w-full rounded-md border-0 py-3 px-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 mb-4"
+                className="relative block w-full rounded-md border-0 py-3 px-4 text-[color:var(--mk-text)] ring-1 ring-inset ring-gray-300 placeholder:text-[color:var(--mk-muted)] focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 mb-4"
                 placeholder="Địa chỉ email"
               />
             </div>
@@ -69,7 +69,7 @@ export default function ResetPassword() {
                 maxLength={6}
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="relative block w-full rounded-md border-0 py-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 text-center text-xl tracking-[0.3em] font-mono mb-4"
+                className="relative block w-full rounded-md border-0 py-3 text-[color:var(--mk-text)] ring-1 ring-inset ring-gray-300 placeholder:text-[color:var(--mk-muted)] focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 text-center text-xl tracking-[0.3em] font-mono mb-4"
                 placeholder="Mã 000000"
               />
             </div>
@@ -81,7 +81,7 @@ export default function ResetPassword() {
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="relative block w-full rounded-md border-0 py-3 px-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6"
+                className="relative block w-full rounded-md border-0 py-3 px-4 text-[color:var(--mk-text)] ring-1 ring-inset ring-gray-300 placeholder:text-[color:var(--mk-muted)] focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6"
                 placeholder="Mật khẩu mới (tối thiểu 8 ký tự)"
               />
             </div>

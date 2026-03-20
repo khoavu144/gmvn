@@ -70,10 +70,10 @@ const AdminGymApproval: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="animate-pulse space-y-4"><div className="h-24 bg-gray-50 rounded-xl"></div></div>;
+    if (loading) return <div className="animate-pulse space-y-4"><div className="h-24 bg-[color:var(--mk-paper)] rounded-xl"></div></div>;
 
     if (pendingGyms.length === 0) {
-        return <div className="text-gray-500 italic py-12 text-center border-2 border-dashed border-gray-100 rounded-xl">Không có hồ sơ nào đang chờ duyệt.</div>;
+        return <div className="text-[color:var(--mk-muted)] italic py-12 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-xl">Không có hồ sơ nào đang chờ duyệt.</div>;
     }
 
     return (
@@ -87,10 +87,10 @@ const AdminGymApproval: React.FC = () => {
                                 <h4 className="text-xl font-black uppercase tracking-tight">{gym.name}</h4>
                                 <span className="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-1 uppercase rounded-sm">Chờ Duyệt</span>
                             </div>
-                            <p className="text-gray-500 font-medium text-sm mb-4">{gym.tagline}</p>
-                            <p className="text-gray-600 text-sm line-clamp-3 mb-6">{gym.description}</p>
+                            <p className="text-[color:var(--mk-muted)] font-medium text-sm mb-4">{gym.tagline}</p>
+                            <p className="text-[color:var(--mk-text-soft)] text-sm line-clamp-3 mb-6">{gym.description}</p>
 
-                            <div className="grid grid-cols-2 gap-4 text-xs font-bold uppercase tracking-wider text-gray-400">
+                            <div className="grid grid-cols-2 gap-4 text-xs font-bold uppercase tracking-wider text-[color:var(--mk-muted)]">
                                 <div>
                                     <span className="block mb-1">Chủ sở hữu</span>
                                     <span className="text-black">{gym.owner?.full_name} ({gym.owner?.email})</span>
@@ -134,7 +134,7 @@ const AdminGymApproval: React.FC = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
                     <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
                         <h3 className="text-lg font-black uppercase tracking-tight">Từ chối phòng tập</h3>
-                        <p className="text-sm text-gray-600">Vui lòng nhập lý do từ chối để thông báo cho chủ phòng tập.</p>
+                        <p className="text-sm text-[color:var(--mk-text-soft)]">Vui lòng nhập lý do từ chối để thông báo cho chủ phòng tập.</p>
                         <textarea
                             value={rejectConfig.reason}
                             onChange={e => setRejectConfig(prev => ({ ...prev, reason: e.target.value }))}

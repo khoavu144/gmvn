@@ -58,7 +58,7 @@ export default function ShareButton({
         <button
             type="button"
             onClick={handleShare}
-            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:border-black hover:text-black transition-colors ${className}`}
+            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[color:var(--mk-line)] text-sm font-semibold text-[color:var(--mk-text-soft)] hover:border-black hover:text-black transition-colors ${className}`}
             title={titleAttr}
         >
             {copied ? (

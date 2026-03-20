@@ -72,10 +72,9 @@ function formatPrice(gym: GymCenter) {
 
 function getProofValue(gym: GymCenter) {
     const rating = gym.trust_summary?.avg_rating ?? gym.avg_rating;
-    const reviewCount = gym.trust_summary?.review_count ?? gym.review_count;
 
     if (rating) {
-        return `★ ${Number(rating).toFixed(1)}${reviewCount ? ` · ${reviewCount} reviews` : ''}`;
+        return `★ ${Number(rating).toFixed(1)}`;
     }
 
     if (gym.view_count) {
@@ -89,9 +88,7 @@ function getAudienceLabels(gym: GymCenter) {
     return getTerms(gym, 'audience').map((term) => term.label).slice(0, 2);
 }
 
-function getStyleLabels(gym: GymCenter) {
-    return getTerms(gym, 'training_style').map((term) => term.label).slice(0, 2);
-}
+
 
 const GymCard: React.FC<GymCardProps> = ({
     gym,
@@ -106,7 +103,6 @@ const GymCard: React.FC<GymCardProps> = ({
     const priceLabel = formatPrice(gym);
     const proofLabel = getProofValue(gym);
     const audienceLabels = getAudienceLabels(gym);
-    const styleLabels = getStyleLabels(gym);
     const highlights = (gym.hero_value_props && gym.hero_value_props.length > 0 ? gym.hero_value_props : gym.highlights) || [];
     const blurb = gym.discovery_blurb || gym.tagline || gym.description || 'Không gian tập luyện đã được tuyển chọn cho hành trình nâng cấp thể lực của bạn.';
     const isFeatured = variant === 'featured';
@@ -136,6 +132,7 @@ const GymCard: React.FC<GymCardProps> = ({
                         width={400}
                         height={300}
                         loading={index < 4 ? 'eager' : 'lazy'}
+                        fetchPriority={index < 4 ? 'high' : 'auto'}
                         decoding="async"
                         className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
                     />
@@ -188,20 +185,7 @@ const GymCard: React.FC<GymCardProps> = ({
             </div>
 
             <div className={isFeatured ? 'p-6 sm:p-7' : isCompact ? 'p-4' : 'p-5'}>
-                <div className="flex flex-wrap items-center gap-2">
-                    {styleLabels.map((label) => (
-                        <span key={label} className="marketplace-badge marketplace-badge--neutral">
-                            {label}
-                        </span>
-                    ))}
-                    {!styleLabels.length && audienceLabels.slice(0, 1).map((label) => (
-                        <span key={label} className="marketplace-badge marketplace-badge--neutral">
-                            {label}
-                        </span>
-                    ))}
-                </div>
-
-                <div className="mt-3 space-y-3">
+                <div className="space-y-3">
                     <div>
                         <h3 className={isFeatured ? 'text-[clamp(1.6rem,2.4vw,2.15rem)] font-black leading-[0.95] tracking-[-0.06em] text-[color:var(--mk-text)]' : 'text-[1.28rem] font-black leading-[0.98] tracking-[-0.05em] text-[color:var(--mk-text)]'}>
                             {gym.name}
@@ -251,4 +235,4 @@ const GymCard: React.FC<GymCardProps> = ({
     );
 };
 
-export default GymCard;
+export default React.memo(GymCard);

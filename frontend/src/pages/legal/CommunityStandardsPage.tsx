@@ -68,13 +68,13 @@ export default function CommunityStandardsPage() {
                     <p>Chúng tôi áp dụng hệ thống 3 bậc tùy theo mức độ vi phạm:</p>
                     <div className="space-y-3 mt-3">
                         {[
-                            { level: 'Cảnh báo', color: 'border-gray-300', desc: 'Vi phạm lần đầu, mức độ nhẹ. Tài khoản không bị ảnh hưởng nhưng ghi nhận lịch sử.' },
-                            { level: 'Tạm khóa 7–30 ngày', color: 'border-gray-400', desc: 'Vi phạm nghiêm trọng hoặc tái phạm. Không thể đăng ký mới / nhận học viên trong thời gian bị khóa.' },
+                            { level: 'Cảnh báo', color: 'border-[color:var(--mk-line)]', desc: 'Vi phạm lần đầu, mức độ nhẹ. Tài khoản không bị ảnh hưởng nhưng ghi nhận lịch sử.' },
+                            { level: 'Tạm khóa 7–30 ngày', color: 'border-[color:var(--mk-line)]', desc: 'Vi phạm nghiêm trọng hoặc tái phạm. Không thể đăng ký mới / nhận học viên trong thời gian bị khóa.' },
                             { level: 'Xóa tài khoản vĩnh viễn', color: 'border-black', desc: 'Vi phạm rất nghiêm trọng (gian lận, lừa đảo, quấy rối) hoặc vi phạm sau khi đã bị tạm khóa.' },
                         ].map((item) => (
                             <div key={item.level} className={`border-l-4 ${item.color} pl-4 py-2`}>
                                 <span className="font-semibold text-sm text-black">{item.level}:</span>
-                                <span className="text-sm text-gray-600 ml-2">{item.desc}</span>
+                                <span className="text-sm text-[color:var(--mk-text-soft)] ml-2">{item.desc}</span>
                             </div>
                         ))}
                     </div>

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 interface Metric { label: string; value: string; }
 interface Highlight { id: string; title: string; value: string; icon_key?: string; }
+interface CtaProps { text: string; action: () => void; }
 
 interface ProfileHeroSectionProps {
   name: string;
@@ -16,13 +17,15 @@ interface ProfileHeroSectionProps {
   metrics: Metric[] | undefined;
   highlights: Highlight[];
   basePriceMonthly: number | null;
-  onMessage: () => void;
+  onMessage?: () => void;
+  primaryCta?: CtaProps;
+  secondaryCta?: CtaProps;
 }
 
 export default function ProfileHeroSection({
   name, headline, location, avatarUrl, specialties,
   bio, bioLong, isVerified, tagline, metrics, highlights,
-  basePriceMonthly, onMessage,
+  basePriceMonthly, onMessage, primaryCta, secondaryCta
 }: ProfileHeroSectionProps) {
   const scrollToPackages = () => {
     const el = document.getElementById('section-packages');
@@ -123,20 +126,40 @@ export default function ProfileHeroSection({
           )}
           {/* CTA row */}
           <div className="profile-bento-cta-row">
-            <button
-              onClick={scrollToPackages}
-              className="profile-bento-cta-primary profile-bento-cta-primary--package"
-              aria-label="Xem các gói huấn luyện phù hợp"
-            >
-              Xem gói phù hợp
-            </button>
-            <button
-              onClick={onMessage}
-              className="profile-bento-cta-secondary profile-bento-cta-secondary--message"
-              aria-label={`Nhắn tin với ${name} để được tư vấn`}
-            >
-              💬 Nhắn tin để tư vấn
-            </button>
+            {primaryCta ? (
+              <button
+                onClick={primaryCta.action}
+                className="profile-bento-cta-primary profile-bento-cta-primary--package"
+                aria-label={primaryCta.text}
+              >
+                {primaryCta.text}
+              </button>
+            ) : (
+                <button
+                  onClick={scrollToPackages}
+                  className="profile-bento-cta-primary profile-bento-cta-primary--package"
+                  aria-label="Xem các gói huấn luyện phù hợp"
+                >
+                  Xem gói phù hợp
+                </button>
+            )}
+            {secondaryCta ? (
+              <button
+                onClick={secondaryCta.action}
+                className="profile-bento-cta-secondary profile-bento-cta-secondary--message"
+                aria-label={secondaryCta.text}
+              >
+                💬 {secondaryCta.text}
+              </button>
+            ) : (
+              <button
+                onClick={onMessage}
+                className="profile-bento-cta-secondary profile-bento-cta-secondary--message"
+                aria-label={`Nhắn tin với ${name} để được tư vấn`}
+              >
+                💬 Nhắn tin để tư vấn
+              </button>
+            )}
             {basePriceMonthly && (
               <span className="profile-bento-price">
                 Từ <strong>{basePriceMonthly.toLocaleString('vi-VN')}₫</strong>/tháng
