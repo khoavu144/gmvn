@@ -1,5 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
-import { platformSubscriptionService, planSatisfies, PlatformPlan } from '../services/platformSubscriptionService';
+import { platformSubscriptionService, planSatisfies, PlatformPlan, PlanLimits, PLAN_CONFIG } from '../services/platformSubscriptionService';
+
+/** Get user plan with request-level cache to avoid repeated DB queries */
+async function getCachedPlan(req: Request, userId: string): Promise<{ plan: PlatformPlan; limits: PlanLimits }> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cache = (req as any)._platformPlan as { plan: PlatformPlan; limits: PlanLimits } | undefined;
+    if (cache) return cache;
+    const result = await platformSubscriptionService.getMyPlan(userId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (req as any)._platformPlan = result;
+    return result;
+}
 
 /**
  * Middleware: enforce a minimum platform plan.
@@ -19,7 +30,7 @@ export const requirePlatformPlan = (minPlan: PlatformPlan) => {
             const userId = req.user?.user_id;
             if (!userId) { res.status(401).json({ error: 'Authentication required' }); return; }
 
-            const { plan } = await platformSubscriptionService.getMyPlan(userId);
+            const { plan } = await getCachedPlan(req, userId);
             if (planSatisfies(plan, minPlan)) { next(); return; }
 
             res.status(402).json({
@@ -44,7 +55,7 @@ export const requireProgramLimit = async (req: Request, res: Response, next: Nex
         if (!billingEnabled) { next(); return; }
 
         const userId = req.user!.user_id;
-        const { limits } = await platformSubscriptionService.getMyPlan(userId);
+        const { limits } = await getCachedPlan(req, userId);
 
         if (!isFinite(limits.maxPrograms)) { next(); return; }
 
@@ -74,7 +85,7 @@ export const requireBranchLimit = async (req: Request, res: Response, next: Next
         if (!billingEnabled) { next(); return; }
 
         const userId = req.user!.user_id;
-        const { limits } = await platformSubscriptionService.getMyPlan(userId);
+        const { limits } = await getCachedPlan(req, userId);
 
         if (!isFinite(limits.maxBranches)) { next(); return; }
 
@@ -96,3 +107,4 @@ export const requireBranchLimit = async (req: Request, res: Response, next: Next
         res.status(500).json({ error: err.message });
     }
 };
+

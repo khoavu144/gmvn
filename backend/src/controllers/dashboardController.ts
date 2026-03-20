@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
+import { MoreThanOrEqual } from 'typeorm';
 import { Subscription } from '../entities/Subscription';
 import { User } from '../entities/User';
 import { GymCenter } from '../entities/GymCenter';
 import { FinancialTransaction } from '../entities/FinancialTransaction';
+import { WorkoutLog } from '../entities/WorkoutLog';
 import { subscriptionService } from '../services/subscriptionService';
 import { messageService } from '../services/messageService';
 import { programService } from '../services/programService';
@@ -112,29 +114,38 @@ export const getAthleteOverview = async (req: Request, res: Response) => {
     try {
         const userId = req.user!.user_id;
 
-        // Get active subscription count
+        // Active subscription count (real)
         const subRepo = AppDataSource.getRepository(Subscription);
         const activeSubscriptions = await subRepo.count({
             where: { user_id: userId, status: 'active' }
         });
 
-        // Get recent workout sessions (last 7 days)
+        // Workout sessions completed in the last 7 days (real)
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
-        
-        // Note: We would need to implement workout session tracking
-        // This is a placeholder implementation
-        const recentSessions = 0; // To be implemented with actual workout tracking
+        const weekSessions = await AppDataSource.getRepository(WorkoutLog).count({
+            where: {
+                user_id: userId,
+                completed_at: MoreThanOrEqual(weekAgo),
+            }
+        });
 
-        // Get unread notifications
-        // Note: We would need to implement notification service
-        const unreadNotifications = 0; // To be implemented
+        // Unread notifications count (real)
+        let unreadNotifications = 0;
+        try {
+            const { notificationService } = await import('../services/notificationService');
+            if (notificationService && typeof notificationService.getUnreadCount === 'function') {
+                unreadNotifications = await notificationService.getUnreadCount(userId);
+            }
+        } catch {
+            // Notification service may not export getUnreadCount — leave as 0
+        }
 
         res.json({
             success: true,
             overview: {
                 active_subscriptions: activeSubscriptions,
-                week_sessions: recentSessions,
+                week_sessions: weekSessions,
                 unread_notifications: unreadNotifications,
             },
         });

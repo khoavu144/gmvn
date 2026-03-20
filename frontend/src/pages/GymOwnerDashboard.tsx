@@ -567,11 +567,25 @@ const GymOwnerDashboard: React.FC = () => {
 
                         <div className="flex gap-3">
                             <button 
-                                className="btn-primary flex-1 py-3"
-                                onClick={() => {
-                                    toast.success(`Đã gửi lời mời đến ${inviteForm.email}`);
-                                    setShowInviteModal(false);
-                                    setInviteForm({ email: '', role: 'Coach' });
+                                className="btn-primary flex-1 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={!inviteForm.email || creatingBranch}
+                                onClick={async () => {
+                                    if (!inviteForm.email.trim() || !gym) return;
+                                    // Use first branch if gym has branches, else use gym id as fallback
+                                    const branches = gym.branches ?? [];
+                                    const targetBranchId = branches[0]?.id ?? gym.id;
+                                    try {
+                                        const apiClient = (await import('../services/api')).default;
+                                        await apiClient.post(`/gym-owner/branches/${targetBranchId}/trainers/invite`, {
+                                            email: inviteForm.email.trim(),
+                                            role: inviteForm.role,
+                                        });
+                                        toast.success(`Đã gửi lời mời đến ${inviteForm.email}`);
+                                        setShowInviteModal(false);
+                                        setInviteForm({ email: '', role: 'Coach' });
+                                    } catch (err: any) {
+                                        toast.error(err?.response?.data?.error || 'Không thể gửi lời mời. Vui lòng thử lại.');
+                                    }
                                 }}
                             >
                                 Gửi lời mời

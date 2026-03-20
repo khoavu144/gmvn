@@ -344,6 +344,17 @@ function AthleteDashboard({ overview }: { overview: OverviewData }) {
 // Cards for Admin role
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState<'overview' | 'gyms' | 'reviews' | 'gallery' | 'coach-apps'>('overview');
+    const [adminStats, setAdminStats] = useState<{
+        total_users: number; total_trainers: number; total_gyms: number; monthly_revenue: number;
+    } | null>(null);
+
+    useEffect(() => {
+        apiClient.get('/dashboard/admin/stats')
+            .then(r => setAdminStats(r.data.stats))
+            .catch(() => {/* silently ignore — shows — if failed */});
+    }, []);
+
+    const fmt = (n: number | undefined) => n !== undefined ? n.toLocaleString('vi') : '—';
 
     return (
         <div className="space-y-8">
@@ -405,10 +416,10 @@ const AdminDashboard = () => {
                     <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Tổng quan Hệ thống</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                         {[
-                            { label: 'Người dùng', value: '—', icon: <Users className="w-5 h-5 text-blue-600" /> },
-                            { label: 'Huấn luyện viên', value: '—', icon: <User className="w-5 h-5 text-amber-600" /> },
-                            { label: 'Gym Center', value: '—', icon: <Building2 className="w-5 h-5 text-green-600" /> },
-                            { label: 'Hồ sơ chờ duyệt', value: '—', icon: <ShieldAlert className="w-5 h-5 text-red-600" /> },
+                            { label: 'Người dùng', value: fmt(adminStats?.total_users), icon: <Users className="w-5 h-5 text-blue-600" /> },
+                            { label: 'Huấn luyện viên', value: fmt(adminStats?.total_trainers), icon: <User className="w-5 h-5 text-amber-600" /> },
+                            { label: 'Gym Center', value: fmt(adminStats?.total_gyms), icon: <Building2 className="w-5 h-5 text-green-600" /> },
+                            { label: 'Doanh thu/tháng', value: adminStats ? `${fmt(adminStats.monthly_revenue)}đ` : '—', icon: <ShieldAlert className="w-5 h-5 text-red-600" /> },
                         ].map(stat => (
                             <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} tone="subtle" />
                         ))}
