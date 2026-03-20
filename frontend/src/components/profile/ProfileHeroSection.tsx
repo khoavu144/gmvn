@@ -26,6 +26,11 @@ export default function ProfileHeroSection({
 }: ProfileHeroSectionProps) {
   const firstName = name.split(' ').slice(-1)[0];
 
+  const scrollToPackages = () => {
+    const el = document.getElementById('section-packages');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   const displayMetrics = useMemo(() => {
     if (metrics && metrics.length >= 3) return metrics.slice(0, 3);
     const base = metrics ? [...metrics] : [];
@@ -94,8 +99,8 @@ export default function ProfileHeroSection({
             ))}
           </div>
           <div className="profile-bento-stats-footer">
-            <button onClick={onMessage} className="profile-bento-portfolio-btn">
-              Nhắn tin để tư vấn
+            <button onClick={scrollToPackages} className="profile-bento-portfolio-btn">
+              Xem gói phù hợp
               <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
                 <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
@@ -121,8 +126,17 @@ export default function ProfileHeroSection({
           )}
           {/* CTA row */}
           <div className="profile-bento-cta-row">
-            <button onClick={onMessage} className="profile-bento-cta-primary">
-              💬 Nhắn tin với {firstName}
+            <button
+              onClick={scrollToPackages}
+              className="profile-bento-cta-primary profile-bento-cta-primary--package"
+            >
+              Xem gói phù hợp
+            </button>
+            <button
+              onClick={onMessage}
+              className="profile-bento-cta-secondary profile-bento-cta-secondary--message"
+            >
+              💬 Nhắn tin để tư vấn cùng {firstName}
             </button>
             {basePriceMonthly && (
               <span className="profile-bento-price">
@@ -153,8 +167,6 @@ export default function ProfileHeroSection({
                 </div>
               )}
             </div>
-            {/* FIX: ★ watermark — reduced opacity so it's truly decorative, not AI-template prominent */}
-            <span className="profile-bento-pr-watermark" aria-hidden="true">★</span>
           </div>
         )}
       </div>

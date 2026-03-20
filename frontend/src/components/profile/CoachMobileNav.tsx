@@ -12,9 +12,10 @@ const NAV_ITEMS = [
 
 interface CoachMobileNavProps {
   name: string;
+  onMessage: () => void;
 }
 
-export default function CoachMobileNav({ name }: CoachMobileNavProps) {
+export default function CoachMobileNav({ name, onMessage }: CoachMobileNavProps) {
   const [activeSection, setActiveSection] = useState('about');
   const [show, setShow] = useState(false);
 
@@ -52,18 +53,23 @@ export default function CoachMobileNav({ name }: CoachMobileNavProps) {
       <div className="coach-mobile-nav-inner">
         <span className="coach-mobile-nav-name" aria-label={`Hồ sơ: ${name}`}>{name}</span>
         {show && (
-          <nav aria-label="Điều hướng trang" className="coach-mobile-nav-tabs">
-            {NAV_ITEMS.map(({ id, label }) => (
-              <button
-                key={id}
-                onClick={() => scrollTo(id)}
-                className={`coach-mobile-nav-tab${activeSection === id ? ' active' : ''}`}
-                aria-current={activeSection === id ? 'location' : undefined}
-              >
-                {label}
-              </button>
-            ))}
-          </nav>
+          <>
+            <nav aria-label="Điều hướng trang" className="coach-mobile-nav-tabs">
+              {NAV_ITEMS.map(({ id, label }) => (
+                <button
+                  key={id}
+                  onClick={() => scrollTo(id)}
+                  className={`coach-mobile-nav-tab${activeSection === id ? ' active' : ''}`}
+                  aria-current={activeSection === id ? 'location' : undefined}
+                >
+                  {label}
+                </button>
+              ))}
+            </nav>
+            <button onClick={onMessage} className="coach-mobile-nav-message-btn">
+              💬 Nhắn tin để tư vấn
+            </button>
+          </>
         )}
       </div>
     </div>

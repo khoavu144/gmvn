@@ -319,7 +319,7 @@ export default function CoachDetailPage() {
             {ToastComponent}
 
             {/* Mobile sticky nav (visible only < 1024px) */}
-            <CoachMobileNav name={trainer.full_name} />
+            <CoachMobileNav name={trainer.full_name} onMessage={handleMessage} />
 
             {/* Main layout: sidebar + content */}
             <div className="coach-profile-layout">
