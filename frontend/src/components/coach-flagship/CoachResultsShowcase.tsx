@@ -42,7 +42,7 @@ export default function CoachResultsShowcase({ photos }: Props) {
                                 src={getOptimizedUrl(lead.before_url, 600)}
                                 srcSet={getSrcSet(lead.before_url)}
                                 sizes="50vw"
-                                alt="Before"
+                                alt="Ảnh trước"
                                 className="w-full aspect-[4/5] object-cover"
                                 loading="lazy"
                                 decoding="async"
@@ -56,7 +56,7 @@ export default function CoachResultsShowcase({ photos }: Props) {
                                 src={getOptimizedUrl(lead.after_url, 600)}
                                 srcSet={getSrcSet(lead.after_url)}
                                 sizes="50vw"
-                                alt="After"
+                                alt="Ảnh sau"
                                 className="w-full aspect-[4/5] object-cover"
                                 loading="lazy"
                                 decoding="async"
@@ -90,13 +90,13 @@ export default function CoachResultsShowcase({ photos }: Props) {
                                 <div className="grid grid-cols-2 gap-px bg-gray-100">
                                     <img
                                         src={getOptimizedUrl(photo.before_url, 300)}
-                                        alt="Before"
+                                        alt="Ảnh trước"
                                         className="w-full aspect-square object-cover"
                                         loading="lazy"
                                     />
                                     <img
                                         src={getOptimizedUrl(photo.after_url, 300)}
-                                        alt="After"
+                                        alt="Ảnh sau"
                                         className="w-full aspect-square object-cover"
                                         loading="lazy"
                                     />

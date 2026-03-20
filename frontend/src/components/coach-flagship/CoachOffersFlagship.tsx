@@ -91,7 +91,7 @@ export default function CoachOffersFlagship({ programs, subscribing, onSubscribe
                                         <span className="text-xs font-semibold border border-gray-200 px-2.5 py-1 rounded-sm uppercase">{featured.difficulty}</span>
                                     )}
                                     <span className="text-xs font-semibold border border-gray-200 px-2.5 py-1 rounded-sm">
-                                        {featured.current_clients}/{featured.max_clients} slot
+                                        {featured.current_clients}/{featured.max_clients} chỗ
                                     </span>
                                 </div>
                             </div>

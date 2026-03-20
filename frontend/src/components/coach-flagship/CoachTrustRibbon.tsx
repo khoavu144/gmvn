@@ -22,7 +22,7 @@ export default function CoachTrustRibbon({
     const proofs: { icon: string; label: string; value: string }[] = [];
 
     if (isVerified) {
-        proofs.push({ icon: '✓', label: 'Xác thực', value: 'Verified Coach' });
+        proofs.push({ icon: '✓', label: 'Xác thực', value: 'Đã xác minh' });
     }
 
     if (gymLinks.length > 0) {
@@ -39,7 +39,7 @@ export default function CoachTrustRibbon({
     }
 
     if (beforeAfterCount > 0) {
-        proofs.push({ icon: '📸', label: 'Kết quả', value: `${beforeAfterCount} case study` });
+        proofs.push({ icon: '📸', label: 'Kết quả', value: `${beforeAfterCount} kết quả` });
     }
 
     if (testimonialCount > 0) {

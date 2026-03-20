@@ -21,7 +21,7 @@ export default function CoachClosingCta({ coachName, onMessage }: Props) {
                         onClick={onMessage}
                         className="h-14 px-10 bg-black text-white font-bold text-sm uppercase tracking-wider rounded-sm hover:bg-gray-900 transition-all active:scale-[0.98] shadow-lg shadow-black/20"
                     >
-                        Nhắn tin cho Coach
+                        Nhắn tin để tư vấn
                     </button>
                     <a
                         href="#programs"

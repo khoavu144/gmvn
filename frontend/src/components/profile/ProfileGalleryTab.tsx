@@ -193,7 +193,7 @@ export function ProfileGalleryTab() {
                         >
                             <img 
                                 src={lightboxImage.image_url} 
-                                alt={lightboxImage.caption || 'gallery fullscreen'} 
+                                alt={lightboxImage.caption || 'Xem ảnh chi tiết'} 
                                 className="max-w-full max-h-[80vh] object-contain shadow-2xl"
                             />
                             

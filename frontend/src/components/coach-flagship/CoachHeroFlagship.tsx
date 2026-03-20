@@ -56,7 +56,7 @@ export default function CoachHeroFlagship({
                         ← Huấn luyện viên
                     </button>
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">
-                        GYMERVIET Coach
+                        Huấn luyện viên GYMERVIET
                     </span>
                 </div>
 
@@ -68,7 +68,7 @@ export default function CoachHeroFlagship({
                         <div className="flex items-center gap-3 mb-4 sm:mb-6">
                             {isVerified && (
                                 <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.15em] bg-white text-black px-2.5 py-1 rounded-sm">
-                                    ✓ Verified
+                                    ✓ Đã xác minh
                                 </span>
                             )}
                             {specialties && specialties.length > 0 && (

@@ -80,7 +80,7 @@ export default function CoachAuthoritySection({ gymLinks, mediaFeatures, pressMe
                     <div className="space-y-6">
                         {mediaFeatures.length > 0 && (
                             <div>
-                                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Featured Media</h3>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">Nội dung nổi bật</h3>
                                 <div className="grid grid-cols-2 gap-3">
                                     {mediaFeatures.slice(0, 4).map(media => (
                                         <a
@@ -94,7 +94,7 @@ export default function CoachAuthoritySection({ gymLinks, mediaFeatures, pressMe
                                                 src={getOptimizedUrl(media.thumbnail_url || media.url, 300)}
                                                 srcSet={getSrcSet(media.thumbnail_url || media.url)}
                                                 sizes="150px"
-                                                alt={media.caption || 'Featured media'}
+                                                alt={media.caption || 'Nội dung nổi bật'}
                                                 className="w-full aspect-video object-cover"
                                                 loading="lazy"
                                                 decoding="async"

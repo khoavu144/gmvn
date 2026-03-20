@@ -229,7 +229,7 @@ export default function CoachDetailPage() {
 
     const seoTitle = useMemo(() => {
         if (!trainer?.full_name) return 'Coach Detail | GYMERVIET';
-        return `${trainer.full_name} — GYMERVIET Coach`;
+        return `${trainer.full_name} — Huấn luyện viên GYMERVIET`;
     }, [trainer?.full_name]);
 
     const seoDescription = useMemo(() => {
