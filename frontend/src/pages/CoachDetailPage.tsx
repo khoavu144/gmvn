@@ -80,7 +80,7 @@ export default function CoachDetailPage() {
 
     const [trainer, setTrainer] = useState<Trainer | null>(null);
     const [programs, setPrograms] = useState<Program[]>([]);
-    const [gymLinks, setGymLinks] = useState<GymTrainerLink[]>([]);
+    const [_gymLinks, setGymLinks] = useState<GymTrainerLink[]>([]);
     const [testimonials, setTestimonials] = useState<any[]>([]);
     const [beforeAfterPhotos, setBeforeAfterPhotos] = useState<any[]>([]);
     const [similarCoaches, setSimilarCoaches] = useState<SimilarCoach[]>([]);
