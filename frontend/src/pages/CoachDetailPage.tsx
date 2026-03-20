@@ -24,6 +24,8 @@ import ProfileContactSection from '../components/profile/ProfileContactSection';
 import CoachResultsShowcase from '../components/coach-flagship/CoachResultsShowcase';
 import CoachTestimonialsWall from '../components/coach-flagship/CoachTestimonialsWall';
 import CoachRelatedFooter from '../components/coach-flagship/CoachRelatedFooter';
+import ShareButton from '../components/ShareButton';
+import { buildProfileShareUrl } from '../utils/share';
 
 interface Program {
     id: string;
@@ -226,6 +228,8 @@ export default function CoachDetailPage() {
 
     const canonicalPath = trainer?.slug ? `/coach/${trainer.slug}` : `/coaches/${trainerId ?? ''}`;
     const canonicalUrl = `${window.location.origin}${canonicalPath}`;
+    const shareIdentifier = trainer?.slug ?? trainer?.id ?? slug ?? trainerId ?? '';
+    const shareUrl = shareIdentifier ? buildProfileShareUrl('coach', shareIdentifier) : canonicalUrl;
 
     const seoTitle = useMemo(() => {
         if (!trainer?.full_name) return 'Coach Detail | GYMERVIET';
@@ -309,17 +313,65 @@ export default function CoachDetailPage() {
                 <title>{seoTitle}</title>
                 <meta name="description" content={seoDescription} />
                 <link rel="canonical" href={canonicalUrl} />
+                {/* Open Graph */}
                 <meta property="og:type" content="profile" />
                 <meta property="og:title" content={seoTitle} />
                 <meta property="og:description" content={seoDescription} />
                 <meta property="og:url" content={canonicalUrl} />
+                <meta property="og:site_name" content="GYMERVIET" />
+                <meta property="og:locale" content="vi_VN" />
                 {trainer.avatar_url && <meta property="og:image" content={trainer.avatar_url} />}
+                {trainer.avatar_url && <meta property="og:image:width" content="400" />}
+                {trainer.avatar_url && <meta property="og:image:height" content="400" />}
+                {/* Twitter Card */}
+                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:site" content="@gymerviet" />
+                <meta name="twitter:title" content={seoTitle} />
+                <meta name="twitter:description" content={seoDescription} />
+                {trainer.avatar_url && <meta name="twitter:image" content={trainer.avatar_url} />}
+                {/* JSON-LD: Person */}
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'Person',
+                    name: trainer.full_name,
+                    jobTitle: (trainer as any).headline || 'Huấn luyện viên cá nhân',
+                    description: seoDescription,
+                    image: trainer.avatar_url || undefined,
+                    url: canonicalUrl,
+                    knowsAbout: (trainer.specialties as string[] | undefined) ?? [],
+                    worksFor: { '@type': 'Organization', name: 'GYMERVIET', url: 'https://gymerviet.vn' },
+                })}</script>
+                {/* JSON-LD: BreadcrumbList */}
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://gymerviet.vn' },
+                        { '@type': 'ListItem', position: 2, name: 'Coach', item: 'https://gymerviet.vn/coaches' },
+                        { '@type': 'ListItem', position: 3, name: trainer.full_name },
+                    ],
+                })}</script>
             </Helmet>
+
 
             {ToastComponent}
 
             {/* Mobile sticky nav (visible only < 1024px) */}
             <CoachMobileNav name={trainer.full_name} onMessage={handleMessage} />
+
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-0">
+                <div className="flex items-center justify-end">
+                    <ShareButton
+                        url={shareUrl}
+                        title={seoTitle}
+                        text={seoDescription}
+                        label="Chia sẻ Facebook"
+                        variant="facebook"
+                        titleAttr="Chia sẻ hồ sơ này lên Facebook"
+                        className="bg-white"
+                    />
+                </div>
+            </div>
 
             {/* Main layout: sidebar + content */}
             <div className="coach-profile-layout">

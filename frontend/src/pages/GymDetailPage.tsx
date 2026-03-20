@@ -248,22 +248,51 @@ const GymDetailPage: React.FC = () => {
                 <title>{seoTitle}</title>
                 <meta name="description" content={seoDesc} />
                 <link rel="canonical" href={canonicalUrl} />
+                {/* Open Graph */}
                 <meta property="og:type" content="business.business" />
                 <meta property="og:title" content={seoTitle} />
                 <meta property="og:description" content={seoDesc} />
-                {seoImage && <meta property="og:image" content={seoImage} />}
                 <meta property="og:url" content={canonicalUrl} />
-                <meta property="og:site_name" content="GymViet" />
+                <meta property="og:site_name" content="GYMERVIET" />
+                <meta property="og:locale" content="vi_VN" />
+                {seoImage && <meta property="og:image" content={seoImage} />}
+                {seoImage && <meta property="og:image:width" content="1200" />}
+                {seoImage && <meta property="og:image:height" content="630" />}
+                {/* Twitter Card */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:site" content="@gymerviet" />
+                <meta name="twitter:title" content={seoTitle} />
+                <meta name="twitter:description" content={seoDesc} />
+                {seoImage && <meta name="twitter:image" content={seoImage} />}
+                {/* JSON-LD: ExerciseGym */}
                 <script type="application/ld+json">{JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "SportsActivityLocation",
-                    "name": gym.name,
-                    "description": seoDesc,
-                    "image": seoImage,
-                    "url": canonicalUrl,
-                    "address": activeBranch ? { "@type": "PostalAddress", "streetAddress": activeBranch.address, "addressLocality": activeBranch.city } : undefined,
+                    '@context': 'https://schema.org',
+                    '@type': 'ExerciseGym',
+                    name: gym.name,
+                    description: seoDesc,
+                    image: seoImage || undefined,
+                    url: canonicalUrl,
+                    address: activeBranch ? {
+                        '@type': 'PostalAddress',
+                        streetAddress: activeBranch.address,
+                        addressLocality: (activeBranch as any).city || (activeBranch as any).district || undefined,
+                        addressCountry: 'VN',
+                    } : undefined,
+                    telephone: (branchDetail as any)?.phone || undefined,
+                    openingHoursSpecification: undefined, // populated if needed
+                })}</script>
+                {/* JSON-LD: BreadcrumbList */}
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://gymerviet.vn' },
+                        { '@type': 'ListItem', position: 2, name: 'Phòng tập', item: 'https://gymerviet.vn/gyms' },
+                        { '@type': 'ListItem', position: 3, name: gym.name },
+                    ],
                 })}</script>
             </Helmet>
+
 
             {/* ── LIGHTBOX ─────────────────────────────────────────────── */}
             {lightboxImg && (

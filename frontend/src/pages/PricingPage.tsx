@@ -114,7 +114,45 @@ export default function PricingPage() {
             <Helmet>
                 <title>Bảng giá — GYMERVIET</title>
                 <meta name="description" content="Chọn gói phù hợp để mở khoá toàn bộ tính năng GYMERVIET. Thanh toán theo năm, huỷ bất cứ lúc nào." />
+                <link rel="canonical" href="https://gymerviet.vn/pricing" />
+                <meta property="og:type" content="website" />
+                <meta property="og:title" content="Bảng giá — GYMERVIET" />
+                <meta property="og:description" content="Chọn gói phù hợp. Thanh toán theo năm, huỷ bất cứ lúc nào." />
+                <meta property="og:url" content="https://gymerviet.vn/pricing" />
+                <meta property="og:image" content="https://gymerviet.vn/og-default.jpg" />
+                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:site" content="@gymerviet" />
+                <meta name="twitter:title" content="Bảng giá — GYMERVIET" />
+                <meta name="twitter:description" content="Chọn gói phù hợp. Thanh toán theo năm, huỷ bất cứ lúc nào." />
+                {/* JSON-LD: FAQPage — helps Google show rich results for pricing questions */}
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'FAQPage',
+                    mainEntity: [
+                        {
+                            '@type': 'Question',
+                            name: 'Gói Coach Pro có những gì?',
+                            acceptedAnswer: { '@type': 'Answer', text: 'Không giới hạn chương trình, 50 học viên cùng lúc, Badge Pro trên hồ sơ, ưu tiên tìm kiếm, share card tuỳ chỉnh. Giá 499.999đ/năm.' },
+                        },
+                        {
+                            '@type': 'Question',
+                            name: 'Gói Coach Elite có những gì?',
+                            acceptedAnswer: { '@type': 'Answer', text: 'Không giới hạn chương trình & học viên, top tìm kiếm, Badge Elite nổi bật, share card tuỳ chỉnh, hỗ trợ ưu tiên. Giá 999.999đ/năm.' },
+                        },
+                        {
+                            '@type': 'Question',
+                            name: 'Có thể huỷ bất kỳ lúc nào không?',
+                            acceptedAnswer: { '@type': 'Answer', text: 'Có. Bạn có thể huỷ bất kỳ lúc nào. Gói sẽ hết hiệu lực sau khi chu kỳ hiện tại kết thúc.' },
+                        },
+                        {
+                            '@type': 'Question',
+                            name: 'GYMERVIET hỗ trợ phương thức thanh toán nào?',
+                            acceptedAnswer: { '@type': 'Answer', text: 'Hỗ trợ chuyển khoản ngân hàng qua SePay. Gói được kích hoạt tự động ngay sau khi xác nhận giao dịch.' },
+                        },
+                    ],
+                })}</script>
             </Helmet>
+
 
             {/* Hero */}
             <div style={{ background: '#0f172a', color: '#fff', textAlign: 'center', padding: '72px 24px 80px' }}>

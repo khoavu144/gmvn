@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /messages
+Disallow: /profile
+Disallow: /onboarding
+Disallow: /workouts
+Disallow: /api/
+Disallow: /reset-password
+Disallow: /forgot-password
+Disallow: /verify-email
+
+Sitemap: https://gymerviet.vn/sitemap.xml

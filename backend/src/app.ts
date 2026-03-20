@@ -24,6 +24,7 @@ import communityGalleryRoutes from './routes/communityGallery';
 import coachApplicationRoutes from './routes/coachApplication';
 import shareRoutes from './routes/share';
 import platformSubscriptionRoutes from './routes/platformSubscription';
+import { generateSitemap } from './controllers/sitemapController';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { User } from './entities/User';
@@ -40,6 +41,9 @@ const PORT = process.env.PORT || 3001;
 
 // Trust reverse proxy (Render, Nginx) — required for express-rate-limit & real IP
 app.set('trust proxy', 1);
+
+// SEO: Sitemap (public, before auth middleware, cached 6h)
+app.get('/sitemap.xml', generateSitemap);
 
 // Middleware
 app.use(helmet());
