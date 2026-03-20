@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 
 interface SimilarCoach {
     id: string;
@@ -14,47 +15,73 @@ interface Props {
     coaches: SimilarCoach[];
 }
 
+const PAGE_SIZE = 3;
+
 export default function CoachRelatedFooter({ coaches }: Props) {
+    const [page, setPage] = useState(0);
     if (coaches.length === 0) return null;
 
+    const totalPages = Math.ceil(coaches.length / PAGE_SIZE);
+    const visible = coaches.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+
     return (
-        <section className="py-10 border-t border-gray-100 bg-gray-50/50">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6">
-                <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-gray-400 mb-5">
-                    Huấn luyện viên tương tự
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {coaches.map(coach => {
+        <section className="coach-related-section">
+            <div className="coach-related-inner">
+                {/* Header + prev/next */}
+                <div className="coach-related-header">
+                    <h3 className="coach-related-title">Huấn luyện viên tương tự</h3>
+                    {totalPages > 1 && (
+                        <div className="coach-related-nav">
+                            <button
+                                onClick={() => setPage(p => Math.max(0, p - 1))}
+                                disabled={page === 0}
+                                className="coach-related-nav-btn"
+                                aria-label="Previous"
+                            >
+                                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                            </button>
+                            <span className="coach-related-page">{page + 1} / {totalPages}</span>
+                            <button
+                                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                                disabled={page === totalPages - 1}
+                                className="coach-related-nav-btn"
+                                aria-label="Next"
+                            >
+                                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* Cards */}
+                <div className="coach-related-grid">
+                    {visible.map(coach => {
                         const link = coach.user_type === 'athlete'
                             ? (coach.slug ? `/athlete/${coach.slug}` : `/athletes/${coach.id}`)
                             : (coach.slug ? `/coach/${coach.slug}` : `/coaches/${coach.id}`);
                         return (
-                            <Link
-                                key={coach.id}
-                                to={link}
-                                className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-400 transition-colors group"
-                            >
+                            <Link key={coach.id} to={link} className="coach-related-card">
                                 {coach.avatar_url ? (
-                                    <img
-                                        src={coach.avatar_url}
-                                        alt={coach.full_name}
-                                        className="w-12 h-12 rounded-full object-cover border border-gray-100 shrink-0"
-                                    />
+                                    <img src={coach.avatar_url} alt={coach.full_name} className="coach-related-avatar" />
                                 ) : (
-                                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-base font-bold text-gray-500 shrink-0">
+                                    <div className="coach-related-avatar coach-related-avatar--fallback">
                                         {coach.full_name.charAt(0)}
                                     </div>
                                 )}
-                                <div className="min-w-0 flex-1">
-                                    <div className="text-sm font-bold text-black truncate group-hover:underline">{coach.full_name}</div>
+                                <div className="coach-related-info">
+                                    <div className="coach-related-name">{coach.full_name}</div>
                                     {coach.specialties && coach.specialties.length > 0 && (
-                                        <div className="text-xs text-gray-500 mt-0.5 truncate">
+                                        <div className="coach-related-spec">
                                             {coach.specialties.slice(0, 2).join(' · ')}
                                         </div>
                                     )}
                                 </div>
                                 {coach.base_price_monthly && (
-                                    <div className="text-xs font-semibold text-gray-500 shrink-0">
+                                    <div className="coach-related-price">
                                         {Number(coach.base_price_monthly).toLocaleString('vi-VN')}₫
                                     </div>
                                 )}
