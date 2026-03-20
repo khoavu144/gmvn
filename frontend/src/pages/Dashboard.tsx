@@ -252,7 +252,11 @@ const UserDashboard = () => {
 };
 
 // Cards for Pro Athlete role
-const AthleteDashboard = ({ overview }: { overview: OverviewData }) => (
+function AthleteDashboard({ overview }: { overview: OverviewData }) {
+    const user = useSelector((state: RootState) => state.auth.user);
+    const publicProfileUrl = user ? `/athletes/${user.id}` : '/coaches?type=athlete';
+
+    return (
     <div className="space-y-8">
         {/* Next Workout Hero Card */}
         <div className="bg-black text-white p-8 md:p-10 rounded-xl relative overflow-hidden group shadow-2xl">
@@ -284,6 +288,22 @@ const AthleteDashboard = ({ overview }: { overview: OverviewData }) => (
             ))}
         </div>
 
+        {/* Athlete public profile preview banner */}
+        <div className="flex items-center justify-between gap-4 bg-gray-900 text-white rounded-xl px-5 py-4">
+            <div>
+                <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">Hồ sơ Athlete public của bạn</p>
+                <p className="text-sm font-bold truncate max-w-xs">{window.location.origin}{publicProfileUrl}</p>
+            </div>
+            <Link
+                to={publicProfileUrl}
+                target="_blank"
+                className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition-colors whitespace-nowrap shrink-0"
+            >
+                <Eye className="w-3.5 h-3.5" />
+                Xem ngay
+            </Link>
+        </div>
+
         <section className="page-header mb-0">
             <p className="page-kicker">Không gian Luyện tập</p>
             <h2 className="section-title">Theo dõi lịch tập và xây dựng hồ sơ thi đấu</h2>
@@ -295,9 +315,9 @@ const AthleteDashboard = ({ overview }: { overview: OverviewData }) => (
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             {[
                 { to: '/workouts', icon: <Calendar className="w-5 h-5" />, title: 'LỊCH TẬP', desc: 'Theo dõi lịch tập và điểm số tiến độ' },
-                { to: '/profile', icon: <Star className="w-5 h-5" />, title: 'PORTFOLIO', desc: 'Cập nhật thành tích thi đấu' },
+                { to: '/profile', icon: <Star className="w-5 h-5" />, title: 'CẬP NHẬT HỒ SƠ', desc: 'Cập nhật thành tích thi đấu' },
                 { to: '/coaches', icon: <Search className="w-5 h-5" />, title: 'TÌM COACH', desc: 'Khám phá huấn luyện viên phù hợp' },
-                { to: '/messages', icon: <MessageSquare className="w-5 h-5" />, title: 'TIN NHẮN', desc: 'Trao đổi về lịch và giáo án' },
+                { to: publicProfileUrl, icon: <Eye className="w-5 h-5" />, title: 'XEM PROFILE PUBLIC', desc: 'Kiểm tra giao diện người dùng nhìn thấy' },
             ].map(card => (
                 <QuickActionCard
                     key={card.to}
@@ -309,7 +329,8 @@ const AthleteDashboard = ({ overview }: { overview: OverviewData }) => (
             ))}
         </div>
     </div>
-);
+    );
+}
 
 // Cards for Admin role
 const AdminDashboard = () => {
