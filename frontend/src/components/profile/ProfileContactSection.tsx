@@ -5,65 +5,68 @@ interface ProfileContactSectionProps {
   onMessage: () => void;
 }
 
+const SOCIAL_LABELS: Record<string, string> = {
+  instagram: 'Instagram', tiktok: 'TikTok', youtube: 'YouTube',
+  facebook: 'Facebook', website: 'Website',
+};
+
 export default function ProfileContactSection({ coachName, location, socialLinks, onMessage }: ProfileContactSectionProps) {
   const firstName = coachName.split(' ').slice(-1)[0];
+  const hasSocial = Object.keys(socialLinks).length > 0;
 
   return (
     <section className="profile-contact-section">
       <div className="profile-contact-inner">
-        {/* Gradient heading */}
-        <div className="profile-contact-heading-wrap">
-          <h2 className="profile-contact-heading">
-            Sẵn sàng bắt đầu<br />
-            <span className="profile-contact-heading-accent">hành trình cùng {firstName}?</span>
-          </h2>
-          <p className="profile-contact-subtitle">
-            Nhắn tin ngay hôm nay để nhận tư vấn miễn phí và lộ trình phù hợp với bạn.
-          </p>
-        </div>
+        {/* 3-col compact layout */}
+        <div className="profile-contact-grid">
 
-        {/* Contact cards */}
-        <div className="profile-contact-cards">
-          <button onClick={onMessage} className="profile-contact-card profile-contact-card--primary">
-            <span className="profile-contact-card-icon">💬</span>
-            <div>
-              <p className="profile-contact-card-title">Nhắn tin trực tiếp</p>
-              <p className="profile-contact-card-desc">Phản hồi trong vòng 2 giờ</p>
-            </div>
-            <svg className="profile-contact-card-arrow" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </button>
+          {/* Col 1: Heading + CTA */}
+          <div className="profile-contact-col-main">
+            <h2 className="profile-contact-heading">
+              Sẵn sàng bắt đầu{' '}
+              <span className="profile-contact-heading-accent">
+                hành trình cùng {firstName}?
+              </span>
+            </h2>
+            <p className="profile-contact-subtitle">
+              Nhắn tin để nhận tư vấn miễn phí và lộ trình phù hợp với bạn.
+            </p>
+            <button onClick={onMessage} className="profile-contact-cta-btn">
+              💬 Nhắn tin với {firstName}
+            </button>
+          </div>
 
+          {/* Col 2: Location */}
           {location && (
-            <div className="profile-contact-card">
-              <span className="profile-contact-card-icon">📍</span>
-              <div>
-                <p className="profile-contact-card-title">Khu vực hoạt động</p>
-                <p className="profile-contact-card-desc">{location}</p>
-              </div>
+            <div className="profile-contact-col-info">
+              <p className="profile-contact-info-label">Khu vực</p>
+              <p className="profile-contact-info-value">
+                <span style={{ marginRight: 4 }}>📍</span>{location}
+              </p>
+              <p className="profile-contact-info-label" style={{ marginTop: 12 }}>Phản hồi</p>
+              <p className="profile-contact-info-value">Trong vòng 2 giờ</p>
             </div>
           )}
 
-          {Object.keys(socialLinks).length > 0 && (
-            <div className="profile-contact-card">
-              <span className="profile-contact-card-icon">🌐</span>
-              <div>
-                <p className="profile-contact-card-title">Mạng xã hội</p>
-                <div className="profile-contact-social">
-                  {socialLinks.instagram && (
-                    <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="profile-contact-social-link">Instagram</a>
-                  )}
-                  {socialLinks.tiktok && (
-                    <a href={socialLinks.tiktok} target="_blank" rel="noopener noreferrer" className="profile-contact-social-link">TikTok</a>
-                  )}
-                  {socialLinks.youtube && (
-                    <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="profile-contact-social-link">YouTube</a>
-                  )}
-                  {socialLinks.facebook && (
-                    <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="profile-contact-social-link">Facebook</a>
-                  )}
-                </div>
+          {/* Col 3: Social */}
+          {hasSocial && (
+            <div className="profile-contact-col-info">
+              <p className="profile-contact-info-label">Mạng xã hội</p>
+              <div className="profile-contact-social-list">
+                {Object.entries(socialLinks).map(([key, url]) => url && (
+                  <a
+                    key={key}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="profile-contact-social-link"
+                  >
+                    {SOCIAL_LABELS[key] || key}
+                    <svg viewBox="0 0 12 12" fill="currentColor" width="10" height="10" style={{ marginLeft: 4, opacity: 0.5 }}>
+                      <path d="M3.5 1h-2a.5.5 0 00-.5.5v7a.5.5 0 00.5.5h7a.5.5 0 00.5-.5v-2a.5.5 0 00-1 0V8H2V2h1.5a.5.5 0 000-1zM6 1a.5.5 0 000 1h2.293L4.146 6.146a.5.5 0 00.708.708L9 2.707V5a.5.5 0 001 0V1.5A.5.5 0 009.5 1H6z"/>
+                    </svg>
+                  </a>
+                ))}
               </div>
             </div>
           )}

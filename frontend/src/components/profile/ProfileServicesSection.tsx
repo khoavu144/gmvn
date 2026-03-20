@@ -21,14 +21,12 @@ export default function ProfileServicesSection({ specialties, skills, highlights
       <div className="profile-services-inner">
         <h2 className="profile-section-title">Chuyên môn & Kỹ năng</h2>
 
-        {/* Stats highlights */}
+        {/* Stats highlights — compact row */}
         {highlights.length > 0 && (
           <div className="profile-stats-grid">
             {highlights.map((h, i) => (
               <div key={i} className="profile-stat-card">
-                <span className="profile-stat-icon">
-                  {ICON_MAP[h.icon_key || ''] || ICON_MAP.default}
-                </span>
+                <span className="profile-stat-icon">{ICON_MAP[h.icon_key || ''] || ICON_MAP.default}</span>
                 <span className="profile-stat-value">{h.value}</span>
                 <span className="profile-stat-label">{h.title}</span>
               </div>
@@ -36,33 +34,35 @@ export default function ProfileServicesSection({ specialties, skills, highlights
           </div>
         )}
 
-        {/* Skills with progress bars */}
-        {skills.length > 0 && (
-          <div className="profile-skills-list">
-            <h3 className="profile-skills-title">Kỹ năng chuyên sâu</h3>
-            {skills.map((s, i) => (
-              <div key={i} className="profile-skill-item">
-                <div className="profile-skill-header">
-                  <span className="profile-skill-name">{s.name}</span>
-                  <span className="profile-skill-level">{s.level}%</span>
-                </div>
-                <div className="profile-skill-bar">
-                  <div
-                    className="profile-skill-bar-fill"
-                    style={{ width: `${s.level}%` }}
-                  />
+        {/* 2-col: skills bars LEFT, specialty pills RIGHT */}
+        {(skills.length > 0 || (specialties && specialties.length > 0)) && (
+          <div className="profile-services-grid">
+            {skills.length > 0 && (
+              <div className="profile-skills-list">
+                <h3 className="profile-skills-title">Kỹ năng chuyên sâu</h3>
+                {skills.map((s, i) => (
+                  <div key={i} className="profile-skill-item">
+                    <div className="profile-skill-header">
+                      <span className="profile-skill-name">{s.name}</span>
+                      <span className="profile-skill-level">{s.level}%</span>
+                    </div>
+                    <div className="profile-skill-bar">
+                      <div className="profile-skill-bar-fill" style={{ width: `${s.level}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {specialties && specialties.length > 0 && (
+              <div className="profile-specialties-zone">
+                <h3 className="profile-skills-title">Lĩnh vực</h3>
+                <div className="profile-specialties-cloud">
+                  {specialties.map((s, i) => (
+                    <span key={i} className="profile-specialty-pill">{s}</span>
+                  ))}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-
-        {/* Specialties tag cloud */}
-        {specialties && specialties.length > 0 && (
-          <div className="profile-specialties-cloud">
-            {specialties.map((s, i) => (
-              <span key={i} className="profile-specialty-pill">{s}</span>
-            ))}
+            )}
           </div>
         )}
       </div>
