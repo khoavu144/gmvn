@@ -21,6 +21,7 @@ import gymOwnerRoutes from './routes/gymOwner';
 import gymAdminRoutes from './routes/gymAdmin';
 import notificationRoutes from './routes/notification';
 import communityGalleryRoutes from './routes/communityGallery';
+import coachApplicationRoutes from './routes/coachApplication';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { User } from './entities/User';
@@ -105,6 +106,9 @@ app.use('/api/v1/admin/gyms', gymAdminRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 // Community Gallery
 app.use('/api/v1/gallery', communityGalleryRoutes);
+// Coach Applications (Athlete → Coach upgrade)
+app.use('/api/v1/coach-applications', coachApplicationRoutes);
+
 
 // Health check (Public standard mode - P0-4 Security Fix)
 app.get('/api/v1/health', (_req, res) => {

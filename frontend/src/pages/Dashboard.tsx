@@ -13,6 +13,8 @@ import type { GymTrainerLink } from '../types';
 import { useToast } from '../components/Toast';
 import QuickActionCard from '../components/dashboard/QuickActionCard';
 import StatCard from '../components/dashboard/StatCard';
+import UpgradeToCoachBanner from '../components/dashboard/UpgradeToCoachBanner';
+import AdminCoachApplications from '../components/AdminCoachApplications';
 
 interface OverviewData {
     active_clients?: number;
@@ -304,6 +306,9 @@ function AthleteDashboard({ overview }: { overview: OverviewData }) {
             </Link>
         </div>
 
+        {/* Upgrade to Coach banner — shown to athletes who haven't applied */}
+        <UpgradeToCoachBanner />
+
         <section className="page-header mb-0">
             <p className="page-kicker">Không gian Luyện tập</p>
             <h2 className="section-title">Theo dõi lịch tập và xây dựng hồ sơ thi đấu</h2>
@@ -334,7 +339,7 @@ function AthleteDashboard({ overview }: { overview: OverviewData }) {
 
 // Cards for Admin role
 const AdminDashboard = () => {
-    const [activeTab, setActiveTab] = useState<'overview' | 'gyms' | 'reviews' | 'gallery'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'gyms' | 'reviews' | 'gallery' | 'coach-apps'>('overview');
 
     return (
         <div className="space-y-8">
@@ -362,6 +367,12 @@ const AdminDashboard = () => {
                     className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'gallery' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
                 >
                     Gallery
+                </button>
+                <button
+                    onClick={() => setActiveTab('coach-apps')}
+                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'coach-apps' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
+                >
+                    Đơn Coach
                 </button>
             </div>
 
@@ -429,9 +440,23 @@ const AdminDashboard = () => {
                     <AdminGalleryManagement />
                 </div>
             )}
+
+            {activeTab === 'coach-apps' && (
+                <div>
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 className="text-xl font-black uppercase">Đơn đăng ký làm Coach</h3>
+                            <p className="text-xs text-gray-500 mt-1">Duyệt hoặc từ chối đơn của Athlete muốn nâng cấp thành Coach</p>
+                        </div>
+                        <button onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-black">Quay lại</button>
+                    </div>
+                    <AdminCoachApplications />
+                </div>
+            )}
         </div>
     );
 };
+
 
 export default function Dashboard() {
     const user = useSelector((state: RootState) => state.auth.user);
