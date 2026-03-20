@@ -79,6 +79,12 @@ export default function ProfileHeroSection({
 
         {/* Stats card — 1/3 */}
         <div className="profile-bento-stats">
+          {/* Avatar canvas background */}
+          {avatarUrl && (
+            <div className="profile-bento-stats-bg">
+              <img src={avatarUrl} alt="" aria-hidden="true" />
+            </div>
+          )}
           <div className="profile-bento-stats-list">
             {displayMetrics.map((m, i) => (
               <div key={i} className="profile-bento-stat">
@@ -133,6 +139,17 @@ export default function ProfileHeroSection({
               <div className="profile-bento-pr-value">{topAchievement.value}</div>
               <div className="profile-bento-pr-label">{topAchievement.title}</div>
               {tagline && <div className="profile-bento-pr-tagline">"{tagline}"</div>}
+              {/* Extra highlights as sub-stats */}
+              {highlights.length > 1 && (
+                <div className="profile-bento-pr-subs">
+                  {highlights.slice(1, 3).map((h, i) => (
+                    <div key={i} className="profile-bento-pr-sub">
+                      <span className="profile-bento-pr-sub-val">{h.value}</span>
+                      <span className="profile-bento-pr-sub-label">{h.title}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <span className="profile-bento-pr-watermark">★</span>
           </div>

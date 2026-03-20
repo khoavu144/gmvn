@@ -1442,3 +1442,111 @@
 
 /* Contact section compact 3-col overrides */
 .profile-contact-inner { padding: 32px 28px; }
+
+/* ── Stats card avatar background ──────────────────────────── */
+.profile-bento-stats {
+  background: #080c1e;
+  border-radius: 24px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.profile-bento-stats-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.profile-bento-stats-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0.12;
+  filter: grayscale(80%);
+}
+
+/* ── PR card watermark larger + rotated ─────────────────────── */
+.profile-bento-pr-watermark {
+  position: absolute;
+  right: -20px;
+  bottom: -24px;
+  font-size: 16rem;
+  color: rgba(255,255,255,0.08);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  transform: rotate(-15deg);
+}
+
+/* ── PR sub-stats (extra highlights) ───────────────────────── */
+.profile-bento-pr-subs {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.profile-bento-pr-sub {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.profile-bento-pr-sub-val {
+  font-size: 1rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: -0.02em;
+}
+.profile-bento-pr-sub-label {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.45);
+  text-align: right;
+  max-width: 55%;
+  line-height: 1.3;
+}
+
+/* ── Skills section header row (title + chips) ────────────── */
+.profile-skills-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.profile-skills-chips {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.profile-skills-chip {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #46464c;
+  background: #e6e8ea;
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+/* ── Skills 2-col grid (replaces old single-col) ────────────── */
+.profile-skills-2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px 40px;
+}
+@media (min-width: 640px) {
+  .profile-skills-2col {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 48px;
+  }
+}
+
+/* ── Experience section bg card ─────────────────────────────── */
+.profile-exp-col-right .profile-skills-title {
+  margin-top: 0;
+}

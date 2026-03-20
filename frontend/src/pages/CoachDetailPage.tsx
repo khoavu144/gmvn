@@ -347,9 +347,7 @@ export default function CoachDetailPage() {
                     {/* §2 Services / Skills */}
                     <div id="section-services" className="profile-section-anchor">
                         <ProfileServicesSection
-                            specialties={trainer.specialties}
                             skills={profileSkills}
-                            highlights={premium?.highlights || []}
                         />
                     </div>
 

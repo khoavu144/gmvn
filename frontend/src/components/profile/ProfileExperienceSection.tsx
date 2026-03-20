@@ -85,7 +85,7 @@ export default function ProfileExperienceSection({
           {/* Right: Certifications grid */}
           {allCerts.length > 0 && (
             <div className="profile-exp-col-right">
-              <h2 className="profile-section-title">Certifications</h2>
+              <h3 className="profile-skills-title" style={{ marginBottom: 12 }}>Certifications &amp; Awards</h3>
               <div className="profile-cert-list">
                 {allCerts.map((c, i) => (
                   <div key={i} className="profile-cert-row">
