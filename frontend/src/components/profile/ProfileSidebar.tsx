@@ -127,7 +127,7 @@ export default function ProfileSidebar({
             className={`sidebar-nav-item${activeSection === id ? ' active' : ''}`}
             aria-current={activeSection === id ? 'location' : undefined}
           >
-            <span style={{ opacity: 0.55, flexShrink: 0, display: 'flex' }} aria-hidden="true">{icon}</span>
+            <span className="sidebar-nav-item-icon" aria-hidden="true">{icon}</span>
             {label}
           </button>
         ))}
@@ -166,9 +166,12 @@ export default function ProfileSidebar({
         </div>
       )}
 
-      {/* CTA button */}
-      <button onClick={onContactClick} className="sidebar-cta-btn">
-        Liên hệ ngay
+      <button
+        onClick={onContactClick}
+        className="sidebar-cta-btn"
+        aria-label={`Nhắn tin với ${name} để được tư vấn`}
+      >
+        Nhắn tin để tư vấn
       </button>
     </aside>
   );

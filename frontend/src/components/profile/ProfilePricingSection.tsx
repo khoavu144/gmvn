@@ -21,13 +21,13 @@ export default function ProfilePricingSection({ packages, subscribing, onSubscri
     <section className="profile-pricing-section">
       <div className="profile-pricing-inner">
         <h2 className="profile-section-title">Gói dịch vụ</h2>
-        <p className="profile-section-subtitle">Chọn gói phù hợp với mục tiêu và ngân sách của bạn</p>
+        <p className="profile-section-subtitle">Chọn gói phù hợp với mục tiêu, lịch tập và ngân sách của bạn</p>
 
         <div className="profile-pricing-grid">
           {packages.map((pkg, i) => (
             <div key={i} className={`profile-pricing-card${pkg.is_popular ? ' profile-pricing-card--popular' : ''}`}>
               {pkg.is_popular && (
-                <div className="profile-pricing-popular-badge">⭐ Phổ biến nhất</div>
+                <div className="profile-pricing-popular-badge">Được chọn nhiều</div>
               )}
               <div className="profile-pricing-header">
                 <h3 className="profile-pricing-name">{pkg.name}</h3>
@@ -57,8 +57,9 @@ export default function ProfilePricingSection({ packages, subscribing, onSubscri
                 onClick={() => pkg.id && onSubscribe(pkg.id)}
                 disabled={!!subscribing}
                 className={`profile-pricing-btn${pkg.is_popular ? ' profile-pricing-btn--popular' : ''}`}
+                aria-label={`Chọn gói ${pkg.name}`}
               >
-                {subscribing === pkg.id ? 'Đang xử lý...' : 'Đăng ký ngay'}
+                {subscribing === pkg.id ? 'Đang mở thanh toán...' : 'Chọn gói này'}
               </button>
             </div>
           ))}

@@ -24,8 +24,6 @@ export default function ProfileHeroSection({
   bio, bioLong, isVerified, tagline, metrics, highlights,
   basePriceMonthly, onMessage,
 }: ProfileHeroSectionProps) {
-  const firstName = name.split(' ').slice(-1)[0];
-
   const scrollToPackages = () => {
     const el = document.getElementById('section-packages');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -114,7 +112,6 @@ export default function ProfileHeroSection({
 
         {/* Bio — 3/5 */}
         <div className="profile-bento-bio">
-          {/* FIX: "Professional Dossier" → Vietnamese */}
           <h2 className="profile-bento-bio-title">Giới thiệu</h2>
           <p className="profile-bento-bio-text">{displayBio}</p>
           {specialties && specialties.length > 0 && (
@@ -129,14 +126,16 @@ export default function ProfileHeroSection({
             <button
               onClick={scrollToPackages}
               className="profile-bento-cta-primary profile-bento-cta-primary--package"
+              aria-label="Xem các gói huấn luyện phù hợp"
             >
               Xem gói phù hợp
             </button>
             <button
               onClick={onMessage}
               className="profile-bento-cta-secondary profile-bento-cta-secondary--message"
+              aria-label={`Nhắn tin với ${name} để được tư vấn`}
             >
-              💬 Nhắn tin để tư vấn cùng {firstName}
+              💬 Nhắn tin để tư vấn
             </button>
             {basePriceMonthly && (
               <span className="profile-bento-price">
@@ -150,7 +149,6 @@ export default function ProfileHeroSection({
         {topAchievement && (
           <div className="profile-bento-pr">
             <div className="profile-bento-pr-inner">
-              {/* FIX: "Best Personal Record" → Vietnamese */}
               <div className="profile-bento-pr-badge">Thành tích nổi bật</div>
               <div className="profile-bento-pr-value">{topAchievement.value}</div>
               <div className="profile-bento-pr-label">{topAchievement.title}</div>

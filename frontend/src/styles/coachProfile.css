@@ -2520,3 +2520,153 @@
     order: 3;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   POLISH PASS — spacing, states, and resilience
+═══════════════════════════════════════════════════════════════ */
+.sidebar-nav-item-icon {
+  opacity: 0.58;
+  flex-shrink: 0;
+  display: flex;
+}
+
+.profile-contact-info-group+.profile-contact-info-group {
+  margin-top: 12px;
+}
+
+.profile-contact-location {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.profile-contact-social-link-icon {
+  margin-left: 4px;
+  opacity: 0.55;
+  flex-shrink: 0;
+}
+
+.profile-section-title,
+.profile-bento-name,
+.profile-contact-heading,
+.sidebar-name {
+  text-wrap: balance;
+}
+
+.profile-bento-name,
+.profile-contact-heading,
+.sidebar-name,
+.profile-pricing-name {
+  overflow-wrap: anywhere;
+}
+
+.profile-bento-headline,
+.profile-contact-subtitle {
+  max-width: 44ch;
+}
+
+.profile-bento-bio-text {
+  max-width: 64ch;
+}
+
+.coach-mobile-nav-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-cta-btn {
+  min-height: 44px;
+  background: var(--coach-accent);
+  box-shadow: none;
+}
+
+.sidebar-cta-btn:hover {
+  background: var(--coach-accent-hover);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.22);
+}
+
+.sidebar-nav-item,
+.coach-mobile-nav-tab,
+.profile-bento-cta-primary,
+.profile-bento-cta-secondary,
+.profile-bento-portfolio-btn,
+.profile-contact-cta-btn,
+.profile-pricing-btn,
+.sidebar-social-link,
+.sidebar-cta-btn,
+.coach-mobile-nav-message-btn {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+.profile-bento-cta-primary:active,
+.profile-bento-cta-secondary:active,
+.profile-contact-cta-btn:active,
+.profile-pricing-btn:active,
+.sidebar-cta-btn:active,
+.coach-mobile-nav-message-btn:active,
+.sidebar-nav-item:active,
+.coach-mobile-nav-tab:active {
+  transform: translateY(0);
+}
+
+.profile-pricing-btn:disabled {
+  transform: none;
+  box-shadow: none;
+}
+
+.profile-contact-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 32px;
+  padding: 4px 0;
+}
+
+.sidebar-nav-item:focus-visible,
+.sidebar-cta-btn:focus-visible,
+.sidebar-social-link:focus-visible,
+.coach-mobile-nav-tab:focus-visible,
+.profile-contact-cta-btn:focus-visible,
+.profile-pricing-btn:focus-visible,
+.profile-bento-cta-primary:focus-visible,
+.profile-bento-cta-secondary:focus-visible,
+.coach-mobile-nav-message-btn:focus-visible {
+  outline: 2px solid var(--coach-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .coach-mobile-nav,
+  .sidebar-nav-item,
+  .coach-mobile-nav-tab,
+  .profile-bento-cta-primary,
+  .profile-bento-cta-secondary,
+  .profile-bento-portfolio-btn,
+  .profile-contact-cta-btn,
+  .profile-pricing-card,
+  .profile-pricing-btn,
+  .sidebar-social-link,
+  .sidebar-cta-btn,
+  .coach-mobile-nav-message-btn {
+    transition: none !important;
+  }
+
+  .profile-pricing-card:hover,
+  .sidebar-social-link:hover,
+  .sidebar-cta-btn:hover,
+  .profile-bento-cta-primary:hover,
+  .profile-bento-cta-secondary:hover,
+  .profile-contact-cta-btn:hover,
+  .coach-mobile-nav-message-btn:hover,
+  .coach-mobile-nav-tab:hover {
+    transform: none !important;
+  }
+}
