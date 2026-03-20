@@ -33,6 +33,14 @@ import { GymTrainerLink } from '../entities/GymTrainerLink';
 import { GymPricing } from '../entities/GymPricing';
 import { GymEvent } from '../entities/GymEvent';
 import { GymReview } from '../entities/GymReview';
+// Gym Marketplace Extension Entities
+import { GymTaxonomyTerm } from '../entities/GymTaxonomyTerm';
+import { GymCenterTaxonomyTerm } from '../entities/GymCenterTaxonomyTerm';
+import { GymZone } from '../entities/GymZone';
+import { GymProgram } from '../entities/GymProgram';
+import { GymProgramSession } from '../entities/GymProgramSession';
+import { GymLeadRoute } from '../entities/GymLeadRoute';
+import { GymTrainerAvailability } from '../entities/GymTrainerAvailability';
 
 import { TrainerSkill } from '../entities/TrainerSkill';
 import { TrainerPackage } from '../entities/TrainerPackage';
@@ -89,6 +97,14 @@ export const AppDataSource = new DataSource({
         GymPricing,
         GymEvent,
         GymReview,
+        // Gym Marketplace Extensions
+        GymTaxonomyTerm,
+        GymCenterTaxonomyTerm,
+        GymZone,
+        GymProgram,
+        GymProgramSession,
+        GymLeadRoute,
+        GymTrainerAvailability,
         // Coach Profile Enhancement
         Testimonial,
         BeforeAfterPhoto,
