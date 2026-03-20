@@ -46,12 +46,12 @@ interface Props {
 }
 
 const headlineOptions = [
-    { value: 'Fitness Coach', label: 'Fitness Coach' },
-    { value: 'Yoga Instructor', label: 'Yoga Instructor' },
-    { value: 'Rehab Specialist', label: 'Rehab Specialist' },
-    { value: 'Strength & Conditioning Coach', label: 'Strength & Conditioning Coach' },
-    { value: 'Pilates Teacher', label: 'Pilates Teacher' },
-    { value: 'Bodybuilding Coach', label: 'Bodybuilding Coach' },
+    { value: 'Huấn luyện viên thể hình', label: 'Huấn luyện viên thể hình' },
+    { value: 'Huấn luyện viên yoga', label: 'Huấn luyện viên yoga' },
+    { value: 'Chuyên gia phục hồi', label: 'Chuyên gia phục hồi' },
+    { value: 'Huấn luyện viên sức mạnh & thể lực', label: 'Huấn luyện viên sức mạnh & thể lực' },
+    { value: 'Giảng viên pilates', label: 'Giảng viên pilates' },
+    { value: 'Huấn luyện viên hình thể', label: 'Huấn luyện viên hình thể' },
 ];
 
 export function ProfileCoachTab({ myProfile, saving, error: profileError, successMsg, publicBasePath = '/coach' }: Props) {
@@ -160,7 +160,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
             try {
                 certifications = JSON.parse(data.certifications_json);
             } catch {
-                setCertsError('JSON chứng chỉ không hợp lệ. Vui lòng kiểm tra lại cấu trúc.');
+                setCertsError('Danh sách chứng chỉ không hợp lệ. Vui lòng kiểm tra lại trước khi lưu.');
                 return;
             }
         }
@@ -210,7 +210,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                     <h2 className="card-header">URL & Hiển thị</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label className="form-label">Profile URL slug</label>
+                            <label className="form-label">Đường dẫn hồ sơ</label>
                             <div className="flex border border-gray-200 rounded-xs bg-gray-50 focus-within:border-black focus-within:ring-1 focus-within:ring-black transition overflow-hidden">
                                 <span className="px-3 py-2.5 text-gray-500 text-sm border-r border-gray-200 select-none">{profilePathLabel}</span>
                                 <input type="text" {...regProfile('slug')} placeholder="ten-user"
@@ -219,11 +219,11 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                             {errorsProfile.slug && <p className="form-helper text-red-600">{errorsProfile.slug.message}</p>}
                         </div>
                         <div>
-                            <label className="form-label">Ảnh bìa (Cover Image)</label>
+                            <label className="form-label">Ảnh bìa hồ sơ</label>
                             <div className="flex flex-col gap-3">
                                 {watchProfile('cover_image_url') ? (
                                     <div className="relative w-full aspect-[21/9] bg-gray-100 border border-gray-200 rounded overflow-hidden">
-                                        <img src={watchProfile('cover_image_url') || ''} alt="Cover Preview" className="w-full h-full object-cover" />
+                                        <img src={watchProfile('cover_image_url') || ''} alt="Xem trước ảnh bìa" className="w-full h-full object-cover" />
                                         <button type="button" onClick={() => setProfileValue('cover_image_url', '')} className="absolute top-2 right-2 bg-white/90 text-black px-2 py-1 rounded text-xs font-medium hover:bg-white transition shadow">
                                             Xóa ảnh
                                         </button>
@@ -244,22 +244,22 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                     <div className="flex flex-col sm:flex-row gap-6 pt-4 border-t border-gray-200">
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" {...regProfile('is_profile_public')} className="rounded-xs text-black border-gray-300 focus:ring-black" />
-                            <span className="text-sm font-medium text-black">Cho phép tìm thấy profile public</span>
+                            <span className="text-sm font-medium text-black">Hiển thị hồ sơ công khai</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" {...regProfile('is_accepting_clients')} className="rounded-xs text-black border-gray-300 focus:ring-black" />
-                            <span className="text-sm font-medium text-black">Trạng thái: Đang nhận học viên mới</span>
+                            <span className="text-sm font-medium text-black">Đang nhận học viên mới</span>
                         </label>
                     </div>
 
                     {/* Template & Theme Settings */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-gray-200 mt-4">
                         <div>
-                            <label className="form-label">Giao diện Hồ sơ Public</label>
+                            <label className="form-label">Bố cục hồ sơ công khai</label>
                             <div className="grid grid-cols-2 gap-2 mt-1">
                                 {[
-                                    { value: 'card', label: 'Card Scroll', desc: 'Sticky nav + skill bars + pricing' },
-                                    { value: 'hero', label: 'Hero Layout', desc: 'Full-width hero + sections' },
+                                    { value: 'card', label: 'Dạng thẻ cuộn', desc: 'Điều hướng ghim, thanh kỹ năng và bảng giá' },
+                                    { value: 'hero', label: 'Bố cục nổi bật', desc: 'Phần mở đầu lớn và các mục nội dung toàn chiều rộng' },
                                 ].map(opt => (
                                     <label key={opt.value} className="cursor-pointer">
                                         <input type="radio" value={opt.value} {...regProfile('profile_template')} className="sr-only" />
@@ -272,11 +272,11 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                             </div>
                         </div>
                         <div>
-                            <label className="form-label">Màu nền Hồ sơ</label>
+                            <label className="form-label">Chế độ màu hồ sơ</label>
                             <div className="grid grid-cols-2 gap-2 mt-1">
                                 {[
-                                    { value: 'light', label: 'Light', desc: 'Nền trắng, chữ đen' },
-                                    { value: 'dark', label: 'Dark', desc: 'Nền đen, chữ trắng' },
+                                    { value: 'light', label: 'Sáng', desc: 'Nền sáng, chữ đậm' },
+                                    { value: 'dark', label: 'Tối', desc: 'Nền tối, chữ sáng' },
                                 ].map(opt => (
                                     <label key={opt.value} className="cursor-pointer">
                                         <input type="radio" value={opt.value} {...regProfile('theme_color')} className="sr-only" />
@@ -293,7 +293,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                     {/* Preview Link */}
                     {watchProfile('slug') && (
                         <div className="pt-4 border-t border-gray-200 mt-4 flex items-center gap-3">
-                            <span className="text-xs text-gray-500">URL profile của bạn:</span>
+                            <span className="text-xs text-gray-500">Liên kết hồ sơ của bạn:</span>
                             <a
                                 href={`${publicBasePath}/${watchProfile('slug')}`}
                                 target="_blank"
@@ -310,13 +310,13 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                     <h2 className="card-header">Giới thiệu</h2>
                     <div className="space-y-6">
                         <div>
-                            <label className="form-label">Headline (Chức danh chính)</label>
+                            <label className="form-label">Chức danh chính</label>
                             <CreatableSelect
                                 isClearable
                                 options={headlineOptions}
                                 value={watchProfile('headline') ? { label: watchProfile('headline'), value: watchProfile('headline') } : null}
                                 onChange={(newValue) => setProfileValue('headline', newValue ? newValue.value : '', { shouldDirty: true })}
-                                placeholder="Chọn hoặc gõ chức danh mới..."
+                                placeholder="Chọn hoặc nhập chức danh..."
                                 className="text-sm"
                                 classNamePrefix="react-select"
                                 styles={{
@@ -400,7 +400,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                 <div className="card">
                     <h2 className="card-header border-none pb-0 mb-2">Chứng chỉ & Bằng cấp</h2>
                     <p className="text-xs text-gray-500 mb-4">
-                        Tải lên hình ảnh chứng chỉ của bạn (những ảnh đã tải lên sẽ lưu và hiển thị trên hồ sơ public).
+                        Tải lên hình ảnh chứng chỉ của bạn. Những ảnh này sẽ được lưu và hiển thị trên hồ sơ công khai.
                     </p>
                     <input type="hidden" {...regProfile('certifications_json')} />
                     {certsError && <p className="form-helper text-red-600 font-medium mb-2">{certsError}</p>}
@@ -471,7 +471,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
 
                 <div className="flex justify-end pt-4 pb-12">
                     <button type="submit" disabled={saving} className="btn-primary min-w-[160px] py-3 text-base">
-                        {saving ? 'Đang lưu...' : 'Lưu hồ sơ Public'}
+                        {saving ? 'Đang lưu...' : 'Lưu hồ sơ công khai'}
                     </button>
                 </div>
             </form>
@@ -485,7 +485,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                 imageFile={selectedImageFile}
                 onCropComplete={handleCropCompleteReal}
                 aspectRatio={21 / 9} // Ultra-wide banner format for cover
-                title="Cắt ảnh bìa (Cover Image)"
+                title="Cắt ảnh bìa hồ sơ"
             />
         </>
     );

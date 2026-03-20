@@ -7,7 +7,7 @@ interface ProfileContactSectionProps {
 
 const SOCIAL_LABELS: Record<string, string> = {
   instagram: 'Instagram', tiktok: 'TikTok', youtube: 'YouTube',
-  facebook: 'Facebook', website: 'Website',
+  facebook: 'Facebook', website: 'Trang web',
 };
 
 export default function ProfileContactSection({ coachName, location, socialLinks, onMessage }: ProfileContactSectionProps) {
@@ -29,10 +29,10 @@ export default function ProfileContactSection({ coachName, location, socialLinks
               </span>
             </h2>
             <p className="profile-contact-subtitle">
-              Nhắn tin để nhận tư vấn miễn phí và lộ trình phù hợp với bạn.
+              Nhắn tin để được tư vấn miễn phí và nhận lộ trình phù hợp với mục tiêu của bạn.
             </p>
             <button onClick={onMessage} className="profile-contact-cta-btn">
-              💬 Nhắn tin với {firstName}
+              💬 Nhắn tin để tư vấn
             </button>
           </div>
 
@@ -44,7 +44,7 @@ export default function ProfileContactSection({ coachName, location, socialLinks
                 <span style={{ marginRight: 4 }}>📍</span>{location}
               </p>
               <p className="profile-contact-info-label" style={{ marginTop: 12 }}>Phản hồi</p>
-              <p className="profile-contact-info-value">Trong vòng 2 giờ</p>
+              <p className="profile-contact-info-value">Thường phản hồi trong 2 giờ</p>
             </div>
           )}
 
@@ -63,7 +63,7 @@ export default function ProfileContactSection({ coachName, location, socialLinks
                   >
                     {SOCIAL_LABELS[key] || key}
                     <svg viewBox="0 0 12 12" fill="currentColor" width="10" height="10" style={{ marginLeft: 4, opacity: 0.5 }}>
-                      <path d="M3.5 1h-2a.5.5 0 00-.5.5v7a.5.5 0 00.5.5h7a.5.5 0 00.5-.5v-2a.5.5 0 00-1 0V8H2V2h1.5a.5.5 0 000-1zM6 1a.5.5 0 000 1h2.293L4.146 6.146a.5.5 0 00.708.708L9 2.707V5a.5.5 0 001 0V1.5A.5.5 0 009.5 1H6z"/>
+                      <path d="M3.5 1h-2a.5.5 0 00-.5.5v7a.5.5 0 00.5.5h7a.5.5 0 00.5-.5v-2a.5.5 0 00-1 0V8H2V2h1.5a.5.5 0 000-1zM6 1a.5.5 0 000 1h2.293L4.146 6.146a.5.5 0 00.708.708L9 2.707V5a.5.5 0 001 0V1.5A.5.5 0 009.5 1H6z" />
                     </svg>
                   </a>
                 ))}

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-fixed-variant": "#5c5b5b",
+              "primary": "#5f5e5e",
+              "surface-container-highest": "#dde4e5",
+              "on-secondary-fixed-variant": "#0050d4",
+              "tertiary-fixed-dim": "#73f08c",
+              "on-secondary-fixed": "#003798",
+              "primary-fixed": "#e5e2e1",
+              "secondary-dim": "#0049c2",
+              "background": "#f9f9f9",
+              "tertiary-dim": "#006127",
+              "on-surface-variant": "#5a6061",
+              "surface-tint": "#5f5e5e",
+              "surface-container": "#ebeeef",
+              "on-tertiary-container": "#006127",
+              "secondary": "#0053dc",
+              "tertiary": "#006e2e",
+              "outline": "#757c7d",
+              "on-secondary-container": "#0048bf",
+              "surface-container-lowest": "#ffffff",
+              "error-dim": "#4e0309",
+              "inverse-on-surface": "#9c9d9d",
+              "surface-container-low": "#f2f4f4",
+              "tertiary-container": "#82ff99",
+              "primary-dim": "#535252",
+              "on-primary": "#faf7f6",
+              "surface-bright": "#f9f9f9",
+              "secondary-fixed-dim": "#c7d3ff",
+              "inverse-primary": "#ffffff",
+              "surface": "#f9f9f9",
+              "on-primary-container": "#525151",
+              "error-container": "#fe8983",
+              "on-tertiary-fixed-variant": "#006c2d",
+              "outline-variant": "#adb3b4",
+              "surface-variant": "#dde4e5",
+              "on-error": "#fff7f6",
+              "secondary-container": "#dbe1ff",
+              "on-secondary": "#faf8ff",
+              "secondary-fixed": "#dbe1ff",
+              "surface-container-high": "#e4e9ea",
+              "on-surface": "#2d3435",
+              "on-error-container": "#752121",
+              "primary-fixed-dim": "#d7d4d3",
+              "surface-dim": "#d4dbdd",
+              "error": "#9f403d",
+              "on-tertiary": "#e9ffe6",
+              "on-primary-fixed": "#403f3f",
+              "primary-container": "#e5e2e1",
+              "inverse-surface": "#0c0f0f",
+              "tertiary-fixed": "#82ff99",
+              "on-background": "#2d3435",
+              "on-tertiary-fixed": "#004c1d"
+            },
+            fontFamily: {
+              "headline": ["Lexend"],
+              "body": ["Lexend"],
+              "label": ["Lexend"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Lexend', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased">
+<!-- Top Navigation Anchor -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md shadow-sm">
+<div class="flex justify-between items-center px-6 py-4 w-full max-w-screen-2xl mx-auto">
+<div class="text-xl font-semibold tracking-tighter text-zinc-900 dark:text-zinc-50">GymCenter</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-zinc-500 hover:text-zinc-900 transition-colors font-medium text-sm" href="#">Coach</a>
+<a class="text-zinc-500 hover:text-zinc-900 transition-colors font-medium text-sm" href="#">Gallery</a>
+<a class="text-zinc-500 hover:text-zinc-900 transition-colors font-medium text-sm" href="#">Gym Center</a>
+<a class="text-zinc-900 font-semibold border-b-2 border-zinc-900 pb-1 text-sm" href="#">Vận động viên</a>
+<a class="text-zinc-500 hover:text-zinc-900 transition-colors font-medium text-sm" href="#">Khóa học</a>
+<a class="text-zinc-500 hover:text-zinc-900 transition-colors font-medium text-sm" href="#">Lịch tập</a>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-zinc-600">notifications</span>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-zinc-200">
+<img class="w-full h-full object-cover" data-alt="User profile avatar small" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHrQllLM12nfPWdVgzjYyAtTtZQQldZnpb3ctx5fsFn9F3rIfsnjGV-7MtrHpcD9zlkOSCksekcWhZ0FwCK8xDdzWhw72fcb5gKEzIBLNaXebds-lQEYdVjX3966r4dd4xdfKdlRjZL2bUBrQWhk1aiwD-9Y-x4WJo-mtzGC_2F0ZvkEXOWGOQ6RbJR49DwPfVMU2ZbH9w7KHJ_Mu4-59QlIp1Bcc-t_wgs5z721wTZa_gJbYDHj6NW85MdLioEEZtXMXJbcVQj7KX"/>
+</div>
+</div>
+</div>
+<div class="bg-zinc-100 dark:bg-zinc-800 h-[1px] w-full"></div>
+</nav>
+<!-- Sidebar Navigation Shell -->
+<aside class="h-screen w-64 fixed left-0 top-0 pt-20 hidden lg:flex flex-col gap-2 py-8 bg-zinc-50 dark:bg-zinc-900">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div>
+<div class="text-sm font-bold text-zinc-900">Coach Profile</div>
+<div class="text-[10px] uppercase tracking-widest text-zinc-500">Elite Performance</div>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-4 text-zinc-900 font-bold bg-white dark:bg-zinc-800 rounded-r-full py-3 pl-6 border-l-4 border-zinc-900" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-sm">Overview</span>
+</a>
+<a class="flex items-center gap-4 text-zinc-500 py-3 pl-10 hover:translate-x-1 transition-transform hover:text-zinc-900" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="text-sm">Professional</span>
+</a>
+<a class="flex items-center gap-4 text-zinc-500 py-3 pl-10 hover:translate-x-1 transition-transform hover:text-zinc-900" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="text-sm">Gallery</span>
+</a>
+<a class="flex items-center gap-4 text-zinc-500 py-3 pl-10 hover:translate-x-1 transition-transform hover:text-zinc-900" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="text-sm">Experience</span>
+</a>
+<a class="flex items-center gap-4 text-zinc-500 py-3 pl-10 hover:translate-x-1 transition-transform hover:text-zinc-900" href="#">
+<span class="material-symbols-outlined" data-icon="exercise">exercise</span>
+<span class="text-sm">Service</span>
+</a>
+<a class="flex items-center gap-4 text-zinc-500 py-3 pl-10 hover:translate-x-1 transition-transform hover:text-zinc-900" href="#">
+<span class="material-symbols-outlined" data-icon="star">star</span>
+<span class="text-sm">Review</span>
+</a>
+<a class="flex items-center gap-4 text-zinc-500 py-3 pl-10 hover:translate-x-1 transition-transform hover:text-zinc-900" href="#">
+<span class="material-symbols-outlined" data-icon="contact_support">contact_support</span>
+<span class="text-sm">Contact</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:ml-64 pt-24 pb-20 px-6 lg:px-12 max-w-7xl">
+<!-- Header Section -->
+<header class="mb-12">
+<div class="bg-surface-container-lowest rounded-xl p-8 flex flex-col md:flex-row items-center gap-10">
+<div class="relative">
+<div class="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-white shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Portrait of Coach Bùi Quang Huy" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlrJTctfM7R_tCgNUtONjZotaO3dR6wrInqoDiPhv-O7yUDDrlF_Rk2KSJU6fdQ7cIGk3EHYcd-c0kCYYJ0ccUb5n6p3MeWCr7LE5d071BcH6bMVBSACpIKn9BpfuqP8P_qR1zeSDSdbDbaHQp9cHXVI-9xJS0I_rYHS-ZQ1ZUoiO1cPLEav0BVVXlMpGBw7NnBNILtR5i6soPmWGpFuza1tyjYBNz0n8Sgy13bdeBC_3aPiNqSCbRptHZGkuDKAWiYGWYIFdGq73X"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-secondary text-white p-2 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<div class="flex-1 text-center md:text-left">
+<h1 class="text-4xl font-semibold tracking-tight text-on-surface mb-2">Bùi Quang Huy</h1>
+<p class="text-xl text-primary font-medium mb-6">Marathon Running Coach</p>
+<div class="grid grid-cols-3 gap-8 pt-6 border-t border-surface-container">
+<div>
+<div class="text-2xl font-bold text-on-surface">120+</div>
+<div class="text-[10px] uppercase tracking-widest text-outline">Runners Trained</div>
+</div>
+<div>
+<div class="text-2xl font-bold text-on-surface">5 Years</div>
+<div class="text-[10px] uppercase tracking-widest text-outline">Experience</div>
+</div>
+<div>
+<div class="text-2xl font-bold text-on-surface">40+</div>
+<div class="text-[10px] uppercase tracking-widest text-outline">FM Finishers</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<button class="bg-primary text-on-primary px-8 py-3 rounded-lg font-semibold text-sm hover:scale-[1.02] active:scale-95 transition-all shadow-sm">
+                        Liên hệ tư vấn
+                    </button>
+<button class="bg-surface-container-low text-primary px-8 py-3 rounded-lg font-semibold text-sm hover:bg-surface-container transition-all">
+                        Xem lịch tập
+                    </button>
+</div>
+</div>
+</header>
+<!-- Bento Grid Content -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Introduction -->
+<section class="lg:col-span-2 bg-surface-container-lowest p-8 rounded-xl">
+<h2 class="text-xl font-bold text-on-surface mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">format_quote</span>
+                    Giới thiệu
+                </h2>
+<p class="text-lg font-medium text-on-surface mb-4 leading-relaxed italic">"Mỗi bước chân là một câu chuyện, mỗi km là một bài học về sự kiên trì."</p>
+<p class="text-on-surface-variant leading-relaxed mb-8">
+                    Tôi đồng hành cùng những người yêu chạy bộ để chinh phục các cự ly từ 5km đến Ultra Marathon. Phương pháp huấn luyện của tôi tập trung vào sự cân bằng giữa hiệu suất và bền vững, giúp vận động viên tránh chấn thương và duy trì đam mê lâu dài.
+                </p>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-container-low px-4 py-1.5 rounded-full text-xs font-medium text-primary">Running</span>
+<span class="bg-surface-container-low px-4 py-1.5 rounded-full text-xs font-medium text-primary">Marathon</span>
+<span class="bg-surface-container-low px-4 py-1.5 rounded-full text-xs font-medium text-primary">Endurance</span>
+<span class="bg-surface-container-low px-4 py-1.5 rounded-full text-xs font-medium text-primary">Triathlon</span>
+<span class="bg-surface-container-low px-4 py-1.5 rounded-full text-xs font-medium text-primary">Trail Running</span>
+</div>
+</section>
+<!-- Best Time Highlight -->
+<section class="bg-primary text-on-primary p-8 rounded-xl flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-4xl opacity-50">timer</span>
+<span class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase">Best Time</span>
+</div>
+<div class="text-5xl font-extrabold tracking-tighter mb-1">Sub-3h</div>
+<div class="text-sm opacity-80">Personal Record Marathon</div>
+</div>
+<div class="pt-6 border-t border-white/10 mt-6">
+<div class="flex items-center gap-2 text-sm">
+<span class="material-symbols-outlined text-sm">location_on</span>
+                        Vietnam Marathon 2023
+                    </div>
+</div>
+</section>
+<!-- Skills & Progress -->
+<section class="lg:col-span-1 bg-surface-container-lowest p-8 rounded-xl">
+<h2 class="text-xl font-bold text-on-surface mb-8">Kỹ năng chuyên môn</h2>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between text-xs font-bold mb-2 uppercase tracking-wide">
+<span>Marathon Training</span>
+<span>95%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 95%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold mb-2 uppercase tracking-wide">
+<span>Interval &amp; Tempo Running</span>
+<span>92%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 92%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold mb-2 uppercase tracking-wide">
+<span>Recovery &amp; Injury Prevention</span>
+<span>88%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 88%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold mb-2 uppercase tracking-wide">
+<span>Nutrition Strategy</span>
+<span>85%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 85%"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Experience Timeline -->
+<section class="lg:col-span-2 bg-surface-container-lowest p-8 rounded-xl">
+<h2 class="text-xl font-bold text-on-surface mb-8">Kinh nghiệm &amp; Thành tích</h2>
+<div class="space-y-8">
+<div class="flex gap-6 relative">
+<div class="absolute left-[11px] top-6 bottom-0 w-[2px] bg-surface-container"></div>
+<div class="w-6 h-6 rounded-full bg-primary flex-shrink-0 z-10 border-4 border-white"></div>
+<div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest">2022 - Nay</span>
+<h3 class="text-lg font-bold text-on-surface mt-1">Certified RRCA Running Coach</h3>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Được cấp chứng chỉ bởi Road Runners Club of America, chuyên sâu về lập kế hoạch huấn luyện marathon.</p>
+</div>
+</div>
+<div class="flex gap-6 relative">
+<div class="absolute left-[11px] top-6 bottom-0 w-[2px] bg-surface-container"></div>
+<div class="w-6 h-6 rounded-full bg-surface-container flex-shrink-0 z-10 border-4 border-white"></div>
+<div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest">2023</span>
+<h3 class="text-lg font-bold text-on-surface mt-1">Sub-3 Marathon Vietnam Marathon</h3>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Xếp hạng Top 10 vận động viên phong trào tại giải chạy marathon quốc tế.</p>
+</div>
+</div>
+<div class="flex gap-6 relative">
+<div class="w-6 h-6 rounded-full bg-surface-container flex-shrink-0 z-10 border-4 border-white"></div>
+<div>
+<span class="text-[10px] font-bold text-outline uppercase tracking-widest">2019 - 2021</span>
+<h3 class="text-lg font-bold text-on-surface mt-1">Founder of Urban Runners Club</h3>
+<p class="text-sm text-on-surface-variant mt-2 leading-relaxed">Sáng lập cộng đồng chạy bộ với hơn 500 thành viên, tổ chức các buổi training hàng tuần.</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Service Packages -->
+<section class="mt-12">
+<div class="text-center mb-10">
+<h2 class="text-3xl font-bold text-on-surface">Gói Huấn Luyện</h2>
+<p class="text-on-surface-variant mt-2">Lựa chọn lộ trình phù hợp với mục tiêu của bạn</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Cơ Bản -->
+<div class="bg-surface-container-lowest p-8 rounded-xl flex flex-col hover:shadow-card transition-all">
+<h3 class="text-lg font-bold text-on-surface mb-2">Cơ Bản</h3>
+<div class="text-3xl font-bold text-primary mb-6">1.500.000đ <span class="text-sm font-normal text-outline">/tháng</span></div>
+<ul class="space-y-4 mb-10 flex-1">
+<li class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-lg">check_circle</span>
+                            Lịch tập cá nhân hóa tuần
+                        </li>
+<li class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-lg">check_circle</span>
+                            Phản hồi qua email/chat
+                        </li>
+<li class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-lg">check_circle</span>
+                            Phân tích thông số chạy bộ
+                        </li>
+</ul>
+<button class="w-full py-3 rounded-lg border border-outline text-on-surface-variant font-semibold text-sm hover:bg-surface-container-low transition-all">Chọn gói này</button>
+</div>
+<!-- Tiêu Chuẩn -->
+<div class="bg-primary text-on-primary p-8 rounded-xl flex flex-col relative scale-105 shadow-xl">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-white px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Best Seller</div>
+<h3 class="text-lg font-bold mb-2">Tiêu Chuẩn</h3>
+<div class="text-3xl font-bold mb-6">3.000.000đ <span class="text-sm font-normal opacity-70">/tháng</span></div>
+<ul class="space-y-4 mb-10 flex-1">
+<li class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+                            Lịch tập cá nhân hóa chi tiết
+                        </li>
+<li class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+                            Hỗ trợ 24/7 qua Zalo/Phone
+                        </li>
+<li class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+                            Tư vấn dinh dưỡng hàng tuần
+                        </li>
+<li class="flex items-center gap-3 text-sm">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+                            Điều chỉnh lịch tập linh hoạt
+                        </li>
+</ul>
+<button class="w-full py-3 rounded-lg bg-white text-primary font-bold text-sm hover:scale-[1.02] active:scale-95 transition-all">Đăng ký ngay</button>
+</div>
+<!-- Cao Cấp -->
+<div class="bg-surface-container-lowest p-8 rounded-xl flex flex-col hover:shadow-card transition-all">
+<h3 class="text-lg font-bold text-on-surface mb-2">Cao Cấp</h3>
+<div class="text-3xl font-bold text-primary mb-6">5.500.000đ <span class="text-sm font-normal text-outline">/tháng</span></div>
+<ul class="space-y-4 mb-10 flex-1">
+<li class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-lg">check_circle</span>
+                            Tất cả quyền lợi gói Tiêu Chuẩn
+                        </li>
+<li class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-lg">check_circle</span>
+                            1 buổi offline trực tiếp/tuần
+                        </li>
+<li class="flex items-center gap-3 text-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-secondary text-lg">check_circle</span>
+                            Hỗ trợ tại các giải thi đấu
+                        </li>
+</ul>
+<button class="w-full py-3 rounded-lg border border-outline text-on-surface-variant font-semibold text-sm hover:bg-surface-container-low transition-all">Liên hệ Coach</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 px-8 mt-auto border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-7xl mx-auto">
+<div class="col-span-2 md:col-span-1">
+<div class="font-bold text-zinc-900 dark:text-zinc-50 mb-4 text-lg">GymCenter</div>
+<p class="text-xs text-zinc-500 dark:text-zinc-400 mb-6 leading-relaxed">Hệ thống quản lý và kết nối huấn luyện viên chuyên nghiệp hàng đầu Việt Nam.</p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-zinc-400 cursor-pointer hover:text-primary">social_leaderboard</span>
+<span class="material-symbols-outlined text-zinc-400 cursor-pointer hover:text-primary">linked_camera</span>
+<span class="material-symbols-outlined text-zinc-400 cursor-pointer hover:text-primary">mail</span>
+</div>
+</div>
+<div>
+<h4 class="text-[10px] font-bold text-zinc-900 uppercase tracking-widest mb-6">Platform Info</h4>
+<div class="flex flex-col gap-4">
+<a class="text-xs text-zinc-500 hover:underline" href="#">Về chúng tôi</a>
+<a class="text-xs text-zinc-500 hover:underline" href="#">Điều khoản dịch vụ</a>
+<a class="text-xs text-zinc-500 hover:underline" href="#">Chính sách bảo mật</a>
+</div>
+</div>
+<div>
+<h4 class="text-[10px] font-bold text-zinc-900 uppercase tracking-widest mb-6">Community</h4>
+<div class="flex flex-col gap-4">
+<a class="text-xs text-zinc-500 hover:underline" href="#">Cộng đồng chạy bộ</a>
+<a class="text-xs text-zinc-500 hover:underline" href="#">Câu chuyện thành công</a>
+<a class="text-xs text-zinc-500 hover:underline" href="#">Sự kiện sắp tới</a>
+</div>
+</div>
+<div>
+<h4 class="text-[10px] font-bold text-zinc-900 uppercase tracking-widest mb-6">Support</h4>
+<div class="flex flex-col gap-4">
+<a class="text-xs text-zinc-500 hover:underline" href="#">Trung tâm trợ giúp</a>
+<a class="text-xs text-zinc-500 hover:underline" href="#">Trở thành HLV</a>
+<a class="text-xs text-zinc-500 hover:underline" href="#">Liên hệ hợp tác</a>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="text-[10px] text-zinc-500">© 2024 GymCenter Performance Labs</div>
+<div class="flex gap-8 text-[10px] text-zinc-500 uppercase font-medium tracking-tight">
+<span>Made with Performance in Mind</span>
+</div>
+</div>
+</footer>
+<!-- Mobile Bottom Navigation -->
+<nav class="lg:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border-t border-zinc-100 z-50">
+<a class="flex flex-col items-center justify-center text-zinc-400" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-900 relative after:content-[''] after:absolute after:-bottom-1 after:w-1 after:h-1 after:bg-zinc-900 after:rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="sports_score">sports_score</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Coach</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400" href="#">
+<span class="material-symbols-outlined" data-icon="fitness_center">fitness_center</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Workout</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Messaging</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="text-[10px] font-medium uppercase tracking-tighter">Profile</span>
+</a>
+</nav>
+</body></html>

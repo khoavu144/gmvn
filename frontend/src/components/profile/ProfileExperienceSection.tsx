@@ -44,14 +44,14 @@ export default function ProfileExperienceSection({
   return (
     <section className="profile-experience-section">
       <div className="profile-experience-inner">
-        {/* 2-col grid: Career Milestones | Certifications */}
+        {/* 2-col grid: Cột mốc sự nghiệp | Chứng chỉ */}
         <div className="profile-exp-grid">
 
-          {/* Left: Career Milestones timeline */}
+          {/* Left: Cột mốc sự nghiệp */}
           {experiences.length > 0 && (
             <div className="profile-exp-col-left">
               <h2 className="profile-section-title">
-                Career Milestones
+                Cột mốc sự nghiệp
                 {yearsExperience && (
                   <span className="profile-section-title-badge">{yearsExperience} năm</span>
                 )}
@@ -67,7 +67,7 @@ export default function ProfileExperienceSection({
                       <div className="profile-exp-content">
                         <div className={`profile-exp-date ${isActive ? 'profile-exp-date--active' : ''}`}>
                           {formatDate(exp.start_date)}
-                          {exp.is_current ? ' - Present' : exp.end_date ? ` — ${formatDate(exp.end_date)}` : ''}
+                          {exp.is_current ? ' - Hiện tại' : exp.end_date ? ` — ${formatDate(exp.end_date)}` : ''}
                         </div>
                         <div className="profile-exp-title">{exp.title}</div>
                         <div className="profile-exp-org">{exp.organization}</div>
@@ -82,10 +82,10 @@ export default function ProfileExperienceSection({
             </div>
           )}
 
-          {/* Right: Certifications grid */}
+          {/* Right: Chứng chỉ và thành tích */}
           {allCerts.length > 0 && (
             <div className="profile-exp-col-right">
-              <h3 className="profile-skills-title" style={{ marginBottom: 12 }}>Certifications &amp; Awards</h3>
+              <h3 className="profile-skills-title" style={{ marginBottom: 12 }}>Chứng chỉ & Thành tích</h3>
               <div className="profile-cert-list">
                 {allCerts.map((c, i) => (
                   <div key={i} className="profile-cert-row">
