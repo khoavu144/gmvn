@@ -33,7 +33,7 @@ export default function ProfilePricingSection({ packages, subscribing, onSubscri
                 <h3 className="profile-pricing-name">{pkg.name}</h3>
                 <div className="profile-pricing-price">
                   <span className="profile-pricing-amount">
-                    {pkg.price.toLocaleString('vi-VN')}₫
+                    {Number(pkg.price).toLocaleString('vi-VN')}₫
                   </span>
                   <span className="profile-pricing-period">/{pkg.duration_months === 1 ? 'tháng' : `${pkg.duration_months} tháng`}</span>
                 </div>

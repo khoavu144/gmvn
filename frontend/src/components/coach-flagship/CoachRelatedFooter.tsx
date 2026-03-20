@@ -15,7 +15,7 @@ interface Props {
     coaches: SimilarCoach[];
 }
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 2;
 
 export default function CoachRelatedFooter({ coaches }: Props) {
     const [page, setPage] = useState(0);
@@ -27,34 +27,32 @@ export default function CoachRelatedFooter({ coaches }: Props) {
     return (
         <section className="coach-related-section">
             <div className="coach-related-inner">
-                {/* Header + prev/next */}
+                {/* Header + prev/next — always visible */}
                 <div className="coach-related-header">
                     <h3 className="coach-related-title">Huấn luyện viên tương tự</h3>
-                    {totalPages > 1 && (
-                        <div className="coach-related-nav">
-                            <button
-                                onClick={() => setPage(p => Math.max(0, p - 1))}
-                                disabled={page === 0}
-                                className="coach-related-nav-btn"
-                                aria-label="Previous"
-                            >
-                                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                                </svg>
-                            </button>
-                            <span className="coach-related-page">{page + 1} / {totalPages}</span>
-                            <button
-                                onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
-                                disabled={page === totalPages - 1}
-                                className="coach-related-nav-btn"
-                                aria-label="Next"
-                            >
-                                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-                                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                    )}
+                    <div className="coach-related-nav">
+                        <button
+                            onClick={() => setPage(p => Math.max(0, p - 1))}
+                            disabled={page === 0}
+                            className="coach-related-nav-btn"
+                            aria-label="Previous"
+                        >
+                            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                        </button>
+                        <span className="coach-related-page">{page + 1} / {totalPages}</span>
+                        <button
+                            onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                            disabled={page === totalPages - 1}
+                            className="coach-related-nav-btn"
+                            aria-label="Next"
+                        >
+                            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Cards */}
