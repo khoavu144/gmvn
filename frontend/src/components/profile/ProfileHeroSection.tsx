@@ -31,6 +31,13 @@ export default function ProfileHeroSection({
 
   const displayBio = bioLong || bio || '';
 
+  // Top achievement = first highlight shown as the featured card
+  const topAchievement = useMemo(() => {
+    if (highlights && highlights.length > 0) return highlights[0];
+    if (displayMetrics.length > 0) return { title: displayMetrics[0].label, value: displayMetrics[0].value, icon_key: 'star' };
+    return null;
+  }, [highlights, displayMetrics]);
+
   return (
     <section className="profile-hero-section">
       {/* Cover gradient band */}
@@ -80,27 +87,48 @@ export default function ProfileHeroSection({
           </div>
         )}
 
-        {/* Bio */}
-        {displayBio && (
-          <div className="profile-hero-bio">
-            <h2 className="profile-section-title">Giới thiệu</h2>
-            <p className="profile-hero-bio-text">{displayBio}</p>
+        {/* Bio + Achievement card — 2-col grid on desktop */}
+        <div className="profile-hero-body-grid">
+          <div className="profile-hero-body-left">
+            {displayBio && (
+              <div className="profile-hero-bio">
+                <h2 className="profile-section-title">Giới thiệu</h2>
+                <p className="profile-hero-bio-text">{displayBio}</p>
+              </div>
+            )}
+            {specialties && specialties.length > 0 && (
+              <div className="profile-hero-specialties">
+                <h3 className="profile-hero-specialties-title">Lĩnh vực chuyên môn</h3>
+                <div className="profile-hero-tags profile-hero-tags--large">
+                  {specialties.map((s, i) => (
+                    <span key={i} className="profile-hero-tag profile-hero-tag--large">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        )}
 
-        {/* Specialties pills */}
-        {specialties && specialties.length > 0 && (
-          <div className="profile-hero-specialties">
-            <h3 className="profile-hero-specialties-title">Lĩnh vực chuyên môn</h3>
-            <div className="profile-hero-tags profile-hero-tags--large">
-              {specialties.map((s, i) => (
-                <span key={i} className="profile-hero-tag profile-hero-tag--large">{s}</span>
-              ))}
+          {/* Achievement card — desktop right column */}
+          {topAchievement && (
+            <div className="profile-hero-achievement-card">
+              <span className="profile-achievement-badge">BEST RECORD</span>
+              <div className="profile-achievement-value">{topAchievement.value}</div>
+              <div className="profile-achievement-title">{topAchievement.title}</div>
+              {highlights.length > 1 && (
+                <div className="profile-achievement-sub">
+                  {highlights.slice(1, 3).map((h, i) => (
+                    <div key={i} className="profile-achievement-sub-item">
+                      <span className="profile-achievement-sub-value">{h.value}</span>
+                      <span className="profile-achievement-sub-label">{h.title}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Price + CTA */}
+        {/* Price + CTA row */}
         <div className="profile-hero-cta-row">
           {basePriceMonthly && (
             <div className="profile-hero-price">
@@ -112,7 +140,10 @@ export default function ProfileHeroSection({
             </div>
           )}
           <button onClick={onMessage} className="profile-hero-cta-btn">
-            Nhắn tin với {name.split(' ').slice(-1)[0]}
+            Liên hệ tư vấn
+          </button>
+          <button onClick={onMessage} className="profile-hero-cta-btn-ghost">
+            Xem lịch tập
           </button>
         </div>
       </div>

@@ -6,7 +6,7 @@
 /* ── Page wrapper ──────────────────────────────────────────────── */
 .coach-profile-page {
   min-height: 100vh;
-  background: #f8f8f8;
+  background: #f9f9f9;
 }
 
 /* ── Layout grid ───────────────────────────────────────────────── */
@@ -21,9 +21,8 @@
   width: 260px;
   min-width: 260px;
   background: #ffffff;
-  border-right: 1px solid #eee;
   position: sticky;
-  top: 64px; /* header height */
+  top: 64px;
   height: calc(100vh - 64px);
   overflow-y: auto;
   padding: 28px 20px 32px;
@@ -32,7 +31,7 @@
   gap: 20px;
   scrollbar-width: none;
   z-index: 40;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.04);
+  box-shadow: 1px 0 0 0 rgba(0,0,0,0.06);
   flex-shrink: 0;
 }
 .profile-sidebar::-webkit-scrollbar { display: none; }
@@ -163,13 +162,16 @@
   color: #111;
 }
 .sidebar-nav-item.active {
-  background: #f0f0ff;
-  color: #4338ca;
-  font-weight: 600;
+  background: transparent;
+  color: #0a0a0a;
+  font-weight: 700;
+  border-left: 3px solid #0a0a0a;
+  border-radius: 0 8px 8px 0;
+  padding-left: 9px;
 }
 .sidebar-nav-item.active::before {
   opacity: 1;
-  background: #4338ca;
+  background: #0a0a0a;
 }
 
 /* Social links */
@@ -217,7 +219,7 @@
 .sidebar-cta-btn {
   width: 100%;
   padding: 11px 16px;
-  background: #1a1a2e;
+  background: linear-gradient(180deg, #5f5e5e 0%, #403f3f 100%);
   color: white;
   font-size: 0.82rem;
   font-weight: 600;
@@ -229,9 +231,9 @@
   margin-top: auto;
 }
 .sidebar-cta-btn:hover {
-  background: #2d2d4e;
+  background: linear-gradient(180deg, #6d6c6c 0%, #524f4f 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(26,26,46,0.25);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 /* ── MAIN CONTENT ──────────────────────────────────────────────── */
@@ -443,9 +445,8 @@
   flex-wrap: wrap;
   margin-bottom: 28px;
   padding: 20px;
-  background: #f9fafb;
+  background: #f9f9f9;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
 }
 .profile-hero-metric {
   display: flex;
@@ -506,7 +507,7 @@
 .profile-hero-price-period { font-size: 0.75rem; color: #9ca3af; }
 .profile-hero-cta-btn {
   padding: 11px 24px;
-  background: #1a1a2e;
+  background: linear-gradient(180deg, #5f5e5e 0%, #403f3f 100%);
   color: white;
   font-size: 0.85rem;
   font-weight: 600;
@@ -517,15 +518,115 @@
   margin-left: auto;
 }
 .profile-hero-cta-btn:hover {
-  background: #2d2d4e;
+  background: linear-gradient(180deg, #6d6c6c 0%, #524f4f 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(26,26,46,0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+}
+.profile-hero-cta-btn-ghost {
+  padding: 11px 24px;
+  background: transparent;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 10px;
+  border: 1.5px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.profile-hero-cta-btn-ghost:hover {
+  border-color: #9ca3af;
+  background: #f9f9f9;
+}
+
+/* 2-column bio + achievement card grid */
+.profile-hero-body-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+@media (min-width: 768px) {
+  .profile-hero-body-grid {
+    grid-template-columns: 1fr 220px;
+    gap: 28px;
+    align-items: start;
+  }
+}
+.profile-hero-body-left { display: flex; flex-direction: column; }
+
+/* Achievement card */
+.profile-hero-achievement-card {
+  background: #1a1a2e;
+  border-radius: 14px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.profile-hero-achievement-card::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 120px;
+  height: 120px;
+  background: rgba(99,102,241,0.12);
+  border-radius: 50%;
+}
+.profile-achievement-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.06);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+.profile-achievement-value {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.profile-achievement-title {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.6);
+  font-weight: 500;
+  line-height: 1.4;
+}
+.profile-achievement-sub {
+  margin-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-top: 12px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.profile-achievement-sub-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.profile-achievement-sub-value {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+.profile-achievement-sub-label {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.45);
 }
 
 /* ── ProfileServicesSection ──────────────────────────────────── */
 .profile-services-section {
-  background: #f8f8f8;
-  border-top: 1px solid #eee;
+  background: #f9f9f9;
 }
 .profile-services-inner { padding: 36px 32px; }
 @media (max-width: 768px) { .profile-services-inner { padding: 28px 20px; } }
@@ -567,7 +668,13 @@
   align-items: center;
   margin-bottom: 6px;
 }
-.profile-skill-name { font-size: 0.85rem; font-weight: 600; color: #374151; }
+.profile-skill-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
 .profile-skill-level { font-size: 0.75rem; color: #6b7280; }
 .profile-skill-bar {
   height: 6px;
@@ -606,7 +713,6 @@
 /* ── ProfileExperienceSection ────────────────────────────────── */
 .profile-experience-section {
   background: #fff;
-  border-top: 1px solid #eee;
 }
 .profile-experience-inner { padding: 36px 32px; }
 @media (max-width: 768px) { .profile-experience-inner { padding: 28px 20px; } }
@@ -623,7 +729,7 @@
   top: 8px;
   bottom: 0;
   width: 2px;
-  background: linear-gradient(to bottom, #4338ca, #e5e7eb);
+  background: #e5e7eb;
 }
 .profile-timeline-item {
   position: relative;
@@ -716,8 +822,7 @@
 
 /* ── ProfilePricingSection ───────────────────────────────────── */
 .profile-pricing-section {
-  background: #f8f8f8;
-  border-top: 1px solid #eee;
+  background: #f9f9f9;
 }
 .profile-pricing-inner { padding: 36px 32px; }
 @media (max-width: 768px) { .profile-pricing-inner { padding: 28px 20px; } }
@@ -742,21 +847,34 @@
   transform: translateY(-2px);
 }
 .profile-pricing-card--popular {
-  border-color: #4338ca;
-  box-shadow: 0 0 0 1px #4338ca;
+  background: #111827;
+  border-color: #111827;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  transform: translateY(-4px);
 }
+.profile-pricing-card--popular:hover {
+  box-shadow: 0 16px 40px rgba(0,0,0,0.22);
+  transform: translateY(-6px);
+}
+.profile-pricing-card--popular .profile-pricing-name { color: #ffffff; }
+.profile-pricing-card--popular .profile-pricing-amount { color: #ffffff; }
+.profile-pricing-card--popular .profile-pricing-period { color: rgba(255,255,255,0.55); }
+.profile-pricing-card--popular .profile-pricing-sessions { color: rgba(255,255,255,0.55); }
+.profile-pricing-card--popular .profile-pricing-feature { color: rgba(255,255,255,0.80); }
+.profile-pricing-card--popular .profile-pricing-check { color: #34d399; }
 .profile-pricing-popular-badge {
   position: absolute;
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: #4338ca;
-  color: white;
+  background: #ffffff;
+  color: #111827;
   font-size: 0.7rem;
   font-weight: 700;
   padding: 3px 14px;
   border-radius: 999px;
   white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
 }
 .profile-pricing-header { margin-bottom: 20px; }
 .profile-pricing-name { font-size: 0.95rem; font-weight: 700; color: #111; margin-bottom: 8px; }
