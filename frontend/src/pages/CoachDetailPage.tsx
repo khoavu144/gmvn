@@ -86,6 +86,9 @@ export default function CoachDetailPage() {
     const [similarCoaches, setSimilarCoaches] = useState<SimilarCoach[]>([]);
     const [premium, setPremium] = useState<PremiumPayload | null>(null);
     const [trainerProfile, setTrainerProfile] = useState<any>(null);
+    const [profileSkillsData, setProfileSkillsData] = useState<any[]>([]);
+    const [profileExperienceData, setProfileExperienceData] = useState<any[]>([]);
+    const [profilePackagesData, setProfilePackagesData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [subscribing, setSubscribing] = useState<string | null>(null);
     const [pendingPayment, setPendingPayment] = useState<{
@@ -138,6 +141,9 @@ export default function CoachDetailPage() {
                     slug: profileData?.slug || trainerData?.slug || slug || null,
                 });
                 setTrainerProfile(profileData || null);
+                setProfileSkillsData(profileRes?.data?.skills || []);
+                setProfileExperienceData(profileRes?.data?.experience || []);
+                setProfilePackagesData(profileRes?.data?.packages || []);
                 setPremium(profileRes?.data?.premium || null);
                 setPrograms(programsRes.data.programs || []);
                 setGymLinks(gymsRes.data.gyms || []);
@@ -272,11 +278,11 @@ export default function CoachDetailPage() {
         catch { return {}; }
     }, [trainerProfile?.social_links]);
 
-    const profileSkills = useMemo(() => trainerProfile?.skills || [], [trainerProfile?.skills]);
-    const profileExperiences = useMemo(() => trainerProfile?.experiences || [], [trainerProfile?.experiences]);
-    const profileCerts = useMemo(() => trainerProfile?.certifications || [], [trainerProfile?.certifications]);
-    const profileAwards = useMemo(() => trainerProfile?.awards || [], [trainerProfile?.awards]);
-    const profilePackages = useMemo(() => trainerProfile?.packages || programs, [trainerProfile?.packages, programs]);
+    const profileSkills = useMemo(() => profileSkillsData, [profileSkillsData]);
+    const profileExperiences = useMemo(() => profileExperienceData, [profileExperienceData]);
+    const profileCerts = useMemo(() => [], []);
+    const profileAwards = useMemo(() => [], []);
+    const profilePackages = useMemo(() => profilePackagesData.length > 0 ? profilePackagesData : programs, [profilePackagesData, programs]);
 
     return (
         <div className="coach-profile-page">
@@ -351,7 +357,7 @@ export default function CoachDetailPage() {
                             experiences={profileExperiences}
                             certifications={profileCerts}
                             awards={profileAwards}
-                            yearsExperience={trainerProfile?.years_of_experience || null}
+                            yearsExperience={trainerProfile?.years_experience || null}
                         />
                     </div>
 
