@@ -2,6 +2,7 @@ import { AppDataSource } from '../config/database';
 import { PlatformSubscription, PlatformPlan } from '../entities/PlatformSubscription';
 import { AppSetting } from '../entities/AppSetting';
 import { User } from '../entities/User';
+import redisClient from '../config/redis';
 
 export type { PlatformPlan };
 
@@ -145,7 +146,16 @@ class PlatformSubscriptionService {
 
         // SePay description format: GYMERVIET-PLAN-{plan}-{userId_short}
         const userShort = userId.replace(/-/g, '').substring(0, 8).toUpperCase();
-        const description = `GYMERVIET-PLAN-${plan.toUpperCase()}-${userShort}`;
+        // Use a unique random suffix to completely prevent collisions in webhook matching
+        const uniqueId = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const description = `GYMERVIET-PLAN-${plan.toUpperCase()}-${userShort}-${uniqueId}`;
+
+        // Store checkout intent in Redis for 24 hours (86400s)
+        try {
+            await redisClient.set(`checkout:${description}`, JSON.stringify({ userId, plan }), 'EX', 86400);
+        } catch (e) {
+            console.warn('[checkout] Failed to write to Redis, falling back to substring match', e);
+        }
 
         return {
             plan,

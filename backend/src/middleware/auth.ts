@@ -84,6 +84,30 @@ export const adminOnly: RequestHandler = (req, res, next) => {
 // Alias — used by marketplace and other modern routes
 export const requireAdmin = adminOnly;
 
+export const athleteOnly: RequestHandler = (req, res, next) => {
+    if (req.user?.user_type !== 'athlete') {
+        res.status(403).json({ success: false, error: 'Only athletes can perform this action' });
+        return;
+    }
+    next();
+};
+
+export const adminAndTrainerOnly: RequestHandler = (req, res, next) => {
+    if (req.user?.user_type !== 'admin' && req.user?.user_type !== 'trainer') {
+        res.status(403).json({ success: false, error: 'Only admins or trainers can perform this action' });
+        return;
+    }
+    next();
+};
+
+export const athleteOrUser: RequestHandler = (req, res, next) => {
+    if (req.user?.user_type !== 'athlete' && req.user?.user_type !== 'user') {
+        res.status(403).json({ success: false, error: 'Only athletes or users can perform this action' });
+        return;
+    }
+    next();
+};
+
 export const trainerOnly: RequestHandler = (req, res, next) => {
     if (req.user?.user_type !== 'trainer') {
         res.status(403).json({ success: false, error: 'Only trainers can perform this action' });

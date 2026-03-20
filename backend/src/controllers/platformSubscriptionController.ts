@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { platformSubscriptionService, PLAN_CONFIG, PlatformPlan } from '../services/platformSubscriptionService';
+import redisClient from '../config/redis';
 
 const VALID_PLANS: PlatformPlan[] = ['coach_pro', 'coach_elite', 'athlete_premium', 'gym_business'];
 
@@ -80,40 +81,65 @@ export const sepayPlatformWebhook = async (req: Request, res: Response): Promise
             content?: string; amount?: number; transaction_id?: string;
         };
 
-        // Parse description: GYMERVIET-PLAN-{PLAN}-{USER_SHORT}
-        const match = content?.match(/GYMERVIET-PLAN-([A-Z_]+)-([A-Z0-9]+)/i);
-        if (!match) {
-            // Not a platform payment — ignore silently
-            res.json({ success: true, ignored: true });
-            return;
+        // Parse description: GYMERVIET-PLAN-{PLAN}-{USER_SHORT}-{RANDOM}
+        let targetUserId: string | null = null;
+        let targetPlan: PlatformPlan | null = null;
+
+        if (content) {
+            try {
+                // Try exact match from Redis first
+                const redisData = await redisClient.get(`checkout:${content}`);
+                if (redisData) {
+                    const parsed = JSON.parse(redisData);
+                    targetUserId = parsed.userId;
+                    targetPlan = parsed.plan;
+                    // Note: intentionally not deleting from Redis yet in case webhook fires multiple times
+                }
+            } catch (e) {
+                console.warn('[platform-webhook] Redis read failed', e);
+            }
         }
 
-        const planRaw = match[1].toLowerCase() as PlatformPlan;
-        if (!VALID_PLANS.includes(planRaw)) {
-            res.status(400).json({ error: 'Unknown plan in webhook' });
-            return;
+        // Fallback to old substring regex if Redis miss (for backwards compatibility)
+        if (!targetUserId) {
+            const match = content?.match(/GYMERVIET-PLAN-([A-Z_]+)-([A-Z0-9]+)/i);
+            if (!match) {
+                res.json({ success: true, ignored: true });
+                return;
+            }
+
+            const planRaw = match[1].toLowerCase() as PlatformPlan;
+            if (!VALID_PLANS.includes(planRaw)) {
+                res.status(400).json({ error: 'Unknown plan in webhook' });
+                return;
+            }
+            targetPlan = planRaw;
+
+            const { AppDataSource } = await import('../config/database');
+            const { User } = await import('../entities/User');
+            const userShort = match[2].toUpperCase();
+            const users = await AppDataSource
+                .getRepository(User)
+                .createQueryBuilder('u')
+                .where("REPLACE(u.id::text, '-', '') ILIKE :prefix", { prefix: `${userShort}%` })
+                .getMany();
+
+            if (users.length !== 1) {
+                console.error('[platform-webhook] ambiguous user match:', userShort, users.length);
+                res.status(400).json({ error: 'Cannot uniquely identify user from transaction' });
+                return;
+            }
+            targetUserId = users[0].id;
         }
 
-        // Find user by short id prefix — fallback: admin must manually check if ambiguous
-        // In production: store pending_checkout in Redis/DB keyed by description
-        const { AppDataSource } = await import('../config/database');
-        const { User } = await import('../entities/User');
-        const userShort = match[2].toUpperCase();
-        const users = await AppDataSource
-            .getRepository(User)
-            .createQueryBuilder('u')
-            .where("REPLACE(u.id::text, '-', '') ILIKE :prefix", { prefix: `${userShort}%` })
-            .getMany();
-
-        if (users.length !== 1) {
-            console.error('[platform-webhook] ambiguous user match:', userShort, users.length);
-            res.status(400).json({ error: 'Cannot uniquely identify user from transaction' });
+        if (!targetUserId || !targetPlan) {
+            res.status(400).json({ error: 'Failed to resolve user and plan' });
             return;
         }
 
         await platformSubscriptionService.activateFromWebhook(
-            users[0].id,
-            planRaw,
+            targetUserId,
+            targetPlan,
             transaction_id ?? '',
             amount ?? 0,
         );

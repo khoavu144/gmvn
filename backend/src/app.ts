@@ -47,7 +47,18 @@ app.set('trust proxy', 1);
 app.get('/sitemap.xml', generateSitemap);
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            imgSrc: ["'self'", "data:", "https:"],
+            connectSrc: ["'self'", "https://api.vietqr.io", "https://my.sepay.vn"],
+        }
+    }
+}));
 app.use(requestLogger);
 const allowedOrigins = [
     'http://localhost:5173',
