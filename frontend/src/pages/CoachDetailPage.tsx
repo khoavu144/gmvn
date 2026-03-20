@@ -225,6 +225,22 @@ export default function CoachDetailPage() {
         return `${trainer.full_name} là huấn luyện viên được xác thực trên GYMERVIET.`;
     }, [trainer?.bio, trainer?.full_name]);
 
+    // Derived data — must be computed unconditionally before any early returns (Rules of Hooks)
+    const sidebarSocialLinks = useMemo(() => {
+        try {
+            const sl = trainerProfile?.social_links;
+            return (sl !== null && sl !== undefined && typeof sl === 'object') ? sl : {};
+        } catch { return {}; }
+    }, [trainerProfile?.social_links]);
+    const profileSkills = useMemo(() => profileSkillsData, [profileSkillsData]);
+    const profileExperiences = useMemo(() => profileExperienceData, [profileExperienceData]);
+    const profilePackages = useMemo(
+        () => profilePackagesData.length > 0 ? profilePackagesData : programs,
+        [profilePackagesData, programs]
+    );
+    const profileCerts: never[] = [];
+    const profileAwards: never[] = [];
+
     // Loading skeleton — section-aware
     if (loading) {
         return (
@@ -272,19 +288,6 @@ export default function CoachDetailPage() {
             </div>
         );
     }
-
-    const sidebarSocialLinks = useMemo(() => {
-        try {
-            const sl = trainerProfile?.social_links;
-            return (sl !== null && sl !== undefined && typeof sl === 'object') ? sl : {};
-        } catch { return {}; }
-    }, [trainerProfile?.social_links]);
-
-    const profileSkills = useMemo(() => profileSkillsData, [profileSkillsData]);
-    const profileExperiences = useMemo(() => profileExperienceData, [profileExperienceData]);
-    const profileCerts = useMemo(() => [], []);
-    const profileAwards = useMemo(() => [], []);
-    const profilePackages = useMemo(() => profilePackagesData.length > 0 ? profilePackagesData : programs, [profilePackagesData, programs]);
 
     return (
         <div className="coach-profile-page">
