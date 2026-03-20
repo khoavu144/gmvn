@@ -7,10 +7,14 @@ import apiClient from '../services/api';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import { useToast } from '../components/Toast';
+import '../styles/coachProfile.css';
 
-// Flagship components
+// Layout / sidebar
+import ProfileSidebar from '../components/profile/ProfileSidebar';
+import CoachMobileNav from '../components/profile/CoachMobileNav';
+
+// Flagship section components
 import CoachHeroFlagship from '../components/coach-flagship/CoachHeroFlagship';
-import CoachTrustRibbon from '../components/coach-flagship/CoachTrustRibbon';
 import CoachMobileStickyCta from '../components/coach-flagship/CoachMobileStickyCta';
 import CoachResultsShowcase from '../components/coach-flagship/CoachResultsShowcase';
 import CoachMethodSection from '../components/coach-flagship/CoachMethodSection';
@@ -80,6 +84,7 @@ export default function CoachDetailPage() {
     const [beforeAfterPhotos, setBeforeAfterPhotos] = useState<any[]>([]);
     const [similarCoaches, setSimilarCoaches] = useState<SimilarCoach[]>([]);
     const [premium, setPremium] = useState<PremiumPayload | null>(null);
+    const [trainerProfile, setTrainerProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [subscribing, setSubscribing] = useState<string | null>(null);
     const [pendingPayment, setPendingPayment] = useState<{
@@ -131,6 +136,7 @@ export default function CoachDetailPage() {
                     ...trainerData,
                     slug: profileData?.slug || trainerData?.slug || slug || null,
                 });
+                setTrainerProfile(profileData || null);
                 setPremium(profileRes?.data?.premium || null);
                 setPrograms(programsRes.data.programs || []);
                 setGymLinks(gymsRes.data.gyms || []);
@@ -260,8 +266,13 @@ export default function CoachDetailPage() {
         );
     }
 
+    const sidebarSocialLinks = useMemo(() => {
+        try { return typeof trainerProfile?.social_links === 'object' ? trainerProfile.social_links : {}; }
+        catch { return {}; }
+    }, [trainerProfile?.social_links]);
+
     return (
-        <div className="min-h-screen bg-white pb-20 lg:pb-0">
+        <div className="coach-profile-page">
             <Helmet>
                 <title>{seoTitle}</title>
                 <meta name="description" content={seoDescription} />
@@ -275,68 +286,95 @@ export default function CoachDetailPage() {
 
             {ToastComponent}
 
-            {/* 1. Hero Promise */}
-            <CoachHeroFlagship
-                name={trainer.full_name}
-                avatarUrl={trainer.avatar_url}
-                specialties={trainer.specialties}
-                bio={trainer.bio}
-                isVerified={trainer.is_verified}
-                tagline={premium?.hero?.tagline}
-                metrics={premium?.hero?.metrics}
-                basePriceMonthly={trainer.base_price_monthly}
-                onMessage={handleMessage}
-            />
+            {/* Mobile sticky nav (visible only < 1024px) */}
+            <CoachMobileNav name={trainer.full_name} />
 
-            {/* 2. Trust Ribbon */}
-            <CoachTrustRibbon
-                isVerified={trainer.is_verified}
-                basePriceMonthly={trainer.base_price_monthly}
-                gymLinks={gymLinks}
-                programCount={programs.length}
-                specialties={trainer.specialties}
-                testimonialCount={testimonials.length}
-                beforeAfterCount={beforeAfterPhotos.length}
-            />
+            {/* Main layout: sidebar + content */}
+            <div className="coach-profile-layout">
 
-            {/* 3. Transformation Proof (moved high) */}
-            <CoachResultsShowcase photos={beforeAfterPhotos} />
+                {/* Sidebar (hidden on mobile) */}
+                <ProfileSidebar
+                    name={trainer.full_name}
+                    avatarUrl={trainer.avatar_url}
+                    headline={trainerProfile?.headline || trainer.specialties?.[0] || null}
+                    isVerified={trainer.is_verified}
+                    isAcceptingClients={trainerProfile?.is_accepting_clients ?? true}
+                    socialLinks={sidebarSocialLinks}
+                    location={trainerProfile?.location || null}
+                    onContactClick={handleMessage}
+                />
 
-            {/* 4. Coaching Method */}
-            <CoachMethodSection
-                bio={trainer.bio}
-                specialties={trainer.specialties}
-                highlights={premium?.highlights || []}
-                gymCount={gymLinks.length}
-            />
+                {/* Scrollable main content */}
+                <main className="coach-profile-main">
 
-            {/* 5. Offer Architecture */}
-            <CoachOffersFlagship
-                programs={programs}
-                subscribing={subscribing}
-                onSubscribe={handleSubscribe}
-            />
+                    {/* §1 Hero / About */}
+                    <div id="section-about" className="profile-section-anchor">
+                        <CoachHeroFlagship
+                            name={trainer.full_name}
+                            avatarUrl={trainer.avatar_url}
+                            specialties={trainer.specialties}
+                            bio={trainer.bio}
+                            isVerified={trainer.is_verified}
+                            tagline={premium?.hero?.tagline}
+                            metrics={premium?.hero?.metrics}
+                            basePriceMonthly={trainer.base_price_monthly}
+                            onMessage={handleMessage}
+                        />
+                    </div>
 
-            {/* 6. Testimonials Wall */}
-            <CoachTestimonialsWall testimonials={testimonials} />
+                    {/* §2 Services / Skills */}
+                    <div id="section-services" className="profile-section-anchor">
+                        <CoachMethodSection
+                            bio={trainer.bio}
+                            specialties={trainer.specialties}
+                            highlights={premium?.highlights || []}
+                            gymCount={gymLinks.length}
+                        />
+                    </div>
 
-            {/* 7. Authority Section */}
-            <CoachAuthoritySection
-                gymLinks={gymLinks}
-                mediaFeatures={premium?.mediaFeatures || []}
-                pressMentions={premium?.pressMentions || []}
-            />
+                    {/* §3 Gallery / Results */}
+                    <div id="section-gallery" className="profile-section-anchor">
+                        <CoachResultsShowcase photos={beforeAfterPhotos} />
+                    </div>
 
-            {/* 8. Closing CTA */}
-            <CoachClosingCta
-                coachName={trainer.full_name}
-                onMessage={handleMessage}
-            />
+                    {/* §4 Experience / Authority */}
+                    <div id="section-experience" className="profile-section-anchor">
+                        <CoachAuthoritySection
+                            gymLinks={gymLinks}
+                            mediaFeatures={premium?.mediaFeatures || []}
+                            pressMentions={premium?.pressMentions || []}
+                        />
+                    </div>
 
-            {/* 9. Related Coaches Footer */}
-            <CoachRelatedFooter coaches={similarCoaches} />
+                    {/* §5 Packages */}
+                    <div id="section-packages" className="profile-section-anchor">
+                        <CoachOffersFlagship
+                            programs={programs}
+                            subscribing={subscribing}
+                            onSubscribe={handleSubscribe}
+                        />
+                    </div>
 
-            {/* Mobile Sticky CTA */}
+                    {/* §6 Testimonials */}
+                    <div id="section-testimonials" className="profile-section-anchor">
+                        <CoachTestimonialsWall testimonials={testimonials} />
+                    </div>
+
+                    {/* §7 Contact / Closing CTA */}
+                    <div id="section-contact" className="profile-section-anchor">
+                        <CoachClosingCta
+                            coachName={trainer.full_name}
+                            onMessage={handleMessage}
+                        />
+                    </div>
+
+                    {/* Related Coaches (full-width below) */}
+                    <CoachRelatedFooter coaches={similarCoaches} />
+
+                </main>
+            </div>
+
+            {/* Mobile Sticky CTA — only shows on mobile */}
             <CoachMobileStickyCta
                 coachName={trainer.full_name}
                 onMessage={handleMessage}
