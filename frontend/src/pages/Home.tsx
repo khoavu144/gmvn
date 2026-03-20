@@ -153,18 +153,6 @@ export default function Home() {
                             </Link>
                         </div>
 
-                        {/* Inline stats */}
-                        <div style={{
-                            display: 'flex', gap: 36, flexWrap: 'wrap',
-                            paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.08)',
-                        }}>
-                            {[{ val: '1,200+', lbl: 'Coach' }, { val: '89', lbl: 'Gym' }, { val: '15k+', lbl: 'Học viên' }].map(s => (
-                                <div key={s.lbl}>
-                                    <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#ffffff', fontFamily: "'Roboto Condensed', sans-serif", lineHeight: 1 }}>{s.val}</div>
-                                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 4 }}>{s.lbl}</div>
-                                </div>
-                            ))}
-                        </div>
                     </div>
 
                     {/* Right: Coach bento mini — FIX: use CSS grid properly, no conflicting aspectRatio+gridRow */}
@@ -271,7 +259,7 @@ export default function Home() {
                         <div style={{ marginBottom: 40, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
                             <div>
                                 <span style={{ fontSize: '0.62rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.3)', display: 'block', marginBottom: 8 }}>
-                                    Verified by GYMERVIET
+                                    Xác minh bởi GYMERVIET
                                 </span>
                                 <h2 style={{
                                     fontFamily: "'Roboto Condensed', sans-serif",
@@ -342,7 +330,7 @@ export default function Home() {
                                             {/* Info */}
                                             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '20px 24px', color: 'white', pointerEvents: 'none' }}>
                                                 {coach.is_verified && (
-                                                    <span style={{ fontSize: '0.58rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.45)', display: 'block', marginBottom: 4 }}>✓ Verified</span>
+                                                    <span style={{ fontSize: '0.58rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.45)', display: 'block', marginBottom: 4 }}>✓ Đã xác minh</span>
                                                 )}
                                                 {coach.specialties?.[0] && (
                                                     <span style={{ fontSize: '0.6rem', background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.75)', padding: '2px 10px', borderRadius: 999, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, display: 'inline-block', marginBottom: 8, backdropFilter: 'blur(4px)' }}>
