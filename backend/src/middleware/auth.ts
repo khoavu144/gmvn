@@ -81,6 +81,9 @@ export const adminOnly: RequestHandler = (req, res, next) => {
     next();
 };
 
+// Alias — used by marketplace and other modern routes
+export const requireAdmin = adminOnly;
+
 export const trainerOnly: RequestHandler = (req, res, next) => {
     if (req.user?.user_type !== 'trainer') {
         res.status(403).json({ success: false, error: 'Only trainers can perform this action' });

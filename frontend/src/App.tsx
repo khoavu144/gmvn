@@ -85,6 +85,8 @@ const GymRegisterPage = lazyWithChunkRetry(() => import('./pages/GymRegisterPage
 const GymOwnerDashboard = lazyWithChunkRetry(() => import('./pages/GymOwnerDashboard'), 'gym-owner-dashboard');
 const CommunityGallery = lazyWithChunkRetry(() => import('./pages/CommunityGallery'), 'community-gallery');
 const PricingPage = lazyWithChunkRetry(() => import('./pages/PricingPage'), 'pricing');
+const MarketplacePage = lazyWithChunkRetry(() => import('./pages/MarketplacePage'), 'marketplace');
+const ProductDetailPage = lazyWithChunkRetry(() => import('./pages/ProductDetailPage'), 'product-detail');
 
 const AboutPage = lazyWithChunkRetry(() => import('./pages/legal/AboutPage'), 'about');
 const CommunityStandardsPage = lazyWithChunkRetry(() => import('./pages/legal/CommunityStandardsPage'), 'community-standards');
@@ -252,6 +254,10 @@ const router = createBrowserRouter([
       { path: '/gyms/:id', element: lazyRoute(<GymDetailPage />) },
       { path: '/gym-owner/register', element: lazyRoute(<ProtectedRoute requiredRole="gym_owner"><GymRegisterPage /></ProtectedRoute>) },
       { path: '/gym-owner', element: lazyRoute(<ProtectedRoute requiredRole="gym_owner"><GymOwnerDashboard /></ProtectedRoute>) },
+
+      // Marketplace Routes
+      { path: '/marketplace', element: lazyRoute(<MarketplacePage />) },
+      { path: '/marketplace/product/:slug', element: lazyRoute(<ProductDetailPage />) },
 
       // Legal & Community Routes
       { path: '/about', element: lazyRoute(<AboutPage />) },

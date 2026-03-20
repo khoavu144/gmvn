@@ -24,3 +24,9 @@ frontend/node_modules/
 gymerviet-final/
 files.zip
 gymerviet-final 2.zip
+
+# Large binaries / app bundles — never commit these
+*.app/
+dyad*/
+*.dmg
+*.pkg

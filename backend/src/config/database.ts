@@ -58,6 +58,18 @@ import { CoachApplication } from '../entities/CoachApplication';
 import { PlatformSubscription } from '../entities/PlatformSubscription';
 import { AppSetting } from '../entities/AppSetting';
 
+// Product Marketplace Entities
+import { ProductCategory } from '../entities/ProductCategory';
+import { SellerProfile } from '../entities/SellerProfile';
+import { Product } from '../entities/Product';
+import { ProductVariant } from '../entities/ProductVariant';
+import { TrainingPackage } from '../entities/TrainingPackage';
+import { ProductReview } from '../entities/ProductReview';
+import { ProductOrder } from '../entities/ProductOrder';
+import { ProductOrderItem } from '../entities/ProductOrderItem';
+import { ProductWishlist } from '../entities/ProductWishlist';
+import { ProhibitedKeyword } from '../entities/ProhibitedKeyword';
+
 const env = getEnv();
 
 export const AppDataSource = new DataSource({
@@ -122,6 +134,17 @@ export const AppDataSource = new DataSource({
         // Platform Subscription (Free/Pro/Elite tiers)
         PlatformSubscription,
         AppSetting,
+        // Product Marketplace
+        ProductCategory,
+        SellerProfile,
+        Product,
+        ProductVariant,
+        TrainingPackage,
+        ProductReview,
+        ProductOrder,
+        ProductOrderItem,
+        ProductWishlist,
+        ProhibitedKeyword,
     ],
     subscribers: [],
     migrations: [__dirname + '/../migrations/*.{js,ts}'],

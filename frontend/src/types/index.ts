@@ -583,3 +583,236 @@ export interface ProgressPhoto {
     weight_kg?: number | null;
     created_at: string;
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// PRODUCT MARKETPLACE
+// ─────────────────────────────────────────────────────────────────────
+
+export type ProductType = 'digital' | 'physical' | 'service';
+export type ProductStatus =
+    | 'draft'
+    | 'pending_review'
+    | 'active'
+    | 'rejected'
+    | 'suspended'
+    | 'sold_out'
+    | 'archived';
+
+export interface ProductCategory {
+    id: string;
+    slug: string;
+    label: string;
+    parent_id: string | null;
+    icon_emoji: string | null;
+    product_type: ProductType;
+    requires_moderation: boolean;
+    sort_order: number;
+    is_active: boolean;
+    created_at: string;
+    // Relations
+    children?: ProductCategory[];
+    parent?: ProductCategory | null;
+}
+
+export interface SellerProfile {
+    id: string;
+    user_id: string;
+    shop_name: string;
+    shop_slug: string;
+    shop_description: string | null;
+    shop_logo_url: string | null;
+    shop_cover_url: string | null;
+    business_type: 'individual' | 'brand' | 'gym' | 'coach';
+    contact_phone: string | null;
+    contact_email: string | null;
+    commission_rate: number;
+    is_verified: boolean;
+    total_revenue: number;
+    total_orders: number;
+    avg_rating: number | null;
+    status: 'pending' | 'active' | 'suspended';
+    created_at: string;
+    updated_at: string;
+    // Relations
+    user?: User;
+}
+
+export interface ProductVariant {
+    id: string;
+    product_id: string;
+    variant_label: string;
+    variant_attributes: Record<string, string> | null;
+    price: number | null;
+    compare_at_price: number | null;
+    stock_quantity: number | null;
+    sku: string | null;
+    image_url: string | null;
+    is_active: boolean;
+    sort_order: number;
+    created_at: string;
+}
+
+export interface TrainingPackageDetail {
+    id: string;
+    product_id: string;
+    goal: 'fat_loss' | 'muscle_gain' | 'endurance' | 'flexibility' | 'rehabilitation' | 'competition_prep' | 'general_fitness';
+    level: 'beginner' | 'intermediate' | 'advanced' | 'all';
+    duration_weeks: number;
+    sessions_per_week: number;
+    equipment_required: string[] | null;
+    includes_nutrition: boolean;
+    includes_video: boolean;
+    program_structure: Record<string, Record<string, {
+        title: string;
+        exercises: Array<{
+            name: string;
+            sets: number;
+            reps: string;
+            rest_seconds?: number;
+            note?: string;
+            video_url?: string;
+        }>;
+        warmup?: string;
+        cooldown?: string;
+    }>> | null;
+    preview_weeks: number;
+    nutrition_guide: Record<string, unknown> | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Product {
+    id: string;
+    seller_id: string;
+    seller_profile_id: string | null;
+    category_id: string;
+    title: string;
+    slug: string;
+    description: string | null;
+    product_type: ProductType;
+    status: ProductStatus;
+    price: number;
+    compare_at_price: number | null;
+    currency: string;
+    stock_quantity: number | null;
+    track_inventory: boolean;
+    sku: string | null;
+    digital_file_url: string | null;
+    preview_content: string | null;
+    thumbnail_url: string | null;
+    gallery: string[] | null;
+    attributes: Record<string, unknown> | null;
+    tags: string[] | null;
+    view_count: number;
+    sale_count: number;
+    wishlist_count: number;
+    avg_rating: number | null;
+    review_count: number;
+    featured_weight: number;
+    moderation_note: string | null;
+    created_at: string;
+    updated_at: string;
+    deleted_at: string | null;
+    // Relations
+    category?: ProductCategory;
+    seller?: User;
+    variants?: ProductVariant[];
+    training_package?: TrainingPackageDetail | null;
+}
+
+export interface ProductReview {
+    id: string;
+    product_id: string;
+    user_id: string;
+    order_item_id: string | null;
+    rating: number;
+    comment: string | null;
+    quality_rating: number | null;
+    value_rating: number | null;
+    delivery_rating: number | null;
+    is_verified_purchase: boolean;
+    is_visible: boolean;
+    reply_text: string | null;
+    replied_by_id: string | null;
+    replied_at: string | null;
+    created_at: string;
+    updated_at: string;
+    // Relations
+    user?: User;
+}
+
+export interface ProductOrderItem {
+    id: string;
+    order_id: string;
+    product_id: string;
+    variant_id: string | null;
+    quantity: number;
+    unit_price: number;
+    subtotal: number;
+    digital_download_url: string | null;
+    digital_download_count: number;
+    digital_download_limit: number;
+    product_title_snapshot: string | null;
+    created_at: string;
+    // Relations
+    product?: Product;
+    variant?: ProductVariant | null;
+}
+
+export interface ShippingAddress {
+    full_name: string;
+    phone: string;
+    address: string;
+    district?: string;
+    city: string;
+    province?: string;
+    note?: string;
+}
+
+export interface ProductOrder {
+    id: string;
+    buyer_id: string;
+    order_number: string;
+    status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled' | 'refunded';
+    total_amount: number;
+    shipping_fee: number;
+    discount_amount: number;
+    payment_method: 'bank_transfer' | 'cod' | 'vnpay' | 'momo' | 'zalopay';
+    payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+    shipping_address: ShippingAddress | null;
+    tracking_number: string | null;
+    note: string | null;
+    created_at: string;
+    updated_at: string;
+    // Relations
+    buyer?: User;
+    items?: ProductOrderItem[];
+}
+
+export interface ProductWishlistItem {
+    id: string;
+    user_id: string;
+    product_id: string;
+    created_at: string;
+    product?: Product;
+}
+
+// API response wrappers
+export interface MarketplaceListResponse {
+    success: boolean;
+    products: Product[];
+    total: number;
+    page: number;
+    limit: number;
+}
+
+export interface MarketplaceCategoriesResponse {
+    success: boolean;
+    categories: ProductCategory[];
+}
+
+export interface MarketplaceFeaturedResponse {
+    success: boolean;
+    featured: Product[];
+    new_arrivals: Product[];
+}
