@@ -329,6 +329,8 @@ export default function CoachDetailPage() {
                     <div id="section-about" className="profile-section-anchor">
                         <ProfileHeroSection
                             name={trainer.full_name}
+                            headline={trainerProfile?.headline || null}
+                            location={trainerProfile?.location || null}
                             avatarUrl={trainer.avatar_url}
                             specialties={trainer.specialties}
                             bio={trainer.bio}

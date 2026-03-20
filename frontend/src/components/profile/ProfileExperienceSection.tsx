@@ -19,100 +19,91 @@ interface ProfileExperienceSectionProps {
   yearsExperience: number | null;
 }
 
-const TYPE_CONFIG = {
-  work: { label: 'Làm việc', color: '#4338ca', bg: '#eef2ff', icon: '💼' },
-  education: { label: 'Học vấn', color: '#0891b2', bg: '#ecfeff', icon: '🎓' },
-  certification: { label: 'Chứng chỉ', color: '#059669', bg: '#ecfdf5', icon: '📜' },
-  achievement: { label: 'Thành tích', color: '#d97706', bg: '#fffbeb', icon: '🏆' },
-};
-
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
   return d.toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
 }
+
+const TYPE_DOT: Record<string, { active: boolean }> = {
+  work: { active: true },
+  education: { active: false },
+  certification: { active: false },
+  achievement: { active: false },
+};
 
 export default function ProfileExperienceSection({
   experiences, certifications, awards, yearsExperience,
 }: ProfileExperienceSectionProps) {
   if (!experiences.length && !certifications.length && !awards.length) return null;
 
+  const allCerts = [
+    ...certifications.map(c => ({ name: c.name, issuer: c.issuer, detail: String(c.year), icon: 'verified' })),
+    ...awards.map(a => ({ name: a.name, issuer: a.organization, detail: String(a.year), icon: 'emoji_events' })),
+  ];
+
   return (
     <section className="profile-experience-section">
       <div className="profile-experience-inner">
-        <h2 className="profile-section-title">
-          Kinh nghiệm
-          {yearsExperience && (
-            <span className="profile-section-title-badge">{yearsExperience} năm</span>
-          )}
-        </h2>
+        {/* 2-col grid: Career Milestones | Certifications */}
+        <div className="profile-exp-grid">
 
-        {/* Timeline */}
-        {experiences.length > 0 && (
-          <div className="profile-timeline">
-            {experiences.map((exp, i) => {
-              const cfg = TYPE_CONFIG[exp.experience_type] || TYPE_CONFIG.work;
-              return (
-                <div key={i} className="profile-timeline-item">
-                  <div className="profile-timeline-dot" style={{ background: cfg.color }}>
-                    <span className="profile-timeline-dot-icon">{cfg.icon}</span>
-                  </div>
-                  <div className="profile-timeline-content">
-                    <div className="profile-timeline-header">
-                      <h3 className="profile-timeline-title">{exp.title}</h3>
-                      <span className="profile-timeline-type-badge" style={{ color: cfg.color, background: cfg.bg }}>
-                        {cfg.label}
-                      </span>
+          {/* Left: Career Milestones timeline */}
+          {experiences.length > 0 && (
+            <div className="profile-exp-col-left">
+              <h2 className="profile-section-title">
+                Career Milestones
+                {yearsExperience && (
+                  <span className="profile-section-title-badge">{yearsExperience} năm</span>
+                )}
+              </h2>
+              <div className="profile-exp-timeline">
+                {experiences.map((exp, i) => {
+                  const isActive = exp.is_current || TYPE_DOT[exp.experience_type]?.active;
+                  return (
+                    <div key={i} className="profile-exp-item">
+                      <div className={`profile-exp-dot ${isActive ? 'profile-exp-dot--active' : ''}`}>
+                        <div className="profile-exp-dot-inner" />
+                      </div>
+                      <div className="profile-exp-content">
+                        <div className={`profile-exp-date ${isActive ? 'profile-exp-date--active' : ''}`}>
+                          {formatDate(exp.start_date)}
+                          {exp.is_current ? ' - Present' : exp.end_date ? ` — ${formatDate(exp.end_date)}` : ''}
+                        </div>
+                        <div className="profile-exp-title">{exp.title}</div>
+                        <div className="profile-exp-org">{exp.organization}</div>
+                        {exp.description && (
+                          <p className="profile-exp-desc">{exp.description}</p>
+                        )}
+                      </div>
                     </div>
-                    <p className="profile-timeline-org">{exp.organization}</p>
-                    <p className="profile-timeline-date">
-                      {formatDate(exp.start_date)}
-                      {exp.is_current ? ' — Hiện tại' : exp.end_date ? ` — ${formatDate(exp.end_date)}` : ''}
-                    </p>
-                    {exp.description && (
-                      <p className="profile-timeline-desc">{exp.description}</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Certifications */}
-        {certifications.length > 0 && (
-          <div className="profile-certs">
-            <h3 className="profile-certs-title">Chứng chỉ quốc tế</h3>
-            <div className="profile-certs-grid">
-              {certifications.map((c, i) => (
-                <div key={i} className="profile-cert-card">
-                  <span className="profile-cert-icon">📜</span>
-                  <div>
-                    <p className="profile-cert-name">{c.name}</p>
-                    <p className="profile-cert-issuer">{c.issuer} · {c.year}</p>
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Awards */}
-        {awards.length > 0 && (
-          <div className="profile-awards">
-            <h3 className="profile-certs-title">Giải thưởng & Thành tích</h3>
-            <div className="profile-certs-grid">
-              {awards.map((a, i) => (
-                <div key={i} className="profile-cert-card profile-cert-card--award">
-                  <span className="profile-cert-icon">🏆</span>
-                  <div>
-                    <p className="profile-cert-name">{a.name}</p>
-                    <p className="profile-cert-issuer">{a.organization} · {a.year}</p>
+          {/* Right: Certifications grid */}
+          {allCerts.length > 0 && (
+            <div className="profile-exp-col-right">
+              <h2 className="profile-section-title">Certifications</h2>
+              <div className="profile-cert-list">
+                {allCerts.map((c, i) => (
+                  <div key={i} className="profile-cert-row">
+                    <div className="profile-cert-row-icon">
+                      <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+                        <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="profile-cert-row-name">{c.name}</div>
+                      <div className="profile-cert-row-issuer">{c.issuer}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );
