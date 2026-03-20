@@ -70,17 +70,17 @@ const AdminGymApproval: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="animate-pulse space-y-4"><div className="h-24 bg-[color:var(--mk-paper)] rounded-xl"></div></div>;
+    if (loading) return <div className="animate-pulse space-y-4"><div className="h-24 bg-[color:var(--mk-paper)] rounded-lg"></div></div>;
 
     if (pendingGyms.length === 0) {
-        return <div className="text-[color:var(--mk-muted)] italic py-12 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-xl">Không có hồ sơ nào đang chờ duyệt.</div>;
+        return <div className="text-[color:var(--mk-muted)] italic py-12 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-lg">Không có hồ sơ nào đang chờ duyệt.</div>;
     }
 
     return (
         <div className="space-y-6">
             {ToastComponent}
             {pendingGyms.map(gym => (
-                <div key={gym.id} className="bg-white border-2 border-black p-6 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div key={gym.id} className="bg-white border-2 border-black p-6 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                     <div className="flex flex-col md:flex-row justify-between gap-6">
                         <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
@@ -132,7 +132,7 @@ const AdminGymApproval: React.FC = () => {
             {/* Reject reason modal */}
             {rejectConfig.isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-                    <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
                         <h3 className="text-lg font-black uppercase tracking-tight">Từ chối phòng tập</h3>
                         <p className="text-sm text-[color:var(--mk-text-soft)]">Vui lòng nhập lý do từ chối để thông báo cho chủ phòng tập.</p>
                         <textarea

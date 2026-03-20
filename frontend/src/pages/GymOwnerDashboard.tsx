@@ -112,7 +112,7 @@ const GymOwnerDashboard: React.FC = () => {
             <div className="min-h-screen flex">
                 {ToastComponent}
                 <div className="w-64 bg-[color:var(--mk-paper)] border-r border-[color:var(--mk-line)]"></div>
-                <div className="flex-1 p-8"><div className="animate-pulse h-32 bg-[color:var(--mk-paper)] rounded-xl" /></div>
+                <div className="flex-1 p-8"><div className="animate-pulse h-32 bg-[color:var(--mk-paper)] rounded-lg" /></div>
             </div>
         );
     }
@@ -192,7 +192,7 @@ const GymOwnerDashboard: React.FC = () => {
                                 { label: 'Đánh giá', val: stats?.avg_rating ? `★ ${stats.avg_rating.toFixed(1)}` : 'N/A' },
                                 { label: 'HLV liên kết', val: stats?.total_trainers ?? 0 },
                             ].map((item, i) => (
-                                <div key={i} className="p-6 rounded-xl border border-[color:var(--mk-line)] bg-white shadow-sm">
+                                <div key={i} className="p-6 rounded-lg border border-[color:var(--mk-line)] bg-white shadow-sm">
                                     <p className="text-xs text-[color:var(--mk-muted)] font-bold uppercase tracking-widest mb-2">{item.label}</p>
                                     <p className="text-3xl font-black">{item.val}</p>
                                 </div>
@@ -200,7 +200,7 @@ const GymOwnerDashboard: React.FC = () => {
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-                            <div className="p-6 rounded-xl border border-[color:var(--mk-line)] bg-white shadow-sm h-80 col-span-1 lg:col-span-2 flex flex-col">
+                            <div className="p-6 rounded-lg border border-[color:var(--mk-line)] bg-white shadow-sm h-80 col-span-1 lg:col-span-2 flex flex-col">
                                 <p className="text-xs text-[color:var(--mk-muted)] font-bold uppercase tracking-widest mb-6">Phân bổ đánh giá</p>
                                 <div className="flex-1 min-h-0">
                                     <Suspense fallback={<ChartFallback />}>
@@ -224,7 +224,7 @@ const GymOwnerDashboard: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="p-6 rounded-xl border border-[color:var(--mk-line)] bg-white shadow-sm h-80 col-span-1 flex flex-col">
+                            <div className="p-6 rounded-lg border border-[color:var(--mk-line)] bg-white shadow-sm h-80 col-span-1 flex flex-col">
                                 <p className="text-xs text-[color:var(--mk-muted)] font-bold uppercase tracking-widest mb-2">Tỷ lệ lấp đầy HLV</p>
                                 <div className="flex-1 min-h-0 relative">
                                     <Suspense fallback={<ChartFallback />}>
@@ -258,7 +258,7 @@ const GymOwnerDashboard: React.FC = () => {
                             <h2 className="text-xl font-black uppercase tracking-tight mb-4 flex items-center gap-2"><Star className="w-5 h-5 text-yellow-500 fill-yellow-500" /> Đánh giá gần đây</h2>
                             <div className="grid md:grid-cols-3 gap-6">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="p-5 rounded-xl border border-[color:var(--mk-line)] bg-white shadow-sm hover:border-black transition-colors cursor-pointer group flex flex-col min-h-[160px]">
+                                    <div key={i} className="p-5 rounded-lg border border-[color:var(--mk-line)] bg-white shadow-sm hover:border-black transition-colors cursor-pointer group flex flex-col min-h-[160px]">
                                         <div className="flex justify-between items-start mb-3">
                                             <div className="flex gap-1">
                                                 {[...Array(5)].map((_, idx) => <Star key={idx} className={`w-3 h-3 ${idx === 4 && i === 3 ? 'text-gray-300' : 'text-yellow-400 fill-yellow-400'}`} />)}
@@ -294,7 +294,7 @@ const GymOwnerDashboard: React.FC = () => {
 
                         {/* ─── NEW BRANCH FORM ─── */}
                         {showNewBranchForm && (
-                            <div className="mb-8 p-6 border-2 border-black rounded-xl bg-[color:var(--mk-paper)] animate-fade-in">
+                            <div className="mb-8 p-6 border-2 border-black rounded-lg bg-[color:var(--mk-paper)] animate-fade-in">
                                 <div className="flex justify-between items-center mb-6">
                                     <h2 className="text-lg font-black uppercase tracking-tight">Thêm Chi Nhánh Mới</h2>
                                     <button onClick={() => setShowNewBranchForm(false)} className="text-[color:var(--mk-muted)] hover:text-black text-2xl font-black transition-colors">×</button>
@@ -382,7 +382,7 @@ const GymOwnerDashboard: React.FC = () => {
 
                         <div className="grid gap-6">
                             {branches.map((branch: GymBranch) => (
-                                <div key={branch.id} className="p-6 border border-[color:var(--mk-line)] rounded-xl flex items-center justify-between hover:border-black transition-colors cursor-pointer group" onClick={() => setEditingBranch(branch)}>
+                                <div key={branch.id} className="p-6 border border-[color:var(--mk-line)] rounded-lg flex items-center justify-between hover:border-black transition-colors cursor-pointer group" onClick={() => setEditingBranch(branch)}>
                                     <div>
                                         <h3 className="font-bold text-lg">{branch.branch_name}</h3>
                                         <p className="text-[color:var(--mk-muted)] text-sm mt-1">{branch.address}, {branch.district}, {branch.city}</p>
@@ -391,7 +391,7 @@ const GymOwnerDashboard: React.FC = () => {
                                 </div>
                             ))}
                             {branches.length === 0 && (
-                                <div className="py-16 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-xl">
+                                <div className="py-16 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-lg">
                                     <p className="text-[color:var(--mk-muted)] font-bold uppercase text-sm">Chưa có chi nhánh nào</p>
                                     <button className="mt-4 btn-primary py-2 px-6" onClick={() => setShowNewBranchForm(true)}>Thêm chi nhánh đầu tiên</button>
                                 </div>
@@ -429,7 +429,7 @@ const GymOwnerDashboard: React.FC = () => {
 
                         <div className="grid gap-4">
                             {[1, 2, 3].map(i => (
-                                <div key={i} className="p-4 border border-[color:var(--mk-line)] rounded-xl flex flex-col md:flex-row md:items-center justify-between hover:border-black transition-colors bg-white group">
+                                <div key={i} className="p-4 border border-[color:var(--mk-line)] rounded-lg flex flex-col md:flex-row md:items-center justify-between hover:border-black transition-colors bg-white group">
                                     <div className="flex items-center gap-4 mb-4 md:mb-0">
                                         <div className="w-12 h-12 rounded-full bg-[color:var(--mk-paper)] flex items-center justify-center font-black text-[color:var(--mk-muted)] uppercase">C{i}</div>
                                         <div>
@@ -459,7 +459,7 @@ const GymOwnerDashboard: React.FC = () => {
                             <p className="text-[color:var(--mk-muted)]">Cập nhật thông tin hệ thống Gym Center và bộ nhận diện</p>
                         </div>
                         <div className="grid md:grid-cols-3 gap-8">
-                            <div className="md:col-span-2 space-y-6 bg-white border border-[color:var(--mk-line)] p-6 rounded-xl shadow-sm">
+                            <div className="md:col-span-2 space-y-6 bg-white border border-[color:var(--mk-line)] p-6 rounded-lg shadow-sm">
                                 <h3 className="text-lg font-black uppercase tracking-tight border-b border-[color:var(--mk-line)] pb-3">Thông tin cơ bản</h3>
                                 <div>
                                     <label className="form-label block mb-2 font-bold text-xs uppercase text-[color:var(--mk-muted)] tracking-widest">Tên Gym Center *</label>
@@ -502,14 +502,14 @@ const GymOwnerDashboard: React.FC = () => {
                             </div>
 
                             <div className="col-span-1 space-y-6">
-                                <div className="bg-white border border-[color:var(--mk-line)] p-6 rounded-xl shadow-sm text-center">
+                                <div className="bg-white border border-[color:var(--mk-line)] p-6 rounded-lg shadow-sm text-center">
                                     <h3 className="text-sm font-black uppercase tracking-tight mb-4">Logo Phòng Tập</h3>
                                     <div className="w-32 h-32 mx-auto bg-[color:var(--mk-paper)] rounded-full border border-dashed border-[color:var(--mk-line)] flex flex-col items-center justify-center text-[color:var(--mk-muted)] hover:bg-white hover:border-black hover:text-black cursor-pointer transition-colors mb-4 group">
                                         <Upload className="w-6 h-6 mb-2 group-hover:scale-110 transition-transform" />
                                         <span className="text-[10px] font-bold uppercase tracking-widest text-center px-4 leading-tight">Tải ảnh lên<br />(Tối đa 2MB)</span>
                                     </div>
                                 </div>
-                                <div className="bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] p-6 rounded-xl">
+                                <div className="bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] p-6 rounded-lg">
                                     <h3 className="text-sm font-black uppercase tracking-tight mb-2">Public Profile</h3>
                                     <p className="text-xs text-[color:var(--mk-muted)] mb-4 leading-relaxed">Hồ sơ sẽ hiển thị tới công chúng sau khi được admin GYMERVIET phê duyệt.</p>
                                     <div className="flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-[color:var(--mk-line)] shadow-sm">
@@ -537,7 +537,7 @@ const GymOwnerDashboard: React.FC = () => {
             {/* Invite Coach Overlay */}
             {showInviteModal && (
                 <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onClick={() => setShowInviteModal(false)}>
-                    <div className="bg-white rounded-xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
+                    <div className="bg-white rounded-lg p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
                         <h3 className="text-xl font-black uppercase tracking-tight mb-4">Mời Coach Tham Gia</h3>
                         <p className="text-sm text-[color:var(--mk-muted)] mb-6">Gửi lời mời liên kết đến huấn luyện viên thông qua email.</p>
                         

@@ -41,7 +41,7 @@ export default function VerifyEmail() {
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center bg-[color:var(--mk-paper)] px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-sm border border-[color:var(--mk-line)]">
+      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-sm border border-[color:var(--mk-line)]">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-[color:var(--mk-text)]">
             Xác thực Email

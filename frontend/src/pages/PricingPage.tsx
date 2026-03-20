@@ -38,7 +38,7 @@ function PlanColumn({ planKey, highlighted, onUpgrade, isLoading }: {
     return (
         <div style={{
             flex: 1, border: highlighted ? '2px solid #111' : '1.5px solid #e5e7eb',
-            borderRadius: 20, padding: '28px 24px',
+            borderRadius: 8, padding: '28px 24px',
             background: highlighted ? '#0f172a' : '#fff',
             color: highlighted ? '#fff' : '#111',
             display: 'flex', flexDirection: 'column', gap: 16,
@@ -49,7 +49,7 @@ function PlanColumn({ planKey, highlighted, onUpgrade, isLoading }: {
                 <span style={{
                     position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
                     background: '#fff', color: '#0f172a',
-                    padding: '3px 16px', borderRadius: 999,
+                    padding: '3px 16px', borderRadius: 8,
                     fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.1em',
                     textTransform: 'uppercase', whiteSpace: 'nowrap',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -74,7 +74,7 @@ function PlanColumn({ planKey, highlighted, onUpgrade, isLoading }: {
                     onClick={() => onUpgrade(planKey)}
                     disabled={isLoading === planKey}
                     style={{
-                        width: '100%', padding: '13px 0', borderRadius: 999, border: 'none',
+                        width: '100%', padding: '13px 0', borderRadius: 8, border: 'none',
                         background: highlighted ? '#fff' : '#0f172a',
                         color: highlighted ? '#0f172a' : '#fff',
                         fontSize: '0.85rem', fontWeight: 800, cursor: 'pointer',
@@ -167,7 +167,7 @@ export default function PricingPage() {
 
                 {/* Error */}
                 {error && (
-                    <div style={{ margin: '32px 0 0', padding: '14px 20px', background: '#fef2f2', border: '1.5px solid #fecaca', borderRadius: 12, color: '#991b1b', fontSize: '0.85rem' }}>
+                    <div style={{ margin: '32px 0 0', padding: '14px 20px', background: '#fef2f2', border: '1.5px solid #fecaca', borderRadius: 8, color: '#991b1b', fontSize: '0.85rem' }}>
                         ⚠ {error}
                     </div>
                 )}
@@ -175,12 +175,12 @@ export default function PricingPage() {
                 {/* Checkout modal */}
                 {checkoutInfo && (
                     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-                        <div style={{ background: '#fff', borderRadius: 20, padding: 32, maxWidth: 420, width: '100%', textAlign: 'center' }}>
+                        <div style={{ background: '#fff', borderRadius: 8, padding: 32, maxWidth: 420, width: '100%', textAlign: 'center' }}>
                             <p style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: 8 }}>Thanh toán qua SePay</p>
                             <p style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: 20 }}>
                                 Chuyển khoản đúng số tiền và nội dung để kích hoạt gói tự động.
                             </p>
-                            <div style={{ background: '#f8fafc', borderRadius: 12, padding: '16px 20px', marginBottom: 20, textAlign: 'left' }}>
+                            <div style={{ background: '#f8fafc', borderRadius: 8, padding: '16px 20px', marginBottom: 20, textAlign: 'left' }}>
                                 <Row label="Gói" value={PLAN_LABELS[checkoutInfo.plan]} />
                                 <Row label="Số tiền" value={checkoutInfo.amount.toLocaleString('vi-VN') + 'đ'} />
                                 <Row label="Nội dung CK" value={checkoutInfo.description} mono />
@@ -188,7 +188,7 @@ export default function PricingPage() {
                             <p style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 20 }}>
                                 Sau khi chuyển khoản thành công, gói sẽ được kích hoạt tự động trong vài phút.
                             </p>
-                            <button onClick={() => setCheckoutInfo(null)} style={{ padding: '10px 28px', borderRadius: 999, border: '1.5px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontWeight: 700 }}>Đóng</button>
+                            <button onClick={() => setCheckoutInfo(null)} style={{ padding: '10px 28px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontWeight: 700 }}>Đóng</button>
                         </div>
                     </div>
                 )}

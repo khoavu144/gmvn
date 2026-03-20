@@ -244,7 +244,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
             {ToastComponent}
-            <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-fade-in text-black">
+            <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-fade-in text-black">
                 {/* Header */}
                 <div className="p-6 border-b border-[color:var(--mk-line)] flex justify-between items-center bg-[color:var(--mk-paper)]/50">
                     <div>
@@ -334,7 +334,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
 
                     {activeTab === 'gallery' && (
                         <div className="animate-fade-in text-black">
-                            <div className="bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] p-6 rounded-xl mb-8">
+                            <div className="bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] p-6 rounded-lg mb-8">
                                 <h3 className="text-sm font-black uppercase tracking-widest mb-4 text-black">Thêm ảnh mới</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <input
@@ -376,7 +376,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                                     </div>
                                 ))}
                                 {(!branch.gallery || branch.gallery.length === 0) && (
-                                    <div className="col-span-full py-10 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-xl text-[color:var(--mk-muted)] text-xs font-bold uppercase">
+                                    <div className="col-span-full py-10 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-lg text-[color:var(--mk-muted)] text-xs font-bold uppercase">
                                         Chưa có hình ảnh nào trong thư viện
                                     </div>
                                 )}
@@ -386,7 +386,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
 
                     {activeTab === 'amenities' && (
                         <div className="animate-fade-in text-black">
-                            <div className="bg-white border border-[color:var(--mk-line)] rounded-xl overflow-hidden mb-8">
+                            <div className="bg-white border border-[color:var(--mk-line)] rounded-lg overflow-hidden mb-8">
                                 <div className="p-4 bg-[color:var(--mk-paper)] border-b border-[color:var(--mk-line)] flex items-center justify-between">
                                     <h3 className="text-[10px] font-black uppercase tracking-widest text-[color:var(--mk-muted)]">Danh sách tiện ích</h3>
                                     <button
@@ -469,7 +469,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
 
                     {activeTab === 'equipment' && (
                         <div className="animate-fade-in text-black">
-                            <div className="bg-white border border-[color:var(--mk-line)] rounded-xl overflow-hidden mb-8">
+                            <div className="bg-white border border-[color:var(--mk-line)] rounded-lg overflow-hidden mb-8">
                                 <div className="p-4 bg-[color:var(--mk-paper)] border-b border-[color:var(--mk-line)]">
                                     <h3 className="text-[10px] font-black uppercase tracking-widest text-[color:var(--mk-muted)] text-black">Danh sách máy móc & thiết bị</h3>
                                 </div>
@@ -626,7 +626,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
 
                     {activeTab === 'events' && (
                         <div className="animate-fade-in space-y-8">
-                            <div className="bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] p-6 rounded-xl">
+                            <div className="bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] p-6 rounded-lg">
                                 <h3 className="text-sm font-black uppercase tracking-widest mb-4">Tạo sự kiện mới</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <input
@@ -683,7 +683,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
 
                             <div className="grid grid-cols-1 gap-4">
                                 {branch.events?.map((evt) => (
-                                    <div key={evt.id} className="flex border border-[color:var(--mk-line)] rounded-xl overflow-hidden hover:border-black transition-colors group">
+                                    <div key={evt.id} className="flex border border-[color:var(--mk-line)] rounded-lg overflow-hidden hover:border-black transition-colors group">
                                         <div className="bg-[color:var(--mk-paper)] w-24 flex flex-col items-center justify-center p-2 text-center">
                                             <span className="text-[10px] font-black uppercase">{new Date(evt.start_time).toLocaleDateString('vi-VN', { weekday: 'short' })}</span>
                                             <span className="text-2xl font-black">{new Date(evt.start_time).getDate()}</span>
@@ -711,7 +711,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                                     </div>
                                 ))}
                                 {(!branch.events || branch.events.length === 0) && (
-                                    <div className="py-10 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-xl text-[color:var(--mk-muted)] text-xs font-bold uppercase">
+                                    <div className="py-10 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-lg text-[color:var(--mk-muted)] text-xs font-bold uppercase">
                                         Chưa có sự kiện nào được lên lịch
                                     </div>
                                 )}
@@ -761,7 +761,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                                     </div>
                                 ))}
                                 {(!branch.reviews || branch.reviews.length === 0) && (
-                                    <div className="py-20 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-xl text-[color:var(--mk-muted)] text-xs font-bold uppercase">
+                                    <div className="py-20 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-lg text-[color:var(--mk-muted)] text-xs font-bold uppercase">
                                         Chưa có lượt đánh giá nào cho chi nhánh này
                                     </div>
                                 )}
@@ -774,11 +774,11 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                             <h3 className="text-sm font-black uppercase tracking-widest mb-6">Chỉ số hiệu năng chi nhánh</h3>
 
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-2xl border border-[color:var(--mk-line)]">
+                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-lg border border-[color:var(--mk-line)]">
                                     <p className="text-[10px] font-black text-[color:var(--mk-muted)] uppercase tracking-widest mb-1">Tổng lượt xem</p>
                                     <p className="text-3xl font-black">{branch.view_count || 0}</p>
                                 </div>
-                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-2xl border border-[color:var(--mk-line)]">
+                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-lg border border-[color:var(--mk-line)]">
                                     <p className="text-[10px] font-black text-[color:var(--mk-muted)] uppercase tracking-widest mb-1">Đánh giá trung bình</p>
                                     <p className="text-3xl font-black">
                                         {(branch.reviews && branch.reviews.length > 0)
@@ -786,25 +786,25 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                                             : '0.0'}
                                     </p>
                                 </div>
-                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-2xl border border-[color:var(--mk-line)]">
+                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-lg border border-[color:var(--mk-line)]">
                                     <p className="text-[10px] font-black text-[color:var(--mk-muted)] uppercase tracking-widest mb-1">Coach cơ hữu</p>
                                     <p className="text-3xl font-black">{branch.trainer_links?.length || 0}</p>
                                 </div>
-                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-2xl border border-[color:var(--mk-line)]">
+                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-lg border border-[color:var(--mk-line)]">
                                     <p className="text-[10px] font-black text-[color:var(--mk-muted)] uppercase tracking-widest mb-1">Tiện ích tích hợp</p>
                                     <p className="text-3xl font-black">{branch.amenities?.length || 0}</p>
                                 </div>
-                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-2xl border border-[color:var(--mk-line)]">
+                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-lg border border-[color:var(--mk-line)]">
                                     <p className="text-[10px] font-black text-[color:var(--mk-muted)] uppercase tracking-widest mb-1">Thiết bị & Máy tập</p>
                                     <p className="text-3xl font-black">{branch.equipment?.length || 0}</p>
                                 </div>
-                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-2xl border border-[color:var(--mk-line)]">
+                                <div className="p-6 bg-[color:var(--mk-paper)] rounded-lg border border-[color:var(--mk-line)]">
                                     <p className="text-[10px] font-black text-[color:var(--mk-muted)] uppercase tracking-widest mb-1">Gói phí tập</p>
                                     <p className="text-3xl font-black">{branch.pricing?.length || 0}</p>
                                 </div>
                             </div>
 
-                            <div className="bg-black text-white p-8 rounded-2xl relative overflow-hidden">
+                            <div className="bg-black text-white p-8 rounded-lg relative overflow-hidden">
                                 <div className="relative z-10">
                                     <h4 className="text-lg font-black uppercase tracking-tight mb-2">Tăng trưởng tương tác</h4>
                                     <p className="text-xs text-[color:var(--mk-muted)] font-bold uppercase tracking-widest">Chi nhánh đang thu hút sự quan tâm của cộng đồng Gymers.</p>
@@ -818,7 +818,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
 
                     {activeTab === 'coaches' && (
                         <div className="animate-fade-in space-y-8">
-                            <div className="bg-[color:var(--mk-paper)] p-6 rounded-xl border border-[color:var(--mk-line)]">
+                            <div className="bg-[color:var(--mk-paper)] p-6 rounded-lg border border-[color:var(--mk-line)]">
                                 <h3 className="text-sm font-black uppercase tracking-widest mb-4">Mời Coach tham gia</h3>
                                 <div className="flex gap-2">
                                     <input
@@ -847,7 +847,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                                 </div>
 
                                 {searchResults.length > 0 && (
-                                    <div className="mt-4 divide-y divide-gray-100 bg-white rounded-xl border border-[color:var(--mk-line)] overflow-hidden shadow-sm">
+                                    <div className="mt-4 divide-y divide-gray-100 bg-white rounded-lg border border-[color:var(--mk-line)] overflow-hidden shadow-sm">
                                         {searchResults.map(user => (
                                             <div key={user.id} className="p-3 flex items-center justify-between hover:bg-[color:var(--mk-paper)] transition-colors">
                                                 <div className="flex items-center gap-3">
@@ -875,7 +875,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {branch.trainer_links?.map((link) => (
-                                    <div key={link.id} className="p-4 bg-white border border-[color:var(--mk-line)] rounded-2xl flex items-center justify-between group hover:border-black transition-all">
+                                    <div key={link.id} className="p-4 bg-white border border-[color:var(--mk-line)] rounded-lg flex items-center justify-between group hover:border-black transition-all">
                                         <div className="flex items-center gap-4">
                                             <img
                                                 src={link.trainer?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(link.trainer?.full_name || 'C')}&background=000&color=fff`}
@@ -899,7 +899,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                                     </div>
                                 ))}
                                 {(!branch.trainer_links || branch.trainer_links.length === 0) && (
-                                    <div className="col-span-full py-10 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-xl text-[color:var(--mk-muted)] text-xs font-bold uppercase">
+                                    <div className="col-span-full py-10 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-lg text-[color:var(--mk-muted)] text-xs font-bold uppercase">
                                         Chưa có Coach nào liên kết
                                     </div>
                                 )}

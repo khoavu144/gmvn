@@ -17,7 +17,7 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
     
     return (
         <div 
-            className="group relative cursor-zoom-in overflow-hidden rounded-2xl bg-white/5"
+            className="group relative cursor-zoom-in overflow-hidden rounded-lg bg-white/5"
             onClick={onClick}
         >
             {/* Loading Skeleton */}

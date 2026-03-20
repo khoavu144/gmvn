@@ -73,7 +73,7 @@ export function ProfileExperienceTab() {
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="bg-green-50/50 text-green-600 px-4 py-3 rounded-2xl text-sm border border-green-100 flex items-center justify-between"
+                        className="bg-green-50/50 text-green-600 px-4 py-3 rounded-lg text-sm border border-green-100 flex items-center justify-between"
                     >
                         {successMsg}
                     </motion.div>
@@ -87,7 +87,7 @@ export function ProfileExperienceTab() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="bg-white rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5"
+                        className="bg-white rounded-lg p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5"
                     >
                         <h3 className="text-xl font-bold tracking-tight text-[color:var(--mk-text)] mb-6">
                             {editingId ? 'Chỉnh sửa kinh nghiệm' : 'Thêm kinh nghiệm'}
@@ -100,7 +100,7 @@ export function ProfileExperienceTab() {
                                         value={form.title} 
                                         onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                                         required 
-                                        className="w-full form-input rounded-2xl transition-all" 
+                                        className="w-full form-input rounded-lg transition-all" 
                                     />
                                 </div>
                                 <div>
@@ -109,7 +109,7 @@ export function ProfileExperienceTab() {
                                         value={form.organization} 
                                         onChange={e => setForm(f => ({ ...f, organization: e.target.value }))}
                                         required 
-                                        className="w-full form-input rounded-2xl transition-all" 
+                                        className="w-full form-input rounded-lg transition-all" 
                                     />
                                 </div>
                             </div>
@@ -120,7 +120,7 @@ export function ProfileExperienceTab() {
                                     <select 
                                         value={form.experience_type} 
                                         onChange={e => setForm(f => ({ ...f, experience_type: e.target.value as any }))}
-                                        className="w-full form-input rounded-2xl transition-all"
+                                        className="w-full form-input rounded-lg transition-all"
                                     >
                                         <option value="work">Công việc</option>
                                         <option value="education">Học vấn</option>
@@ -135,7 +135,7 @@ export function ProfileExperienceTab() {
                                         value={form.start_date} 
                                         onChange={e => setForm(f => ({ ...f, start_date: e.target.value }))}
                                         required 
-                                        className="w-full form-input rounded-2xl transition-all" 
+                                        className="w-full form-input rounded-lg transition-all" 
                                     />
                                 </div>
                                 <div>
@@ -145,12 +145,12 @@ export function ProfileExperienceTab() {
                                         value={form.end_date} 
                                         disabled={form.is_current}
                                         onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))}
-                                        className="w-full form-input rounded-2xl transition-all disabled:bg-[color:var(--mk-paper)] disabled:text-[color:var(--mk-muted)]" 
+                                        className="w-full form-input rounded-lg transition-all disabled:bg-[color:var(--mk-paper)] disabled:text-[color:var(--mk-muted)]" 
                                     />
                                 </div>
                             </div>
 
-                            <label className="flex items-center gap-3 text-sm font-medium text-[color:var(--mk-text-soft)] cursor-pointer w-fit p-3 bg-[color:var(--mk-paper)] rounded-2xl hover:bg-[color:var(--mk-paper)] transition-colors">
+                            <label className="flex items-center gap-3 text-sm font-medium text-[color:var(--mk-text-soft)] cursor-pointer w-fit p-3 bg-[color:var(--mk-paper)] rounded-lg hover:bg-[color:var(--mk-paper)] transition-colors">
                                 <input 
                                     type="checkbox" 
                                     checked={form.is_current}
@@ -166,19 +166,19 @@ export function ProfileExperienceTab() {
                                     rows={4} 
                                     value={form.description} 
                                     onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                                    className="w-full form-input rounded-2xl resize-none transition-all placeholder:text-[color:var(--mk-muted)]" 
+                                    className="w-full form-input rounded-lg resize-none transition-all placeholder:text-[color:var(--mk-muted)]" 
                                     placeholder="Mô tả công việc, thành tích, hoặc những gì bạn học được..."
                                 />
                             </div>
 
                             <div className="flex items-center gap-3 pt-4 border-t border-[color:var(--mk-line)]">
-                                <button type="submit" className="btn-primary rounded-2xl px-8 py-3 bg-black text-white hover:bg-gray-900 transition-colors">
+                                <button type="submit" className="btn-primary rounded-lg px-8 py-3 bg-black text-white hover:bg-gray-900 transition-colors">
                                     {editingId ? 'Lưu thay đổi' : 'Thêm kinh nghiệm'}
                                 </button>
                                 <button 
                                     type="button" 
                                     onClick={resetForm}
-                                    className="btn-secondary rounded-2xl px-8 py-3 border border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] transition-colors"
+                                    className="btn-secondary rounded-lg px-8 py-3 border border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] transition-colors"
                                 >
                                     Hủy
                                 </button>
@@ -190,7 +190,7 @@ export function ProfileExperienceTab() {
                         key="list"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="bg-white rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5"
+                        className="bg-white rounded-lg p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5"
                     >
                         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 items-start sm:items-center justify-between mb-8">
                             <div>
@@ -199,7 +199,7 @@ export function ProfileExperienceTab() {
                             </div>
                             <button 
                                 onClick={() => setIsAdding(true)}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-[color:var(--mk-paper)] hover:bg-black hover:text-white text-[color:var(--mk-text-soft)] rounded-2xl transition-all duration-300 border border-[color:var(--mk-line)] hover:border-black font-medium text-sm"
+                                className="flex items-center gap-2 px-5 py-2.5 bg-[color:var(--mk-paper)] hover:bg-black hover:text-white text-[color:var(--mk-text-soft)] rounded-lg transition-all duration-300 border border-[color:var(--mk-line)] hover:border-black font-medium text-sm"
                             >
                                 <PlusIcon className="w-4 h-4" /> 
                                 Thêm mới
@@ -207,7 +207,7 @@ export function ProfileExperienceTab() {
                         </div>
 
                         {experience.length === 0 ? (
-                            <div className="text-center py-12 px-4 rounded-3xl bg-[color:var(--mk-paper)] border border-dashed border-[color:var(--mk-line)]">
+                            <div className="text-center py-12 px-4 rounded-lg bg-[color:var(--mk-paper)] border border-dashed border-[color:var(--mk-line)]">
                                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm ring-1 ring-black/5">
                                     <BriefcaseIcon className="w-8 h-8 text-[color:var(--mk-muted)]" />
                                 </div>
@@ -217,7 +217,7 @@ export function ProfileExperienceTab() {
                                 </p>
                                 <button 
                                     onClick={() => setIsAdding(true)}
-                                    className="btn-primary rounded-2xl"
+                                    className="btn-primary rounded-lg"
                                 >
                                     Bắt đầu thêm
                                 </button>
@@ -240,7 +240,7 @@ export function ProfileExperienceTab() {
                                                 </div>
                                             </div>
                                             
-                                            <div className="bg-white rounded-3xl p-6 border border-[color:var(--mk-line)] hover:shadow-lg transition-all duration-300 group-hover:border-[color:var(--mk-line)]">
+                                            <div className="bg-white rounded-lg p-6 border border-[color:var(--mk-line)] hover:shadow-lg transition-all duration-300 group-hover:border-[color:var(--mk-line)]">
                                                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-3">
                                                     <div>
                                                         <h4 className="text-lg font-bold text-[color:var(--mk-text)]">{exp.title}</h4>
@@ -253,14 +253,14 @@ export function ProfileExperienceTab() {
                                                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                             <button 
                                                                 onClick={() => startEdit(exp)} 
-                                                                className="p-2 text-[color:var(--mk-muted)] hover:text-black hover:bg-[color:var(--mk-paper)] rounded-xl transition-colors"
+                                                                className="p-2 text-[color:var(--mk-muted)] hover:text-black hover:bg-[color:var(--mk-paper)] rounded-lg transition-colors"
                                                                 title="Chỉnh sửa"
                                                             >
                                                                 <PencilIcon className="w-4 h-4" />
                                                             </button>
                                                             <button 
                                                                 onClick={() => dispatch(deleteExperienceThunk(exp.id))} 
-                                                                className="p-2 text-[color:var(--mk-muted)] hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                                                                className="p-2 text-[color:var(--mk-muted)] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                                 title="Xóa"
                                                             >
                                                                 <TrashIcon className="w-4 h-4" />
@@ -278,7 +278,7 @@ export function ProfileExperienceTab() {
                                                 </div>
 
                                                 {exp.description && (
-                                                    <p className="text-[color:var(--mk-text-soft)] text-sm leading-relaxed whitespace-pre-wrap bg-[color:var(--mk-paper)]/50 p-4 rounded-2xl">
+                                                    <p className="text-[color:var(--mk-text-soft)] text-sm leading-relaxed whitespace-pre-wrap bg-[color:var(--mk-paper)]/50 p-4 rounded-lg">
                                                         {exp.description}
                                                     </p>
                                                 )}

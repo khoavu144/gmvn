@@ -69,7 +69,7 @@ const GymRegisterPage: React.FC = () => {
     if (submitted || user?.gym_owner_status === 'pending_review') {
         return (
             <div className="min-h-[80vh] flex items-center justify-center p-4">
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-[color:var(--mk-line)] border-t-4 border-t-black text-center max-w-lg w-full">
+                <div className="bg-white p-8 rounded-lg shadow-sm border border-[color:var(--mk-line)] border-t-4 border-t-black text-center max-w-lg w-full">
                     <div className="w-16 h-16 border-4 border-black rounded-full mx-auto mb-6 flex items-center justify-center">
                         <div className="w-1 h-8 bg-black rounded-full animate-bounce mx-0.5"></div>
                         <div className="w-1 h-8 bg-black rounded-full animate-bounce [animation-delay:0.2s] mx-0.5"></div>
@@ -100,7 +100,7 @@ const GymRegisterPage: React.FC = () => {
     if (user?.gym_owner_status === 'rejected') {
         return (
             <div className="min-h-[80vh] flex items-center justify-center p-4">
-                <div className="bg-white p-8 rounded-xl shadow-sm border border-[color:var(--mk-line)] border-t-4 border-t-red-600 text-center max-w-lg w-full">
+                <div className="bg-white p-8 rounded-lg shadow-sm border border-[color:var(--mk-line)] border-t-4 border-t-red-600 text-center max-w-lg w-full">
                     <div className="text-sm font-black uppercase tracking-widest text-red-600 mb-2">Hồ sơ bị từ chối</div>
                     <h2 className="text-2xl font-black mb-2 uppercase text-red-600">Xác minh thất bại</h2>
                     <p className="text-[color:var(--mk-text-soft)]">
@@ -118,7 +118,7 @@ const GymRegisterPage: React.FC = () => {
                 <p className="text-[color:var(--mk-text-soft)] mt-2">Vui lòng cung cấp chính xác thông tin phòng tập để được kiểm duyệt nhanh nhất.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-xl border border-[color:var(--mk-line)] space-y-8">
+            <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-lg border border-[color:var(--mk-line)] space-y-8">
                 {error && (
                     <div className="p-4 bg-red-50 text-red-700 rounded-lg text-sm font-medium border border-red-100">
                         {error}

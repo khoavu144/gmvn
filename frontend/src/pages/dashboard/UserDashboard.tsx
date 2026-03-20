@@ -21,7 +21,7 @@ const UserDashboard: React.FC = () => {
 
     return (
         <div className="space-y-8 max-w-3xl">
-            <div className="bg-white border border-[color:var(--mk-line)] rounded-xl p-6 sm:p-8 shadow-sm">
+            <div className="bg-white border border-[color:var(--mk-line)] rounded-lg p-6 sm:p-8 shadow-sm">
                 <div className="mb-8">
                     <h2 className="text-2xl font-black uppercase tracking-tight mb-2">Bắt đầu hành trình</h2>
                     <p className="text-[color:var(--mk-muted)]">Hoàn tất các bước dưới đây để tối ưu hóa trải nghiệm của bạn trên GYMERVIET.</p>

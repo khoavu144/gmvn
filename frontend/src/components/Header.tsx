@@ -98,7 +98,7 @@ function DesktopDropdown({ group, isActive, onToggle }: {
             </button>
 
             {isActive && (
-                <div className="absolute left-0 top-full mt-2 min-w-[16rem] rounded-xl border border-[color:var(--mk-line)] bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute left-0 top-full mt-2 min-w-[16rem] rounded-lg border border-[color:var(--mk-line)] bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                     {group.children.map((child) => (
                         <Link
                             key={child.to}
@@ -217,7 +217,7 @@ function UserDropdown({ user, onLogout, isActive, onToggle }: {
             </button>
 
             {isActive && (
-                <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-[color:var(--mk-line)] bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-lg border border-[color:var(--mk-line)] bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                     <div className="px-4 py-3 border-b border-[color:var(--mk-line)]">
                         <div className="text-sm font-semibold text-[color:var(--mk-text)] truncate">{user.full_name}</div>
                         <div className="text-[11px] text-[color:var(--mk-muted)] mt-0.5">{roleLabel[user.user_type] || user.user_type}</div>

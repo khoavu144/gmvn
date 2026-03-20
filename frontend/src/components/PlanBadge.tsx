@@ -23,7 +23,7 @@ export default function PlanBadge({ plan, size = 'sm' }: PlanBadgeProps) {
     return (
         <span style={{
             display: 'inline-flex', alignItems: 'center',
-            padding, borderRadius: 999,
+            padding, borderRadius: 8,
             background: style.bg, color: style.color,
             fontSize, fontWeight: 800,
             letterSpacing: '0.1em',

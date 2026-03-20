@@ -128,8 +128,8 @@ export default function CoachHeroFlagship({
                     <div className="flex justify-center lg:justify-end order-1 lg:order-2">
                         <div className="relative w-48 h-48 sm:w-64 sm:h-64 lg:w-[320px] lg:h-[400px]">
                             {/* Decorative frame */}
-                            <div className="absolute -inset-3 rounded-2xl border border-white/10" />
-                            <div className="absolute -inset-1 rounded-xl bg-gradient-to-br from-white/10 via-transparent to-white/5" />
+                            <div className="absolute -inset-3 rounded-lg border border-white/10" />
+                            <div className="absolute -inset-1 rounded-lg bg-gradient-to-br from-white/10 via-transparent to-white/5" />
 
                             {avatarUrl ? (
                                 <img

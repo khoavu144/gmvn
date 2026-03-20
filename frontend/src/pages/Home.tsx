@@ -205,7 +205,7 @@ export default function Home() {
                                 ].map((pos, i) => (
                                     <div key={i} style={{
                                         background: 'rgba(255,255,255,0.06)',
-                                        borderRadius: 16,
+                                        borderRadius: 8,
                                         gridColumn: pos.col,
                                         gridRow: pos.row,
                                     }} />
@@ -226,7 +226,7 @@ export default function Home() {
                                             onMouseEnter={() => prefetchCoach(identifier)}
                                             style={{
                                                 display: 'block',
-                                                borderRadius: 16, overflow: 'hidden',
+                                                borderRadius: 8, overflow: 'hidden',
                                                 position: 'relative',
                                                 background: '#1a1a1a',
                                                 textDecoration: 'none',
@@ -328,7 +328,7 @@ export default function Home() {
                         }} className="home-coaches-grid">
                             {isLoading
                                 ? Array.from({ length: 6 }).map((_, i) => (
-                                    <div key={i} style={{ height: 300, background: 'rgba(255,255,255,0.05)', borderRadius: 20 }} />
+                                    <div key={i} style={{ height: 300, background: 'rgba(255,255,255,0.05)', borderRadius: 8 }} />
                                 ))
                                 : featured.map((coach, i) => {
                                     const link = coachLink(coach);
@@ -344,7 +344,7 @@ export default function Home() {
                                                 height: isLead ? 400 : 300,
                                                 // FIX: lead card uses col-span (stays on same row) not row-span
                                                 gridColumn: isLead ? 'span 2' : 'auto',
-                                                borderRadius: 20,
+                                                borderRadius: 8,
                                                 overflow: 'hidden',
                                                 position: 'relative',
                                                 textDecoration: 'none',
@@ -373,7 +373,7 @@ export default function Home() {
                                                     <span style={{ fontSize: '0.58rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.45)', display: 'block', marginBottom: 4 }}>✓ Đã xác minh</span>
                                                 )}
                                                 {coach.specialties?.[0] && (
-                                                    <span style={{ fontSize: '0.6rem', background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.75)', padding: '2px 10px', borderRadius: 999, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, display: 'inline-block', marginBottom: 8, backdropFilter: 'blur(4px)' }}>
+                                                    <span style={{ fontSize: '0.6rem', background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.75)', padding: '2px 10px', borderRadius: 8, textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, display: 'inline-block', marginBottom: 8, backdropFilter: 'blur(4px)' }}>
                                                         {coach.specialties[0]}
                                                     </span>
                                                 )}
@@ -417,7 +417,7 @@ export default function Home() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }} className="home-steps-grid">
                         {HOW_IT_WORKS.map((step, i) => (
                             <div key={step.step} style={{
-                                background: '#ffffff', borderRadius: 20,
+                                background: '#ffffff', borderRadius: 8,
                                 padding: '32px 28px',
                                 border: '1px solid rgba(0,0,0,0.05)',
                                 position: 'relative', overflow: 'hidden',
@@ -434,7 +434,7 @@ export default function Home() {
                                 <div style={{
                                     width: 40, height: 40,
                                     background: i === 1 ? '#0a0a0a' : '#f2f4f6',
-                                    borderRadius: 12, display: 'flex', alignItems: 'center',
+                                    borderRadius: 8, display: 'flex', alignItems: 'center',
                                     justifyContent: 'center', fontSize: '1.1rem', marginBottom: 18,
                                 }}>
                                     {step.icon}

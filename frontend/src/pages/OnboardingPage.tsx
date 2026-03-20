@@ -152,7 +152,7 @@ export default function OnboardingPage() {
                                     <div 
                                         key={lvl.id}
                                         onClick={() => setExperience(lvl.id)}
-                                        className={`border-2 p-5 rounded-2xl cursor-pointer transition-all ${experience === lvl.id ? 'border-black bg-[color:var(--mk-paper)]' : 'border-[color:var(--mk-line)] hover:border-[color:var(--mk-line)]'}`}
+                                        className={`border-2 p-5 rounded-lg cursor-pointer transition-all ${experience === lvl.id ? 'border-black bg-[color:var(--mk-paper)]' : 'border-[color:var(--mk-line)] hover:border-[color:var(--mk-line)]'}`}
                                     >
                                         <div className="flex justify-between items-center">
                                             <div>
@@ -189,7 +189,7 @@ export default function OnboardingPage() {
                                     return (
                                         <div 
                                             key={sp} onClick={() => toggleSpecialty(sp)}
-                                            className={`border rounded-xl p-4 cursor-pointer text-center text-sm font-semibold transition-all ${selected ? 'bg-black text-white border-black' : 'bg-white text-black hover:bg-[color:var(--mk-paper)] border-[color:var(--mk-line)]'}`}
+                                            className={`border rounded-lg p-4 cursor-pointer text-center text-sm font-semibold transition-all ${selected ? 'bg-black text-white border-black' : 'bg-white text-black hover:bg-[color:var(--mk-paper)] border-[color:var(--mk-line)]'}`}
                                         >
                                             {sp}
                                         </div>

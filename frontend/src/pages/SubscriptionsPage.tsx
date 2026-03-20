@@ -56,7 +56,7 @@ export default function SubscriptionsPage() {
                 {loading ? (
                     <div className="flex justify-center py-12"><div className="h-8 w-8 animate-spin rounded-full border-b-2 border-black" /></div>
                 ) : subscriptions.length === 0 ? (
-                    <div className="card text-center py-12 bg-white border border-[color:var(--mk-line)] shadow-sm rounded-2xl">
+                    <div className="card text-center py-12 bg-white border border-[color:var(--mk-line)] shadow-sm rounded-lg">
                         <CreditCard className="w-12 h-12 mx-auto text-gray-300 mb-4" />
                         <h3 className="text-xl font-bold mb-2 tracking-tight">Bạn chưa đăng ký gói tập nào</h3>
                         <p className="text-[color:var(--mk-muted)] mb-6 text-sm">Khám phá các Coach chuyên nghiệp và tham gia chuyên đề để bắt đầu lộ trình.</p>
@@ -65,7 +65,7 @@ export default function SubscriptionsPage() {
                 ) : (
                     <div className="space-y-6">
                         {subscriptions.map((sub: any) => (
-                            <div key={sub.id} className="card bg-white p-6 rounded-2xl shadow-sm border border-[color:var(--mk-line)] flex flex-col sm:flex-row gap-6 justify-between items-start sm:items-center transition hover:shadow-md">
+                            <div key={sub.id} className="card bg-white p-6 rounded-lg shadow-sm border border-[color:var(--mk-line)] flex flex-col sm:flex-row gap-6 justify-between items-start sm:items-center transition hover:shadow-md">
                                 <div className="space-y-2">
                                     <div className="flex items-center gap-3">
                                         <h3 className="text-lg font-black tracking-tight uppercase">{sub.program?.name || 'Gói tập'}</h3>

@@ -60,7 +60,7 @@ export default function GymMapView({ gyms }: Props) {
 
     if (pins.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-[520px] bg-[color:var(--mk-paper)] rounded-xl border border-dashed border-[color:var(--mk-line)]">
+            <div className="flex flex-col items-center justify-center h-[520px] bg-[color:var(--mk-paper)] rounded-lg border border-dashed border-[color:var(--mk-line)]">
                 <span className="text-5xl mb-4">🗺️</span>
                 <p className="text-[color:var(--mk-muted)] font-medium">Chưa có cơ sở nào có tọa độ bản đồ.</p>
                 <p className="text-xs text-[color:var(--mk-muted)] mt-1">Gym owner cần cập nhật latitude/longitude trong cài đặt chi nhánh.</p>
@@ -72,7 +72,7 @@ export default function GymMapView({ gyms }: Props) {
         <MapContainer
             center={center}
             zoom={12}
-            style={{ height: '520px', width: '100%', borderRadius: '12px' }}
+            style={{ height: '520px', width: '100%', borderRadius: '8px' }}
             className="border border-[color:var(--mk-line)]"
         >
             <TileLayer

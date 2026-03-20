@@ -178,7 +178,7 @@ export default function Register() {
                             <button
                                 onClick={() => handleSelectRoleAndSubmit('user')}
                                 disabled={loading}
-                                className="w-full text-left p-4 rounded-xl border-2 border-[color:var(--mk-line)] hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
+                                className="w-full text-left p-4 rounded-lg border-2 border-[color:var(--mk-line)] hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
                             >
                                 <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🏋️</div>
                                 <div>
@@ -190,7 +190,7 @@ export default function Register() {
                             <button
                                 onClick={() => handleSelectRoleAndSubmit('trainer')}
                                 disabled={loading}
-                                className="w-full text-left p-4 rounded-xl border-2 border-[color:var(--mk-line)] hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
+                                className="w-full text-left p-4 rounded-lg border-2 border-[color:var(--mk-line)] hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
                             >
                                 <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🎯</div>
                                 <div>
@@ -202,7 +202,7 @@ export default function Register() {
                             <button
                                 onClick={() => handleSelectRoleAndSubmit('gym_owner')}
                                 disabled={loading}
-                                className="w-full text-left p-4 rounded-xl border-2 border-[color:var(--mk-line)] hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
+                                className="w-full text-left p-4 rounded-lg border-2 border-[color:var(--mk-line)] hover:border-black transition-colors focus:ring-2 focus:ring-black flex items-center gap-4 group"
                             >
                                 <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🏢</div>
                                 <div>

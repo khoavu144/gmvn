@@ -90,7 +90,7 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
                     <img 
                         src={item.image_url} 
                         alt={item.caption || 'Community image'}
-                        className={`max-w-full max-h-full object-contain rounded-xl shadow-2xl transition-opacity duration-500 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                        className={`max-w-full max-h-full object-contain rounded-lg shadow-2xl transition-opacity duration-500 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
                         onLoad={() => setIsImageLoaded(true)}
                         onContextMenu={(e) => e.preventDefault()}
                     />
@@ -137,7 +137,7 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
 
                             <Link 
                                 to={`/coach/${item.linked_user.slug}`}
-                                className="mt-4 w-full py-3 bg-white text-black hover:bg-[color:var(--mk-paper-strong)] font-bold rounded-xl text-center transition-colors flex items-center justify-center gap-2"
+                                className="mt-4 w-full py-3 bg-white text-black hover:bg-[color:var(--mk-paper-strong)] font-bold rounded-lg text-center transition-colors flex items-center justify-center gap-2"
                             >
                                 Truy cập Profile
                             </Link>
@@ -162,14 +162,14 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
                         <button 
                             disabled={currentIndex === 0}
                             onClick={(e) => { e.stopPropagation(); onNavigate(currentIndex - 1); }}
-                            className="flex-1 py-3 bg-white/10 rounded-xl disabled:opacity-30 flex justify-center items-center"
+                            className="flex-1 py-3 bg-white/10 rounded-lg disabled:opacity-30 flex justify-center items-center"
                         >
                             <ChevronLeft />
                         </button>
                         <button 
                             disabled={currentIndex === items.length - 1}
                             onClick={(e) => { e.stopPropagation(); onNavigate(currentIndex + 1); }}
-                            className="flex-1 py-3 bg-white/10 rounded-xl disabled:opacity-30 justify-center flex items-center"
+                            className="flex-1 py-3 bg-white/10 rounded-lg disabled:opacity-30 justify-center flex items-center"
                         >
                             <ChevronRight />
                         </button>

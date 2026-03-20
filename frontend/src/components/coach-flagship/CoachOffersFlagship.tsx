@@ -72,7 +72,7 @@ export default function CoachOffersFlagship({ programs, subscribing, onSubscribe
                 </h2>
 
                 {/* Featured offer */}
-                <div className="bg-white border-2 border-black rounded-xl overflow-hidden mb-6 shadow-sm">
+                <div className="bg-white border-2 border-black rounded-lg overflow-hidden mb-6 shadow-sm">
                     <div className="bg-black text-white px-6 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-center">
                         Gói được đề xuất
                     </div>

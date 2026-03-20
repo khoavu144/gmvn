@@ -36,13 +36,13 @@ const GymReviewList: React.FC<GymReviewListProps> = ({ gymId, refreshTick = 0 })
 
     if (loading) {
         return <div className="animate-pulse columns-1 md:columns-2 gap-4">
-            <div className="h-40 bg-white/5 border border-white/10 rounded-2xl w-full mb-4"></div>
-            <div className="h-32 bg-white/5 border border-white/10 rounded-2xl w-full mb-4"></div>
+            <div className="h-40 bg-white/5 border border-white/10 rounded-lg w-full mb-4"></div>
+            <div className="h-32 bg-white/5 border border-white/10 rounded-lg w-full mb-4"></div>
         </div>;
     }
 
     if (reviews.length === 0) {
-        return <div className="text-[color:var(--mk-muted)] italic text-sm py-8 text-center border border-dashed border-white/20 rounded-2xl bg-white/5">Chưa có đánh giá nào cho phòng tập này. Hãy là người đầu tiên!</div>;
+        return <div className="text-[color:var(--mk-muted)] italic text-sm py-8 text-center border border-dashed border-white/20 rounded-lg bg-white/5">Chưa có đánh giá nào cho phòng tập này. Hãy là người đầu tiên!</div>;
     }
 
     return (
@@ -96,7 +96,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, gymId, canReply, onRepl
     };
 
     return (
-        <div className="border border-white/10 bg-white/5 p-5 sm:p-6 rounded-2xl break-inside-avoid mb-4 hover:bg-white/10 transition-colors">
+        <div className="border border-white/10 bg-white/5 p-5 sm:p-6 rounded-lg break-inside-avoid mb-4 hover:bg-white/10 transition-colors">
             {/* Review body */}
             <div className="flex gap-4">
                 <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center font-bold text-gray-300 uppercase flex-shrink-0 border border-white/10">
@@ -120,7 +120,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, gymId, canReply, onRepl
 
             {/* Existing reply */}
             {review.reply_text && (
-                <div className="mt-5 bg-black/50 border border-white/10 rounded-xl p-4 relative">
+                <div className="mt-5 bg-black/50 border border-white/10 rounded-lg p-4 relative">
                     <div className="absolute -top-2 left-6 w-4 h-4 bg-black/50 border-t border-l border-white/10 rotate-45"></div>
                     <div className="flex items-center gap-2 mb-2 relative z-10">
                         <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--mk-muted)]">Phản hồi từ thiết chế</span>
@@ -145,7 +145,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, gymId, canReply, onRepl
                             ↩ Trả lời đánh giá này
                         </button>
                     ) : (
-                        <form onSubmit={handleReplySubmit} className="space-y-3 bg-black/30 p-4 rounded-xl border border-white/10 mt-2">
+                        <form onSubmit={handleReplySubmit} className="space-y-3 bg-black/30 p-4 rounded-lg border border-white/10 mt-2">
                             <textarea
                                 value={replyText}
                                 onChange={e => setReplyText(e.target.value)}

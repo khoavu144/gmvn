@@ -60,10 +60,10 @@ const AdminReviewManagement: React.FC = () => {
 
     const filteredReviews = reviews.filter(r => ratingFilter === 'all' || r.rating === ratingFilter);
 
-    if (loading) return <div className="animate-pulse space-y-4"><div className="h-24 bg-[color:var(--mk-paper)] rounded-xl"></div></div>;
+    if (loading) return <div className="animate-pulse space-y-4"><div className="h-24 bg-[color:var(--mk-paper)] rounded-lg"></div></div>;
 
     if (reviews.length === 0) {
-        return <div className="text-[color:var(--mk-muted)] italic py-12 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-xl">Chưa có đánh giá nào.</div>;
+        return <div className="text-[color:var(--mk-muted)] italic py-12 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-lg">Chưa có đánh giá nào.</div>;
     }
 
     return (
@@ -71,7 +71,7 @@ const AdminReviewManagement: React.FC = () => {
             {ToastComponent}
             
             {/* Toolbar */}
-            <div className="flex flex-wrap items-center gap-4 bg-[color:var(--mk-paper)] p-4 rounded-xl border border-[color:var(--mk-line)]">
+            <div className="flex flex-wrap items-center gap-4 bg-[color:var(--mk-paper)] p-4 rounded-lg border border-[color:var(--mk-line)]">
                 <div className="flex items-center gap-2 text-sm font-bold text-[color:var(--mk-muted)] uppercase tracking-widest">
                     <Filter className="w-4 h-4" /> Lọc theo:
                 </div>
@@ -94,7 +94,7 @@ const AdminReviewManagement: React.FC = () => {
 
             <div className="space-y-4">
                 {filteredReviews.map(review => (
-                    <div key={review.id} className={`bg-white border p-5 rounded-xl flex justify-between items-start transition-colors ${review.is_visible ? 'border-[color:var(--mk-line)] hover:border-black' : 'border-dashed border-[color:var(--mk-line)] opacity-60'}`}>
+                    <div key={review.id} className={`bg-white border p-5 rounded-lg flex justify-between items-start transition-colors ${review.is_visible ? 'border-[color:var(--mk-line)] hover:border-black' : 'border-dashed border-[color:var(--mk-line)] opacity-60'}`}>
                         <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
                                 <span className="font-black text-sm uppercase tracking-tight">Hội viên {review.user_id.substring(0, 8)}...</span>
@@ -127,7 +127,7 @@ const AdminReviewManagement: React.FC = () => {
                     </div>
                 ))}
                 {filteredReviews.length === 0 && (
-                    <div className="text-[color:var(--mk-muted)] italic py-12 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-xl">Không tìm thấy đánh giá nào phù hợp.</div>
+                    <div className="text-[color:var(--mk-muted)] italic py-12 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-lg">Không tìm thấy đánh giá nào phù hợp.</div>
                 )}
             </div>
         </div>

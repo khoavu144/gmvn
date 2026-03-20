@@ -52,7 +52,7 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
             {ToastComponent}
             {/* Invitations Alert */}
             {!loadingInvs && invitations.length > 0 && (
-                <div className="bg-amber-50 border-2 border-amber-500 rounded-xl p-6">
+                <div className="bg-amber-50 border-2 border-amber-500 rounded-lg p-6">
                     <h3 className="font-black uppercase tracking-tight text-amber-800 mb-4 flex items-center gap-2">
                         <span>🔔</span> Bạn có {invitations.length} lời mời hợp tác mới
                     </h3>
@@ -86,7 +86,7 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
             </div>
 
             {/* Coach public profile preview banner */}
-            <div className="flex items-center justify-between gap-4 bg-gray-900 text-white rounded-xl px-5 py-4">
+            <div className="flex items-center justify-between gap-4 bg-gray-900 text-white rounded-lg px-5 py-4">
                 <div>
                     <p className="text-[10px] uppercase tracking-widest text-[color:var(--mk-muted)] mb-1">Hồ sơ public của bạn</p>
                     <p className="text-sm font-bold truncate max-w-xs">{window.location.origin}{publicProfileUrl}</p>

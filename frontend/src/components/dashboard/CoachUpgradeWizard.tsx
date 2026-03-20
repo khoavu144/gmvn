@@ -42,7 +42,7 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
         const ok = await onSubmit({
             specialties,
             headline: headline.trim(),
-            base_price_monthly: basePriceMonthly ? Number(basePriceMonthly) : null,
+            base_price_monthly: basePriceMonthly ? Math.min(Number(basePriceMonthly), 99999999) : null,
             motivation: motivation.trim(),
             certifications_note: certificationsNote.trim() || null,
         });
@@ -65,7 +65,7 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
             onClick={e => { if (e.target === e.currentTarget) onClose(); }}
         >
             <div style={{
-                background: '#fff', borderRadius: 20, width: '100%', maxWidth: 560,
+                background: '#fff', borderRadius: 8, width: '100%', maxWidth: 560,
                 maxHeight: '90vh', overflowY: 'auto', padding: '32px 28px',
                 boxShadow: '0 24px 64px rgba(0,0,0,0.18)',
             }}>
@@ -89,8 +89,8 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
                 </div>
 
                 {/* Progress bar */}
-                <div style={{ height: 4, background: '#f0f0f0', borderRadius: 99, marginBottom: 28 }}>
-                    <div style={{ height: 4, borderRadius: 99, background: '#080c1e', width: `${(step / 3) * 100}%`, transition: 'width 0.3s ease' }} />
+                <div style={{ height: 4, background: '#f0f0f0', borderRadius: 8, marginBottom: 28 }}>
+                    <div style={{ height: 4, borderRadius: 8, background: '#080c1e', width: `${(step / 3) * 100}%`, transition: 'width 0.3s ease' }} />
                 </div>
 
                 {/* ── STEP 1 ─────────────────────────────── */}
@@ -107,7 +107,7 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
                                         type="button"
                                         onClick={() => toggleSpecialty(s)}
                                         style={{
-                                            padding: '6px 14px', borderRadius: 999,
+                                            padding: '6px 14px', borderRadius: 8,
                                             fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer',
                                             border: specialties.includes(s) ? '2px solid #080c1e' : '2px solid #e5e7eb',
                                             background: specialties.includes(s) ? '#080c1e' : '#fff',
@@ -133,7 +133,7 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
                                 maxLength={120}
                                 placeholder='VD: "Coach giảm cân chuyên biệt cho dân văn phòng"'
                                 style={{
-                                    width: '100%', padding: '10px 14px', borderRadius: 10,
+                                    width: '100%', padding: '10px 14px', borderRadius: 8,
                                     border: '1.5px solid #e5e7eb', fontSize: '0.88rem',
                                     outline: 'none', boxSizing: 'border-box',
                                 }}
@@ -154,11 +154,17 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
                                 id="wiz-price"
                                 type="number"
                                 value={basePriceMonthly}
-                                onChange={e => setBasePriceMonthly(e.target.value)}
+                                onChange={e => {
+                                    const v = e.target.value;
+                                    if (v === '' || (Number(v) >= 0 && Number(v) <= 99999999)) {
+                                        setBasePriceMonthly(v);
+                                    }
+                                }}
                                 min={0}
+                                max={99999999}
                                 placeholder="VD: 2000000"
                                 style={{
-                                    width: '100%', padding: '10px 14px', borderRadius: 10,
+                                    width: '100%', padding: '10px 14px', borderRadius: 8,
                                     border: '1.5px solid #e5e7eb', fontSize: '0.88rem',
                                     outline: 'none', boxSizing: 'border-box',
                                 }}
@@ -182,7 +188,7 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
                                 maxLength={1000}
                                 placeholder="Chia sẻ câu chuyện và định hướng phát triển của bạn..."
                                 style={{
-                                    width: '100%', padding: '10px 14px', borderRadius: 10,
+                                    width: '100%', padding: '10px 14px', borderRadius: 8,
                                     border: '1.5px solid #e5e7eb', fontSize: '0.88rem',
                                     outline: 'none', resize: 'vertical', boxSizing: 'border-box',
                                     fontFamily: 'inherit',
@@ -199,7 +205,7 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
                 {step === 3 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                         {/* Summary */}
-                        <div style={{ background: '#f9fafb', borderRadius: 12, padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        <div style={{ background: '#f9fafb', borderRadius: 8, padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                             <Row label="Chuyên môn" value={specialties.join(', ')} />
                             <Row label="Tiêu đề" value={headline} />
                             {basePriceMonthly && <Row label="Giá/tháng" value={`${Number(basePriceMonthly).toLocaleString('vi-VN')} đ`} />}
@@ -218,7 +224,7 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
                                 maxLength={500}
                                 placeholder="VD: Chứng chỉ ACE-CPT, Top 3 Mr. Saigon Fitness 2023..."
                                 style={{
-                                    width: '100%', padding: '10px 14px', borderRadius: 10,
+                                    width: '100%', padding: '10px 14px', borderRadius: 8,
                                     border: '1.5px solid #e5e7eb', fontSize: '0.88rem',
                                     outline: 'none', resize: 'vertical', boxSizing: 'border-box',
                                     fontFamily: 'inherit',
@@ -254,7 +260,7 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
                     {step > 1 ? (
                         <button
                             onClick={() => setStep(s => s - 1)}
-                            style={{ padding: '11px 20px', borderRadius: 999, border: '1.5px solid #e5e7eb', background: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', color: '#374151' }}
+                            style={{ padding: '11px 20px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: '#fff', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', color: '#374151' }}
                         >← Quay lại</button>
                     ) : <div />}
 
@@ -263,7 +269,7 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
                             onClick={() => setStep(s => s + 1)}
                             disabled={step === 1 ? !canNext1 : !canNext2}
                             style={{
-                                padding: '11px 24px', borderRadius: 999, border: 'none',
+                                padding: '11px 24px', borderRadius: 8, border: 'none',
                                 background: (step === 1 ? canNext1 : canNext2) ? '#080c1e' : '#e5e7eb',
                                 color: (step === 1 ? canNext1 : canNext2) ? '#fff' : '#9ca3af',
                                 fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
@@ -274,7 +280,7 @@ export default function CoachUpgradeWizard({ isOpen, onClose, onSubmit, isSubmit
                             onClick={handleSubmit}
                             disabled={!canSubmit || isSubmitting}
                             style={{
-                                padding: '11px 24px', borderRadius: 999, border: 'none',
+                                padding: '11px 24px', borderRadius: 8, border: 'none',
                                 background: canSubmit && !isSubmitting ? '#080c1e' : '#e5e7eb',
                                 color: canSubmit && !isSubmitting ? '#fff' : '#9ca3af',
                                 fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',

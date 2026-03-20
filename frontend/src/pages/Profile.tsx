@@ -105,8 +105,8 @@ export default function Profile() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     className="relative group shrink-0"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-3xl blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
-                                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-3xl overflow-hidden border-[6px] border-white shadow-md bg-white">
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-lg blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+                                    <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-lg overflow-hidden border-[6px] border-white shadow-md bg-white">
                                         <img
                                             src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || 'U')}&background=000&color=fff&size=200`}
                                             alt={user?.full_name}
@@ -115,7 +115,7 @@ export default function Profile() {
                                         />
                                     </div>
                                     {((user?.user_type === 'trainer' || user?.user_type === 'athlete') && user?.is_verified) && (
-                                        <div className="absolute bottom-2 right-2 bg-blue-500 text-white p-1.5 rounded-2xl border-4 border-white shadow-md" title="Verified Professional">
+                                        <div className="absolute bottom-2 right-2 bg-blue-500 text-white p-1.5 rounded-lg border-4 border-white shadow-md" title="Verified Professional">
                                             <CheckCircle className="w-5 h-5 fill-current" />
                                         </div>
                                     )}
@@ -157,7 +157,7 @@ export default function Profile() {
                                     {/* TODO: Re-enable when EditProfileModal is implemented */}
                                     {/* <button
                                         onClick={() => setShowEditModal(true)}
-                                        className="flex-1 md:flex-none px-6 py-3 bg-black text-white rounded-2xl font-bold text-sm hover:bg-gray-800 transition-all shadow-md shadow-black/10 flex items-center justify-center gap-2 group"
+                                        className="flex-1 md:flex-none px-6 py-3 bg-black text-white rounded-lg font-bold text-sm hover:bg-gray-800 transition-all shadow-md shadow-black/10 flex items-center justify-center gap-2 group"
                                     >
                                         Chỉnh sửa hồ sơ
                                         <ArrowLeft className="w-4 h-4 rotate-180 group-hover:translate-x-1 transition-transform" />
@@ -171,7 +171,7 @@ export default function Profile() {
                                             }
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="p-3 bg-white border border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)] rounded-2xl hover:border-black hover:text-black transition-all shadow-sm group"
+                                            className="p-3 bg-white border border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)] rounded-lg hover:border-black hover:text-black transition-all shadow-sm group"
                                             title="Xem trang công khai"
                                         >
                                             <ExternalLink className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -187,7 +187,7 @@ export default function Profile() {
                 <div className="bg-white/80 backdrop-blur-md border-b border-[color:var(--mk-line)] sticky top-16 z-30">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
                         <div className="flex items-center gap-4 overflow-x-auto no-scrollbar after:content-[''] after:block after:w-4 after:shrink-0">
-                            <Link to="/dashboard" className="shrink-0 p-2 hover:bg-[color:var(--mk-paper)] rounded-xl transition-colors">
+                            <Link to="/dashboard" className="shrink-0 p-2 hover:bg-[color:var(--mk-paper)] rounded-lg transition-colors">
                                 <ArrowLeft className="w-5 h-5 text-[color:var(--mk-muted)]" />
                             </Link>
                             <div className="h-6 w-px bg-[color:var(--mk-paper-strong)] shrink-0"></div>
@@ -195,7 +195,7 @@ export default function Profile() {
                                 <button
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key)}
-                                    className={`shrink-0 px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeTab === tab.key
+                                    className={`shrink-0 px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === tab.key
                                         ? 'bg-black text-white shadow-md'
                                         : 'text-[color:var(--mk-muted)] hover:text-black hover:bg-[color:var(--mk-paper)]'
                                         }`}
@@ -212,7 +212,7 @@ export default function Profile() {
                     <div className="flex flex-col lg:flex-row gap-8 items-start">
 
                         {/* LEFT COLUMN: Profile Card Sidebar */}
-                        <div className="w-full lg:w-[320px] shrink-0 bg-white rounded-2xl shadow-sm border border-[color:var(--mk-line)] overflow-hidden sticky top-[120px]">
+                        <div className="w-full lg:w-[320px] shrink-0 bg-white rounded-lg shadow-sm border border-[color:var(--mk-line)] overflow-hidden sticky top-[120px]">
                             {/* Cover Image Area */}
                             <div className="h-32 bg-gray-900 relative">
                                 {myProfile?.cover_image_url ? (
@@ -238,7 +238,7 @@ export default function Profile() {
                                     <img
                                         src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || 'U')}&background=000&color=fff&size=150`}
                                         alt={user?.full_name}
-                                        className="w-full h-full rounded-2xl object-cover border-4 border-white shadow-md bg-white filter grayscale hover:grayscale-0 transition-all duration-500"
+                                        className="w-full h-full rounded-lg object-cover border-4 border-white shadow-md bg-white filter grayscale hover:grayscale-0 transition-all duration-500"
                                         loading="lazy"
                                         decoding="async"
                                     />
@@ -285,7 +285,7 @@ export default function Profile() {
                                         <button
                                             key={tab.key}
                                             onClick={() => setActiveTab(tab.key)}
-                                            className={`flex items-center justify-between px-4 py-3 rounded-xl transition-all font-medium text-sm group ${activeTab === tab.key
+                                            className={`flex items-center justify-between px-4 py-3 rounded-lg transition-all font-medium text-sm group ${activeTab === tab.key
                                                 ? 'bg-black text-white shadow-md'
                                                 : 'text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] hover:text-black'
                                                 }`}
@@ -300,7 +300,7 @@ export default function Profile() {
                                 </div>
 
                                 {(user.user_type === 'gym_owner') && (
-                                    <div className="mt-8 p-4 bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] rounded-xl text-left">
+                                    <div className="mt-8 p-4 bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] rounded-lg text-left">
                                         <p className="text-sm font-bold text-[color:var(--mk-text)]">Quản lý phòng tập</p>
                                         <p className="text-xs text-[color:var(--mk-muted)] mt-1.5 leading-relaxed">
                                             Thông tin chi nhánh, huấn luyện viên và hệ thống đánh giá được quản lý tại trang riêng.

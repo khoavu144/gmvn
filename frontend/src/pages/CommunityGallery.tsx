@@ -87,7 +87,7 @@ export default function CommunityGallery() {
 
                     {/* Filters */}
                     <div className="flex justify-center gap-2 overflow-x-auto pb-4 no-scrollbar">
-                        <div className="flex p-1 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">
+                        <div className="flex p-1 bg-white/5 backdrop-blur-md rounded-lg border border-white/10">
                             {CATEGORIES.map(cat => {
                                 const Icon = cat.icon;
                                 const isActive = currentCategory === cat.id;
@@ -95,7 +95,7 @@ export default function CommunityGallery() {
                                     <button
                                         key={cat.id}
                                         onClick={() => handleCategorySelect(cat.id)}
-                                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${isActive
+                                        className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${isActive
                                                 ? 'bg-white text-black shadow-md shadow-white/10'
                                                 : 'text-[color:var(--mk-muted)] hover:text-white hover:bg-white/10'
                                             }`}
@@ -113,7 +113,7 @@ export default function CommunityGallery() {
             {/* Masonry Grid */}
             <div className="max-w-[1600px] mx-auto px-4 py-12 md:py-16">
                 {items.length === 0 && !loading ? (
-                    <div className="text-center py-24 border border-dashed border-white/20 rounded-3xl bg-white/5">
+                    <div className="text-center py-24 border border-dashed border-white/20 rounded-lg bg-white/5">
                         <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                             <Camera className="w-8 h-8 text-[color:var(--mk-muted)]" />
                         </div>

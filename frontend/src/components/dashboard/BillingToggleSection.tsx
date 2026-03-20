@@ -31,7 +31,7 @@ export default function BillingToggleSection({ initialEnabled = false }: Billing
     };
 
     return (
-        <div style={{ border: '1.5px solid #e5e7eb', borderRadius: 16, padding: '20px 24px' }}>
+        <div style={{ border: '1.5px solid #e5e7eb', borderRadius: 8, padding: '20px 24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
                 <div>
                     <p style={{ fontWeight: 700, fontSize: '0.9rem', margin: '0 0 4px' }}>Thu phí nền tảng</p>
@@ -46,7 +46,7 @@ export default function BillingToggleSection({ initialEnabled = false }: Billing
                     onClick={() => toggle(!enabled)}
                     disabled={isLoading}
                     style={{
-                        width: 56, height: 30, borderRadius: 999, border: 'none',
+                        width: 56, height: 30, borderRadius: 8, border: 'none',
                         background: enabled ? '#16a34a' : '#d1d5db',
                         position: 'relative', cursor: 'pointer',
                         transition: 'background 0.2s ease',
@@ -65,7 +65,7 @@ export default function BillingToggleSection({ initialEnabled = false }: Billing
 
             {/* Confirm dialog for enabling */}
             {showConfirm && (
-                <div style={{ marginTop: 16, background: '#fef3c7', borderRadius: 12, padding: '14px 18px' }}>
+                <div style={{ marginTop: 16, background: '#fef3c7', borderRadius: 8, padding: '14px 18px' }}>
                     <p style={{ fontSize: '0.82rem', fontWeight: 700, color: '#92400e', margin: '0 0 10px' }}>
                         ⚠ Xác nhận BẬT thu phí?
                     </p>
@@ -73,10 +73,10 @@ export default function BillingToggleSection({ initialEnabled = false }: Billing
                         Sau khi bật, user đang ở gói Free sẽ bị giới hạn (tối đa 3 chương trình, 10 học viên, 1 chi nhánh...).
                     </p>
                     <div style={{ display: 'flex', gap: 10 }}>
-                        <button onClick={() => toggle(true)} style={{ padding: '7px 18px', borderRadius: 999, border: 'none', background: '#92400e', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+                        <button onClick={() => toggle(true)} style={{ padding: '7px 18px', borderRadius: 8, border: 'none', background: '#92400e', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
                             Xác nhận bật
                         </button>
-                        <button onClick={() => setShowConfirm(false)} style={{ padding: '7px 18px', borderRadius: 999, border: '1.5px solid #d97706', background: 'transparent', color: '#92400e', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>
+                        <button onClick={() => setShowConfirm(false)} style={{ padding: '7px 18px', borderRadius: 8, border: '1.5px solid #d97706', background: 'transparent', color: '#92400e', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}>
                             Hủy
                         </button>
                     </div>

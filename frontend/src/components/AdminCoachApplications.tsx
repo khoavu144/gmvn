@@ -94,7 +94,7 @@ export default function AdminCoachApplications() {
 
             {feedback && (
                 <div style={{
-                    padding: '10px 16px', borderRadius: 10,
+                    padding: '10px 16px', borderRadius: 8,
                     background: feedback.ok ? '#f0fdf4' : '#fef2f2',
                     color: feedback.ok ? '#166534' : '#991b1b',
                     fontSize: '0.82rem', fontWeight: 600,
@@ -105,7 +105,7 @@ export default function AdminCoachApplications() {
             )}
 
             {applications.map(app => (
-                <div key={app.id} style={{ border: '1.5px solid #e5e7eb', borderRadius: 16, overflow: 'hidden' }}>
+                <div key={app.id} style={{ border: '1.5px solid #e5e7eb', borderRadius: 8, overflow: 'hidden' }}>
                     {/* Header row */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 20px', background: '#fafafa' }}>
                         {app.user.avatar_url ? (
@@ -148,7 +148,7 @@ export default function AdminCoachApplications() {
                             onClick={() => approve(app.id)}
                             disabled={actionLoading === app.id}
                             style={{
-                                padding: '8px 20px', borderRadius: 999, border: 'none',
+                                padding: '8px 20px', borderRadius: 8, border: 'none',
                                 background: '#16a34a', color: '#fff',
                                 fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer',
                                 opacity: actionLoading === app.id ? 0.6 : 1,
@@ -163,19 +163,19 @@ export default function AdminCoachApplications() {
                                     value={rejectReason}
                                     onChange={e => setRejectReason(e.target.value)}
                                     placeholder="Lý do từ chối (tối thiểu 10 ký tự)..."
-                                    style={{ flex: 1, minWidth: 180, padding: '8px 12px', borderRadius: 999, border: '1.5px solid #fca5a5', fontSize: '0.78rem', outline: 'none' }}
+                                    style={{ flex: 1, minWidth: 180, padding: '8px 12px', borderRadius: 8, border: '1.5px solid #fca5a5', fontSize: '0.78rem', outline: 'none' }}
                                 />
                                 <button
                                     onClick={() => reject(app.id)}
                                     disabled={rejectReason.trim().length < 10 || actionLoading === app.id}
-                                    style={{ padding: '8px 16px', borderRadius: 999, border: 'none', background: '#dc2626', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', opacity: rejectReason.trim().length < 10 ? 0.5 : 1 }}
+                                    style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#dc2626', color: '#fff', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', opacity: rejectReason.trim().length < 10 ? 0.5 : 1 }}
                                 >Gửi</button>
                                 <button onClick={() => { setRejectId(null); setRejectReason(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: '0.78rem' }}>Hủy</button>
                             </div>
                         ) : (
                             <button
                                 onClick={() => setRejectId(app.id)}
-                                style={{ padding: '8px 16px', borderRadius: 999, border: '1.5px solid #fca5a5', background: '#fff', color: '#dc2626', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}
+                                style={{ padding: '8px 16px', borderRadius: 8, border: '1.5px solid #fca5a5', background: '#fff', color: '#dc2626', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}
                             >Từ chối</button>
                         )}
                     </div>

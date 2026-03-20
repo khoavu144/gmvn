@@ -51,7 +51,7 @@ export default function FeaturedCoaches() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 auto-rows-[280px] md:auto-rows-[320px]">
                     {isLoading ? (
                         Array.from({ length: 6 }).map((_, idx) => (
-                            <div key={`skeleton-${idx}`} className="bg-white/5 rounded-xl overflow-hidden animate-pulse">
+                            <div key={`skeleton-${idx}`} className="bg-white/5 rounded-lg overflow-hidden animate-pulse">
                                 <div className="w-full h-full bg-white/10"></div>
                             </div>
                         ))
@@ -66,7 +66,7 @@ export default function FeaturedCoaches() {
                                 <Link
                                     key={`${coach.id}-${index}`}
                                     to={detailLink}
-                                    className="group relative block overflow-hidden rounded-xl bg-gray-900 border border-white/10 hover:border-white/30 transition-all duration-500"
+                                    className="group relative block overflow-hidden rounded-lg bg-gray-900 border border-white/10 hover:border-white/30 transition-all duration-500"
                                     onMouseEnter={() => prefetchCoach(identifier)}
                                     onTouchStart={() => prefetchCoach(identifier)}
                                 >

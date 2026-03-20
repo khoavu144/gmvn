@@ -100,7 +100,7 @@ export default function AdminGalleryManagement() {
         <div className="space-y-6">
             {ToastComponent}
             {/* Header & Add form */}
-            <div className="bg-white p-6 rounded-xl border border-[color:var(--mk-line)] shadow-sm">
+            <div className="bg-white p-6 rounded-lg border border-[color:var(--mk-line)] shadow-sm">
                 <h3 className="text-lg font-black uppercase tracking-tight mb-4 flex items-center gap-2">
                     <Camera className="w-5 h-5" /> Thêm hình ảnh mới
                 </h3>
@@ -168,7 +168,7 @@ export default function AdminGalleryManagement() {
             </div>
 
             {/* List */}
-            <div className="bg-white rounded-xl border border-[color:var(--mk-line)] overflow-hidden shadow-sm">
+            <div className="bg-white rounded-lg border border-[color:var(--mk-line)] overflow-hidden shadow-sm">
                 <div className="p-4 border-b border-[color:var(--mk-line)] flex justify-between items-center bg-[color:var(--mk-paper)]">
                     <h3 className="font-bold text-sm uppercase tracking-wider text-[color:var(--mk-text-soft)] flex items-center gap-2">
                         <Filter className="w-4 h-4" /> Danh sách ảnh ({items.length})

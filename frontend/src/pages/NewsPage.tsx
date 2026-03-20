@@ -49,7 +49,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
     return (
         <Link
             to={`/news/${article.slug}`}
-            className="group flex flex-col overflow-hidden rounded-2xl border border-[color:var(--mk-line)] bg-white shadow-[0_4px_24px_rgba(53,41,26,0.04)] hover:-translate-y-1 hover:shadow-[0_18px_50px_rgba(53,41,26,0.12)] transition-all duration-300"
+            className="group flex flex-col overflow-hidden rounded-lg border border-[color:var(--mk-line)] bg-white shadow-[0_4px_24px_rgba(53,41,26,0.04)] hover:-translate-y-1 hover:shadow-[0_18px_50px_rgba(53,41,26,0.12)] transition-all duration-300"
         >
             {/* Thumbnail */}
             <div className="relative aspect-[16/9] overflow-hidden bg-[color:var(--mk-paper-strong)]">
@@ -179,7 +179,7 @@ export default function NewsPage() {
                     {loading && (
                         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                             {Array.from({ length: 6 }).map((_, i) => (
-                                <div key={i} className="rounded-2xl border border-[color:var(--mk-line)] overflow-hidden">
+                                <div key={i} className="rounded-lg border border-[color:var(--mk-line)] overflow-hidden">
                                     <Skeleton className="aspect-[16/9] w-full rounded-none" />
                                     <div className="p-5 space-y-3">
                                         <Skeleton className="h-5 w-full" />
@@ -193,7 +193,7 @@ export default function NewsPage() {
 
                     {/* Error state */}
                     {error && !loading && (
-                        <div className="rounded-2xl border border-red-100 bg-red-50 px-5 py-6 text-center text-sm text-red-600">
+                        <div className="rounded-lg border border-red-100 bg-red-50 px-5 py-6 text-center text-sm text-red-600">
                             {error}
                         </div>
                     )}
@@ -222,7 +222,7 @@ export default function NewsPage() {
                                 type="button"
                                 disabled={page === 1}
                                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                className="rounded-xl border border-[color:var(--mk-line)] px-4 py-2 text-sm font-semibold text-[color:var(--mk-text)] disabled:opacity-40 transition hover:border-[color:var(--mk-text)]"
+                                className="rounded-lg border border-[color:var(--mk-line)] px-4 py-2 text-sm font-semibold text-[color:var(--mk-text)] disabled:opacity-40 transition hover:border-[color:var(--mk-text)]"
                             >
                                 ← Trang trước
                             </button>
@@ -233,7 +233,7 @@ export default function NewsPage() {
                                 type="button"
                                 disabled={page === totalPages}
                                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                className="rounded-xl border border-[color:var(--mk-line)] px-4 py-2 text-sm font-semibold text-[color:var(--mk-text)] disabled:opacity-40 transition hover:border-[color:var(--mk-text)]"
+                                className="rounded-lg border border-[color:var(--mk-line)] px-4 py-2 text-sm font-semibold text-[color:var(--mk-text)] disabled:opacity-40 transition hover:border-[color:var(--mk-text)]"
                             >
                                 Trang sau →
                             </button>

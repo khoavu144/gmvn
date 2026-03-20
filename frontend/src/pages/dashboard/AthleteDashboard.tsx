@@ -25,7 +25,7 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
     return (
         <div className="space-y-8">
             {/* Next Workout Hero Card */}
-            <div className="bg-black text-white p-8 md:p-10 rounded-xl relative overflow-hidden group shadow-md">
+            <div className="bg-black text-white p-8 md:p-10 rounded-lg relative overflow-hidden group shadow-md">
                 <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10"></div>
                 <div className="relative z-20 max-w-2xl">
                     <span className="inline-block px-3 py-1 bg-white text-black text-[10px] font-black uppercase tracking-widest mb-4">Buổi tập tiếp theo</span>
@@ -55,7 +55,7 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
             </div>
 
             {/* Athlete public profile preview banner */}
-            <div className="flex items-center justify-between gap-4 bg-gray-900 text-white rounded-xl px-5 py-4">
+            <div className="flex items-center justify-between gap-4 bg-gray-900 text-white rounded-lg px-5 py-4">
                 <div>
                     <p className="text-[10px] uppercase tracking-widest text-[color:var(--mk-muted)] mb-1">Hồ sơ Athlete public của bạn</p>
                     <p className="text-sm font-bold truncate max-w-xs">{window.location.origin}{publicProfileUrl}</p>

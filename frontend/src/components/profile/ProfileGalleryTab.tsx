@@ -197,7 +197,7 @@ export function ProfileGalleryTab() {
                                 className="max-w-full max-h-[80vh] object-contain shadow-2xl"
                             />
                             
-                            <div className="w-full mt-6 bg-white/10 p-4 rounded-xl border border-white/10 backdrop-blur-md">
+                            <div className="w-full mt-6 bg-white/10 p-4 rounded-lg border border-white/10 backdrop-blur-md">
                                 <div className="flex items-center gap-3">
                                     <span className="px-2.5 py-1 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-sm">
                                         {typeLabels[lightboxImage.image_type]}

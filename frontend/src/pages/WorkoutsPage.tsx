@@ -74,7 +74,7 @@ export default function WorkoutsPage() {
                 </section>
 
                 {subs.length === 0 ? (
-                    <div className="empty-state border-dashed border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] mt-4 rounded-xl max-w-2xl mx-auto">
+                    <div className="empty-state border-dashed border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] mt-4 rounded-lg max-w-2xl mx-auto">
                         <div className="text-4xl mb-4">🎯</div>
                         <h3 className="text-lg font-bold text-[color:var(--mk-text)] mb-2">Chưa có lộ trình tập luyện</h3>
                         <p className="text-sm text-[color:var(--mk-muted)] mb-6 max-w-sm mx-auto">

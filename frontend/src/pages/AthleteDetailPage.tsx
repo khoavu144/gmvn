@@ -571,7 +571,7 @@ export default function AthleteDetailPage() {
                                         <div key={pkg.id} style={{
                                             background: pkg.is_popular ? '#111' : '#fff',
                                             border: pkg.is_popular ? 'none' : '1.5px solid #e5e7eb',
-                                            borderRadius: 20,
+                                            borderRadius: 8,
                                             padding: 24,
                                             display: 'flex',
                                             flexDirection: 'column',
@@ -596,7 +596,7 @@ export default function AthleteDetailPage() {
                                                 style={{
                                                     marginTop: 'auto',
                                                     padding: '10px',
-                                                    borderRadius: 999,
+                                                    borderRadius: 8,
                                                     fontWeight: 700,
                                                     fontSize: '0.82rem',
                                                     border: 'none',

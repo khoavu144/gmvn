@@ -278,10 +278,10 @@ export default function CoachDetailPage() {
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
                     <div className="flex gap-10">
                         <div className="flex-1">
-                            <Skeleton className="h-[28rem] w-full rounded-3xl" />
+                            <Skeleton className="h-[28rem] w-full rounded-lg" />
                         </div>
                         <div className="w-[320px] hidden lg:block">
-                            <Skeleton className="h-[28rem] w-full rounded-3xl" />
+                            <Skeleton className="h-[28rem] w-full rounded-lg" />
                         </div>
                     </div>
                 </div>
@@ -469,7 +469,7 @@ export default function CoachDetailPage() {
                     aria-modal="true"
                     aria-labelledby="payment-dialog-title"
                 >
-                    <div className="bg-white rounded-xl p-6 sm:p-8 max-w-sm w-full space-y-6 shadow-md">
+                    <div className="bg-white rounded-lg p-6 sm:p-8 max-w-sm w-full space-y-6 shadow-md">
                         <div className="flex justify-between items-center border-b border-[color:var(--mk-line)] pb-4">
                             <h3 id="payment-dialog-title" className="text-xl font-extrabold">Thanh Toán</h3>
                             <button

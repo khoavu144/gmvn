@@ -34,7 +34,7 @@ export default class ErrorBoundary extends Component<Props, State> {
 
         return (
             <div className="min-h-screen bg-white text-black flex items-center justify-center px-6 py-12">
-                <div className="w-full max-w-lg rounded-3xl border border-[color:var(--mk-line)] bg-white p-8 shadow-sm text-center">
+                <div className="w-full max-w-lg rounded-lg border border-[color:var(--mk-line)] bg-white p-8 shadow-sm text-center">
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">
                         GYMERVIET
                     </p>
@@ -48,13 +48,13 @@ export default class ErrorBoundary extends Component<Props, State> {
                         <button
                             type="button"
                             onClick={this.handleRetry}
-                            className="inline-flex items-center justify-center rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+                            className="inline-flex items-center justify-center rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
                         >
                             Thử lại
                         </button>
                         <a
                             href="/"
-                            className="inline-flex items-center justify-center rounded-2xl border border-[color:var(--mk-line)] px-5 py-3 text-sm font-semibold text-[color:var(--mk-text-soft)] transition hover:border-black hover:text-black"
+                            className="inline-flex items-center justify-center rounded-lg border border-[color:var(--mk-line)] px-5 py-3 text-sm font-semibold text-[color:var(--mk-text-soft)] transition hover:border-black hover:text-black"
                         >
                             Về trang chủ
                         </a>

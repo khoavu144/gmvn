@@ -10,7 +10,7 @@ interface CoachGymBadgeProps {
 
 const CoachGymBadge: React.FC<CoachGymBadgeProps> = ({ gymId, gymName, branchName, role }) => {
     return (
-        <Link to={`/gyms/${gymId}`} className="block border border-[color:var(--mk-line)] rounded-xl p-4 hover:border-black transition-colors group">
+        <Link to={`/gyms/${gymId}`} className="block border border-[color:var(--mk-line)] rounded-lg p-4 hover:border-black transition-colors group">
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xs bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] flex items-center justify-center font-bold text-[color:var(--mk-muted)] uppercase">
                     {gymName.charAt(0)}

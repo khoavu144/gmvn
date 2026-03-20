@@ -49,9 +49,9 @@ export default function NewsDetailPage() {
         return (
             <div className="marketplace-shell min-h-screen animate-pulse">
                 <div className="marketplace-container max-w-3xl pt-10 pb-24 space-y-4">
-                    <div className="h-8 bg-[color:var(--mk-paper-strong)] rounded-xl w-3/4" />
-                    <div className="h-4 bg-[color:var(--mk-paper)] rounded-xl w-1/2" />
-                    <div className="mt-6 aspect-[16/9] rounded-2xl bg-[color:var(--mk-paper-strong)]" />
+                    <div className="h-8 bg-[color:var(--mk-paper-strong)] rounded-lg w-3/4" />
+                    <div className="h-4 bg-[color:var(--mk-paper)] rounded-lg w-1/2" />
+                    <div className="mt-6 aspect-[16/9] rounded-lg bg-[color:var(--mk-paper-strong)]" />
                     <div className="mt-6 space-y-3">
                         {Array.from({ length: 8 }).map((_, i) => (
                             <div key={i} className="h-4 bg-[color:var(--mk-paper)] rounded-lg" style={{ width: `${75 + Math.random() * 25}%` }} />
@@ -174,7 +174,7 @@ export default function NewsDetailPage() {
 
                     {/* Hero image */}
                     {article.thumbnail_url && (
-                        <figure className="mb-8 overflow-hidden rounded-2xl">
+                        <figure className="mb-8 overflow-hidden rounded-lg">
                             <img
                                 src={article.thumbnail_url}
                                 alt={article.og_image_alt || article.title}
@@ -193,7 +193,7 @@ export default function NewsDetailPage() {
                             prose-p:leading-8 prose-p:text-[color:var(--mk-muted)]
                             prose-strong:text-[color:var(--mk-text)] prose-strong:font-bold
                             prose-a:text-[color:var(--mk-accent)] prose-a:no-underline hover:prose-a:underline
-                            prose-img:rounded-xl prose-img:shadow-md
+                            prose-img:rounded-lg prose-img:shadow-md
                             prose-ul:list-disc prose-ol:list-decimal"
                         dangerouslySetInnerHTML={{ __html: article.content }}
                     />

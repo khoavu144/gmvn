@@ -165,7 +165,7 @@ const RouteErrorFallback = () => {
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-6 py-12 bg-white">
-      <div className="w-full max-w-xl rounded-3xl border border-gray-200 bg-white p-8 shadow-sm text-center">
+      <div className="w-full max-w-xl rounded-lg border border-gray-200 bg-white p-8 shadow-sm text-center">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">GYMERVIET</p>
         <h1 className="mt-4 text-2xl font-black text-black tracking-tight">
           {isChunkError ? 'Ứng dụng vừa cập nhật, vui lòng tải lại trang' : 'Không thể tải trang này'}
@@ -179,13 +179,13 @@ const RouteErrorFallback = () => {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="inline-flex items-center justify-center rounded-2xl bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+            className="inline-flex items-center justify-center rounded-lg bg-black px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
           >
             Tải lại trang
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-2xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:border-black hover:text-black"
+            className="inline-flex items-center justify-center rounded-lg border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:border-black hover:text-black"
           >
             Về trang chủ
           </a>
