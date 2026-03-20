@@ -8,6 +8,14 @@ const router = Router();
 router.get('/:gymId/check-review', authenticate, gymController.checkReviewEligibility);
 router.get('/trainer/:trainerId', gymController.getTrainerGyms);
 
+// Marketplace public routes
+router.get('/marketplace', gymController.listGymsMarketplace);
+router.get('/marketplace/taxonomy', gymController.listMarketplaceTaxonomy);
+router.get('/marketplace/:gymId/similar', gymController.getSimilarMarketplaceGyms);
+router.get('/marketplace/:gymId/branches/:branchId/programs/:programId/sessions', gymController.getProgramSessions);
+router.get('/marketplace/:gymId/branches/:branchId', gymController.getMarketplaceBranchDetail);
+router.get('/marketplace/:gymId', gymController.getGymMarketplace);
+
 // Public routes
 router.get('/', gymController.listGyms);
 router.get('/:gymId', gymController.getGymCenter);

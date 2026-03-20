@@ -456,4 +456,575 @@ export const gymService = {
             relations: ['trainer'],
         });
     },
+
+    // ── MARKETPLACE LISTING (new marketplace queries) ─────────────────
+
+    /**
+     * Rich marketplace listing with taxonomy, thumbnail, price_from, and trust proof.
+     * Replaces basic listGyms for the new /gyms discovery page.
+     */
+    async listGymsMarketplace(query: {
+        search?: string;
+        city?: string;
+        district?: string;
+        venue_type?: string;
+        audience_tag?: string;
+        positioning_tier?: string;
+        sort?: 'featured' | 'rating' | 'newest' | 'price_asc' | 'views';
+        page?: number;
+        limit?: number;
+    }) {
+        const page = Math.max(1, query.page || 1);
+        const limit = Math.min(query.limit || 12, 50);
+        const skip = (page - 1) * limit;
+
+        const qb = AppDataSource.getRepository(GymCenter)
+            .createQueryBuilder('gc')
+            .leftJoinAndSelect('gc.branches', 'branch', 'branch.is_active = true')
+            .where('gc.is_verified = true')
+            .andWhere('gc.is_active = true')
+            .andWhere('gc.deleted_at IS NULL');
+
+        if (query.search) {
+            qb.andWhere(
+                '(gc.name ILIKE :s OR gc.discovery_blurb ILIKE :s OR branch.city ILIKE :s OR branch.district ILIKE :s)',
+                { s: `%${query.search}%` }
+            );
+        }
+        if (query.city) {
+            qb.andWhere('branch.city ILIKE :city', { city: `%${query.city}%` });
+        }
+        if (query.district) {
+            qb.andWhere('branch.district ILIKE :district', { district: `%${query.district}%` });
+        }
+        if (query.venue_type) {
+            qb.andWhere('gc.primary_venue_type_slug = :vt', { vt: query.venue_type });
+        }
+        if (query.positioning_tier) {
+            qb.andWhere('gc.positioning_tier = :tier', { tier: query.positioning_tier });
+        }
+
+        // Sort
+        switch (query.sort) {
+            case 'featured':
+                qb.orderBy('gc.featured_weight', 'DESC').addOrderBy('gc.view_count', 'DESC');
+                break;
+            case 'newest':
+                qb.orderBy('gc.created_at', 'DESC');
+                break;
+            case 'price_asc':
+                qb.orderBy('gc.price_from_amount', 'ASC', 'NULLS LAST');
+                break;
+            case 'views':
+                qb.orderBy('gc.view_count', 'DESC');
+                break;
+            default: // default: featured first
+                qb.orderBy('gc.featured_weight', 'DESC').addOrderBy('gc.view_count', 'DESC');
+        }
+
+        const [gyms, total] = await qb.skip(skip).take(limit).getManyAndCount();
+
+        // Enrich each gym with its listing thumbnail and taxonomy terms
+        const gymIds = gyms.map(g => g.id);
+        let thumbnailMap: Map<string, GymGallery> = new Map();
+        let taxonomyMap: Map<string, GymCenterTaxonomyTerm[]> = new Map();
+
+        if (gymIds.length > 0) {
+            // Get listing thumbnails via branches
+            const branchIds = gyms.flatMap(g => (g.branches || []).map(b => b.id));
+            if (branchIds.length > 0) {
+                const thumbs = await AppDataSource.getRepository(GymGallery)
+                    .createQueryBuilder('img')
+                    .where('img.branch_id IN (:...ids)', { ids: branchIds })
+                    .andWhere('img.is_listing_thumb = true')
+                    .orderBy('img.order_number', 'ASC')
+                    .getMany();
+
+                // Map branch → first thumb, then branch → gym
+                const branchToGym = new Map<string, string>();
+                gyms.forEach(g => (g.branches || []).forEach(b => branchToGym.set(b.id, g.id)));
+                thumbs.forEach(t => {
+                    const gymId = branchToGym.get(t.branch_id);
+                    if (gymId && !thumbnailMap.has(gymId)) thumbnailMap.set(gymId, t);
+                });
+
+                // Fallback: first gallery image if no listing_thumb
+                const gymsMissingThumb = gymIds.filter(id => !thumbnailMap.has(id));
+                if (gymsMissingThumb.length > 0) {
+                    const branchIdsMissing = gyms
+                        .filter(g => gymsMissingThumb.includes(g.id))
+                        .flatMap(g => (g.branches || []).map(b => b.id));
+                    if (branchIdsMissing.length > 0) {
+                        const fallbacks = await AppDataSource.getRepository(GymGallery)
+                            .createQueryBuilder('img')
+                            .where('img.branch_id IN (:...ids)', { ids: branchIdsMissing })
+                            .orderBy('img.order_number', 'ASC')
+                            .getMany();
+                        fallbacks.forEach(t => {
+                            const gymId = branchToGym.get(t.branch_id);
+                            if (gymId && !thumbnailMap.has(gymId)) thumbnailMap.set(gymId, t);
+                        });
+                    }
+                }
+            }
+
+            // Taxonomy terms
+            const ctTerms = await AppDataSource.getRepository(GymCenterTaxonomyTerm)
+                .find({
+                    where: { gym_center_id: In(gymIds) },
+                    relations: ['term'],
+                    order: { sort_order: 'ASC' },
+                });
+            ctTerms.forEach(ct => {
+                if (!taxonomyMap.has(ct.gym_center_id)) taxonomyMap.set(ct.gym_center_id, []);
+                taxonomyMap.get(ct.gym_center_id)!.push(ct);
+            });
+        }
+
+        const enriched = gyms.map(g => ({
+            ...g,
+            listing_thumbnail: thumbnailMap.get(g.id) ?? null,
+            taxonomy_terms: taxonomyMap.get(g.id) ?? [],
+        }));
+
+        return {
+            gyms: enriched,
+            pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
+        };
+    },
+
+    /**
+     * Full gym detail payload for the marketplace detail page.
+     * Returns zones, programs, lead routes, trust dimensions, and taxonomy.
+     */
+    async getGymDetailMarketplace(gymCenterIdOrSlug: string) {
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(gymCenterIdOrSlug);
+        const gymCenterRepo = AppDataSource.getRepository(GymCenter);
+
+        const where = isUUID
+            ? { id: gymCenterIdOrSlug, is_active: true }
+            : { slug: gymCenterIdOrSlug, is_active: true };
+
+        const gym = await gymCenterRepo.findOne({
+            where,
+            relations: ['branches'],
+        });
+        if (!gym) return null;
+
+        // Increment view count
+        await gymCenterRepo.update(gym.id, { view_count: () => 'view_count + 1' });
+
+        const branchIds = (gym.branches || []).filter(b => b.is_active).map(b => b.id);
+
+        // Parallel fetch of all related data
+        const [
+            gallery,
+            amenities,
+            equipment,
+            pricing,
+            reviews,
+            trainerLinks,
+            zones,
+            programs,
+            leadRoutes,
+            taxonomyTerms,
+        ] = await Promise.all([
+            branchIds.length > 0
+                ? AppDataSource.getRepository(GymGallery).find({
+                    where: { branch_id: In(branchIds) },
+                    order: { is_hero: 'DESC', is_featured: 'DESC', order_number: 'ASC' },
+                })
+                : [],
+            branchIds.length > 0
+                ? AppDataSource.getRepository(GymAmenity).find({
+                    where: { branch_id: In(branchIds) },
+                })
+                : [],
+            branchIds.length > 0
+                ? AppDataSource.getRepository(GymEquipment).find({
+                    where: { branch_id: In(branchIds) },
+                })
+                : [],
+            branchIds.length > 0
+                ? AppDataSource.getRepository(GymPricing).find({
+                    where: { branch_id: In(branchIds) },
+                    order: { order_number: 'ASC' },
+                })
+                : [],
+            branchIds.length > 0
+                ? AppDataSource.getRepository(GymReview).find({
+                    where: { branch_id: In(branchIds), is_visible: true },
+                    order: { created_at: 'DESC' },
+                    take: 20,
+                })
+                : [],
+            branchIds.length > 0
+                ? AppDataSource.getRepository(GymTrainerLink).find({
+                    where: { branch_id: In(branchIds), status: 'active' },
+                    order: { featured_at_branch: 'DESC', visible_order: 'ASC' },
+                })
+                : [],
+            branchIds.length > 0
+                ? AppDataSource.getRepository(GymZone).find({
+                    where: { branch_id: In(branchIds), is_active: true },
+                    order: { is_signature_zone: 'DESC', sort_order: 'ASC' },
+                })
+                : [],
+            branchIds.length > 0
+                ? AppDataSource.getRepository(GymProgram).find({
+                    where: { branch_id: In(branchIds), is_active: true },
+                    order: { title: 'ASC' },
+                })
+                : [],
+            branchIds.length > 0
+                ? AppDataSource.getRepository(GymLeadRoute).find({
+                    where: { branch_id: In(branchIds), is_active: true },
+                })
+                : [],
+            AppDataSource.getRepository(GymCenterTaxonomyTerm).find({
+                where: { gym_center_id: gym.id },
+                relations: ['term'],
+                order: { is_primary: 'DESC', sort_order: 'ASC' },
+            }),
+        ]);
+
+        // Compute trust dimension aggregates
+        const reviewCount = reviews.length;
+        const avgRating = reviewCount > 0
+            ? Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviewCount) * 10) / 10
+            : null;
+
+        const dimFields = ['equipment_rating', 'cleanliness_rating', 'coaching_rating', 'atmosphere_rating', 'value_rating', 'crowd_rating'] as const;
+        const trustDimensions: Record<string, number | null> = {};
+        for (const field of dimFields) {
+            const vals = reviews.map(r => r[field]).filter((v): v is number => v !== null && v !== undefined);
+            trustDimensions[field] = vals.length > 0
+                ? Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10
+                : null;
+        }
+
+        // Group branch-level data
+        const branchDetailMap = new Map<string, {
+            gallery: GymGallery[];
+            amenities: typeof amenities;
+            equipment: typeof equipment;
+            pricing: typeof pricing;
+            reviews: typeof reviews;
+            trainer_links: typeof trainerLinks;
+            zones: typeof zones;
+            programs: typeof programs;
+            lead_routes: typeof leadRoutes;
+        }>();
+
+        branchIds.forEach(bid => {
+            branchDetailMap.set(bid, {
+                gallery: gallery.filter(i => i.branch_id === bid),
+                amenities: amenities.filter(a => a.branch_id === bid),
+                equipment: equipment.filter(e => e.branch_id === bid),
+                pricing: pricing.filter(p => p.branch_id === bid),
+                reviews: reviews.filter(r => r.branch_id === bid),
+                trainer_links: trainerLinks.filter(t => t.branch_id === bid),
+                zones: zones.filter(z => z.branch_id === bid),
+                programs: programs.filter(pg => pg.branch_id === bid),
+                lead_routes: leadRoutes.filter(lr => lr.branch_id === bid),
+            });
+        });
+
+        const branchesWithDetail = (gym.branches || [])
+            .filter(b => b.is_active)
+            .map(b => ({
+                ...b,
+                ...(branchDetailMap.get(b.id) ?? {}),
+            }));
+
+        return {
+            ...gym,
+            taxonomy_terms: taxonomyTerms,
+            branches: branchesWithDetail,
+            trust_summary: {
+                avg_rating: avgRating,
+                review_count: reviewCount,
+                dimensions: trustDimensions,
+            },
+        };
+    },
+
+    /**
+     * Similar venues based on venue type, price band, city, and audience tags.
+     */
+    async getSimilarGyms(gymCenterId: string, limit = 4) {
+        const gymCenterRepo = AppDataSource.getRepository(GymCenter);
+        const sourceGym = await gymCenterRepo.findOne({
+            where: { id: gymCenterId, is_active: true, is_verified: true },
+            relations: ['branches'],
+        });
+        if (!sourceGym) return [];
+
+        const sourceBranch = (sourceGym.branches || [])[0];
+        const sourceCity = sourceBranch?.city ?? null;
+        const sourceVenueType = sourceGym.primary_venue_type_slug;
+        const sourcePriceFrom = sourceGym.price_from_amount ?? 0;
+        const priceFloor = sourcePriceFrom * 0.4;
+        const priceCeil = sourcePriceFrom > 0 ? sourcePriceFrom * 2.5 : 999_999_999;
+
+        const qb = gymCenterRepo.createQueryBuilder('gc')
+            .leftJoinAndSelect('gc.branches', 'b', 'b.is_active = true')
+            .where('gc.is_active = true')
+            .andWhere('gc.is_verified = true')
+            .andWhere('gc.deleted_at IS NULL')
+            .andWhere('gc.id != :id', { id: gymCenterId });
+
+        const orConditions: string[] = [];
+        if (sourceVenueType) {
+            orConditions.push('gc.primary_venue_type_slug = :vt');
+        }
+        if (sourceCity) {
+            orConditions.push('b.city ILIKE :city');
+        }
+        if (sourcePriceFrom > 0) {
+            orConditions.push('(gc.price_from_amount BETWEEN :pf AND :pc)');
+        }
+
+        if (orConditions.length > 0) {
+            qb.andWhere(`(${orConditions.join(' OR ')})`, {
+                vt: sourceVenueType ?? undefined,
+                city: sourceCity ? `%${sourceCity}%` : undefined,
+                pf: priceFloor,
+                pc: priceCeil,
+            });
+        }
+
+        qb.orderBy('gc.featured_weight', 'DESC')
+            .addOrderBy('gc.view_count', 'DESC')
+            .take(limit);
+
+        const similar = await qb.getMany();
+
+        // Attach listing thumbnails
+        const branchIds = similar.flatMap(g => (g.branches || []).map(b => b.id));
+        let thumbMap = new Map<string, GymGallery>();
+        if (branchIds.length > 0) {
+            const thumbs = await AppDataSource.getRepository(GymGallery).find({
+                where: { branch_id: In(branchIds), is_listing_thumb: true },
+                order: { order_number: 'ASC' },
+            });
+            const branchToGym = new Map<string, string>();
+            similar.forEach(g => (g.branches || []).forEach(b => branchToGym.set(b.id, g.id)));
+            thumbs.forEach(t => {
+                const gid = branchToGym.get(t.branch_id);
+                if (gid && !thumbMap.has(gid)) thumbMap.set(gid, t);
+            });
+        }
+
+        return similar.map(g => ({
+            ...g,
+            listing_thumbnail: thumbMap.get(g.id) ?? null,
+        }));
+    },
+
+    // ── TAXONOMY ─────────────────────────────────────────────────────────
+
+    async listTaxonomyTerms(termType?: string) {
+        const repo = AppDataSource.getRepository(GymTaxonomyTerm);
+        const where = termType ? { term_type: termType as any, is_active: true } : { is_active: true };
+        return repo.find({ where, order: { sort_order: 'ASC', label: 'ASC' } });
+    },
+
+    async setGymTaxonomyTerms(gymCenterId: string, ownerId: string, termIds: string[], primaryTermId?: string) {
+        const gymCenterRepo = AppDataSource.getRepository(GymCenter);
+        const gym = await gymCenterRepo.findOne({ where: { id: gymCenterId, owner_id: ownerId } });
+        if (!gym) throw new Error('Gym not found or unauthorized');
+
+        const ctRepo = AppDataSource.getRepository(GymCenterTaxonomyTerm);
+        await ctRepo.delete({ gym_center_id: gymCenterId });
+
+        const entries = termIds.map((tid, i) =>
+            ctRepo.create({
+                gym_center_id: gymCenterId,
+                term_id: tid,
+                is_primary: tid === primaryTermId,
+                sort_order: i,
+            })
+        );
+        return ctRepo.save(entries);
+    },
+
+    // ── ZONES ────────────────────────────────────────────────────────────
+
+    async getBranchZones(branchId: string) {
+        return AppDataSource.getRepository(GymZone).find({
+            where: { branch_id: branchId, is_active: true },
+            order: { is_signature_zone: 'DESC', sort_order: 'ASC' },
+        });
+    },
+
+    async upsertZone(branchId: string, ownerId: string, zoneData: Partial<GymZone> & { id?: string }) {
+        const branchRepo = AppDataSource.getRepository(GymBranch);
+        const branch = await branchRepo.findOne({ where: { id: branchId }, relations: ['gym_center'] });
+        if (!branch || branch.gym_center.owner_id !== ownerId) throw new Error('Unauthorized');
+
+        const repo = AppDataSource.getRepository(GymZone);
+        if (zoneData.id) {
+            const zone = await repo.findOne({ where: { id: zoneData.id, branch_id: branchId } });
+            if (!zone) throw new Error('Zone not found');
+            Object.assign(zone, zoneData);
+            return repo.save(zone);
+        }
+        const zone = repo.create({ ...zoneData, branch_id: branchId });
+        return repo.save(zone);
+    },
+
+    async deleteZone(zoneId: string, branchId: string, ownerId: string) {
+        const branchRepo = AppDataSource.getRepository(GymBranch);
+        const branch = await branchRepo.findOne({ where: { id: branchId }, relations: ['gym_center'] });
+        if (!branch || branch.gym_center.owner_id !== ownerId) throw new Error('Unauthorized');
+        await AppDataSource.getRepository(GymZone).delete({ id: zoneId, branch_id: branchId });
+    },
+
+    // ── PROGRAMS ─────────────────────────────────────────────────────────
+
+    async getBranchPrograms(branchId: string) {
+        return AppDataSource.getRepository(GymProgram).find({
+            where: { branch_id: branchId, is_active: true },
+            order: { title: 'ASC' },
+        });
+    },
+
+    async upsertProgram(branchId: string, ownerId: string, programData: Partial<GymProgram> & { id?: string }) {
+        const branchRepo = AppDataSource.getRepository(GymBranch);
+        const branch = await branchRepo.findOne({ where: { id: branchId }, relations: ['gym_center'] });
+        if (!branch || branch.gym_center.owner_id !== ownerId) throw new Error('Unauthorized');
+
+        const repo = AppDataSource.getRepository(GymProgram);
+        if (programData.id) {
+            const prog = await repo.findOne({ where: { id: programData.id, branch_id: branchId } });
+            if (!prog) throw new Error('Program not found');
+            Object.assign(prog, programData);
+            return repo.save(prog);
+        }
+        const prog = repo.create({ ...programData, branch_id: branchId });
+        return repo.save(prog);
+    },
+
+    async getProgramSessions(programId: string, from?: Date, to?: Date) {
+        const qb = AppDataSource.getRepository(GymProgramSession)
+            .createQueryBuilder('s')
+            .where('s.program_id = :id', { id: programId })
+            .andWhere('s.is_cancelled = false');
+        if (from) qb.andWhere('s.starts_at >= :from', { from });
+        if (to) qb.andWhere('s.starts_at <= :to', { to });
+        return qb.orderBy('s.starts_at', 'ASC').getMany();
+    },
+
+    // ── LEAD ROUTES ───────────────────────────────────────────────────────
+
+    async getBranchLeadRoutes(branchId: string) {
+        return AppDataSource.getRepository(GymLeadRoute).find({
+            where: { branch_id: branchId, is_active: true },
+        });
+    },
+
+    async upsertLeadRoute(branchId: string, ownerId: string, routeData: Partial<GymLeadRoute> & { id?: string }) {
+        const branchRepo = AppDataSource.getRepository(GymBranch);
+        const branch = await branchRepo.findOne({ where: { id: branchId }, relations: ['gym_center'] });
+        if (!branch || branch.gym_center.owner_id !== ownerId) throw new Error('Unauthorized');
+
+        const repo = AppDataSource.getRepository(GymLeadRoute);
+        if (routeData.id) {
+            const route = await repo.findOne({ where: { id: routeData.id, branch_id: branchId } });
+            if (!route) throw new Error('Lead route not found');
+            Object.assign(route, routeData);
+            return repo.save(route);
+        }
+        const route = repo.create({ ...routeData, branch_id: branchId });
+        return repo.save(route);
+    },
+
+    // ── PRICE_FROM SYNC ───────────────────────────────────────────────────
+
+    /**
+     * Recalculate and persist price_from_amount + price_from_billing_cycle
+     * from the gym center's cheapest active pricing row.
+     */
+    async syncPriceFrom(gymCenterId: string) {
+        const gymCenterRepo = AppDataSource.getRepository(GymCenter);
+        const branchRepo = AppDataSource.getRepository(GymBranch);
+        const pricingRepo = AppDataSource.getRepository(GymPricing);
+
+        const branches = await branchRepo.find({ where: { gym_center_id: gymCenterId, is_active: true } });
+        const branchIds = branches.map(b => b.id);
+        if (branchIds.length === 0) return;
+
+        const allPricing = await pricingRepo.find({ where: { branch_id: In(branchIds) } });
+        const valid = allPricing.filter(p => Number(p.price) > 0);
+        if (valid.length === 0) return;
+
+        valid.sort((a, b) => Number(a.price) - Number(b.price));
+        const cheapest = valid[0];
+
+        await gymCenterRepo.update(gymCenterId, {
+            price_from_amount: Number(cheapest.price),
+            price_from_billing_cycle: cheapest.billing_cycle,
+        });
+    },
+
+    // ── BRANCH DETAIL (enhanced, includes new fields) ─────────────────────
+
+    async getBranchDetailMarketplace(branchId: string) {
+        const branchRepo = AppDataSource.getRepository(GymBranch);
+        const branch = await branchRepo.findOne({
+            where: { id: branchId, is_active: true },
+            relations: ['gym_center'],
+        });
+        if (!branch) return null;
+
+        await branchRepo.update(branchId, { view_count: () => 'view_count + 1' });
+
+        const [gallery, amenities, equipment, pricing, reviews, trainerLinks, zones, programs, leadRoutes] =
+            await Promise.all([
+                AppDataSource.getRepository(GymGallery).find({
+                    where: { branch_id: branchId },
+                    order: { is_hero: 'DESC', is_featured: 'DESC', order_number: 'ASC' },
+                }),
+                AppDataSource.getRepository(GymAmenity).find({ where: { branch_id: branchId } }),
+                AppDataSource.getRepository(GymEquipment).find({ where: { branch_id: branchId } }),
+                AppDataSource.getRepository(GymPricing).find({
+                    where: { branch_id: branchId },
+                    order: { order_number: 'ASC' },
+                }),
+                AppDataSource.getRepository(GymReview).find({
+                    where: { branch_id: branchId, is_visible: true },
+                    order: { created_at: 'DESC' },
+                    take: 20,
+                }),
+                AppDataSource.getRepository(GymTrainerLink).find({
+                    where: { branch_id: branchId, status: 'active' },
+                    order: { featured_at_branch: 'DESC', visible_order: 'ASC' },
+                }),
+                AppDataSource.getRepository(GymZone).find({
+                    where: { branch_id: branchId, is_active: true },
+                    order: { is_signature_zone: 'DESC', sort_order: 'ASC' },
+                }),
+                AppDataSource.getRepository(GymProgram).find({
+                    where: { branch_id: branchId, is_active: true },
+                    order: { title: 'ASC' },
+                }),
+                AppDataSource.getRepository(GymLeadRoute).find({
+                    where: { branch_id: branchId, is_active: true },
+                }),
+            ]);
+
+        return {
+            ...branch,
+            gallery,
+            amenities,
+            equipment,
+            pricing,
+            reviews,
+            trainer_links: trainerLinks,
+            zones,
+            programs,
+            lead_routes: leadRoutes,
+        };
+    },
 };

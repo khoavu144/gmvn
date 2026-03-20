@@ -217,6 +217,41 @@ export interface TrainerTestimonial {
     created_at: string;
 }
 
+export interface GymTaxonomyTerm {
+    id: string;
+    slug: string;
+    label: string;
+    term_type: 'venue_type' | 'training_style' | 'audience' | 'positioning' | 'service_model' | 'recovery_type' | 'atmosphere';
+    parent_id?: string | null;
+    sort_order?: number;
+    is_active?: boolean;
+    created_at?: string;
+}
+
+export interface GymCenterTaxonomyTerm {
+    id: string;
+    gym_center_id: string;
+    term_id: string;
+    is_primary: boolean;
+    sort_order: number;
+    term?: GymTaxonomyTerm;
+}
+
+export interface GymTrustDimensions {
+    equipment_rating: number | null;
+    cleanliness_rating: number | null;
+    coaching_rating: number | null;
+    atmosphere_rating: number | null;
+    value_rating: number | null;
+    crowd_rating: number | null;
+}
+
+export interface GymTrustSummary {
+    avg_rating: number | null;
+    review_count: number;
+    dimensions: GymTrustDimensions;
+}
+
 export interface GymCenter {
     id: string;
     owner_id: string;
@@ -237,10 +272,29 @@ export interface GymCenter {
     view_count: number;
     avg_rating?: number | null;
     review_count?: number | null;
+    primary_venue_type_slug?: string | null;
+    price_from_amount?: number | null;
+    price_from_billing_cycle?: 'per_day' | 'per_month' | 'per_quarter' | 'per_year' | 'per_session' | null;
+    positioning_tier?: 'budget' | 'mid' | 'premium' | 'luxury' | null;
+    beginner_friendly?: boolean | null;
+    women_friendly?: boolean | null;
+    family_friendly?: boolean | null;
+    athlete_friendly?: boolean | null;
+    recovery_focused?: boolean | null;
+    discovery_blurb?: string | null;
+    hero_value_props?: string[] | null;
+    profile_completeness_score?: number;
+    response_sla_text?: string | null;
+    default_primary_cta?: 'consultation' | 'visit_booking' | 'class_trial' | 'membership' | 'private_training' | 'corporate' | null;
+    default_secondary_cta?: 'consultation' | 'visit_booking' | 'class_trial' | 'membership' | 'private_training' | 'corporate' | null;
+    featured_weight?: number;
     created_at: string;
     updated_at: string;
-    owner?: User; // joined relation for admin
-    branches?: GymBranch[]; // optional relation
+    owner?: User;
+    branches?: GymBranch[];
+    listing_thumbnail?: GymGallery | null;
+    taxonomy_terms?: GymCenterTaxonomyTerm[];
+    trust_summary?: GymTrustSummary | null;
 }
 
 export interface GymBranch {
@@ -260,6 +314,23 @@ export interface GymBranch {
     is_active: boolean;
     view_count: number;
     description: string | null;
+    neighborhood_label?: string | null;
+    parking_summary?: string | null;
+    locker_summary?: string | null;
+    shower_summary?: string | null;
+    towel_service_summary?: string | null;
+    crowd_level_summary?: string | null;
+    best_visit_time_summary?: string | null;
+    accessibility_summary?: string | null;
+    women_only_summary?: string | null;
+    child_friendly_summary?: string | null;
+    check_in_instructions?: string | null;
+    branch_tagline?: string | null;
+    whatsapp_number?: string | null;
+    messenger_url?: string | null;
+    consultation_phone?: string | null;
+    cover_media_id?: string | null;
+    branch_status_badges?: string[] | null;
     created_at: string;
     updated_at: string;
 
@@ -272,6 +343,44 @@ export interface GymBranch {
     events?: GymEvent[];
     reviews?: GymReview[];
     trainer_links?: GymTrainerLink[];
+    zones?: GymZone[];
+    programs?: GymProgram[];
+    lead_routes?: GymLeadRoute[];
+}
+
+export interface GymZone {
+    id: string;
+    branch_id: string;
+    zone_type:
+    | 'cardio_floor'
+    | 'strength_floor'
+    | 'free_weight_zone'
+    | 'functional_zone'
+    | 'yoga_room'
+    | 'pilates_reformer_room'
+    | 'pilates_mat_room'
+    | 'cycling_room'
+    | 'boxing_zone'
+    | 'dance_room'
+    | 'recovery_zone'
+    | 'locker_zone'
+    | 'pool_zone'
+    | 'sauna_zone'
+    | 'outdoor_zone'
+    | 'other';
+    name: string;
+    description: string | null;
+    capacity: number | null;
+    area_sqm: number | null;
+    booking_required: boolean;
+    temperature_mode?: 'heated' | 'cooled' | 'ambient' | 'infrared' | 'outdoor' | null;
+    sound_profile?: 'silent' | 'ambient_music' | 'energetic' | 'instructor_led' | null;
+    natural_light_score?: number | null;
+    is_signature_zone: boolean;
+    sort_order: number;
+    is_active: boolean;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface GymGallery {
@@ -279,8 +388,16 @@ export interface GymGallery {
     branch_id: string;
     image_url: string;
     caption: string | null;
-    image_type: 'facility' | 'equipment' | 'class' | 'other';
+    image_type: 'facility' | 'equipment' | 'class' | 'other' | 'exterior' | 'interior' | 'pool';
     order_number: number;
+    media_role?: 'hero' | 'exterior' | 'reception' | 'open_gym' | 'class_in_action' | 'trainer_in_action' | 'equipment_detail' | 'zone_overview' | 'amenity' | 'recovery' | 'community' | 'before_after' | 'other';
+    zone_id?: string | null;
+    alt_text?: string | null;
+    is_hero?: boolean;
+    is_listing_thumb?: boolean;
+    is_featured?: boolean;
+    orientation?: 'landscape' | 'portrait' | 'square' | null;
+    zone?: GymZone | null;
 }
 
 export interface GymAmenity {
@@ -298,7 +415,7 @@ export interface GymEquipment {
     name: string;
     quantity: number | null;
     brand: string | null;
-    condition?: string | null; // Added for UI helper if needed
+    condition?: string | null;
     is_available: boolean;
 }
 
@@ -311,6 +428,21 @@ export interface GymPricing {
     description: string | null;
     is_highlighted: boolean;
     order_number: number;
+    plan_type?: 'membership' | 'class_pack' | 'private_pt' | 'drop_in' | 'trial' | 'reformer_pack' | 'recovery_pack' | 'corporate';
+    access_scope?: 'single_branch' | 'all_branches' | 'selected_branches';
+    included_services?: string[] | null;
+    class_credits?: number | null;
+    session_count?: number | null;
+    trial_available?: boolean;
+    trial_price?: number | null;
+    joining_fee?: number | null;
+    deposit_amount?: number | null;
+    freeze_policy_summary?: string | null;
+    cancellation_policy_summary?: string | null;
+    validity_days?: number | null;
+    peak_access_rule?: string | null;
+    supports_multi_branch?: boolean;
+    highlighted_reason?: string | null;
 }
 
 export interface GymEvent {
@@ -326,6 +458,58 @@ export interface GymEvent {
     image_url: string | null;
 }
 
+export interface GymProgramSession {
+    id: string;
+    program_id: string;
+    starts_at: string;
+    ends_at: string;
+    seats_total: number;
+    seats_remaining: number;
+    waitlist_enabled: boolean;
+    is_cancelled: boolean;
+    session_note: string | null;
+    created_at: string;
+}
+
+export interface GymProgram {
+    id: string;
+    branch_id: string;
+    zone_id: string | null;
+    trainer_id: string | null;
+    title: string;
+    program_type: 'yoga' | 'pilates' | 'hiit' | 'cycling' | 'boxing' | 'dance' | 'strength' | 'meditation' | 'recovery' | 'mobility' | 'other';
+    level: 'beginner' | 'intermediate' | 'advanced' | 'all';
+    description: string | null;
+    duration_minutes: number;
+    capacity: number;
+    language_code: string | null;
+    equipment_required: string[] | null;
+    booking_mode: 'walk_in' | 'pre_booking' | 'member_only';
+    is_active: boolean;
+    created_at?: string;
+    updated_at?: string;
+    zone?: GymZone | null;
+    sessions?: GymProgramSession[];
+}
+
+export interface GymLeadRoute {
+    id: string;
+    branch_id: string;
+    inquiry_type: 'consultation' | 'visit_booking' | 'class_trial' | 'membership' | 'private_training' | 'corporate';
+    primary_channel: 'whatsapp' | 'phone' | 'messenger' | 'email' | 'in_app';
+    fallback_channel?: 'whatsapp' | 'phone' | 'messenger' | 'email' | 'in_app' | null;
+    phone?: string | null;
+    whatsapp?: string | null;
+    messenger_url?: string | null;
+    email?: string | null;
+    owner_user_id?: string | null;
+    active_hours?: Record<string, { from: string; to: string }> | null;
+    auto_prefill_message?: string | null;
+    is_active: boolean;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export interface GymTrainerLink {
     id: string;
     gym_center_id: string;
@@ -333,8 +517,15 @@ export interface GymTrainerLink {
     trainer_id: string;
     role_at_gym: string | null;
     status: 'pending' | 'active' | 'inactive' | 'removed';
+    linked_at?: string | null;
+    specialization_summary?: string | null;
+    featured_at_branch?: boolean;
+    accepts_private_clients?: boolean;
+    branch_intro?: string | null;
+    languages?: string[] | null;
+    visible_order?: number;
     created_at: string;
-    updated_at: string;
+    updated_at?: string;
 
     // Relations
     gym_center?: GymCenter;
@@ -357,15 +548,24 @@ export interface Notification {
 export interface GymReview {
     id: string;
     branch_id: string;
-    user_id: string;     // references User.id
+    user_id: string;
     rating: number;
     comment: string | null;
-    is_verified_athlete: boolean;
+    is_verified_athlete?: boolean;
+    verified_via_subscription_id?: string | null;
     is_visible: boolean;
+    equipment_rating?: number | null;
+    cleanliness_rating?: number | null;
+    coaching_rating?: number | null;
+    atmosphere_rating?: number | null;
+    value_rating?: number | null;
+    crowd_rating?: number | null;
+    visit_type?: 'member' | 'drop_in' | 'trial' | 'guest' | null;
+    is_verified_visit?: boolean;
     created_at: string;
     updated_at: string;
 
-    user?: User; // joined relation
+    user?: User;
 
     // Sprint 3: Review Reply
     reply_text?: string | null;

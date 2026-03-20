@@ -9,6 +9,52 @@ export const gymService = {
         return response.data; // { success, gyms, pagination }
     },
 
+    async listMarketplaceGyms(params?: {
+        search?: string;
+        city?: string;
+        district?: string;
+        venue_type?: string;
+        audience_tag?: string;
+        positioning_tier?: string;
+        sort?: string;
+        page?: number;
+        limit?: number;
+    }) {
+        const response = await apiClient.get('/gyms/marketplace', { params });
+        return response.data; // { success, gyms, pagination }
+    },
+
+    async listMarketplaceTaxonomy(term_type?: string) {
+        const response = await apiClient.get('/gyms/marketplace/taxonomy', {
+            params: term_type ? { term_type } : undefined,
+        });
+        return response.data; // { success, terms }
+    },
+
+    async getMarketplaceGym(gymId: string) {
+        const response = await apiClient.get(`/gyms/marketplace/${gymId}`);
+        return response.data; // { success, gym, canonical_slug }
+    },
+
+    async getMarketplaceBranchDetail(gymId: string, branchId: string) {
+        const response = await apiClient.get(`/gyms/marketplace/${gymId}/branches/${branchId}`);
+        return response.data; // { success, branch }
+    },
+
+    async getSimilarMarketplaceGyms(gymId: string, limit = 4) {
+        const response = await apiClient.get(`/gyms/marketplace/${gymId}/similar`, {
+            params: { limit },
+        });
+        return response.data; // { success, gyms }
+    },
+
+    async getProgramSessions(gymId: string, branchId: string, programId: string, params?: { from?: string; to?: string }) {
+        const response = await apiClient.get(`/gyms/marketplace/${gymId}/branches/${branchId}/programs/${programId}/sessions`, {
+            params,
+        });
+        return response.data; // { success, sessions }
+    },
+
     async getGymCenterById(gymId: string) {
         const response = await apiClient.get(`/gyms/${gymId}`);
         return response.data; // { success, gym }

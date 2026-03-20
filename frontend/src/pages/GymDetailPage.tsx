@@ -1,85 +1,298 @@
-/**
- * GymDetailPage.tsx — wpresidence-inspired property detail layout
- *
- * Structure (top→bottom):
- *   1. Masonry hero gallery (fullwidth, no header overlap)
- *   2. Sticky top nav (section jump links, like ProfileCV)
- *   3. 2-col grid: [left content 2/3] + [right sticky sidebar 1/3]
- *      Left:  About + stats | Amenities | Equipment | Trainers | Reviews
- *      Right: Price from | Branch dropdown | Hours today | CTA | Share
- *   4. Map section (iframe → Leaflet fallback)
- *   5. Lightbox overlay
- *
- * Design: minimalism, flat, no icons — consistent with app global UI
- */
-
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { getSrcSet, getOptimizedUrl } from '../utils/image';
-import type { GymTrainerLink } from '../types';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { getOptimizedUrl, getSrcSet } from '../utils/image';
 import { gymService } from '../services/gymService';
-import type { GymCenter, GymBranch, GymGallery, GymEquipment } from '../types';
+import type {
+    GymBranch,
+    GymCenter,
+    GymGallery,
+    GymLeadRoute,
+    GymPricing,
+    GymProgram,
+    GymProgramSession,
+    GymTaxonomyTerm,
+    GymTrainerLink,
+    GymZone,
+} from '../types';
+import GymCard from '../components/GymCard';
 import GymReviewForm from '../components/GymReviewForm';
 import GymReviewList from '../components/GymReviewList';
 import ShareButton from '../components/ShareButton';
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
 const DAY_VI: Record<string, string> = {
-    mon: 'Thứ 2', tue: 'Thứ 3', wed: 'Thứ 4',
-    thu: 'Thứ 5', fri: 'Thứ 6', sat: 'Thứ 7', sun: 'CN',
+    mon: 'Thứ 2',
+    tue: 'Thứ 3',
+    wed: 'Thứ 4',
+    thu: 'Thứ 5',
+    fri: 'Thứ 6',
+    sat: 'Thứ 7',
+    sun: 'CN',
 };
-const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 const TODAY_KEY = DAY_KEYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
 
-const BILLING_VI: Record<string, string> = {
-    per_day: '/ ngày', per_month: '/ tháng',
-    per_quarter: '/ quý', per_year: '/ năm', per_session: '/ buổi',
+const BILLING_LABELS: Record<string, string> = {
+    per_day: '/ ngày',
+    per_month: '/ tháng',
+    per_quarter: '/ quý',
+    per_year: '/ năm',
+    per_session: '/ buổi',
 };
 
-const EQUIP_CATEGORY_VI: Record<string, string> = {
-    cardio: 'Cardio', strength: 'Sức mạnh', free_weights: 'Tạ tự do',
-    functional: 'Functional', studio: 'Studio', other: 'Khác',
+const PROGRAM_TYPE_LABELS: Record<string, string> = {
+    yoga: 'Yoga',
+    pilates: 'Pilates',
+    hiit: 'HIIT',
+    cycling: 'Cycling',
+    boxing: 'Boxing',
+    dance: 'Dance',
+    strength: 'Strength',
+    meditation: 'Meditation',
+    recovery: 'Recovery',
+    mobility: 'Mobility',
+    other: 'Class',
 };
 
-function useInView(threshold = 0.1): [React.RefObject<HTMLDivElement>, boolean] {
+const BOOKING_MODE_LABELS: Record<string, string> = {
+    walk_in: 'Walk-in',
+    pre_booking: 'Đặt trước',
+    member_only: 'Chỉ hội viên',
+};
+
+function useInView(threshold = 0.08): [React.RefObject<HTMLDivElement>, boolean] {
     const ref = useRef<HTMLDivElement>(null!);
     const [inView, setInView] = useState(false);
+
     useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const obs = new IntersectionObserver(
-            ([e]) => { if (e.isIntersecting) setInView(true); },
+        const element = ref.current;
+        if (!element) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) setInView(true);
+            },
             { threshold }
         );
-        obs.observe(el);
-        return () => obs.disconnect();
+
+        observer.observe(element);
+        return () => observer.disconnect();
     }, [threshold]);
+
     return [ref, inView];
 }
 
 function FadeIn({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-    const [ref, inView] = useInView(0.07);
+    const [ref, inView] = useInView();
     return (
-        <div ref={ref} className={`transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'} ${className}`}>
+        <div
+            ref={ref}
+            className={`transition-all duration-700 ${inView ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'} ${className}`}
+        >
             {children}
         </div>
     );
 }
 
-// ── Nav sections ──────────────────────────────────────────────────────────────
-const NAV_SECTIONS = [
-    { id: 'about', label: 'Tổng quan' },
-    { id: 'amenities', label: 'Tiện ích' },
-    { id: 'equipment', label: 'Thiết bị' },
-    { id: 'trainers', label: 'HLV' },
-    { id: 'pricing', label: 'Bảng giá' },
-    { id: 'reviews', label: 'Đánh giá' },
-    { id: 'map', label: 'Bản đồ' },
-];
+function SectionHeading({
+    kicker,
+    title,
+    description,
+}: {
+    kicker: string;
+    title: string;
+    description?: string;
+}) {
+    return (
+        <div className="mb-6 space-y-2">
+            <div className="marketplace-section-kicker">{kicker}</div>
+            <h2 className="marketplace-section-title">{title}</h2>
+            {description && <p className="marketplace-lead max-w-none text-[0.98rem]">{description}</p>}
+        </div>
+    );
+}
 
-// ── Main Component ─────────────────────────────────────────────────────────────
+function SummaryPill({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="rounded-[1.25rem] border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
+            <div className="text-[0.66rem] font-black uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">{label}</div>
+            <div className="mt-1 text-sm font-bold text-[color:var(--mk-text)]">{value}</div>
+        </div>
+    );
+}
+
+function getTaxonomyLabels(gym: GymCenter | null, type: GymTaxonomyTerm['term_type'], limit = 3) {
+    if (!gym?.taxonomy_terms) return [];
+    const values = gym.taxonomy_terms
+        .map((item) => item.term)
+        .filter((term): term is GymTaxonomyTerm => term != null && term.term_type === type)
+        .map((term) => term.label);
+
+    return Array.from(new Set(values)).slice(0, limit);
+}
+
+function getPrimaryVenueLabel(gym: GymCenter | null) {
+    const primary = gym?.taxonomy_terms?.find((item) => item.is_primary && item.term)?.term;
+    return primary?.label || gym?.primary_venue_type_slug || 'Active Space';
+}
+
+function getFallbackGallery(gym: GymCenter | null, branchId?: string | null): GymGallery[] {
+    const imageUrl = gym?.listing_thumbnail?.image_url || gym?.cover_image_url || gym?.logo_url;
+    if (!imageUrl || !gym) return [];
+
+    return [
+        {
+            id: 'gym-cover-fallback',
+            branch_id: branchId || 'fallback',
+            image_url: imageUrl,
+            caption: gym.name,
+            image_type: 'other',
+            order_number: 0,
+            media_role: 'hero',
+            is_hero: true,
+        },
+    ];
+}
+
+function normalizePhone(raw?: string | null) {
+    return (raw || '').replace(/[^\d+]/g, '');
+}
+
+function buildWhatsappUrl(phone?: string | null, message?: string | null) {
+    const normalized = normalizePhone(phone).replace(/^0/, '84');
+    if (!normalized) return null;
+    const text = message ? `?text=${encodeURIComponent(message)}` : '';
+    return `https://wa.me/${normalized}${text}`;
+}
+
+function getTodayHours(branch: GymBranch | null) {
+    return branch?.opening_hours?.[TODAY_KEY] as { open?: string; close?: string; is_closed?: boolean } | undefined;
+}
+
+function getTrainerLinkPath(link: GymTrainerLink) {
+    const trainer = link.trainer;
+    if (!trainer) return null;
+    if (trainer.user_type === 'athlete') {
+        return trainer.profile_slug ? `/athlete/${trainer.profile_slug}` : `/athletes/${trainer.id}`;
+    }
+    return trainer.profile_slug ? `/coach/${trainer.profile_slug}` : `/coaches/${trainer.id}`;
+}
+
+function resolveLeadRoute(gym: GymCenter | null, branch: GymBranch | null) {
+    const routes = branch?.lead_routes || [];
+    const preferred = routes.find((route) => route.inquiry_type === gym?.default_primary_cta)
+        || routes.find((route) => route.inquiry_type === 'consultation')
+        || routes[0]
+        || null;
+
+    if (!preferred && !branch) {
+        return {
+            href: '/messages',
+            label: 'Nhắn tư vấn',
+            isExternal: false,
+            helper: 'Tư vấn phù hợp mục tiêu và khu vực',
+        };
+    }
+
+    const phone = preferred?.phone || branch?.consultation_phone || branch?.phone || null;
+    const whatsapp = preferred?.whatsapp || branch?.whatsapp_number || null;
+    const messengerUrl = preferred?.messenger_url || branch?.messenger_url || null;
+    const email = preferred?.email || branch?.email || null;
+    const message = preferred?.auto_prefill_message || `Xin chào, tôi muốn nhận tư vấn về ${branch?.branch_name || gym?.name || 'venue'} trên Gymerviet.`;
+
+    if ((preferred?.primary_channel === 'whatsapp' || !preferred?.primary_channel) && whatsapp) {
+        return {
+            href: buildWhatsappUrl(whatsapp, message) || '/messages',
+            label: 'Nhắn WhatsApp',
+            isExternal: true,
+            helper: 'Trao đổi trực tiếp với chi nhánh',
+        };
+    }
+
+    if (preferred?.primary_channel === 'phone' && phone) {
+        return {
+            href: `tel:${normalizePhone(phone)}`,
+            label: 'Gọi tư vấn',
+            isExternal: true,
+            helper: 'Gọi trực tiếp cho chi nhánh',
+        };
+    }
+
+    if (preferred?.primary_channel === 'messenger' && messengerUrl) {
+        return {
+            href: messengerUrl,
+            label: 'Mở Messenger',
+            isExternal: true,
+            helper: 'Chat nhanh với venue',
+        };
+    }
+
+    if (preferred?.primary_channel === 'email' && email) {
+        return {
+            href: `mailto:${email}`,
+            label: 'Gửi email',
+            isExternal: true,
+            helper: 'Nhận báo giá qua email',
+        };
+    }
+
+    if (phone) {
+        return {
+            href: `tel:${normalizePhone(phone)}`,
+            label: 'Gọi tư vấn',
+            isExternal: true,
+            helper: 'Tư vấn đúng chi nhánh đang chọn',
+        };
+    }
+
+    if (messengerUrl) {
+        return {
+            href: messengerUrl,
+            label: 'Nhắn Messenger',
+            isExternal: true,
+            helper: 'Hỏi nhanh về lịch và giá',
+        };
+    }
+
+    return {
+        href: '/messages',
+        label: 'Nhắn tư vấn',
+        isExternal: false,
+        helper: 'Tư vấn phù hợp mục tiêu tập luyện',
+    };
+}
+
+function renderActionButton(action: { href: string; label: string; isExternal: boolean }, className: string) {
+    if (action.isExternal) {
+        return (
+            <a href={action.href} target={action.href.startsWith('http') ? '_blank' : undefined} rel={action.href.startsWith('http') ? 'noopener noreferrer' : undefined} className={className}>
+                {action.label}
+            </a>
+        );
+    }
+
+    return <Link to={action.href} className={className}>{action.label}</Link>;
+}
+
+function formatProgramSubtitle(program: GymProgram) {
+    const bits = [PROGRAM_TYPE_LABELS[program.program_type] || program.program_type];
+    if (program.level && program.level !== 'all') bits.push(program.level);
+    bits.push(`${program.duration_minutes} phút`);
+    bits.push(BOOKING_MODE_LABELS[program.booking_mode] || program.booking_mode);
+    return bits.join(' · ');
+}
+
+function formatSessionDate(value: string) {
+    return new Date(value).toLocaleString('vi-VN', {
+        weekday: 'short',
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
 const GymDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -87,110 +300,244 @@ const GymDetailPage: React.FC = () => {
     const [gym, setGym] = useState<GymCenter | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeBranchId, setActiveBranchId] = useState<string | null>(null);
-    const [branchDetail, setBranchDetail] = useState<GymBranch | null>(null);
-    const [gymTrainers, setGymTrainers] = useState<GymTrainerLink[]>([]);
+    const [activeSection, setActiveSection] = useState('overview');
+    const [activeProgramId, setActiveProgramId] = useState<string | null>(null);
+    const [programSessions, setProgramSessions] = useState<GymProgramSession[]>([]);
+    const [sessionsLoading, setSessionsLoading] = useState(false);
+    const [similarGyms, setSimilarGyms] = useState<GymCenter[]>([]);
     const [canReview, setCanReview] = useState(false);
-    const [lightboxImg, setLightboxImg] = useState<GymGallery | null>(null);
-    const [lightboxIdx, setLightboxIdx] = useState(0);
-    const [activeSection, setActiveSection] = useState('about');
     const [refreshTick, setRefreshTick] = useState(0);
+    const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+
     const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
-    // Fetch gym (UUID or slug — backend handles both)
     useEffect(() => {
         if (!id) return;
+
+        let mounted = true;
+
         (async () => {
             try {
                 setLoading(true);
-                const res = await gymService.getGymCenterById(id);
-                if (res.success && res.gym) {
-                    setGym(res.gym);
-                    // SEO: redirect UUID to slug if available
-                    if (res.canonical_slug && res.canonical_slug !== id) {
-                        navigate(`/gyms/${res.canonical_slug}`, { replace: true });
+                const response = await gymService.getMarketplaceGym(id);
+                if (!mounted) return;
+
+                if (response.success && response.gym) {
+                    setGym(response.gym);
+                    if (response.canonical_slug && response.canonical_slug !== id) {
+                        navigate(`/gyms/${response.canonical_slug}`, { replace: true });
                     }
-                    if (res.gym.branches?.length > 0) {
-                        setActiveBranchId(res.gym.branches[0].id);
-                    }
-                    // fetch trainers
-                    try {
-                        const tRes = await gymService.getGymTrainers(res.gym.id);
-                        if (tRes.success) setGymTrainers(tRes.trainers || []);
-                    } catch { /* trainers optional */ }
+                    const firstBranch = response.gym.branches?.[0];
+                    setActiveBranchId(firstBranch?.id || null);
+                } else {
+                    setGym(null);
                 }
-            } catch { /* handled via !gym below */ }
-            finally { setLoading(false); }
+            } catch {
+                if (mounted) setGym(null);
+            } finally {
+                if (mounted) setLoading(false);
+            }
         })();
-    }, [id]);
 
-    // Fetch branch detail when branch changes
-    useEffect(() => {
-        if (!gym || !activeBranchId) return;
-        (async () => {
-            try {
-                const res = await gymService.getBranchDetail(gym.id, activeBranchId);
-                if (res.success && res.branch) setBranchDetail(res.branch);
-            } catch { /* handled */ }
-        })();
-    }, [gym, activeBranchId]);
+        return () => {
+            mounted = false;
+        };
+    }, [id, navigate]);
 
-    // Review eligibility
     useEffect(() => {
-        if (!gym) return;
+        if (!gym?.id) return;
+
+        let mounted = true;
+        gymService.getSimilarMarketplaceGyms(gym.id, 4)
+            .then((response) => {
+                if (!mounted) return;
+                setSimilarGyms(response.success ? (response.gyms || []) : []);
+            })
+            .catch(() => {
+                if (mounted) setSimilarGyms([]);
+            });
+
+        return () => {
+            mounted = false;
+        };
+    }, [gym?.id]);
+
+    useEffect(() => {
+        if (!gym?.id) return;
+
         gymService.checkReviewEligibility(gym.id)
-            .then(r => setCanReview(r.success && r.canReview))
+            .then((response) => setCanReview(Boolean(response.success && response.canReview)))
             .catch(() => setCanReview(false));
+    }, [gym?.id]);
+
+    const branches = gym?.branches || [];
+    const branchDetail = useMemo(() => {
+        if (!branches.length) return null;
+        return branches.find((branch) => branch.id === activeBranchId) || branches[0];
+    }, [branches, activeBranchId]);
+    const branchId = branchDetail?.id || null;
+    const branchName = branchDetail?.branch_name || gym?.name || 'Venue branch';
+    const branchStatusBadges = branchDetail?.branch_status_badges || [];
+    const branchAmenities = branchDetail?.amenities || [];
+    const branchEquipment = branchDetail?.equipment || [];
+    const branchZones = branchDetail?.zones || [];
+    const branchTrainerLinks = branchDetail?.trainer_links || [];
+    const branchPricing = useMemo(
+        () => [...(branchDetail?.pricing || [])].sort((a, b) => (a.order_number ?? 0) - (b.order_number ?? 0)),
+        [branchDetail?.pricing]
+    );
+    const branchPrograms = branchDetail?.programs || [];
+    const branchMapEmbedUrl = branchDetail?.google_maps_embed_url || null;
+    const branchLatitude = branchDetail?.latitude ?? null;
+    const branchLongitude = branchDetail?.longitude ?? null;
+    const branchPhone = branchDetail?.phone || null;
+    const branchEmail = branchDetail?.email || null;
+    const branchWhatsapp = branchDetail?.whatsapp_number || null;
+    const hasCoordinates = branchLatitude !== null && branchLongitude !== null;
+    const entryBillingCycle = branchPricing[0]?.billing_cycle || null;
+    const branchEquipmentGroups = useMemo(() => {
+        return branchEquipment.reduce<Record<string, NonNullable<GymBranch['equipment']>>>((acc, item) => {
+            const key = item.category || 'other';
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(item);
+            return acc;
+        }, {});
+    }, [branchEquipment]);
+
+    const gallery = useMemo(() => {
+        if (branchDetail?.gallery && branchDetail.gallery.length > 0) {
+            return branchDetail.gallery;
+        }
+        return getFallbackGallery(gym, branchId);
+    }, [branchDetail?.gallery, branchId, gym]);
+
+    const activeImage = lightboxIdx !== null ? gallery[lightboxIdx] : null;
+    const heroImage = gallery.find((item) => item.is_hero) || gallery[0] || null;
+    const activeProgram = branchPrograms.find((program) => program.id === activeProgramId) || branchPrograms[0] || null;
+    const todayHours = getTodayHours(branchDetail);
+    const lowestPrice = useMemo(() => {
+        const values = branchPricing.map((plan) => Number(plan.price)).filter((value) => value > 0);
+        return values.length > 0 ? Math.min(...values) : null;
+    }, [branchPricing]);
+
+    useEffect(() => {
+        if (!branchPrograms.length) {
+            setActiveProgramId(null);
+            return;
+        }
+
+        setActiveProgramId((current) => {
+            if (current && branchPrograms.some((program) => program.id === current)) {
+                return current;
+            }
+            return branchPrograms[0].id;
+        });
+    }, [branchPrograms]);
+
+    useEffect(() => {
+        if (!gym?.id || !branchDetail?.id || !activeProgramId) {
+            setProgramSessions([]);
+            return;
+        }
+
+        let mounted = true;
+        setSessionsLoading(true);
+
+        gymService.getProgramSessions(gym.id, branchDetail.id, activeProgramId)
+            .then((response) => {
+                if (!mounted) return;
+                setProgramSessions(response.success ? (response.sessions || []) : []);
+            })
+            .catch(() => {
+                if (mounted) setProgramSessions([]);
+            })
+            .finally(() => {
+                if (mounted) setSessionsLoading(false);
+            });
+
+        return () => {
+            mounted = false;
+        };
+    }, [activeProgramId, branchDetail?.id, gym?.id]);
+
+    const overviewBadges = useMemo(() => {
+        const labels = [
+            ...getTaxonomyLabels(gym, 'training_style', 3),
+            ...getTaxonomyLabels(gym, 'audience', 2),
+            ...getTaxonomyLabels(gym, 'positioning', 2),
+        ];
+        return Array.from(new Set(labels)).slice(0, 5);
     }, [gym]);
 
-    // Scroll-spy
+    const visibleSections = useMemo(() => {
+        return [
+            { id: 'overview', label: 'Tổng quan', visible: true },
+            { id: 'zones', label: 'Không gian', visible: branchZones.length > 0 },
+            { id: 'facilities', label: 'Tiện ích', visible: branchAmenities.length > 0 || branchEquipment.length > 0 },
+            { id: 'trainers', label: 'Chuyên gia', visible: branchTrainerLinks.length > 0 },
+            { id: 'pricing', label: 'Gói tập', visible: branchPricing.length > 0 },
+            { id: 'schedule', label: 'Lịch lớp', visible: branchPrograms.length > 0 },
+            { id: 'reviews', label: 'Đánh giá', visible: true },
+            { id: 'similar', label: 'Venue tương tự', visible: similarGyms.length > 0 },
+            {
+                id: 'map',
+                label: 'Bản đồ',
+                visible: Boolean(branchMapEmbedUrl || hasCoordinates),
+            },
+        ].filter((item) => item.visible);
+    }, [
+        branchAmenities.length,
+        branchEquipment.length,
+        branchMapEmbedUrl,
+        branchPricing.length,
+        branchPrograms.length,
+        branchTrainerLinks.length,
+        branchZones.length,
+        hasCoordinates,
+        similarGyms.length,
+    ]);
+
     useEffect(() => {
         const observers: IntersectionObserver[] = [];
-        NAV_SECTIONS.forEach(({ id: sid }) => {
-            const el = sectionRefs.current[sid];
-            if (!el) return;
-            const obs = new IntersectionObserver(
-                ([e]) => { if (e.isIntersecting) setActiveSection(sid); },
-                { rootMargin: '-30% 0px -60% 0px' }
-            );
-            obs.observe(el);
-            observers.push(obs);
-        });
-        return () => observers.forEach(o => o.disconnect());
-    }, [branchDetail, gymTrainers]);
+        visibleSections.forEach(({ id: sectionId }) => {
+            const element = sectionRefs.current[sectionId];
+            if (!element) return;
 
-    const setRef = (sid: string) => (el: HTMLElement | null) => { sectionRefs.current[sid] = el; };
-    const scrollTo = useCallback((sid: string) => {
-        sectionRefs.current[sid]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const observer = new IntersectionObserver(
+                ([entry]) => {
+                    if (entry.isIntersecting) setActiveSection(sectionId);
+                },
+                { rootMargin: '-28% 0px -58% 0px' }
+            );
+
+            observer.observe(element);
+            observers.push(observer);
+        });
+
+        return () => observers.forEach((observer) => observer.disconnect());
+    }, [visibleSections, branchDetail, similarGyms, refreshTick, programSessions.length]);
+
+    const setRef = useCallback((sectionId: string) => (node: HTMLElement | null) => {
+        sectionRefs.current[sectionId] = node;
     }, []);
 
-    // Lightbox nav
-    const gallery = branchDetail?.gallery || [];
-    const openLightbox = (img: GymGallery, idx: number) => { setLightboxImg(img); setLightboxIdx(idx); };
-    const lightboxNext = () => {
-        const next = (lightboxIdx + 1) % gallery.length;
-        setLightboxImg(gallery[next]); setLightboxIdx(next);
-    };
-    const lightboxPrev = () => {
-        const prev = (lightboxIdx - 1 + gallery.length) % gallery.length;
-        setLightboxImg(gallery[prev]); setLightboxIdx(prev);
-    };
+    const scrollToSection = useCallback((sectionId: string) => {
+        sectionRefs.current[sectionId]?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, []);
 
-    // ── Loading / 404 ─────────────────────────────────────────────────────────
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 animate-pulse pb-20">
-                <div className="w-full h-[480px] bg-gray-200" />
-                <div className="max-w-6xl mx-auto px-4 mt-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-2 space-y-8">
-                            <div className="h-10 bg-gray-300 w-2/3 rounded-sm" />
-                            <div className="h-4 bg-gray-200 w-full rounded-sm" />
-                            <div className="h-4 bg-gray-200 w-5/6 rounded-sm" />
-                            <div className="h-32 bg-gray-200 w-full rounded-sm mt-8" />
-                        </div>
+            <div className="marketplace-shell min-h-screen animate-pulse pb-20">
+                <div className="marketplace-container pt-8">
+                    <div className="h-[28rem] rounded-[2rem] bg-[color:var(--mk-paper-strong)]" />
+                    <div className="mt-6 grid gap-4 lg:grid-cols-[1.45fr_0.55fr]">
                         <div className="space-y-4">
-                            <div className="h-64 bg-gray-300 w-full rounded-sm" />
+                            <div className="h-6 w-40 rounded-full bg-[color:var(--mk-line)]" />
+                            <div className="h-16 w-3/4 rounded-[1.5rem] bg-[color:var(--mk-line)]" />
+                            <div className="h-5 w-full rounded-full bg-[color:var(--mk-line)]" />
+                            <div className="h-5 w-4/5 rounded-full bg-[color:var(--mk-line)]" />
                         </div>
+                        <div className="rounded-[2rem] bg-[color:var(--mk-paper-strong)] p-6" />
                     </div>
                 </div>
             </div>
@@ -199,669 +546,833 @@ const GymDetailPage: React.FC = () => {
 
     if (!gym) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-gray-50">
-                <div className="text-5xl font-black text-gray-200">404</div>
-                <p className="text-gray-700 font-medium">Không tìm thấy Gym.</p>
-                <Link to="/gyms" className="text-sm font-medium text-black underline underline-offset-4">← Quay lại danh sách</Link>
+            <div className="marketplace-shell min-h-screen">
+                <div className="marketplace-container flex min-h-screen flex-col items-center justify-center gap-5 text-center">
+                    <div className="text-[5rem] font-black leading-none tracking-[-0.08em] text-[color:var(--mk-accent)]/45">404</div>
+                    <div className="space-y-2">
+                        <h1 className="text-3xl font-black tracking-[-0.05em] text-[color:var(--mk-text)]">Không tìm thấy venue này.</h1>
+                        <p className="marketplace-lead">Liên kết có thể đã thay đổi hoặc venue hiện không còn hiển thị trên marketplace.</p>
+                    </div>
+                    <Link to="/gyms" className="marketplace-chip is-active">Quay lại marketplace</Link>
+                </div>
             </div>
         );
     }
 
-    const branches = gym.branches || [];
-    const activeBranch = branches.find((b: GymBranch) => b.id === activeBranchId) || branches[0];
+    const venueLabel = getPrimaryVenueLabel(gym);
+    const leadAction = resolveLeadRoute(gym, branchDetail);
+    const canonicalUrl = `https://gymerviet.vn/gyms/${gym.slug || gym.id}`;
+    const seoTitle = `${gym.name} — ${venueLabel} trên GYMERVIET`;
+    const seoDescription = gym.discovery_blurb || gym.tagline || gym.description || `${gym.name} — ${venueLabel} trên GYMERVIET.`;
+    const seoImage = heroImage?.image_url || gym.cover_image_url || gym.logo_url || '';
 
-    // Today's hours
-    const todayHours = branchDetail?.opening_hours?.[TODAY_KEY];
-
-    // Lowest price
-    const allPrices = (branchDetail?.pricing || []).map(p => Number(p.price)).filter(Boolean);
-    const lowestPrice = allPrices.length > 0 ? Math.min(...allPrices) : null;
-
-    // Equipment by category
-    const equipByCategory = (branchDetail?.equipment || []).reduce<Record<string, GymEquipment[]>>((acc, eq) => {
-        const cat = eq.category || 'other';
-        if (!acc[cat]) acc[cat] = [];
-        acc[cat]!.push(eq);
-        return acc;
-    }, {});
-
-    // SEO
-    const seoTitle = `${gym.name} — Phòng tập GymViet`;
-    const seoDesc = gym.description?.slice(0, 155) || `${gym.name} — hệ thống phòng tập xác thực trên GymViet.`;
-    const seoImage = gym.cover_image_url || gym.logo_url || '';
-    const canonicalUrl = `https://gymviet.vn/gyms/${gym.slug || gym.id}`;
-
-    // Stats for display
-    const gymYear = gym.founded_year;
-    const gymAge = gymYear ? new Date().getFullYear() - gymYear : null;
-
-    // Visible sections
-    const hasEquipment = (branchDetail?.equipment || []).length > 0;
-    const hasAmenities = (branchDetail?.amenities || []).length > 0;
-    const hasTrainers = gymTrainers.length > 0;
-    const hasPricing = (branchDetail?.pricing || []).length > 0;
-    const hasMap = !!(branchDetail?.google_maps_embed_url || (branchDetail?.latitude && branchDetail?.longitude));
+    const quickFacts = [
+        {
+            label: 'Venue type',
+            value: venueLabel,
+        },
+        {
+            label: 'Entry price',
+            value: lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫${entryBillingCycle ? ` ${BILLING_LABELS[entryBillingCycle] || ''}` : ''}` : 'Liên hệ để nhận giá',
+        },
+        {
+            label: 'Trust score',
+            value: gym.trust_summary?.avg_rating ? `★ ${gym.trust_summary.avg_rating.toFixed(1)} · ${gym.trust_summary.review_count} reviews` : 'Đang hoàn thiện trust data',
+        },
+        {
+            label: 'Best for',
+            value: getTaxonomyLabels(gym, 'audience', 1)[0] || 'Người đang tìm venue phù hợp',
+        },
+    ];
 
     return (
         <>
             <Helmet>
                 <title>{seoTitle}</title>
-                <meta name="description" content={seoDesc} />
+                <meta name="description" content={seoDescription} />
                 <link rel="canonical" href={canonicalUrl} />
-                {/* Open Graph */}
                 <meta property="og:type" content="business.business" />
                 <meta property="og:title" content={seoTitle} />
-                <meta property="og:description" content={seoDesc} />
+                <meta property="og:description" content={seoDescription} />
                 <meta property="og:url" content={canonicalUrl} />
                 <meta property="og:site_name" content="GYMERVIET" />
-                <meta property="og:locale" content="vi_VN" />
                 {seoImage && <meta property="og:image" content={seoImage} />}
                 {seoImage && <meta property="og:image:width" content="1200" />}
-                {seoImage && <meta property="og:image:height" content="630" />}
-                {/* Twitter Card */}
+                {seoImage && <meta property="og:image:height" content="800" />}
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:site" content="@gymerviet" />
                 <meta name="twitter:title" content={seoTitle} />
-                <meta name="twitter:description" content={seoDesc} />
+                <meta name="twitter:description" content={seoDescription} />
                 {seoImage && <meta name="twitter:image" content={seoImage} />}
-                {/* JSON-LD: ExerciseGym */}
                 <script type="application/ld+json">{JSON.stringify({
                     '@context': 'https://schema.org',
                     '@type': 'ExerciseGym',
                     name: gym.name,
-                    description: seoDesc,
+                    description: seoDescription,
                     image: seoImage || undefined,
                     url: canonicalUrl,
-                    address: activeBranch ? {
+                    address: branchDetail ? {
                         '@type': 'PostalAddress',
-                        streetAddress: activeBranch.address,
-                        addressLocality: (activeBranch as any).city || (activeBranch as any).district || undefined,
+                        streetAddress: branchDetail.address,
+                        addressLocality: branchDetail.city || branchDetail.district || undefined,
                         addressCountry: 'VN',
                     } : undefined,
-                    telephone: (branchDetail as any)?.phone || undefined,
-                    openingHoursSpecification: undefined, // populated if needed
-                })}</script>
-                {/* JSON-LD: BreadcrumbList */}
-                <script type="application/ld+json">{JSON.stringify({
-                    '@context': 'https://schema.org',
-                    '@type': 'BreadcrumbList',
-                    itemListElement: [
-                        { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://gymerviet.vn' },
-                        { '@type': 'ListItem', position: 2, name: 'Phòng tập', item: 'https://gymerviet.vn/gyms' },
-                        { '@type': 'ListItem', position: 3, name: gym.name },
-                    ],
+                    telephone: branchDetail?.phone || undefined,
                 })}</script>
             </Helmet>
 
-
-            {/* ── LIGHTBOX ─────────────────────────────────────────────── */}
-            {lightboxImg && (
-                <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
-                    onClick={() => setLightboxImg(null)}>
-                    <button className="absolute top-4 right-5 text-white text-3xl font-black hover:text-gray-400 transition-colors"
-                        onClick={() => setLightboxImg(null)}>×</button>
+            {activeImage && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(16,12,10,0.96)] p-4" onClick={() => setLightboxIdx(null)}>
+                    <button
+                        type="button"
+                        onClick={() => setLightboxIdx(null)}
+                        className="absolute right-5 top-5 text-3xl font-black text-white/75 transition hover:text-white"
+                    >
+                        ×
+                    </button>
                     {gallery.length > 1 && (
                         <>
-                            <button className="absolute left-4 text-white text-2xl font-black px-3 py-2 hover:bg-white/10 transition-colors"
-                                onClick={(e) => { e.stopPropagation(); lightboxPrev(); }}>‹</button>
-                            <button className="absolute right-4 text-white text-2xl font-black px-3 py-2 hover:bg-white/10 transition-colors"
-                                onClick={(e) => { e.stopPropagation(); lightboxNext(); }}>›</button>
+                            <button
+                                type="button"
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    setLightboxIdx((current) => current === null ? 0 : (current - 1 + gallery.length) % gallery.length);
+                                }}
+                                className="absolute left-4 rounded-full border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition hover:bg-white/12"
+                            >
+                                ‹
+                            </button>
+                            <button
+                                type="button"
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    setLightboxIdx((current) => current === null ? 0 : (current + 1) % gallery.length);
+                                }}
+                                className="absolute right-4 rounded-full border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition hover:bg-white/12"
+                            >
+                                ›
+                            </button>
                         </>
                     )}
-                    <img src={lightboxImg.image_url} alt={lightboxImg.caption || 'Gallery'}
+                    <img
+                        src={activeImage.image_url}
+                        alt={activeImage.alt_text || activeImage.caption || gym.name}
                         className="max-h-[88vh] max-w-full object-contain"
-                        decoding="async"
-                        onClick={e => e.stopPropagation()} />
-                    {lightboxImg.caption && (
-                        <p className="absolute bottom-5 text-white/70 text-xs text-center px-4">{lightboxImg.caption}</p>
-                    )}
-                    <div className="absolute bottom-5 right-5 text-white/50 text-xs font-mono">{lightboxIdx + 1} / {gallery.length}</div>
+                        onClick={(event) => event.stopPropagation()}
+                    />
                 </div>
             )}
 
-            <div className="bg-gray-50 min-h-screen pb-20">
-
-                {/* 1. IMMERSIVE HERO & IDENTITY (Slice 1) */}
-                <div className="relative w-full min-h-[560px] md:min-h-[640px] bg-black overflow-hidden flex flex-col justify-end">
-                    {/* Background Image & Gradient */}
-                    <div className="absolute inset-0 z-0 bg-black">
-                        {gallery.length > 0 ? (
-                            <img src={getOptimizedUrl(gallery[0].image_url, 1280) || gallery[0].image_url} srcSet={getSrcSet(gallery[0].image_url, [640, 1024, 1920])} sizes="100vw" alt={gym.name} width={1280} height={640} className="w-full h-full object-cover opacity-60" fetchPriority="high" decoding="async" />
-                        ) : gym.cover_image_url ? (
-                            <img src={getOptimizedUrl(gym.cover_image_url, 1280) || gym.cover_image_url} srcSet={getSrcSet(gym.cover_image_url, [640, 1024, 1920])} sizes="100vw" alt={gym.name} className="w-full h-full object-cover opacity-60" fetchPriority="high" />
-                        ) : (
-                            <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-                                <span className="text-6xl font-black text-gray-800">{gym.name.slice(0, 2).toUpperCase()}</span>
-                            </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+            <div className="marketplace-shell min-h-screen pb-24">
+                <div className="marketplace-container pt-6">
+                    <div className="mb-5 flex items-center justify-between gap-4">
+                        <Link to="/gyms" className="back-link">← Quay lại marketplace</Link>
+                        <div className="hidden items-center gap-2 md:flex">
+                            {branchStatusBadges.slice(0, 3).map((badge) => (
+                                <span key={badge} className="marketplace-badge marketplace-badge--neutral">{badge}</span>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* Identity Content */}
-                    <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 pb-10 pt-32">
-                        <div className="max-w-3xl">
-                            <div className="flex flex-wrap items-center gap-3 mb-4">
-                                {gym.is_verified && (
-                                    <span className="text-[10px] font-black tracking-widest uppercase px-2 py-1 bg-white text-black rounded-sm">Xác thực</span>
+                    <section className="marketplace-panel overflow-hidden">
+                        <div className="grid gap-0 lg:grid-cols-[1.2fr_0.8fr]">
+                            <div className="relative min-h-[24rem] overflow-hidden bg-[color:var(--mk-paper-strong)] lg:min-h-[36rem]">
+                                {heroImage ? (
+                                    <img
+                                        src={getOptimizedUrl(heroImage.image_url, 1440) || heroImage.image_url}
+                                        srcSet={getSrcSet(heroImage.image_url, [640, 1024, 1600])}
+                                        sizes="(max-width: 1024px) 100vw, 60vw"
+                                        alt={heroImage.alt_text || heroImage.caption || gym.name}
+                                        className="h-full w-full object-cover"
+                                        fetchPriority="high"
+                                    />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(230,203,154,0.45),transparent_36%),linear-gradient(155deg,rgba(255,255,255,0.55),rgba(222,214,201,0.95))]">
+                                        <span className="text-[5rem] font-black leading-none tracking-[-0.08em] text-[color:var(--mk-text)]/20">
+                                            {gym.name.slice(0, 2).toUpperCase()}
+                                        </span>
+                                    </div>
                                 )}
-                                {activeBranch && (
-                                    <span className="text-xs font-bold text-gray-300 tracking-wider uppercase">
-                                        📍 {activeBranch.branch_name} {activeBranch.city ? `• ${activeBranch.city}` : ''}
-                                    </span>
-                                )}
-                            </div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(26,20,16,0.82)] via-[rgba(26,20,16,0.14)] to-transparent" />
 
-                            <h1 className="text-4xl md:text-5xl lg:text-7xl font-black text-white tracking-tight mb-4 leading-none">
-                                {gym.name}
-                            </h1>
-
-                            {gym.tagline && (
-                                <p className="text-lg md:text-xl text-gray-300 font-medium mb-8 leading-relaxed max-w-2xl">
-                                    {gym.tagline}
-                                </p>
-                            )}
-
-                            {/* Gym Stats Cluster */}
-                            {(gymAge || gym.total_area_sqm || gym.total_equipment_count || branches.length > 1) && (
-                                <div className="flex flex-wrap items-center gap-6 md:gap-10 mb-8 border-y border-white/10 py-5">
-                                    {gymAge && (
-                                        <div>
-                                            <div className="text-2xl md:text-3xl font-black text-white">{gymAge}+</div>
-                                            <div className="text-[10px] uppercase tracking-widest text-gray-400 mt-1">Năm HĐ</div>
-                                        </div>
-                                    )}
-                                    {gym.total_area_sqm && (
-                                        <div>
-                                            <div className="text-2xl md:text-3xl font-black text-white">{gym.total_area_sqm.toLocaleString()}</div>
-                                            <div className="text-[10px] uppercase tracking-widest text-gray-400 mt-1">m² Diện tích</div>
-                                        </div>
-                                    )}
-                                    {gym.total_equipment_count && (
-                                        <div>
-                                            <div className="text-2xl md:text-3xl font-black text-white">{gym.total_equipment_count}+</div>
-                                            <div className="text-[10px] uppercase tracking-widest text-gray-400 mt-1">Thiết bị</div>
-                                        </div>
-                                    )}
-                                    {branches.length > 1 && (
-                                        <div>
-                                            <div className="text-2xl md:text-3xl font-black text-white">{branches.length}</div>
-                                            <div className="text-[10px] uppercase tracking-widest text-gray-400 mt-1">Chi nhánh</div>
+                                <div className="absolute left-5 right-5 top-5 flex flex-wrap items-start justify-between gap-3">
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className="marketplace-badge marketplace-badge--accent">{venueLabel}</span>
+                                        {gym.is_verified && <span className="marketplace-badge marketplace-badge--verified">Verified</span>}
+                                        {branchStatusBadges.slice(0, 2).map((badge) => (
+                                            <span key={badge} className="marketplace-badge marketplace-badge--neutral border-white/16 bg-white/12 text-white">
+                                                {badge}
+                                            </span>
+                                        ))}
+                                    </div>
+                                    {branchDetail?.best_visit_time_summary && (
+                                        <div className="rounded-full border border-white/16 bg-white/10 px-4 py-2 text-[0.72rem] font-semibold text-white/84 backdrop-blur-sm">
+                                            {branchDetail?.best_visit_time_summary}
                                         </div>
                                     )}
                                 </div>
-                            )}
 
-                            <div className="flex flex-wrap gap-4">
-                                <button onClick={() => scrollTo('reviews')} className="btn-base btn-primary px-8 py-3 text-sm">
-                                    Xem đánh giá
-                                </button>
-                                <button onClick={() => scrollTo('pricing')} className="btn-base bg-white/10 text-white hover:bg-white/20 border border-white/20 px-8 py-3 text-sm transition-colors backdrop-blur-sm">
-                                    Chọn gói tập
-                                </button>
+                                {gallery.length > 1 && (
+                                    <div className="absolute inset-x-5 bottom-5 flex gap-2 overflow-x-auto pb-1">
+                                        {gallery.slice(0, 6).map((item, index) => (
+                                            <button
+                                                key={item.id}
+                                                type="button"
+                                                onClick={() => setLightboxIdx(index)}
+                                                className="relative h-20 w-24 shrink-0 overflow-hidden rounded-[1rem] border border-white/14 bg-black/20 transition hover:-translate-y-0.5 hover:border-white/35"
+                                            >
+                                                <img
+                                                    src={getOptimizedUrl(item.image_url, 320) || item.image_url}
+                                                    alt={item.alt_text || item.caption || gym.name}
+                                                    className="h-full w-full object-cover"
+                                                    loading="lazy"
+                                                />
+                                                <div className="absolute inset-0 bg-black/20" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
+
+                            <div className="flex flex-col justify-between p-6 sm:p-8 lg:p-10">
+                                <div className="space-y-5">
+                                    <div className="marketplace-eyebrow">Marketplace detail</div>
+
+                                    <div>
+                                        <h1 className="text-[clamp(2.3rem,4vw,4.2rem)] font-black leading-[0.92] tracking-[-0.07em] text-[color:var(--mk-text)]">
+                                            {gym.name}
+                                        </h1>
+                                        <p className="mt-4 text-[1.02rem] leading-8 text-[color:var(--mk-muted)]">
+                                            {seoDescription}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-2">
+                                        {overviewBadges.map((label) => (
+                                            <span key={label} className="marketplace-badge marketplace-badge--neutral">{label}</span>
+                                        ))}
+                                        {branchDetail?.neighborhood_label && (
+                                            <span className="marketplace-badge marketplace-badge--neutral">{branchDetail?.neighborhood_label}</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                                    {quickFacts.map((fact) => (
+                                        <SummaryPill key={fact.label} label={fact.label} value={fact.value} />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div className="marketplace-container mt-6">
+                    <div className="sticky top-0 z-30 rounded-[1.4rem] border border-[color:var(--mk-line)] bg-[rgba(255,251,244,0.82)] px-3 py-2 backdrop-blur-xl">
+                        <div className="flex items-center gap-2 overflow-x-auto">
+                            {visibleSections.map((section) => (
+                                <button
+                                    key={section.id}
+                                    type="button"
+                                    onClick={() => scrollToSection(section.id)}
+                                    className={`shrink-0 rounded-full px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.16em] transition ${activeSection === section.id ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)] hover:bg-white/70'}`}
+                                >
+                                    {section.label}
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>
 
-                {/* SECONDARY GALLERY STRIP */}
-                {gallery.length > 1 && (
-                    <div className="w-full bg-black py-4 hidden sm:block border-b border-gray-100">
-                        <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                                {gallery.map((img, i) => (
-                                    <div key={img.id} className="w-40 h-24 shrink-0 relative cursor-pointer group rounded-sm overflow-hidden border border-white/10" onClick={() => openLightbox(img, i)}>
-                                        <img src={getOptimizedUrl(img.image_url, 400) || img.image_url} srcSet={getSrcSet(img.image_url, [400, 800])} sizes="(max-width: 768px) 160px, 160px" alt={img.caption || 'Gallery'} width={160} height={96} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" decoding="async" />
-                                        <div className="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-colors duration-300"></div>
-                                        {i === 5 && gallery.length > 6 && (
-                                            <div className="absolute inset-0 bg-black/80 flex items-center justify-center backdrop-blur-sm">
-                                                <span className="text-white font-bold text-sm">+{gallery.length - 6}</span>
+                <div className="marketplace-container mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.55fr)]">
+                    <div className="space-y-6">
+                        <FadeIn>
+                            <section ref={setRef('overview')} id="overview" className="marketplace-panel p-6 sm:p-8">
+                                <SectionHeading
+                                    kicker="Overview"
+                                    title="Venue summary"
+                                    description="Một bức chân dung nhanh để biết nơi này có đúng phong cách tập, mức đầu tư và trải nghiệm bạn đang tìm hay không."
+                                />
+
+                                <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(16rem,0.95fr)]">
+                                    <div className="space-y-5">
+                                        <div className="prose max-w-none text-[color:var(--mk-text-soft)]">
+                                            {(gym.description || seoDescription)
+                                                .split('\n')
+                                                .filter((item) => item.trim())
+                                                .map((paragraph, index) => (
+                                                    <p key={index} className="mb-4 text-[1rem] leading-8">
+                                                        {paragraph}
+                                                    </p>
+                                                ))}
+                                        </div>
+
+                                        {(gym.hero_value_props || gym.highlights || []).length > 0 && (
+                                            <div className="flex flex-wrap gap-2">
+                                                {(gym.hero_value_props || gym.highlights || []).slice(0, 6).map((item) => (
+                                                    <span key={item} className="rounded-full border border-[color:var(--mk-line)] bg-white/80 px-4 py-2 text-sm font-semibold text-[color:var(--mk-text-soft)]">
+                                                        {item}
+                                                    </span>
+                                                ))}
                                             </div>
                                         )}
                                     </div>
-                                )).slice(0, 6)}
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* ── STICKY SECTION NAV ────────────────────────────────── */}
-                <div className="sticky top-0 z-40 border-b border-gray-200 backdrop-blur-sm bg-white/90">
-                    <div className="max-w-6xl mx-auto px-4 flex items-center h-12 gap-1 overflow-x-auto">
-                        <Link to="/gyms" className="text-xs font-medium text-gray-400 hover:text-black transition-colors whitespace-nowrap mr-3 shrink-0">← Gyms</Link>
-                        <div className="w-px h-4 bg-gray-200 shrink-0" />
-                        {NAV_SECTIONS.filter(({ id: sid }) => {
-                            if (sid === 'amenities') return hasAmenities;
-                            if (sid === 'equipment') return hasEquipment;
-                            if (sid === 'trainers') return hasTrainers;
-                            if (sid === 'pricing') return hasPricing;
-                            if (sid === 'map') return hasMap;
-                            return true;
-                        }).map(({ id: sid, label }) => (
-                            <button key={sid} onClick={() => scrollTo(sid)}
-                                className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider whitespace-nowrap rounded-sm transition-all duration-200 shrink-0 ${activeSection === sid ? 'bg-black text-white' : 'text-gray-500 hover:text-black'}`}>
-                                {label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* ── MAIN CONTENT GRID ─────────────────────────────────── */}
-                <div className="max-w-6xl mx-auto px-4 pt-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                        {/* ── LEFT COLUMN (2/3) ─────────────────────────── */}
-                        <div className="lg:col-span-2 space-y-6">
-
-                            {/* 3.1 EXPERIENCE PROOF: ABOUT & PHILOSOPHY (Slice 3) */}
-                            <FadeIn>
-                                <section ref={setRef('about')} id="about" className="py-2">
-                                    <h2 className="text-xl font-black text-black tracking-tight mb-6">Tổng quan</h2>
-                                    <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
-                                        <div className="flex-1">
-                                            {gym.description ? (
-                                                <div className="prose prose-lg prose-gray max-w-none text-gray-700 leading-relaxed font-light">
-                                                    {gym.description.split('\n').filter(p => p.trim()).map((p, i) => (
-                                                        <p key={i} className="mb-4">{p}</p>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <p className="text-gray-500 italic">Chưa có thông tin giới thiệu.</p>
-                                            )}
-                                        </div>
-
-                                        {/* Highlights list on the right */}
-                                        {gym.highlights && gym.highlights.length > 0 && (
-                                            <div className="w-full md:w-64 shrink-0">
-                                                <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4 pb-2 border-b border-gray-100">Điểm nổi bật</h3>
-                                                <ul className="space-y-3">
-                                                    {gym.highlights.map((h, i) => (
-                                                        <li key={i} className="flex items-start gap-2.5">
-                                                            <div className="w-1.5 h-1.5 bg-black rounded-full mt-1.5 shrink-0"></div>
-                                                            <span className="text-sm font-semibold text-gray-800 leading-tight">{h}</span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </div>
-                                </section>
-                            </FadeIn>
-
-                            {/* 3.3 DECISION DRIVERS: FACILITIES (Slice 3) */}
-                            {(hasAmenities || hasEquipment) && (
-                                <FadeIn>
-                                    <section id="facilities" className="bg-gray-50 rounded-2xl p-6 sm:p-8">
-                                        <h2 className="text-2xl font-black text-black tracking-tight mb-2">Trang thiết bị & Tiện ích</h2>
-                                        <p className="text-gray-500 text-sm mb-6 border-b border-gray-200 pb-4">Cơ sở vật chất hiện đại, đáp ứng mọi nhu cầu tập luyện.</p>
-
-                                        <div className="space-y-8">
-                                            {hasAmenities && (
-                                                <div ref={setRef('amenities')}>
-                                                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Các tiện ích đi kèm</h3>
-                                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                                        {(branchDetail?.amenities || []).map(am => (
-                                                            <div key={am.id} className={`flex items-start gap-2.5 p-3 rounded-xl border ${am.is_available ? 'border-gray-200 bg-white shadow-sm' : 'border-gray-100 bg-gray-50 opacity-60'}`}>
-                                                                <div className="w-1.5 h-1.5 rounded-full shrink-0 mt-1.5" style={{ backgroundColor: am.is_available ? 'black' : 'gray' }} />
-                                                                <div className="min-w-0 flex-1">
-                                                                    <p className={`text-sm font-semibold truncate leading-tight ${am.is_available ? 'text-black' : 'text-gray-400 line-through'}`}>{am.name}</p>
-                                                                    {am.note && <p className="text-[10px] text-gray-500 truncate mt-0.5">{am.note}</p>}
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {hasEquipment && (
-                                                <div ref={setRef('equipment')}>
-                                                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Hệ thống thiết bị</h3>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                                        {Object.entries(equipByCategory).map(([cat, items]) => (
-                                                            <div key={cat} className="space-y-3">
-                                                                <div className="flex items-center gap-2">
-                                                                    <div className="h-px bg-gray-200 flex-1"></div>
-                                                                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-gray-500">{EQUIP_CATEGORY_VI[cat] || cat}</h4>
-                                                                    <span className="text-[10px] font-bold bg-white border border-gray-200 px-1.5 py-0.5 rounded-sm text-gray-400">{items?.length}</span>
-                                                                    <div className="h-px bg-gray-200 flex-1"></div>
-                                                                </div>
-                                                                <div className="flex flex-wrap gap-1.5 justify-center">
-                                                                    {(items || []).map(eq => (
-                                                                        <span key={eq.id} className="text-xs font-medium px-2.5 py-1.5 border border-gray-200 bg-white rounded-lg text-gray-700 shadow-sm flex items-center whitespace-nowrap">
-                                                                            {eq.name}{eq.quantity && eq.quantity > 1 ? <span className="text-gray-400 ml-1 text-[10px] font-black tracking-widest">×{eq.quantity}</span> : ''}
-                                                                        </span>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </section>
-                                </FadeIn>
-                            )}
-
-                            {/* 3.4 DECISION DRIVERS: TRAINERS (Slice 3) */}
-                            {hasTrainers && (
-                                <FadeIn>
-                                    <section ref={setRef('trainers')} id="trainers" className="bg-black text-white rounded-2xl p-6 sm:p-8">
-                                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 border-b border-white/10 pb-4 gap-3">
-                                            <div>
-                                                <h2 className="text-2xl font-black tracking-tight flex items-baseline gap-2">
-                                                    Đội ngũ HLV
-                                                    <span className="text-xs font-bold bg-white/10 px-2 py-0.5 rounded-md">{gymTrainers.length}</span>
-                                                </h2>
-                                                <p className="text-gray-400 text-sm mt-1">Chuyên gia đồng hành cùng mục tiêu của bạn.</p>
-                                            </div>
-                                            {gymTrainers.length > 6 && (
-                                                <Link to="/coaches" className="text-[10px] font-bold uppercase tracking-widest text-white border border-white/20 px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors whitespace-nowrap">
-                                                    Xem tất cả ↗
-                                                </Link>
-                                            )}
-                                        </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                                            {gymTrainers.slice(0, 6).map((t: any) => (
-                                                <Link key={t.id} to={t.user_type === 'athlete' ? (t.profile_slug ? `/athlete/${t.profile_slug}` : `/athletes/${t.id}`) : (t.profile_slug ? `/coach/${t.profile_slug}` : `/coaches/${t.id}`)}
-                                                    className="group flex items-center p-3.5 border border-white/10 bg-white/5 rounded-xl hover:bg-white/10 hover:border-white/30 transition-all gap-3.5 relative overflow-hidden">
-                                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full duration-1000"></div>
-                                                    <div className="w-14 h-14 shrink-0 rounded-full overflow-hidden bg-gray-800 border-2 border-transparent group-hover:border-white transition-colors">
-                                                        <img src={getOptimizedUrl(t.avatar_url, 400) || t.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(t.full_name || 'T')}&background=000&color=fff&size=80`}
-                                                            srcSet={getSrcSet(t.avatar_url, [400, 800])}
-                                                            sizes="(max-width: 768px) 50vw, 25vw"
-                                                            alt={t.full_name}
-                                                            width={400}
-                                                            height={400}
-                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                            loading="lazy"
-                                                            decoding="async" />
-                                                    </div>
-                                                    <div className="min-w-0 flex-1">
-                                                        <p className="text-sm font-bold text-gray-100 truncate group-hover:text-white transition-colors">{t.full_name}</p>
-                                                        {t.headline && <p className="text-[10px] font-semibold tracking-wider uppercase text-gray-500 truncate mt-0.5">{t.headline}</p>}
-                                                    </div>
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </section>
-                                </FadeIn>
-                            )}
-
-                            {/* 3.5 DECISION DRIVERS: PRICING (Slice 3) */}
-                            {hasPricing && (
-                                <FadeIn>
-                                    <section ref={setRef('pricing')} id="pricing" className="bg-white border border-black/10 rounded-2xl p-6 sm:p-8 shadow-sm">
-                                        <div className="mb-6 border-b border-gray-100 pb-4">
-                                            <h2 className="text-2xl font-black text-black tracking-tight">Bảng giá</h2>
-                                            <p className="text-gray-500 text-sm mt-1">Đầu tư xứng đáng cho sức khoẻ của bạn.</p>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                            {(branchDetail?.pricing || []).sort((a, b) => a.order_number - b.order_number).map(plan => (
-                                                <div key={plan.id}
-                                                    className={`relative flex flex-col p-6 rounded-2xl border transition-all hover:-translate-y-1 duration-300 ${plan.is_highlighted ? 'border-black bg-black text-white shadow-xl shadow-black/10' : 'border-gray-200 bg-white hover:border-gray-400 hover:shadow-md'}`}>
-                                                    {plan.is_highlighted && (
-                                                        <div className="absolute top-0 right-6 -translate-y-1/2">
-                                                            <span className="text-[9px] font-black tracking-widest px-3 py-1 bg-white text-black rounded-full border-2 border-black inline-block uppercase">Phổ biến nhất</span>
-                                                        </div>
-                                                    )}
-
-                                                    <div className={`text-sm font-bold mb-1 ${plan.is_highlighted ? 'text-white' : 'text-black'}`}>{plan.plan_name}</div>
-
-                                                    <div className="mb-4">
-                                                        <span className={`text-3xl font-black ${plan.is_highlighted ? 'text-white' : 'text-black'}`}>{Number(plan.price).toLocaleString('vi-VN')}</span>
-                                                        <span className={`font-semibold ml-1 ${plan.is_highlighted ? 'text-gray-400' : 'text-gray-500'}`}>₫ / {BILLING_VI[plan.billing_cycle] || plan.billing_cycle}</span>
-                                                    </div>
-
-                                                    <div className="w-full h-px bg-current opacity-10 mb-4"></div>
-
-                                                    {plan.description && (
-                                                        <p className={`text-sm leading-relaxed mb-6 font-medium ${plan.is_highlighted ? 'text-gray-300' : 'text-gray-600'}`}>
-                                                            {plan.description}
-                                                        </p>
-                                                    )}
-
-                                                    <div className="mt-auto">
-                                                        <Link to="/messages" className={`block w-full py-3 text-center text-xs font-black uppercase tracking-wider rounded-xl transition-colors ${plan.is_highlighted ? 'bg-white text-black hover:bg-gray-200' : 'bg-gray-100 text-black hover:bg-gray-200'}`}>
-                                                            Đăng ký ngay
-                                                        </Link>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </section>
-                                </FadeIn>
-                            )}
-
-                            {/* 3.6 DECISION DRIVERS: REVIEWS (Slice 4) */}
-                            <FadeIn>
-                                <section ref={setRef('reviews')} id="reviews" className="bg-black text-white rounded-2xl p-6 sm:p-8">
-                                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 border-b border-white/10 pb-4 gap-3">
-                                        <div>
-                                            <h2 className="text-2xl font-black tracking-tight">Cộng đồng nói gì</h2>
-                                            <p className="text-gray-400 text-sm mt-1">Trải nghiệm thực tế từ các hội viên.</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-4">
-                                        <GymReviewList gymId={gym.id} refreshTick={refreshTick} />
-                                    </div>
-
-                                    {activeBranchId && canReview && (
-                                        <div className="mt-8 pt-6 border-t border-white/10">
-                                            <GymReviewForm gymId={gym.id} branchId={activeBranchId} onSuccess={() => setRefreshTick(t => t + 1)} />
-                                        </div>
-                                    )}
-                                    {activeBranchId && !canReview && (
-                                        <div className="mt-6 border border-white/10 bg-white/5 rounded-xl p-4 text-center">
-                                            <p className="text-xs text-gray-400">
-                                                Bạn cần có gói tập với HLV tại đây để chia sẻ trải nghiệm xác thực.
-                                            </p>
-                                        </div>
-                                    )}
-                                </section>
-                            </FadeIn>
-
-                        </div>
-
-                        {/* ── RIGHT STICKY SIDEBAR (1/3) (Slice 2) ────────── */}
-                        <div className="space-y-6 pb-10">
-                            <div className="lg:sticky lg:top-24 space-y-5">
-
-                                {/* DECISION CARD */}
-                                <div className="border-2 border-black bg-black text-white rounded-2xl p-6 shadow-xl">
-                                    {branchDetail && (
-                                        <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">
-                                            Chi nhánh {branchDetail.branch_name}
-                                        </div>
-                                    )}
-                                    {lowestPrice ? (
-                                        <div className="mb-5 flex items-baseline gap-2">
-                                            <div className="text-4xl font-black">{lowestPrice.toLocaleString('vi-VN')}₫</div>
-                                            <div className="text-xs text-gray-400 font-medium">/ tháng</div>
-                                        </div>
-                                    ) : (
-                                        <p className="text-sm text-gray-400 mb-5 font-medium">Liên hệ để nhận báo giá</p>
-                                    )}
-
-                                    {todayHours && (
-                                        <div className="mb-6 flex items-center gap-2 text-sm font-semibold border-b border-white/10 pb-5">
-                                            {(todayHours as any).is_closed ? (
-                                                <><span className="w-2 h-2 rounded-full bg-red-500"></span><span className="text-red-400">Hôm nay đóng cửa</span></>
-                                            ) : (
-                                                <><span className="w-2 h-2 rounded-full bg-green-500"></span><span className="text-gray-200">Đang mở • Đóng lúc {(todayHours as any).close}</span></>
-                                            )}
-                                        </div>
-                                    )}
 
                                     <div className="space-y-3">
-                                        <Link to="/messages" className="block w-full py-4 bg-white text-black text-center text-sm font-black uppercase tracking-wider rounded-xl hover:bg-gray-200 transition-colors">
-                                            Đặt tư vấn miễn phí
-                                        </Link>
-                                        <button onClick={() => scrollTo('pricing')} className="block w-full py-3 border border-white/30 text-white text-center text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-white/10 transition-colors">
-                                            Xem bảng giá chi tiết
-                                        </button>
-                                    </div>
-
-                                    <div className="mt-5 text-center text-[10px] font-medium text-gray-400 flex items-center justify-center gap-1.5">
-                                        <span className="text-green-400 text-sm leading-none flex-shrink-0 relative top-[-1px]">⚡</span> Phản hồi nhanh · Tư vấn đúng chi nhánh
+                                        <SummaryPill label="Chi nhánh đang xem" value={branchDetail?.branch_name || 'Chưa chọn'} />
+                                        <SummaryPill label="Khu vực" value={[branchDetail?.district, branchDetail?.city].filter(Boolean).join(', ') || 'Chưa cập nhật'} />
+                                        <SummaryPill label="Không khí" value={getTaxonomyLabels(gym, 'atmosphere', 1)[0] || 'Tập trung vào trải nghiệm thực tế'} />
+                                        <SummaryPill label="Phản hồi" value={gym.response_sla_text || leadAction.helper} />
                                     </div>
                                 </div>
+                            </section>
+                        </FadeIn>
 
-                                {/* BRANCH SELECTOR (COMPACT) */}
-                                {branches.length > 1 && (
-                                    <div className="border border-gray-100 bg-white rounded-2xl p-5 shadow-sm">
-                                        <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-3">Chọn chi nhánh khác</div>
-                                        <div className="space-y-2 max-h-48 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
-                                            {branches.map((b: GymBranch) => (
+                        {branchZones.length > 0 && (
+                            <FadeIn>
+                                <section ref={setRef('zones')} id="zones" className="marketplace-panel p-6 sm:p-8">
+                                    <SectionHeading
+                                        kicker="Signature zones"
+                                        title="Những không gian quyết định cảm giác tập"
+                                        description="Không chỉ là danh sách máy móc — đây là các zone giúp bạn đánh giá ngay venue này hợp thói quen tập của mình đến đâu."
+                                    />
+
+                                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                                        {branchZones.map((zone: GymZone) => (
+                                            <article key={zone.id} className={`rounded-[1.4rem] border p-5 ${zone.is_signature_zone ? 'border-[color:var(--mk-accent)]/55 bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/75'}`}>
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div>
+                                                        <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">{zone.zone_type.replace(/_/g, ' ')}</div>
+                                                        <h3 className="mt-2 text-lg font-black tracking-[-0.04em] text-[color:var(--mk-text)]">{zone.name}</h3>
+                                                    </div>
+                                                    {zone.is_signature_zone && <span className="marketplace-badge marketplace-badge--accent">Signature</span>}
+                                                </div>
+
+                                                {zone.description && (
+                                                    <p className="mt-3 text-sm leading-7 text-[color:var(--mk-text-soft)]">{zone.description}</p>
+                                                )}
+
+                                                <div className="mt-4 flex flex-wrap gap-2">
+                                                    {zone.capacity && <span className="marketplace-badge marketplace-badge--neutral">{zone.capacity} người</span>}
+                                                    {zone.area_sqm && <span className="marketplace-badge marketplace-badge--neutral">{zone.area_sqm} m²</span>}
+                                                    {zone.temperature_mode && <span className="marketplace-badge marketplace-badge--neutral">{zone.temperature_mode}</span>}
+                                                    {zone.sound_profile && <span className="marketplace-badge marketplace-badge--neutral">{zone.sound_profile}</span>}
+                                                    {zone.booking_required && <span className="marketplace-badge marketplace-badge--neutral">Đặt trước</span>}
+                                                </div>
+                                            </article>
+                                        ))}
+                                    </div>
+                                </section>
+                            </FadeIn>
+                        )}
+
+                        {(branchAmenities.length > 0 || branchEquipment.length > 0) && (
+                            <FadeIn>
+                                <section ref={setRef('facilities')} id="facilities" className="marketplace-panel p-6 sm:p-8">
+                                    <SectionHeading
+                                        kicker="Facilities"
+                                        title="Tiện ích và thiết bị hỗ trợ quyết định"
+                                        description="Những chi tiết nhỏ như locker, shower, towel service hay chất lượng equipment thường là thứ quyết định bạn có quay lại đều hay không."
+                                    />
+
+                                    <div className="space-y-8">
+                                        {branchAmenities.length > 0 && (
+                                            <div>
+                                                <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Amenity snapshot</div>
+                                                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                                                    {branchAmenities.map((item) => (
+                                                        <div key={item.id} className={`rounded-[1.2rem] border px-4 py-4 ${item.is_available ? 'border-[color:var(--mk-line)] bg-white/80' : 'border-[color:var(--mk-line)]/70 bg-[color:var(--mk-paper-strong)]/60 opacity-70'}`}>
+                                                            <div className="text-sm font-bold text-[color:var(--mk-text)]">{item.name}</div>
+                                                            {item.note && <p className="mt-2 text-sm leading-6 text-[color:var(--mk-muted)]">{item.note}</p>}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {branchEquipment.length > 0 && (
+                                            <div>
+                                                <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Equipment library</div>
+                                                <div className="grid gap-4 md:grid-cols-2">
+                                                    {Object.entries(branchEquipmentGroups).map(([category, items]) => (
+                                                        <div key={category} className="rounded-[1.3rem] border border-[color:var(--mk-line)] bg-white/75 p-4">
+                                                            <div className="mb-3 flex items-center justify-between gap-3">
+                                                                <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{category}</div>
+                                                                <span className="marketplace-badge marketplace-badge--neutral">{items.length} items</span>
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {items.map((item) => (
+                                                                    <span key={item.id} className="rounded-full border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] px-3 py-1.5 text-[0.8rem] font-semibold text-[color:var(--mk-text-soft)]">
+                                                                        {item.name}{item.quantity && item.quantity > 1 ? ` ×${item.quantity}` : ''}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </section>
+                            </FadeIn>
+                        )}
+
+                        {branchTrainerLinks.length > 0 && (
+                            <FadeIn>
+                                <section ref={setRef('trainers')} id="trainers" className="marketplace-panel p-6 sm:p-8">
+                                    <SectionHeading
+                                        kicker="Specialists"
+                                        title="Ai đang dẫn dắt trải nghiệm tại chi nhánh này"
+                                        description="Không chỉ là danh sách HLV — hãy nhìn specialization, ngôn ngữ và cách họ xuất hiện tại chi nhánh này để đo được chất lượng fit."
+                                    />
+
+                                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                                        {branchTrainerLinks.map((link) => {
+                                            const trainerPath = getTrainerLinkPath(link);
+                                            const cardClass = 'group rounded-[1.4rem] border border-[color:var(--mk-line)] bg-white/80 p-5 transition hover:-translate-y-1 hover:shadow-[0_18px_44px_rgba(53,41,26,0.08)]';
+                                            const cardContent = (
+                                                <>
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="h-14 w-14 overflow-hidden rounded-full border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
+                                                            {link.trainer?.avatar_url ? (
+                                                                <img src={link.trainer.avatar_url} alt={link.trainer.full_name} className="h-full w-full object-cover" />
+                                                            ) : (
+                                                                <div className="flex h-full w-full items-center justify-center text-sm font-black uppercase text-[color:var(--mk-muted)]">
+                                                                    {(link.trainer?.full_name || 'T').slice(0, 1)}
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="text-base font-black tracking-[-0.03em] text-[color:var(--mk-text)]">
+                                                                {link.trainer?.full_name || 'Coach partner'}
+                                                            </div>
+                                                            <div className="mt-1 text-sm text-[color:var(--mk-muted)]">
+                                                                {link.specialization_summary || link.role_at_gym || 'Trainer linked with this branch'}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mt-4 flex flex-wrap gap-2">
+                                                        {link.featured_at_branch && <span className="marketplace-badge marketplace-badge--accent">Featured at branch</span>}
+                                                        {link.accepts_private_clients && <span className="marketplace-badge marketplace-badge--neutral">Private clients</span>}
+                                                        {(link.languages || []).slice(0, 2).map((language) => (
+                                                            <span key={language} className="marketplace-badge marketplace-badge--neutral">{language}</span>
+                                                        ))}
+                                                    </div>
+
+                                                    {link.branch_intro && (
+                                                        <p className="mt-4 text-sm leading-7 text-[color:var(--mk-text-soft)]">{link.branch_intro}</p>
+                                                    )}
+                                                </>
+                                            );
+
+                                            return trainerPath ? (
+                                                <Link key={link.id} to={trainerPath} className={cardClass}>
+                                                    {cardContent}
+                                                </Link>
+                                            ) : (
+                                                <div key={link.id} className={cardClass}>
+                                                    {cardContent}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </section>
+                            </FadeIn>
+                        )}
+
+                        {branchPricing.length > 0 && (
+                            <FadeIn>
+                                <section ref={setRef('pricing')} id="pricing" className="marketplace-panel p-6 sm:p-8">
+                                    <SectionHeading
+                                        kicker="Pricing"
+                                        title="Các gói vào cửa và cách bắt đầu"
+                                        description="Đừng chỉ nhìn gói nổi bật. Hãy nhìn gói entry, included services và chính sách freeze/cancel để biết chi phí thực sự của việc bắt đầu."
+                                    />
+
+                                    <div className="grid gap-4 xl:grid-cols-3">
+                                        {branchPricing.map((plan: GymPricing) => (
+                                            <article
+                                                key={plan.id}
+                                                className={`flex h-full flex-col rounded-[1.55rem] border p-5 ${plan.is_highlighted ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80'}`}
+                                            >
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <div>
+                                                        <div className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">
+                                                            {plan.plan_type || 'membership'}
+                                                        </div>
+                                                        <h3 className="mt-2 text-xl font-black tracking-[-0.05em] text-[color:var(--mk-text)]">{plan.plan_name}</h3>
+                                                    </div>
+                                                    {plan.is_highlighted && <span className="marketplace-badge marketplace-badge--accent">Recommended</span>}
+                                                </div>
+
+                                                <div className="mt-5 flex items-end gap-2">
+                                                    <div className="text-[2rem] font-black leading-none tracking-[-0.06em] text-[color:var(--mk-text)]">
+                                                        {Number(plan.price).toLocaleString('vi-VN')}₫
+                                                    </div>
+                                                    <div className="pb-1 text-sm font-semibold text-[color:var(--mk-muted)]">
+                                                        {BILLING_LABELS[plan.billing_cycle] || plan.billing_cycle}
+                                                    </div>
+                                                </div>
+
+                                                {plan.description && (
+                                                    <p className="mt-4 text-sm leading-7 text-[color:var(--mk-text-soft)]">{plan.description}</p>
+                                                )}
+
+                                                {(plan.included_services || []).length > 0 && (
+                                                    <div className="mt-4 flex flex-wrap gap-2">
+                                                        {(plan.included_services || []).slice(0, 4).map((item) => (
+                                                            <span key={item} className="marketplace-badge marketplace-badge--neutral">{item}</span>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                <div className="mt-5 space-y-2 text-sm text-[color:var(--mk-text-soft)]">
+                                                    {plan.highlighted_reason && <div>• {plan.highlighted_reason}</div>}
+                                                    {plan.trial_available && <div>• Có trial {plan.trial_price ? `${Number(plan.trial_price).toLocaleString('vi-VN')}₫` : ''}</div>}
+                                                    {plan.freeze_policy_summary && <div>• Freeze: {plan.freeze_policy_summary}</div>}
+                                                    {plan.cancellation_policy_summary && <div>• Cancel: {plan.cancellation_policy_summary}</div>}
+                                                </div>
+
+                                                <div className="mt-auto pt-6">
+                                                    {renderActionButton(
+                                                        leadAction,
+                                                        'block w-full rounded-[1rem] bg-[color:var(--mk-text)] px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-white transition hover:translate-y-[-1px] hover:bg-[color:var(--mk-accent-ink)]'
+                                                    )}
+                                                </div>
+                                            </article>
+                                        ))}
+                                    </div>
+                                </section>
+                            </FadeIn>
+                        )}
+
+                        {branchPrograms.length > 0 && (
+                            <FadeIn>
+                                <section ref={setRef('schedule')} id="schedule" className="marketplace-panel p-6 sm:p-8">
+                                    <SectionHeading
+                                        kicker="Schedule"
+                                        title="Lịch lớp và nhịp hoạt động tại chi nhánh"
+                                        description="Một venue tốt không chỉ đẹp trên thumbnail — lịch lớp phải đủ rõ để bạn hình dung ngay tuần đầu tiên của mình sẽ trông như thế nào."
+                                    />
+
+                                    <div className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
+                                        <div className="space-y-3">
+                                            {branchPrograms.map((program) => (
                                                 <button
-                                                    key={b.id}
-                                                    onClick={() => setActiveBranchId(b.id)}
-                                                    className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${activeBranchId === b.id ? 'bg-black text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}
+                                                    key={program.id}
+                                                    type="button"
+                                                    onClick={() => setActiveProgramId(program.id)}
+                                                    className={`w-full rounded-[1.3rem] border px-4 py-4 text-left transition ${activeProgram?.id === program.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80 hover:border-[color:var(--mk-accent)]/45'}`}
                                                 >
-                                                    {b.branch_name}
-                                                    {b.district && <span className={`block text-[10px] mt-0.5 ${activeBranchId === b.id ? 'text-gray-300' : 'text-gray-500'}`}>{b.district}</span>}
+                                                    <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{program.title}</div>
+                                                    <div className="mt-1 text-sm text-[color:var(--mk-muted)]">{formatProgramSubtitle(program)}</div>
+                                                    {program.description && (
+                                                        <p className="mt-3 line-clamp-2 text-sm leading-6 text-[color:var(--mk-text-soft)]">{program.description}</p>
+                                                    )}
                                                 </button>
                                             ))}
                                         </div>
-                                    </div>
-                                )}
 
-                                {/* CONTACT & HOURS */}
-                                {branchDetail && (
-                                    <div className="border border-gray-100 bg-white rounded-2xl p-5 shadow-sm space-y-4">
-                                        {branchDetail.address && (
-                                            <div>
-                                                <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1.5">Địa chỉ</div>
-                                                <p className="text-sm text-gray-800 font-medium leading-relaxed">{branchDetail.address}</p>
-                                                {(branchDetail.district || branchDetail.city) && (
-                                                    <p className="text-xs text-gray-500 mt-0.5">{[branchDetail.district, branchDetail.city].filter(Boolean).join(', ')}</p>
-                                                )}
-                                            </div>
-                                        )}
-                                        {branchDetail.phone && (
-                                            <div>
-                                                <div className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1.5">Hotline</div>
-                                                <a href={`tel:${branchDetail.phone}`} className="text-sm font-bold text-black hover:text-gray-600 transition-colors">{branchDetail.phone}</a>
-                                            </div>
-                                        )}
+                                        <div className="rounded-[1.5rem] border border-[color:var(--mk-line)] bg-white/78 p-5">
+                                            {activeProgram ? (
+                                                <>
+                                                    <div className="flex flex-wrap items-start justify-between gap-3">
+                                                        <div>
+                                                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Selected program</div>
+                                                            <h3 className="mt-2 text-2xl font-black tracking-[-0.05em] text-[color:var(--mk-text)]">{activeProgram.title}</h3>
+                                                            <p className="mt-2 text-sm leading-7 text-[color:var(--mk-text-soft)]">{activeProgram.description || 'Chưa có mô tả chi tiết cho lớp này.'}</p>
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-2">
+                                                            <span className="marketplace-badge marketplace-badge--neutral">{activeProgram.capacity} chỗ</span>
+                                                            <span className="marketplace-badge marketplace-badge--neutral">{activeProgram.duration_minutes} phút</span>
+                                                        </div>
+                                                    </div>
 
-                                        {branchDetail.opening_hours && (
-                                            <details className="group border-t border-gray-100 pt-3 opacity-90">
-                                                <summary className="text-[10px] font-bold uppercase tracking-widest text-gray-500 cursor-pointer list-none flex justify-between items-center group-open:mb-3">
-                                                    Lịch mở cửa chi tiết
-                                                    <span className="transition group-open:rotate-180">↓</span>
-                                                </summary>
-                                                <div className="space-y-2 text-xs">
-                                                    {Object.entries(branchDetail.opening_hours).map(([day, hours]) => {
-                                                        if (!hours) return null;
-                                                        const h = hours as { open: string; close: string; is_closed?: boolean };
-                                                        const isToday = day === TODAY_KEY;
-                                                        return (
-                                                            <div key={day} className={`flex justify-between items-center py-2 border-b border-gray-50 last:border-0 ${isToday ? 'font-bold text-black bg-gray-50 px-2 rounded-md -mx-2' : 'text-gray-600'}`}>
-                                                                <span className="w-14">{DAY_VI[day] ?? day}</span>
-                                                                {h.is_closed
-                                                                    ? <span className="text-red-500 font-medium pb-[1px]">Đóng cửa</span>
-                                                                    : <span className="pb-[1px]">{h.open} – {h.close}</span>
-                                                                }
+                                                    {(activeProgram.equipment_required || []).length > 0 && (
+                                                        <div className="mt-4 flex flex-wrap gap-2">
+                                                            {(activeProgram.equipment_required || []).map((item) => (
+                                                                <span key={item} className="marketplace-badge marketplace-badge--neutral">{item}</span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+
+                                                    <div className="mt-6">
+                                                        <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Upcoming sessions</div>
+                                                        {sessionsLoading ? (
+                                                            <div className="space-y-3 animate-pulse">
+                                                                <div className="h-16 rounded-[1rem] bg-[color:var(--mk-paper-strong)]" />
+                                                                <div className="h-16 rounded-[1rem] bg-[color:var(--mk-paper-strong)]" />
                                                             </div>
-                                                        );
-                                                    })}
+                                                        ) : programSessions.length > 0 ? (
+                                                            <div className="space-y-3">
+                                                                {programSessions.slice(0, 6).map((session: GymProgramSession) => (
+                                                                    <div key={session.id} className="flex flex-wrap items-center justify-between gap-3 rounded-[1rem] border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] px-4 py-3">
+                                                                        <div>
+                                                                            <div className="text-sm font-bold text-[color:var(--mk-text)]">{formatSessionDate(session.starts_at)}</div>
+                                                                            <div className="text-sm text-[color:var(--mk-muted)]">{session.session_note || 'Open booking window'}</div>
+                                                                        </div>
+                                                                        <div className="text-right">
+                                                                            <div className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[color:var(--mk-muted)]">Còn chỗ</div>
+                                                                            <div className="mt-1 text-sm font-black text-[color:var(--mk-text)]">{session.seats_remaining}/{session.seats_total}</div>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="rounded-[1rem] border border-dashed border-[color:var(--mk-line)] px-4 py-5 text-sm text-[color:var(--mk-muted)]">
+                                                                Lịch chi tiết cho lớp này đang được cập nhật. Bạn vẫn có thể dùng CTA bên phải để nhận tư vấn nhanh từ chi nhánh.
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="rounded-[1rem] border border-dashed border-[color:var(--mk-line)] px-4 py-5 text-sm text-[color:var(--mk-muted)]">
+                                                    Chưa có chương trình lớp cho chi nhánh này.
                                                 </div>
-                                            </details>
-                                        )}
-                                    </div>
-                                )}
-
-                                {/* SHARE & SOCIAL */}
-                                <div className="flex gap-2.5">
-                                    <div className="flex-1 border border-gray-100 bg-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
-                                        <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Chia sẻ</span>
-                                        <ShareButton title={`${gym.name} — GymViet`} text={gym.description ?? undefined} label="Chia sẻ" />
-                                    </div>
-
-                                    {gym.social_links && Object.values(gym.social_links).some(Boolean) && (
-                                        <div className="flex gap-2 flex-wrap items-center bg-white rounded-2xl p-1 shadow-sm border border-gray-100">
-                                            {Object.entries(gym.social_links).map(([platform, url]) => {
-                                                if (!url) return null;
-                                                return (
-                                                    <a key={platform} href={url as string} target="_blank" rel="noopener noreferrer"
-                                                        className="w-10 h-10 flex items-center justify-center rounded-xl text-gray-500 hover:text-white hover:bg-black font-bold uppercase text-[10px] transition-all"
-                                                        title={platform}>
-                                                        {platform.slice(0, 2)}
-                                                    </a>
-                                                );
-                                            })}
+                                            )}
                                         </div>
-                                    )}
+                                    </div>
+                                </section>
+                            </FadeIn>
+                        )}
+
+                        <FadeIn>
+                            <section ref={setRef('reviews')} id="reviews" className="rounded-[2rem] border border-black/10 bg-[linear-gradient(180deg,rgba(32,25,20,1),rgba(24,18,15,1))] p-6 text-white sm:p-8">
+                                <SectionHeading
+                                    kicker="Trust"
+                                    title="Cộng đồng nói gì về nơi này"
+                                    description="Trust block này kết hợp review tổng, dimension ratings và phản hồi từ venue để bạn đỡ phải đoán mò trước khi thử buổi đầu tiên."
+                                />
+
+                                <div className="mb-6 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+                                    {[
+                                        { label: 'Overall', value: gym.trust_summary?.avg_rating ? `★ ${gym.trust_summary.avg_rating.toFixed(1)}` : '—' },
+                                        { label: 'Equipment', value: gym.trust_summary?.dimensions.equipment_rating ? gym.trust_summary.dimensions.equipment_rating.toFixed(1) : '—' },
+                                        { label: 'Cleanliness', value: gym.trust_summary?.dimensions.cleanliness_rating ? gym.trust_summary.dimensions.cleanliness_rating.toFixed(1) : '—' },
+                                        { label: 'Coaching', value: gym.trust_summary?.dimensions.coaching_rating ? gym.trust_summary.dimensions.coaching_rating.toFixed(1) : '—' },
+                                        { label: 'Atmosphere', value: gym.trust_summary?.dimensions.atmosphere_rating ? gym.trust_summary.dimensions.atmosphere_rating.toFixed(1) : '—' },
+                                        { label: 'Value', value: gym.trust_summary?.dimensions.value_rating ? gym.trust_summary.dimensions.value_rating.toFixed(1) : '—' },
+                                    ].map((item) => (
+                                        <div key={item.label} className="rounded-[1.2rem] border border-white/10 bg-white/6 px-4 py-4">
+                                            <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/55">{item.label}</div>
+                                            <div className="mt-2 text-lg font-black tracking-[-0.04em] text-white">{item.value}</div>
+                                        </div>
+                                    ))}
                                 </div>
 
+                                <GymReviewList gymId={gym.id} refreshTick={refreshTick} />
+
+                                {branchId && canReview && (
+                                    <div className="mt-8 border-t border-white/10 pt-8">
+                                        <GymReviewForm gymId={gym.id} branchId={branchId} onSuccess={() => setRefreshTick((current) => current + 1)} />
+                                    </div>
+                                )}
+
+                                {branchId && !canReview && (
+                                    <div className="mt-8 rounded-[1.2rem] border border-white/10 bg-white/5 px-5 py-4 text-sm text-white/68">
+                                        Bạn cần có gói tập hoặc tương tác đủ điều kiện với venue này để để lại review xác thực trên marketplace.
+                                    </div>
+                                )}
+                            </section>
+                        </FadeIn>
+
+                        {similarGyms.length > 0 && (
+                            <FadeIn>
+                                <section ref={setRef('similar')} id="similar" className="marketplace-panel p-6 sm:p-8">
+                                    <SectionHeading
+                                        kicker="Similar venues"
+                                        title="Nếu venue này gần đúng, hãy nhìn thêm những lựa chọn bên cạnh"
+                                        description="Những venue tương tự được gợi ý theo loại hình, vùng giá và khu vực để bạn so nhanh trước khi quyết định."
+                                    />
+
+                                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                                        {similarGyms.map((item) => (
+                                            <GymCard key={item.id} gym={item} variant="compact" />
+                                        ))}
+                                    </div>
+                                </section>
+                            </FadeIn>
+                        )}
+
+                        {(branchMapEmbedUrl || hasCoordinates) && (
+                            <FadeIn>
+                                <section ref={setRef('map')} id="map" className="marketplace-panel p-6 sm:p-8">
+                                    <SectionHeading
+                                        kicker="Map"
+                                        title="Định vị chi nhánh và bối cảnh quanh venue"
+                                        description="Bản đồ nên giúp bạn trả lời ngay một câu hỏi: mình có thật sự sẽ ghé nơi này đều đặn trong tuần không."
+                                    />
+
+                                    <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+                                        <div className="space-y-4">
+                                            <SummaryPill label="Địa chỉ" value={branchDetail?.address || 'Chưa cập nhật'} />
+                                            <SummaryPill label="Parking" value={branchDetail?.parking_summary || 'Chưa có ghi chú parking'} />
+                                            <SummaryPill label="Check-in" value={branchDetail?.check_in_instructions || 'Tư vấn tại rail bên phải để được hướng dẫn nhanh'} />
+                                        </div>
+
+                                        {branchMapEmbedUrl ? (
+                                            <div className="overflow-hidden rounded-[1.5rem] border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
+                                                <iframe
+                                                    src={branchMapEmbedUrl}
+                                                    width="100%"
+                                                    height="420"
+                                                    style={{ border: 0 }}
+                                                    loading="lazy"
+                                                    referrerPolicy="no-referrer-when-downgrade"
+                                                    title={`Bản đồ ${branchName}`}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="overflow-hidden rounded-[1.5rem] border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
+                                                <iframe
+                                                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(branchLongitude) - 0.01},${Number(branchLatitude) - 0.01},${Number(branchLongitude) + 0.01},${Number(branchLatitude) + 0.01}&layer=mapnik&marker=${Number(branchLatitude)},${Number(branchLongitude)}`}
+                                                    width="100%"
+                                                    height="420"
+                                                    style={{ border: 0 }}
+                                                    loading="lazy"
+                                                    title={`Bản đồ ${branchName}`}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </section>
+                            </FadeIn>
+                        )}
+                    </div>
+
+                    <aside className="marketplace-sticky-rail space-y-4">
+                        <div className="marketplace-panel p-5 sm:p-6">
+                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Decision rail</div>
+                            <div className="mt-3 text-sm font-semibold text-[color:var(--mk-text-soft)]">Chi nhánh đang xem</div>
+                            <h3 className="mt-1 text-[1.55rem] font-black leading-[0.98] tracking-[-0.05em] text-[color:var(--mk-text)]">
+                                {branchName}
+                            </h3>
+                            <p className="mt-3 text-sm leading-7 text-[color:var(--mk-muted)]">
+                                {branchDetail?.branch_tagline || branchDetail?.description || gym.discovery_blurb || 'Chọn đúng chi nhánh trước khi đặt tư vấn để nhận câu trả lời chính xác hơn về giá, lịch và trải nghiệm thực tế.'}
+                            </p>
+
+                            <div className="mt-5 rounded-[1.5rem] bg-[color:var(--mk-text)] px-5 py-5 text-white">
+                                <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-white/55">Entry point</div>
+                                <div className="mt-2 text-[2.3rem] font-black leading-none tracking-[-0.07em]">
+                                    {lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫` : 'Liên hệ'}
+                                </div>
+                                <div className="mt-2 text-sm text-white/72">
+                                    {lowestPrice ? 'Điểm vào thấp nhất tại chi nhánh đang xem' : 'Venue này chưa công bố giá public cho chi nhánh này'}
+                                </div>
+                            </div>
+
+                            <div className="mt-5 space-y-3">
+                                {renderActionButton(
+                                    leadAction,
+                                    'block w-full rounded-[1rem] bg-[color:var(--mk-accent)] px-4 py-4 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)] transition hover:translate-y-[-1px]'
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => scrollToSection(branchPrograms.length > 0 ? 'schedule' : 'pricing')}
+                                    className="block w-full rounded-[1rem] border border-[color:var(--mk-line)] bg-white/70 px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/55"
+                                >
+                                    {branchPrograms.length > 0 ? 'Xem lịch lớp' : 'Xem bảng giá'}
+                                </button>
+                            </div>
+
+                            <div className="mt-4 text-sm leading-6 text-[color:var(--mk-muted)]">{leadAction.helper}</div>
+                        </div>
+
+                        {branches.length > 1 && (
+                            <div className="marketplace-panel p-5">
+                                <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Branch switcher</div>
+                                <div className="mt-4 space-y-2">
+                                    {branches.map((branch) => (
+                                        <button
+                                            key={branch.id}
+                                            type="button"
+                                            onClick={() => setActiveBranchId(branch.id)}
+                                            className={`w-full rounded-[1rem] border px-4 py-3 text-left transition ${branch.id === branchDetail?.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/70 hover:border-[color:var(--mk-accent)]/45'}`}
+                                        >
+                                            <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{branch.branch_name}</div>
+                                            <div className="mt-1 text-sm text-[color:var(--mk-muted)]">{[branch.district, branch.city].filter(Boolean).join(', ') || branch.address}</div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="marketplace-panel p-5">
+                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Live branch notes</div>
+                            <div className="mt-4 space-y-3">
+                                <SummaryPill
+                                    label="Hôm nay"
+                                    value={todayHours ? (todayHours.is_closed ? 'Đóng cửa' : `${todayHours.open || '—'} → ${todayHours.close || '—'}`) : 'Chưa cập nhật lịch'}
+                                />
+                                <SummaryPill label="Crowd" value={branchDetail?.crowd_level_summary || 'Chưa có note crowd'} />
+                                <SummaryPill label="Best visit" value={branchDetail?.best_visit_time_summary || 'Hỏi venue để chọn khung giờ'} />
+                                <SummaryPill label="Women / family" value={branchDetail?.women_only_summary || branchDetail?.child_friendly_summary || 'Chưa có ghi chú riêng'} />
                             </div>
                         </div>
 
-                    </div>
-                </div>
-
-                {/* 3.7 SUPPORT INFO: MAP (Slice 3) */}
-                {hasMap && (
-                    <div className="max-w-6xl mx-auto px-4 pt-10">
-                        <FadeIn>
-                            <section ref={setRef('map')} id="map" className="bg-gray-50 rounded-2xl p-6 sm:p-8">
-                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
-                                    <div>
-                                        <h2 className="text-2xl font-black tracking-tight text-black">Bản đồ & Đường đi</h2>
-                                        {branchDetail?.address && (
-                                            <p className="text-sm font-semibold text-gray-500 mt-1">
-                                                {branchDetail.address}{branchDetail.district ? `, ${branchDetail.district}` : ''}{branchDetail.city ? `, ${branchDetail.city}` : ''}
-                                            </p>
-                                        )}
-                                    </div>
-                                    {branchDetail?.google_maps_embed_url && (
-                                        <a href={branchDetail.google_maps_embed_url} target="_blank" rel="noopener noreferrer" className="btn-base bg-white border border-gray-200 text-sm font-bold text-black px-4 py-2 shadow-sm whitespace-nowrap">
-                                            Mở Google Maps ↗
-                                        </a>
-                                    )}
-                                </div>
-
-                                {branchDetail?.google_maps_embed_url ? (
-                                    <div className="w-full h-72 sm:h-[400px] border border-gray-200 overflow-hidden rounded-xl bg-gray-200">
-                                        <iframe
-                                            src={branchDetail.google_maps_embed_url}
-                                            width="100%" height="100%"
-                                            style={{ border: 0 }} loading="lazy"
-                                            allowFullScreen referrerPolicy="no-referrer-when-downgrade"
-                                            title={`Bản đồ ${branchDetail.branch_name}`}
-                                            className="grayscale-[0.3] hover:grayscale-0 transition-all duration-700"
-                                        />
-                                    </div>
-                                ) : (branchDetail?.latitude && branchDetail?.longitude) ? (
-                                    <div className="w-full h-72 sm:h-[400px] border border-gray-200 overflow-hidden rounded-xl bg-gray-200">
-                                        <iframe
-                                            src={`https://www.openstreetmap.org/export/embed.html?bbox=${branchDetail.longitude - 0.01},${branchDetail.latitude - 0.01},${branchDetail.longitude + 0.01},${branchDetail.latitude + 0.01}&layer=mapnik&marker=${branchDetail.latitude},${branchDetail.longitude}`}
-                                            width="100%" height="100%"
-                                            style={{ border: 0 }} loading="lazy"
-                                            title={`Bản đồ ${branchDetail.branch_name}`}
-                                            className="grayscale hover:grayscale-0 transition-all duration-700"
-                                        />
-                                    </div>
-                                ) : null}
-                            </section>
-                        </FadeIn>
-                    </div>
-                )}
-
-                {/* ── MOBILE STICKY CTA (Slice 2) ─────────────────────────── */}
-                <div className="lg:hidden fixed bottom-5 inset-x-4 z-50">
-                    <div className="bg-black text-white rounded-2xl shadow-2xl p-2.5 flex items-center justify-between border border-white/20 backdrop-blur-md bg-black/95">
-                        <div className="pl-3 py-1">
-                            <div className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Đặt tư vấn ngay</div>
-                            <div className="text-sm font-black">{lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫/m` : 'Liên hệ'}</div>
+                        <div className="marketplace-panel p-5">
+                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Fast contact</div>
+                            <div className="mt-4 grid gap-2">
+                                {branchPhone && (
+                                    <a href={`tel:${normalizePhone(branchPhone)}`} className="rounded-[1rem] border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
+                                        Hotline · {branchPhone}
+                                    </a>
+                                )}
+                                {branchWhatsapp && (
+                                    <a href={buildWhatsappUrl(branchWhatsapp, `Xin chào, tôi muốn hỏi thêm về ${branchName}.`) || '#'} target="_blank" rel="noopener noreferrer" className="rounded-[1rem] border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
+                                        WhatsApp · {branchWhatsapp}
+                                    </a>
+                                )}
+                                {branchEmail && (
+                                    <a href={`mailto:${branchEmail}`} className="rounded-[1rem] border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
+                                        Email · {branchEmail}
+                                    </a>
+                                )}
+                            </div>
                         </div>
-                        <Link to="/messages"
-                            className="px-6 py-3.5 bg-white text-black text-xs font-black uppercase tracking-wider rounded-xl active:scale-95 transition-transform flex items-center gap-2">
-                            Tư vấn <span className="text-[10px] leading-none mb-[1px]">→</span>
-                        </Link>
-                    </div>
+
+                        <div className="marketplace-panel p-5">
+                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Share venue</div>
+                            <div className="mt-4 flex flex-wrap gap-2">
+                                <ShareButton
+                                    url={canonicalUrl}
+                                    title={seoTitle}
+                                    text={seoDescription}
+                                    label="Share Facebook"
+                                    variant="facebook"
+                                    className="!rounded-[1rem] !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
+                                    titleAttr="Chia sẻ venue này lên Facebook"
+                                />
+                                <ShareButton
+                                    url={canonicalUrl}
+                                    title={seoTitle}
+                                    text={seoDescription}
+                                    label="Copy link"
+                                    className="!rounded-[1rem] !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
+                                    titleAttr="Sao chép liên kết venue"
+                                />
+                            </div>
+                        </div>
+                    </aside>
                 </div>
 
+                <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden">
+                    <div className="rounded-[1.35rem] border border-white/14 bg-[rgba(29,22,18,0.94)] px-4 py-3 text-white shadow-[0_18px_50px_rgba(0,0,0,0.26)] backdrop-blur-xl">
+                        <div className="flex items-center justify-between gap-3">
+                            <div>
+                                <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/48">Entry point</div>
+                                <div className="mt-1 text-lg font-black tracking-[-0.04em]">
+                                    {lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫` : 'Liên hệ'}
+                                </div>
+                            </div>
+                            {renderActionButton(
+                                leadAction,
+                                'rounded-[0.95rem] bg-[color:var(--mk-accent)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)]'
+                            )}
+                        </div>
+                    </div>
+                </div>
             </div>
         </>
     );

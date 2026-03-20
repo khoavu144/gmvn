@@ -356,4 +356,9 @@ INSERT INTO gym_taxonomy_terms (slug, label, term_type, sort_order) VALUES
 ('social',           'Socialising',        'atmosphere', 40)
 ON CONFLICT (slug) DO NOTHING;
 
+-- ─────────────────────────────────────────────────────────────
+-- Backfill: users.is_active (was in entity but missing from migrations)
+-- ─────────────────────────────────────────────────────────────
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT true;
+
 COMMIT;

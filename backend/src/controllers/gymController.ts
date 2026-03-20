@@ -3,6 +3,7 @@ import { gymService } from '../services/gymService';
 import { gymReviewService } from '../services/gymReviewService';
 import { AppDataSource } from '../config/database';
 import { GymBranch } from '../entities/GymBranch';
+import { GymCenter } from '../entities/GymCenter';
 
 export const gymController = {
     // GET /api/v1/gyms — list tất cả gym (verified + active)
@@ -158,6 +159,126 @@ export const gymController = {
             const userId = req.user!.user_id;
             const result = await gymReviewService.canUserReviewGym(userId, gymId);
             res.json({ success: true, ...result });
+        } catch (error: any) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    },
+
+    // GET /api/v1/gyms/marketplace — rich marketplace listing
+    async listGymsMarketplace(req: Request, res: Response): Promise<void> {
+        try {
+            const {
+                search,
+                city,
+                district,
+                venue_type,
+                audience_tag,
+                positioning_tier,
+                sort,
+                page,
+                limit,
+            } = req.query;
+
+            const result = await gymService.listGymsMarketplace({
+                search: search as string,
+                city: city as string,
+                district: district as string,
+                venue_type: venue_type as string,
+                audience_tag: audience_tag as string,
+                positioning_tier: positioning_tier as string,
+                sort: sort as any,
+                page: page ? parseInt(String(page), 10) : 1,
+                limit: limit ? parseInt(String(limit), 10) : 12,
+            });
+
+            res.json({ success: true, ...result });
+        } catch (error: any) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    },
+
+    // GET /api/v1/gyms/marketplace/taxonomy
+    async listMarketplaceTaxonomy(req: Request, res: Response): Promise<void> {
+        try {
+            const termType = req.query.term_type ? String(req.query.term_type) : undefined;
+            const terms = await gymService.listTaxonomyTerms(termType);
+            res.json({ success: true, terms });
+        } catch (error: any) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    },
+
+    // GET /api/v1/gyms/marketplace/:gymId — full marketplace detail
+    async getGymMarketplace(req: Request, res: Response): Promise<void> {
+        try {
+            const gymId = String(req.params.gymId);
+            const gym = await gymService.getGymDetailMarketplace(gymId);
+            if (!gym) {
+                res.status(404).json({ success: false, error: 'Gym không tồn tại' });
+                return;
+            }
+            res.json({ success: true, gym, canonical_slug: gym.slug });
+        } catch (error: any) {
+            if (error?.message?.includes('uuid')) {
+                res.status(404).json({ success: false, error: 'Gym không tồn tại' });
+                return;
+            }
+            res.status(500).json({ success: false, error: error.message });
+        }
+    },
+
+    // GET /api/v1/gyms/marketplace/:gymId/similar
+    async getSimilarMarketplaceGyms(req: Request, res: Response): Promise<void> {
+        try {
+            const gymIdOrSlug = String(req.params.gymId);
+            const gymRepo = AppDataSource.getRepository(GymCenter);
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(gymIdOrSlug);
+            const gym = await gymRepo.findOne({
+                where: isUUID
+                    ? { id: gymIdOrSlug, is_active: true }
+                    : { slug: gymIdOrSlug, is_active: true },
+            });
+
+            if (!gym) {
+                res.status(404).json({ success: false, error: 'Gym không tồn tại' });
+                return;
+            }
+
+            const limit = req.query.limit ? parseInt(String(req.query.limit), 10) : 4;
+            const gyms = await gymService.getSimilarGyms(gym.id, limit);
+            res.json({ success: true, gyms });
+        } catch (error: any) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+    },
+
+    // GET /api/v1/gyms/marketplace/:gymId/branches/:branchId
+    async getMarketplaceBranchDetail(req: Request, res: Response): Promise<void> {
+        try {
+            const branchId = String(req.params.branchId);
+            const branch = await gymService.getBranchDetailMarketplace(branchId);
+            if (!branch) {
+                res.status(404).json({ success: false, error: 'Chi nhánh không tồn tại' });
+                return;
+            }
+            res.json({ success: true, branch });
+        } catch (error: any) {
+            if (error?.message?.includes('uuid')) {
+                res.status(404).json({ success: false, error: 'Chi nhánh không tồn tại' });
+                return;
+            }
+            res.status(500).json({ success: false, error: error.message });
+        }
+    },
+
+    // GET /api/v1/gyms/marketplace/:gymId/branches/:branchId/programs/:programId/sessions
+    async getProgramSessions(req: Request, res: Response): Promise<void> {
+        try {
+            const programId = String(req.params.programId);
+            const from = req.query.from ? new Date(String(req.query.from)) : undefined;
+            const to = req.query.to ? new Date(String(req.query.to)) : undefined;
+            const sessions = await gymService.getProgramSessions(programId, from, to);
+            res.json({ success: true, sessions });
         } catch (error: any) {
             res.status(500).json({ success: false, error: error.message });
         }
