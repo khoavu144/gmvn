@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import type { GymTrainerLink } from '../types';
 import { logger } from '../lib/logger';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import apiClient from '../services/api';
 import { useSelector } from 'react-redux';
@@ -77,6 +77,7 @@ export default function CoachDetailPage() {
     const { trainerId, slug } = useParams<{ trainerId?: string; slug?: string }>();
     const navigate = useNavigate();
     const { user } = useSelector((state: RootState) => state.auth);
+    const paymentCloseRef = useRef<HTMLButtonElement>(null);
 
     const [trainer, setTrainer] = useState<Trainer | null>(null);
     const [programs, setPrograms] = useState<Program[]>([]);
@@ -184,6 +185,18 @@ export default function CoachDetailPage() {
         }
     };
 
+    // FIX: Escape key closes payment modal
+    useEffect(() => {
+        if (!pendingPayment) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setPendingPayment(null);
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        // FIX: move focus into modal when opened
+        paymentCloseRef.current?.focus();
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [pendingPayment]);
+
     const handleCheckPayment = async () => {
         if (!pendingPayment) return;
 
@@ -284,7 +297,8 @@ export default function CoachDetailPage() {
                 <div className="text-5xl font-extrabold text-gray-100 mb-2">404</div>
                 <div className="text-gray-800 font-bold text-lg">Không tìm thấy Hồ sơ</div>
                 <p className="text-sm text-gray-500 max-w-sm">Người dùng này có thể đã thay đổi URL hoặc không còn hoạt động trên GYMERVIET.</p>
-                <a href="/coaches" className="btn-primary mt-4 px-6">← Về trang khám phá</a>
+                {/* FIX: use Link not <a href> for SPA-smooth navigation */}
+                <Link to="/coaches" className="btn-primary mt-4 px-6">← Về trang khám phá</Link>
             </div>
         );
     }
@@ -396,13 +410,23 @@ export default function CoachDetailPage() {
                 </main>
             </div>
 
-            {/* Payment Modal */}
+            {/* Payment Modal — FIX: proper dialog semantics + focus management */}
             {pendingPayment && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="payment-dialog-title"
+                >
                     <div className="bg-white rounded-xl p-6 sm:p-8 max-w-sm w-full space-y-6 shadow-2xl">
                         <div className="flex justify-between items-center border-b border-gray-100 pb-4">
-                            <h3 className="text-xl font-extrabold">Thanh Toán</h3>
-                            <button onClick={() => setPendingPayment(null)} className="text-gray-400 hover:text-black text-lg">✕</button>
+                            <h3 id="payment-dialog-title" className="text-xl font-extrabold">Thanh Toán</h3>
+                            <button
+                                ref={paymentCloseRef}
+                                onClick={() => setPendingPayment(null)}
+                                className="text-gray-400 hover:text-black text-lg"
+                                aria-label="Đóng hộp thoại thanh toán"
+                            >✕</button>
                         </div>
                         <div className="text-center space-y-4">
                             <p className="text-sm text-gray-600">Chuyển khoản với nội dung chính xác bên dưới.</p>

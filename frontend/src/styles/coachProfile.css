@@ -1690,3 +1690,105 @@
   flex-shrink: 0;
   white-space: nowrap;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   AUDIT FIXES — /harden /normalize /adapt /optimize /distill
+═══════════════════════════════════════════════════════════════ */
+
+/* ── /harden: focus-visible system ────────────────────────────
+   All interactive elements get a high-contrast outline on keyboard focus
+   (previously only hover states existed).
+────────────────────────────────────────────────────────────── */
+.sidebar-nav-item:focus-visible,
+.sidebar-cta-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+.sidebar-social-link:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+.coach-mobile-nav-tab:focus-visible {
+  outline: 2px solid #080c1e;
+  outline-offset: 2px;
+}
+.profile-bento-cta-primary:focus-visible,
+.profile-bento-portfolio-btn:focus-visible {
+  outline: 2px solid #080c1e;
+  outline-offset: 2px;
+}
+.profile-pricing-btn:focus-visible {
+  outline: 2px solid #787bff;
+  outline-offset: 2px;
+}
+.profile-contact-cta-btn:focus-visible {
+  outline: 2px solid rgba(255,255,255,0.8);
+  outline-offset: 2px;
+}
+
+/* ── /normalize: dark-surface contrast raised ─────────────────
+   Small text on dark backgrounds must be ≥ 4.5:1 (WCAG AA).
+   Previous values were 0.3–0.5 white (failing on dark backgrounds).
+────────────────────────────────────────────────────────────── */
+.sidebar-social-label      { color: rgba(255,255,255,0.55); }
+.sidebar-headline          { color: rgba(255,255,255,0.65); }
+.sidebar-nav-item          { color: rgba(255,255,255,0.70); }
+.profile-contact-info-label { color: rgba(255,255,255,0.55); }
+.profile-bento-stat-label  { color: rgba(255,255,255,0.62); }
+
+/* ── /adapt: touch targets ≥ 40-44px ─────────────────────────
+   WCAG 2.5.5 and platform guidance: all interactive elements
+   should have a minimum 44×44px hit area.
+────────────────────────────────────────────────────────────── */
+.coach-mobile-nav-tab {
+  min-height: 44px;
+  padding: 10px 16px;
+}
+.sidebar-social-link {
+  width: 40px;
+  height: 40px;
+}
+.sidebar-nav-item {
+  min-height: 44px;
+}
+
+/* ── /adapt: featured pricing — border-based instead of scale ──
+   scale(1.04) causes visual instability near breakpoints.
+   Using border + glow for emphasis instead.
+────────────────────────────────────────────────────────────── */
+.profile-pricing-card--popular {
+  transform: none;
+  border-color: #787bff;
+  border-width: 2px;
+  box-shadow: 0 0 0 1px #787bff, 0 12px 40px rgba(120,123,255,0.18);
+}
+.profile-pricing-card--popular:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 1px #787bff, 0 20px 50px rgba(120,123,255,0.24);
+}
+
+/* ── /optimize: composited animation for skill bars ───────────
+   transition: width causes layout recalculation on every frame.
+   transform: scaleX is GPU-composited and avoids layout work.
+   Used in conjunction with --skill-level CSS custom property.
+────────────────────────────────────────────────────────────── */
+.profile-skill-bar-fill {
+  transform: scaleX(var(--skill-level, 0));
+  transform-origin: left center;
+  width: 100%;
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Narrow overly-broad transition declarations */
+.profile-stat-card    { transition: box-shadow 0.15s, transform 0.15s; }
+.profile-pricing-card { transition: box-shadow 0.15s, transform 0.15s; }
+
+/* ── /distill: reduce AI-template visual signals ──────────────
+   The ★ watermark was visually prominent (typical AI-gen look).
+   Reducing to near-invisible decorative level.
+────────────────────────────────────────────────────────────── */
+.profile-bento-pr-watermark {
+  opacity: 0.04;
+  pointer-events: none;
+  user-select: none;
+}

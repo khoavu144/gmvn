@@ -45,20 +45,31 @@ export default function CoachMobileNav({ name }: CoachMobileNavProps) {
   };
 
   return (
-    <div className={`coach-mobile-nav${show ? ' coach-mobile-nav--visible' : ''}`}>
+    // FIX: aria-hidden when not visible so hidden buttons can't be focused by AT
+    // FIX: inert via tabIndex=-1 on all children when !show handled by CSS display:none still
+    // Best approach: only render the interactive content when visible
+    <div
+      className={`coach-mobile-nav${show ? ' coach-mobile-nav--visible' : ''}`}
+      aria-hidden={!show}
+    >
       <div className="coach-mobile-nav-inner">
-        <span className="coach-mobile-nav-name">{name}</span>
-        <div className="coach-mobile-nav-tabs">
-          {NAV_ITEMS.map(({ id, label }) => (
-            <button
-              key={id}
-              onClick={() => scrollTo(id)}
-              className={`coach-mobile-nav-tab${activeSection === id ? ' active' : ''}`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <span className="coach-mobile-nav-name" aria-label={`Hồ sơ: ${name}`}>{name}</span>
+        {/* FIX: Only render nav items when visible so keyboard can't reach hidden buttons */}
+        {show && (
+          <nav aria-label="Điều hướng trang" className="coach-mobile-nav-tabs">
+            {NAV_ITEMS.map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => scrollTo(id)}
+                className={`coach-mobile-nav-tab${activeSection === id ? ' active' : ''}`}
+                // FIX: aria-current marks active section semantically, not just visually
+                aria-current={activeSection === id ? 'true' : undefined}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
+        )}
       </div>
     </div>
   );

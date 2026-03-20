@@ -15,9 +15,10 @@ export default function ProfileServicesSection({ skills }: ProfileServicesSectio
             <h2 className="profile-section-title" style={{ marginBottom: 4 }}>Kỹ năng chuyên sâu</h2>
             <p className="profile-section-subtitle">Mức độ thành thạo từng kỹ năng chuyên môn</p>
           </div>
+          {/* FIX: "Dynamic"/"Static" → Vietnamese labels */}
           <div className="profile-skills-chips">
-            <span className="profile-skills-chip">Dynamic</span>
-            <span className="profile-skills-chip">Static</span>
+            <span className="profile-skills-chip">Thực chiến</span>
+            <span className="profile-skills-chip">Nền tảng</span>
           </div>
         </div>
 
@@ -29,8 +30,12 @@ export default function ProfileServicesSection({ skills }: ProfileServicesSectio
                 <span className="profile-skill-name">{s.name}</span>
                 <span className="profile-skill-level">{s.level}%</span>
               </div>
-              <div className="profile-skill-bar">
-                <div className="profile-skill-bar-fill" style={{ width: `${s.level}%` }} />
+              <div className="profile-skill-bar" role="progressbar" aria-valuenow={s.level} aria-valuemin={0} aria-valuemax={100} aria-label={`${s.name}: ${s.level}%`}>
+                {/* FIX: use CSS custom property + scaleX for composited animation (no width layout recalc) */}
+                <div
+                  className="profile-skill-bar-fill"
+                  style={{ '--skill-level': s.level / 100 } as React.CSSProperties}
+                />
               </div>
             </div>
           ))}
