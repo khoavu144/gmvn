@@ -350,9 +350,9 @@ const Gyms: React.FC = () => {
 
                 <section className="marketplace-container mt-6 space-y-8">
                     {isLoading ? (
-                        <div className="marketplace-card-grid">
+                        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                             {Array.from({ length: 6 }).map((_, idx) => (
-                                <div key={idx} className={`marketplace-card-cell ${idx === 0 ? 'is-wide' : ''}`}>
+                                <div key={idx}>
                                     <div className="marketplace-panel overflow-hidden animate-pulse">
                                         <div className="aspect-[4/3] bg-[color:var(--mk-paper-strong)]" />
                                         <div className="space-y-3 p-5">
@@ -427,7 +427,7 @@ const Gyms: React.FC = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
+                                            <div className="grid gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
                                                 {group.items.map((gym) => (
                                                     <GymCard key={gym.id} gym={gym} variant="compact" />
                                                 ))}
@@ -452,12 +452,7 @@ const Gyms: React.FC = () => {
 
                                 <div className="marketplace-card-grid">
                                     {standardGyms.map((gym, idx) => (
-                                        <div
-                                            key={gym.id}
-                                            className={`marketplace-card-cell ${idx % 5 === 0 ? 'is-wide' : ''}`}
-                                        >
-                                            <GymCard gym={gym} variant={idx % 5 === 0 ? 'featured' : 'standard'} index={idx} />
-                                        </div>
+                                        <GymCard key={gym.id} gym={gym} variant="standard" index={idx} />
                                     ))}
                                 </div>
                             </div>

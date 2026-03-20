@@ -112,7 +112,7 @@ const GymCard: React.FC<GymCardProps> = ({
         'group relative overflow-hidden marketplace-panel transition duration-300',
         'hover:-translate-y-1 hover:shadow-[0_22px_60px_rgba(53,41,26,0.1)]',
         isFeatured ? 'h-full' : '',
-        isCompact ? 'rounded-[1.4rem]' : 'rounded-[1.75rem]',
+        'rounded-2xl',
         className,
     ].join(' ').trim();
 
@@ -120,7 +120,7 @@ const GymCard: React.FC<GymCardProps> = ({
         ? 'aspect-[16/10]'
         : isCompact
             ? 'aspect-[1/1]'
-            : 'aspect-[4/3]';
+            : 'aspect-[3/2]';
 
     return (
         <Link to={href} className={wrapperClass}>
@@ -187,7 +187,7 @@ const GymCard: React.FC<GymCardProps> = ({
             <div className={isFeatured ? 'p-6 sm:p-7' : isCompact ? 'p-4' : 'p-5'}>
                 <div className="space-y-3">
                     <div>
-                        <h3 className={isFeatured ? 'text-[clamp(1.6rem,2.4vw,2.15rem)] font-black leading-[0.95] tracking-[-0.06em] text-[color:var(--mk-text)]' : 'text-[1.28rem] font-black leading-[0.98] tracking-[-0.05em] text-[color:var(--mk-text)]'}>
+                        <h3 className={isFeatured ? 'text-[clamp(1.6rem,2.4vw,2.15rem)] font-black leading-[0.95] tracking-[-0.06em] text-[color:var(--mk-text)] line-clamp-2' : 'text-[1.28rem] font-black leading-[0.98] tracking-[-0.05em] text-[color:var(--mk-text)] line-clamp-2'}>
                             {gym.name}
                         </h3>
                         <p className="mt-2 line-clamp-3 text-[0.95rem] leading-7 text-[color:var(--mk-muted)]">

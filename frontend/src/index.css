@@ -252,6 +252,13 @@ body {
       radial-gradient(circle at top left, color-mix(in oklab, var(--mk-accent-soft) 28%, transparent) 0%, transparent 34%),
       linear-gradient(180deg, var(--mk-bg-elevated) 0%, var(--mk-bg) 18%, var(--mk-bg) 100%);
     color: var(--mk-text);
+    font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  .marketplace-shell h1,
+  .marketplace-shell h2,
+  .marketplace-shell h3 {
+    font-family: 'Noto Sans Display', 'Noto Sans', sans-serif;
   }
 
   .marketplace-container {
@@ -455,22 +462,15 @@ body {
 
   .marketplace-feature-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    grid-template-columns: 1.3fr 0.7fr;
     gap: 1rem;
+    align-items: stretch;
   }
 
   .marketplace-card-grid {
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
     gap: 1rem;
-  }
-
-  .marketplace-card-cell {
-    grid-column: span 4;
-  }
-
-  .marketplace-card-cell.is-wide {
-    grid-column: span 6;
   }
 
   .marketplace-badge {
@@ -543,6 +543,8 @@ body {
   .marketplace-rail {
     display: grid;
     gap: 1rem;
+    grid-template-rows: 1fr 1fr;
+    height: 100%;
   }
 
   .marketplace-sticky-rail {
@@ -562,28 +564,36 @@ body {
     .marketplace-filter-grid {
       grid-template-columns: 1fr;
     }
-
-    .marketplace-card-cell,
-    .marketplace-card-cell.is-wide {
-      grid-column: span 6;
-    }
   }
 
   @media (max-width: 720px) {
 
-    .marketplace-stat-strip,
-    .marketplace-card-grid {
+    .marketplace-stat-strip {
       grid-template-columns: 1fr;
     }
 
-    .marketplace-card-cell,
-    .marketplace-card-cell.is-wide {
-      grid-column: span 12;
+    .marketplace-card-grid {
+      grid-template-columns: 1fr;
     }
 
     .marketplace-input,
     .marketplace-select {
       min-height: 3rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+
+    .marketplace-title {
+      font-size: clamp(2.2rem, 10vw, 3rem);
+    }
+
+    .marketplace-panel {
+      border-radius: 1.2rem;
+    }
+
+    .marketplace-container {
+      padding-inline: 0.75rem;
     }
   }
 

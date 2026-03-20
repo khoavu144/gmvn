@@ -653,7 +653,7 @@ const GymDetailPage: React.FC = () => {
                     </div>
 
                     <section className="marketplace-panel overflow-hidden">
-                        <div className="grid gap-0 lg:grid-cols-[1.2fr_0.8fr]">
+                        <div className="grid gap-0 lg:grid-cols-[1fr_1fr]">
                             <div className="relative min-h-[24rem] overflow-hidden bg-[color:var(--mk-paper-strong)] lg:min-h-[36rem]">
                                 {heroImage ? (
                                     <img
@@ -762,7 +762,7 @@ const GymDetailPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="marketplace-container mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.55fr)]">
+                <div className="marketplace-container mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.45fr)]">
                     <div className="space-y-6">
                         <FadeIn>
                             <section ref={setRef('overview')} id="overview" className="marketplace-panel p-6 sm:p-8">
@@ -772,7 +772,7 @@ const GymDetailPage: React.FC = () => {
                                     description="Một bức chân dung nhanh để biết nơi này có đúng phong cách tập, mức đầu tư và trải nghiệm bạn đang tìm hay không."
                                 />
 
-                                <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(16rem,0.95fr)]">
+                                <div className="grid gap-6 lg:grid-cols-[1fr_minmax(16rem,0.4fr)]">
                                     <div className="space-y-5">
                                         <div className="prose max-w-none text-[color:var(--mk-text-soft)]">
                                             {(gym.description || seoDescription)
@@ -840,7 +840,7 @@ const GymDetailPage: React.FC = () => {
                                         description="Những cơ sở tương tự được gợi ý theo loại hình, vùng giá và khu vực để bạn so sánh nhanh trước khi quyết định."
                                     />
 
-                                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                                    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
                                         {similarGyms.map((item) => (
                                             <GymCard key={item.id} gym={item} variant="compact" />
                                         ))}
@@ -1416,7 +1416,7 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
                     description="Đừng chỉ nhìn gói nổi bật. Hãy nhìn gói khởi điểm, các dịch vụ đi kèm và chính sách để biết chi phí thực sự của việc tập luyện."
                 />
 
-                <div className="grid gap-4 xl:grid-cols-3">
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {branchPricing.map((plan: GymPricing) => (
                         <article
                             key={plan.id}
