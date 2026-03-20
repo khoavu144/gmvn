@@ -310,18 +310,18 @@ const Gyms: React.FC = () => {
 
                             {/* Options & Reset */}
                             <div className="flex flex-wrap items-center gap-3 pt-2">
-                                <div className="inline-flex overflow-hidden rounded-full border border-[color:var(--mk-line)] bg-white/70 p-1">
+                                <div className="inline-flex overflow-hidden rounded-lg border border-[color:var(--mk-line)] bg-white/70 p-1">
                                     <button
                                         type="button"
                                         onClick={() => setViewMode('grid')}
-                                        className={`rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.18em] transition ${viewMode === 'grid' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
+                                        className={`rounded-lg px-4 py-2 text-xs font-black uppercase tracking-[0.18em] transition ${viewMode === 'grid' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
                                     >
                                         Grid
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setViewMode('map')}
-                                        className={`rounded-full px-4 py-2 text-xs font-black uppercase tracking-[0.18em] transition ${viewMode === 'map' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
+                                        className={`rounded-lg px-4 py-2 text-xs font-black uppercase tracking-[0.18em] transition ${viewMode === 'map' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
                                     >
                                         Map
                                     </button>
@@ -356,10 +356,10 @@ const Gyms: React.FC = () => {
                                     <div className="marketplace-panel overflow-hidden animate-pulse">
                                         <div className="aspect-[4/3] bg-[color:var(--mk-paper-strong)]" />
                                         <div className="space-y-3 p-5">
-                                            <div className="h-3 w-24 rounded-full bg-[color:var(--mk-line)]" />
-                                            <div className="h-7 w-3/4 rounded-full bg-[color:var(--mk-line)]" />
-                                            <div className="h-4 w-full rounded-full bg-[color:var(--mk-line)]" />
-                                            <div className="h-4 w-2/3 rounded-full bg-[color:var(--mk-line)]" />
+                                            <div className="h-3 w-24 rounded-lg bg-[color:var(--mk-line)]" />
+                                            <div className="h-7 w-3/4 rounded-lg bg-[color:var(--mk-line)]" />
+                                            <div className="h-4 w-full rounded-lg bg-[color:var(--mk-line)]" />
+                                            <div className="h-4 w-2/3 rounded-lg bg-[color:var(--mk-line)]" />
                                         </div>
                                     </div>
                                 </div>
@@ -375,7 +375,7 @@ const Gyms: React.FC = () => {
                         </div>
                     ) : viewMode === 'map' ? (
                         <div className="marketplace-panel overflow-hidden p-3">
-                            <Suspense fallback={<div className="h-[560px] animate-pulse rounded-xl bg-[color:var(--mk-paper-strong)]" />}>
+                            <Suspense fallback={<div className="h-[560px] animate-pulse rounded-lg bg-[color:var(--mk-paper-strong)]" />}>
                                 <GymMapView gyms={gyms} />
                             </Suspense>
                         </div>
@@ -479,7 +479,7 @@ const Gyms: React.FC = () => {
                                         { title: 'Mức chi phí', body: 'Đừng chỉ nhìn mức giá tối đa. Hãy xem điểm giá khởi điểm để bắt đầu nhanh.' },
                                         { title: 'Phù hợp mục tiêu', body: 'Các thẻ như người mới, ưu tiên nữ giới hay dân thể thao giúp loại bớt lựa chọn sai.' },
                                     ].map((item) => (
-                                        <div key={item.title} className="rounded-xl border border-[color:var(--mk-line)] bg-white/70 p-4">
+                                        <div key={item.title} className="rounded-lg border border-[color:var(--mk-line)] bg-white/70 p-4">
                                             <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{item.title}</div>
                                             <p className="mt-2 text-sm leading-6 text-[color:var(--mk-muted)]">{item.body}</p>
                                         </div>

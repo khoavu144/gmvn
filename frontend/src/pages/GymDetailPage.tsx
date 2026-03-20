@@ -109,7 +109,7 @@ function SectionHeading({
 
 function SummaryPill({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-xl border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
+        <div className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
             <div className="text-[0.66rem] font-black uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">{label}</div>
             <div className="mt-1 text-sm font-bold text-[color:var(--mk-text)]">{value}</div>
         </div>
@@ -498,15 +498,15 @@ const GymDetailPage: React.FC = () => {
         return (
             <div className="marketplace-shell min-h-screen pb-20">
                 <div className="marketplace-container pt-8">
-                    <Skeleton className="h-[28rem] w-full rounded-3xl" />
+                    <Skeleton className="h-[28rem] w-full rounded-lg" />
                     <div className="mt-6 grid gap-4 lg:grid-cols-[1.45fr_0.55fr]">
                         <div className="space-y-4">
                             <Skeleton className="h-6 w-40 rounded-full" />
-                            <Skeleton className="h-16 w-3/4 rounded-2xl" />
+                            <Skeleton className="h-16 w-3/4 rounded-lg" />
                             <Skeleton className="h-5 w-full rounded-full" />
                             <Skeleton className="h-5 w-4/5 rounded-full" />
                         </div>
-                        <Skeleton className="h-40 w-full rounded-3xl" />
+                        <Skeleton className="h-40 w-full rounded-lg" />
                     </div>
                 </div>
             </div>
@@ -614,7 +614,7 @@ const GymDetailPage: React.FC = () => {
                                     event.stopPropagation();
                                     setLightboxIdx((current) => current === null ? 0 : (current - 1 + gallery.length) % gallery.length);
                                 }}
-                                className="absolute left-4 rounded-full border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                className="absolute left-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
                                 aria-label="Previous image"
                             >
                                 ‹
@@ -625,7 +625,7 @@ const GymDetailPage: React.FC = () => {
                                     event.stopPropagation();
                                     setLightboxIdx((current) => current === null ? 0 : (current + 1) % gallery.length);
                                 }}
-                                className="absolute right-4 rounded-full border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                className="absolute right-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
                                 aria-label="Next image"
                             >
                                 ›
@@ -684,7 +684,7 @@ const GymDetailPage: React.FC = () => {
                                         ))}
                                     </div>
                                     {branchDetail?.best_visit_time_summary && (
-                                        <div className="rounded-full border border-white/16 bg-white/10 px-4 py-2 text-[0.72rem] font-semibold text-white/84 backdrop-blur-sm">
+                                        <div className="rounded-lg border border-white/16 bg-white/10 px-4 py-2 text-[0.72rem] font-semibold text-white/84 backdrop-blur-sm">
                                             {branchDetail?.best_visit_time_summary}
                                         </div>
                                     )}
@@ -697,7 +697,7 @@ const GymDetailPage: React.FC = () => {
                                                 key={item.id}
                                                 type="button"
                                                 onClick={() => setLightboxIdx(index)}
-                                                className="relative h-20 w-24 shrink-0 overflow-hidden rounded-xl border border-white/14 bg-black/20 transition hover:-translate-y-0.5 hover:border-white/35"
+                                                className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg border border-white/14 bg-black/20 transition hover:-translate-y-0.5 hover:border-white/35"
                                             >
                                                 <img
                                                     src={getOptimizedUrl(item.image_url, 320) || item.image_url}
@@ -746,14 +746,14 @@ const GymDetailPage: React.FC = () => {
                 </div>
 
                 <div className="marketplace-container mt-6">
-                    <div className="sticky top-0 z-30 rounded-2xl border border-[color:var(--mk-line)] bg-[rgba(255,251,244,0.82)] px-3 py-2 backdrop-blur-xl">
+                    <div className="sticky top-0 z-30 rounded-lg border border-[color:var(--mk-line)] bg-[rgba(255,251,244,0.82)] px-3 py-2 backdrop-blur-xl">
                         <div className="flex items-center gap-2 overflow-x-auto">
                             {visibleSections.map((section) => (
                                 <button
                                     key={section.id}
                                     type="button"
                                     onClick={() => scrollToSection(section.id)}
-                                    className={`shrink-0 rounded-full px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.16em] transition ${activeSection === section.id ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)] hover:bg-white/70'}`}
+                                    className={`shrink-0 rounded-lg px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.16em] transition ${activeSection === section.id ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)] hover:bg-white/70'}`}
                                 >
                                     {section.label}
                                 </button>
@@ -788,7 +788,7 @@ const GymDetailPage: React.FC = () => {
                                         {(gym.hero_value_props || gym.highlights || []).length > 0 && (
                                             <div className="flex flex-wrap gap-2">
                                                 {(gym.hero_value_props || gym.highlights || []).slice(0, 6).map((item) => (
-                                                    <span key={item} className="rounded-full border border-[color:var(--mk-line)] bg-white/80 px-4 py-2 text-sm font-semibold text-[color:var(--mk-text-soft)]">
+                                                    <span key={item} className="rounded-lg border border-[color:var(--mk-line)] bg-white/80 px-4 py-2 text-sm font-semibold text-[color:var(--mk-text-soft)]">
                                                         {item}
                                                     </span>
                                                 ))}
@@ -866,7 +866,7 @@ const GymDetailPage: React.FC = () => {
                                         </div>
 
                                         {branchMapEmbedUrl ? (
-                                            <div className="overflow-hidden rounded-2xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
+                                            <div className="overflow-hidden rounded-lg border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
                                                 <iframe
                                                     src={branchMapEmbedUrl}
                                                     width="100%"
@@ -878,7 +878,7 @@ const GymDetailPage: React.FC = () => {
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="overflow-hidden rounded-2xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
+                                            <div className="overflow-hidden rounded-lg border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
                                                 <iframe
                                                     src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(branchLongitude) - 0.01},${Number(branchLatitude) - 0.01},${Number(branchLongitude) + 0.01},${Number(branchLatitude) + 0.01}&layer=mapnik&marker=${Number(branchLatitude)},${Number(branchLongitude)}`}
                                                     width="100%"
@@ -906,7 +906,7 @@ const GymDetailPage: React.FC = () => {
                                 {branchDetail?.branch_tagline || branchDetail?.description || gym.discovery_blurb || 'Chọn đúng chi nhánh trước khi đặt hẹn tư vấn để nhận thông tin chuẩn nhất về giá mở cửa, lịch và trải nghiệm thực tế tại đó.'}
                             </p>
 
-                            <div className="mt-5 rounded-2xl bg-[color:var(--mk-text)] px-5 py-5 text-white">
+                            <div className="mt-5 rounded-lg bg-[color:var(--mk-text)] px-5 py-5 text-white">
                                 <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-white/55">Đầu tư ban đầu</div>
                                 <div className="mt-2 text-[2.3rem] font-black leading-none tracking-[-0.07em]">
                                     {lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫` : 'Liên hệ'}
@@ -919,12 +919,12 @@ const GymDetailPage: React.FC = () => {
                             <div className="mt-5 space-y-3">
                                 {renderActionButton(
                                     leadAction,
-                                    'block w-full rounded-xl bg-[color:var(--mk-accent)] px-4 py-4 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)] transition hover:translate-y-[-1px]'
+                                    'block w-full rounded-lg bg-[color:var(--mk-accent)] px-4 py-4 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)] transition hover:translate-y-[-1px]'
                                 )}
                                 <button
                                     type="button"
                                     onClick={() => scrollToSection(branchPrograms.length > 0 ? 'schedule' : 'pricing')}
-                                    className="block w-full rounded-xl border border-[color:var(--mk-line)] bg-white/70 px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/55"
+                                    className="block w-full rounded-lg border border-[color:var(--mk-line)] bg-white/70 px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/55"
                                 >
                                     {branchPrograms.length > 0 ? 'Xem lịch lớp' : 'Xem bảng giá'}
                                 </button>
@@ -942,7 +942,7 @@ const GymDetailPage: React.FC = () => {
                                             key={branch.id}
                                             type="button"
                                             onClick={() => setActiveBranchId(branch.id)}
-                                            className={`w-full rounded-xl border px-4 py-3 text-left transition ${branch.id === branchDetail?.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/70 hover:border-[color:var(--mk-accent)]/45'}`}
+                                            className={`w-full rounded-lg border px-4 py-3 text-left transition ${branch.id === branchDetail?.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/70 hover:border-[color:var(--mk-accent)]/45'}`}
                                         >
                                             <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{branch.branch_name}</div>
                                             <div className="mt-1 text-sm text-[color:var(--mk-muted)]">{[branch.district, branch.city].filter(Boolean).join(', ') || branch.address}</div>
@@ -969,17 +969,17 @@ const GymDetailPage: React.FC = () => {
                             <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Liên hệ nhanh</div>
                             <div className="mt-4 grid gap-2">
                                 {branchPhone && (
-                                    <a href={`tel:${normalizePhone(branchPhone)}`} className="rounded-xl border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
+                                    <a href={`tel:${normalizePhone(branchPhone)}`} className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
                                         Hotline · {branchPhone}
                                     </a>
                                 )}
                                 {branchWhatsapp && (
-                                    <a href={buildWhatsappUrl(branchWhatsapp, `Xin chào, tôi muốn hỏi thêm về ${branchName}.`) || '#'} target="_blank" rel="noopener noreferrer" className="rounded-xl border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
+                                    <a href={buildWhatsappUrl(branchWhatsapp, `Xin chào, tôi muốn hỏi thêm về ${branchName}.`) || '#'} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
                                         WhatsApp · {branchWhatsapp}
                                     </a>
                                 )}
                                 {branchEmail && (
-                                    <a href={`mailto:${branchEmail}`} className="rounded-xl border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
+                                    <a href={`mailto:${branchEmail}`} className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
                                         Email · {branchEmail}
                                     </a>
                                 )}
@@ -995,7 +995,7 @@ const GymDetailPage: React.FC = () => {
                                     text={seoDescription}
                                     label="Share Facebook"
                                     variant="facebook"
-                                    className="!rounded-xl !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
+                                    className="!rounded-lg !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
                                     titleAttr="Chia sẻ venue này lên Facebook"
                                 />
                                 <ShareButton
@@ -1003,7 +1003,7 @@ const GymDetailPage: React.FC = () => {
                                     title={seoTitle}
                                     text={seoDescription}
                                     label="Sao chép Link"
-                                    className="!rounded-xl !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
+                                    className="!rounded-lg !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
                                     titleAttr="Sao chép liên kết cơ sở"
                                 />
                             </div>
@@ -1012,7 +1012,7 @@ const GymDetailPage: React.FC = () => {
                 </div>
 
                 <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden" style={{ contain: 'layout paint' }}>
-                    <div className="rounded-xl border border-white/14 bg-[rgba(29,22,18,0.94)] px-4 py-3 text-white shadow-[color:var(--mk-shadow-soft)] backdrop-blur-xl">
+                    <div className="rounded-lg border border-white/14 bg-[rgba(29,22,18,0.94)] px-4 py-3 text-white shadow-[color:var(--mk-shadow-soft)] backdrop-blur-xl">
                         <div className="flex items-center justify-between gap-3">
                             <div>
                                 <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/48">Chí phí ước tính từ</div>
@@ -1097,7 +1097,7 @@ const GymProgramsSection = React.memo(function GymProgramsSection({
                                 key={program.id}
                                 type="button"
                                 onClick={() => setActiveProgramId(program.id)}
-                                className={`w-full rounded-2xl border px-4 py-4 text-left transition ${activeProgram?.id === program.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80 hover:border-[color:var(--mk-accent)]/45'}`}
+                                className={`w-full rounded-lg border px-4 py-4 text-left transition ${activeProgram?.id === program.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80 hover:border-[color:var(--mk-accent)]/45'}`}
                             >
                                 <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{program.title}</div>
                                 <div className="mt-1 text-sm text-[color:var(--mk-muted)]">{formatProgramSubtitle(program)}</div>
@@ -1108,7 +1108,7 @@ const GymProgramsSection = React.memo(function GymProgramsSection({
                         ))}
                     </div>
 
-                    <div className="rounded-2xl border border-[color:var(--mk-line)] bg-white/78 p-5">
+                    <div className="rounded-lg border border-[color:var(--mk-line)] bg-white/78 p-5">
                         {activeProgram ? (
                             <>
                                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -1135,13 +1135,13 @@ const GymProgramsSection = React.memo(function GymProgramsSection({
                                     <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Các buổi học sắp tới</div>
                                     {sessionsLoading ? (
                                         <div className="space-y-3">
-                                            <Skeleton className="h-16 w-full rounded-xl" />
-                                            <Skeleton className="h-16 w-full rounded-xl" />
+                                            <Skeleton className="h-16 w-full rounded-lg" />
+                                            <Skeleton className="h-16 w-full rounded-lg" />
                                         </div>
                                     ) : programSessions.length > 0 ? (
                                         <div className="space-y-3">
                                             {programSessions.slice(0, 6).map((session: GymProgramSession) => (
-                                                <div key={session.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] px-4 py-3">
+                                                <div key={session.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] px-4 py-3">
                                                     <div>
                                                         <div className="text-sm font-bold text-[color:var(--mk-text)]">{formatSessionDate(session.starts_at)}</div>
                                                         <div className="text-sm text-[color:var(--mk-muted)]">{session.session_note || 'Đang mở đăng ký'}</div>
@@ -1154,14 +1154,14 @@ const GymProgramsSection = React.memo(function GymProgramsSection({
                                             ))}
                                         </div>
                                     ) : (
-                                        <div className="rounded-xl border border-dashed border-[color:var(--mk-line)] px-4 py-5 text-sm text-[color:var(--mk-muted)]">
+                                        <div className="rounded-lg border border-dashed border-[color:var(--mk-line)] px-4 py-5 text-sm text-[color:var(--mk-muted)]">
                                             Lịch chi tiết cho lớp này đang được cập nhật. Bạn vẫn có thể dùng CTA bên phải để nhận tư vấn nhanh từ chi nhánh.
                                         </div>
                                     )}
                                 </div>
                             </>
                         ) : (
-                            <div className="rounded-xl border border-dashed border-[color:var(--mk-line)] px-4 py-5 text-sm text-[color:var(--mk-muted)]">
+                            <div className="rounded-lg border border-dashed border-[color:var(--mk-line)] px-4 py-5 text-sm text-[color:var(--mk-muted)]">
                                 Chưa có chương trình lớp cho chi nhánh này.
                             </div>
                         )}
@@ -1189,12 +1189,12 @@ const GymReviewsSection = React.memo(function GymReviewsSection({
 
     return (
         <FadeIn>
-            <section ref={setRef('reviews')} id="reviews" className="rounded-3xl border border-black/10 bg-[linear-gradient(180deg,rgba(32,25,20,1),rgba(24,18,15,1))] p-6 text-white sm:p-8">
-                <SectionHeading
-                    kicker="Trust"
-                    title="Cộng đồng nói gì về nơi này"
-                    description="Trust block này kết hợp review tổng, dimension ratings và phản hồi từ venue để bạn đỡ phải đoán mò trước khi thử buổi đầu tiên."
-                />
+            <section ref={setRef('reviews')} id="reviews" className="rounded-lg border border-black/10 bg-[linear-gradient(180deg,rgba(32,25,20,1),rgba(24,18,15,1))] p-6 text-white sm:p-8">
+                <div className="mb-6 space-y-2">
+                    <div className="text-[0.72rem] font-bold uppercase tracking-[0.2em] text-white/60">Trust</div>
+                    <h2 className="text-xl font-bold tracking-tight text-white">Cộng đồng nói gì về nơi này</h2>
+                    <p className="text-sm leading-relaxed text-white/70">Trust block này kết hợp review tổng, dimension ratings và phản hồi từ venue để bạn đỡ phải đoán mò trước khi thử buổi đầu tiên.</p>
+                </div>
 
                 <div className="mb-6 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
                     {[
@@ -1205,7 +1205,7 @@ const GymReviewsSection = React.memo(function GymReviewsSection({
                         { label: 'Không gian', value: gymTrustSummary?.dimensions?.atmosphere_rating ? gymTrustSummary.dimensions.atmosphere_rating.toFixed(1) : '—' },
                         { label: 'Chi phí', value: gymTrustSummary?.dimensions?.value_rating ? gymTrustSummary.dimensions.value_rating.toFixed(1) : '—' },
                     ].map((item) => (
-                        <div key={item.label} className="rounded-xl border border-white/10 bg-white/6 px-4 py-4">
+                        <div key={item.label} className="rounded-lg border border-white/10 bg-white/6 px-4 py-4">
                             <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/55">{item.label}</div>
                             <div className="mt-2 text-lg font-black tracking-[-0.04em] text-white">{item.value}</div>
                         </div>
@@ -1221,7 +1221,7 @@ const GymReviewsSection = React.memo(function GymReviewsSection({
                 )}
 
                 {branchId && !canReview && (
-                    <div className="mt-8 rounded-xl border border-white/10 bg-white/5 px-5 py-4 text-sm text-white/68">
+                    <div className="mt-8 rounded-lg border border-white/10 bg-white/5 px-5 py-4 text-sm text-white/68">
                         Bạn cần có gói tập hoặc từng tương tác tư vấn với cơ sở này để để lại một review hợp lệ trên marketplace.
                     </div>
                 )}
@@ -1243,7 +1243,7 @@ const GymZonesSection = React.memo(function GymZonesSection({ branchZones, setRe
 
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {branchZones.map((zone: GymZone) => (
-                        <article key={zone.id} className={`rounded-2xl border p-5 ${zone.is_signature_zone ? 'border-[color:var(--mk-accent)]/55 bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/75'}`}>
+                        <article key={zone.id} className={`rounded-lg border p-5 ${zone.is_signature_zone ? 'border-[color:var(--mk-accent)]/55 bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/75'}`}>
                             <div className="flex items-start justify-between gap-3">
                                 <div>
                                     <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">{zone.zone_type.replace(/_/g, ' ')}</div>
@@ -1295,7 +1295,7 @@ const GymFacilitiesSection = React.memo(function GymFacilitiesSection({
                             <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Danh sách tiện ích</div>
                             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                                 {branchAmenities.map((item) => (
-                                    <div key={item.id} className={`rounded-xl border px-4 py-4 ${item.is_available ? 'border-[color:var(--mk-line)] bg-white/80' : 'border-[color:var(--mk-line)]/70 bg-[color:var(--mk-paper-strong)]/60 opacity-70'}`}>
+                                    <div key={item.id} className={`rounded-lg border px-4 py-4 ${item.is_available ? 'border-[color:var(--mk-line)] bg-white/80' : 'border-[color:var(--mk-line)]/70 bg-[color:var(--mk-paper-strong)]/60 opacity-70'}`}>
                                         <div className="text-sm font-bold text-[color:var(--mk-text)]">{item.name}</div>
                                         {item.note && <p className="mt-2 text-sm leading-6 text-[color:var(--mk-muted)]">{item.note}</p>}
                                     </div>
@@ -1305,7 +1305,7 @@ const GymFacilitiesSection = React.memo(function GymFacilitiesSection({
                     )}
 
                     {branchEquipment.length > 0 && (
-                        <details className="mt-6 rounded-2xl border border-[color:var(--mk-line)] bg-white/70 group">
+                        <details className="mt-6 rounded-lg border border-[color:var(--mk-line)] bg-white/70 group">
                             <summary className="flex cursor-pointer select-none items-center justify-between px-5 py-4 text-sm font-black uppercase tracking-[0.1em] text-[color:var(--mk-text)] transition hover:bg-white/90">
                                 Thư viện thiết bị ({Object.values(branchEquipmentGroups).flat().length} items)
                                 <span className="text-xl transition-transform group-open:rotate-180">↓</span>
@@ -1313,14 +1313,14 @@ const GymFacilitiesSection = React.memo(function GymFacilitiesSection({
                             <div className="border-t border-[color:var(--mk-line)] p-5">
                                 <div className="grid gap-4 md:grid-cols-2 animate-fade-in">
                                     {Object.entries(branchEquipmentGroups).map(([category, items]) => (
-                                        <div key={category} className="rounded-2xl border border-[color:var(--mk-line)] bg-white/75 p-4">
+                                        <div key={category} className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 p-4">
                                             <div className="mb-3 flex items-center justify-between gap-3">
                                                 <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{category}</div>
                                                 <span className="marketplace-badge marketplace-badge--neutral">{items.length} items</span>
                                             </div>
                                             <div className="flex flex-wrap gap-2">
                                                 {items.map((item) => (
-                                                    <span key={item.id} className="rounded-full border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] px-3 py-1.5 text-[0.8rem] font-semibold text-[color:var(--mk-text)]">
+                                                    <span key={item.id} className="rounded-lg border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] px-3 py-1.5 text-[0.8rem] font-semibold text-[color:var(--mk-text)]">
                                                         {item.name}{item.quantity && item.quantity > 1 ? ` ×${item.quantity}` : ''}
                                                     </span>
                                                 ))}
@@ -1351,7 +1351,7 @@ const GymTrainersSection = React.memo(function GymTrainersSection({ branchTraine
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     {branchTrainerLinks.map((link) => {
                         const trainerPath = getTrainerLinkPath(link);
-                        const cardClass = 'group rounded-2xl border border-[color:var(--mk-line)] bg-white/80 p-5 transition hover:-translate-y-1 hover:shadow-[color:var(--mk-shadow-soft)]';
+                        const cardClass = 'group rounded-lg border border-[color:var(--mk-line)] bg-white/80 p-5 transition hover:-translate-y-1 hover:shadow-[color:var(--mk-shadow-soft)]';
                         const cardContent = (
                             <>
                                 <div className="flex items-center gap-4">
@@ -1420,7 +1420,7 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
                     {branchPricing.map((plan: GymPricing) => (
                         <article
                             key={plan.id}
-                            className={`flex h-full flex-col rounded-2xl border p-5 ${plan.is_highlighted ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80'}`}
+                            className={`flex h-full flex-col rounded-lg border p-5 ${plan.is_highlighted ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80'}`}
                         >
                             <div className="flex items-start justify-between gap-3">
                                 <div>
@@ -1463,7 +1463,7 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
                             <div className="mt-auto pt-6">
                                 {renderActionButton(
                                     leadAction,
-                                    'block w-full rounded-xl bg-[color:var(--mk-text)] px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-white transition hover:translate-y-[-1px] hover:bg-[color:var(--mk-accent-ink)]'
+                                    'block w-full rounded-lg bg-[color:var(--mk-text)] px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-white transition hover:translate-y-[-1px] hover:bg-[color:var(--mk-accent-ink)]'
                                 )}
                             </div>
                         </article>

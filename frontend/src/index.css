@@ -286,9 +286,9 @@ body {
   }
 
   .marketplace-title {
-    font-size: clamp(2.9rem, 7vw, 6.6rem);
-    line-height: 0.94;
-    letter-spacing: -0.06em;
+    font-size: clamp(2.4rem, 5vw, 4.2rem);
+    line-height: 0.96;
+    letter-spacing: -0.04em;
     font-weight: 900;
     color: var(--mk-text);
     text-wrap: balance;
@@ -322,7 +322,7 @@ body {
   .marketplace-stat-card {
     background: color-mix(in oklab, var(--mk-paper) 85%, white 15%);
     border: 1px solid var(--mk-line);
-    border-radius: 1.6rem;
+    border-radius: 0.5rem;
     padding: 1rem 1rem 1.05rem;
     box-shadow: var(--mk-shadow-soft);
   }
@@ -348,7 +348,7 @@ body {
   .marketplace-panel {
     background: color-mix(in oklab, var(--mk-paper) 86%, white 14%);
     border: 1px solid var(--mk-line);
-    border-radius: 1.75rem;
+    border-radius: 0.5rem;
     box-shadow: var(--mk-shadow-soft);
   }
 
@@ -387,7 +387,7 @@ body {
     width: 100%;
     min-height: 3.15rem;
     padding: 0.9rem 1rem;
-    border-radius: 1rem;
+    border-radius: 0.5rem;
     border: 1px solid color-mix(in oklab, var(--mk-line) 82%, var(--mk-accent-soft) 18%);
     background: color-mix(in oklab, var(--mk-paper) 88%, white 12%);
     color: var(--mk-text);
@@ -418,7 +418,7 @@ body {
     gap: 0.45rem;
     min-height: 2.35rem;
     padding: 0.58rem 0.95rem;
-    border-radius: 999px;
+    border-radius: 0.5rem;
     border: 1px solid color-mix(in oklab, var(--mk-line) 78%, var(--mk-accent-soft) 22%);
     background: color-mix(in oklab, var(--mk-paper) 92%, white 8%);
     color: var(--mk-text-soft);
@@ -533,10 +533,10 @@ body {
   }
 
   .marketplace-section-title {
-    font-size: clamp(1.7rem, 3vw, 2.6rem);
-    letter-spacing: -0.05em;
-    line-height: 0.96;
-    font-weight: 900;
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    font-weight: 800;
     color: var(--mk-text);
   }
 
@@ -585,11 +585,11 @@ body {
   @media (max-width: 480px) {
 
     .marketplace-title {
-      font-size: clamp(2.2rem, 10vw, 3rem);
+      font-size: clamp(1.8rem, 8vw, 2.4rem);
     }
 
     .marketplace-panel {
-      border-radius: 1.2rem;
+      border-radius: 0.5rem;
     }
 
     .marketplace-container {

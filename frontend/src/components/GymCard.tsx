@@ -112,7 +112,7 @@ const GymCard: React.FC<GymCardProps> = ({
         'group relative overflow-hidden marketplace-panel transition duration-300',
         'hover:-translate-y-1 hover:shadow-[0_22px_60px_rgba(53,41,26,0.1)]',
         isFeatured ? 'h-full' : '',
-        'rounded-2xl',
+        'rounded-lg',
         className,
     ].join(' ').trim();
 
@@ -177,7 +177,7 @@ const GymCard: React.FC<GymCardProps> = ({
                     </div>
 
                     {!isCompact && (
-                        <div className="rounded-full border border-white/18 bg-white/10 px-3 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white/88 backdrop-blur-sm">
+                        <div className="rounded-lg border border-white/18 bg-white/10 px-3 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white/88 backdrop-blur-sm">
                             {proofLabel}
                         </div>
                     )}
@@ -200,7 +200,7 @@ const GymCard: React.FC<GymCardProps> = ({
                             {highlights.slice(0, isFeatured ? 4 : 3).map((item) => (
                                 <span
                                     key={item}
-                                    className="inline-flex items-center rounded-full border border-[color:var(--mk-line)] bg-white/70 px-3 py-1.5 text-[0.75rem] font-semibold text-[color:var(--mk-text-soft)]"
+                                    className="inline-flex items-center rounded-lg border border-[color:var(--mk-line)] bg-white/70 px-3 py-1.5 text-[0.75rem] font-semibold text-[color:var(--mk-text-soft)]"
                                 >
                                     {item}
                                 </span>
@@ -209,25 +209,15 @@ const GymCard: React.FC<GymCardProps> = ({
                     )}
                 </div>
 
-                <div className="mt-5 flex items-end justify-between gap-3 border-t border-[color:var(--mk-line)] pt-4">
-                    <div className="min-w-0">
-                        <div className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">
-                            Phù hợp cho
-                        </div>
-                        <div className="mt-1 flex flex-wrap gap-x-2 gap-y-1 text-[0.88rem] font-semibold text-[color:var(--mk-text-soft)]">
-                            {(audienceLabels.length > 0 ? audienceLabels : ['Người muốn tập thông minh']).slice(0, 2).map((label) => (
-                                <span key={label}>{label}</span>
-                            ))}
-                        </div>
+                <div className="mt-4 flex items-center justify-between gap-3 border-t border-[color:var(--mk-line)] pt-3">
+                    <div className="min-w-0 flex-1">
+                        <span className="text-[0.72rem] font-semibold text-[color:var(--mk-muted)] truncate block">
+                            {(audienceLabels.length > 0 ? audienceLabels : ['Người muốn tập thông minh']).slice(0, 2).join(' · ')}
+                        </span>
                     </div>
 
-                    <div className="shrink-0 text-right">
-                        <div className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">
-                            Xem chi tiết
-                        </div>
-                        <div className="mt-1 text-sm font-black tracking-[0.18em] text-[color:var(--mk-text)] transition-transform duration-300 group-hover:translate-x-1">
-                            OPEN →
-                        </div>
+                    <div className="shrink-0 text-xs font-bold tracking-wide text-[color:var(--mk-text)] transition-transform duration-300 group-hover:translate-x-1">
+                        OPEN →
                     </div>
                 </div>
             </div>
