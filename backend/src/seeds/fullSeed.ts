@@ -678,8 +678,8 @@ export async function fullSeed() {
     }
     if (!(await gymRepo.findOneBy({ name: g.gym.name, owner_id: owner.id }))) {
       const slug = g.gym.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '').slice(0, 50) + '-' + Date.now();
-      const center = await gymRepo.save(gymRepo.create({ owner_id: owner.id, slug, logo_url: g.gym.cover_image_url, is_verified: true, is_active: true, ...g.gym } as any));
-      const branch = await branchRepo.save(branchRepo.create({ gym_center_id: center.id, branch_name: 'Trụ sở chính', is_active: true, ...g.branch } as any));
+      const center = await gymRepo.save(gymRepo.create({ owner_id: owner.id, slug, logo_url: g.gym.cover_image_url, is_verified: true, is_active: true, ...g.gym } as any)) as unknown as GymCenter;
+      const branch = await branchRepo.save(branchRepo.create({ gym_center_id: center.id, branch_name: 'Trụ sở chính', is_active: true, ...g.branch } as any)) as unknown as GymBranch;
       for (const am of g.amenities) await amenityRepo.save(amenityRepo.create({ branch_id: branch.id, name: am } as any));
       for (const eq of g.equipment) await equipmentRepo.save(equipmentRepo.create({ branch_id: branch.id, name: eq, category: 'other' } as any));
       await pricingRepo.save(pricingRepo.create({ branch_id: branch.id, plan_name: g.pricing.plan_name, description: 'Full access', price: g.pricing.price as any, billing_cycle: g.pricing.billing_cycle as any }));
