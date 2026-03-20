@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Users, DollarSign, MessageSquare, ClipboardList, User, Search, Calendar, Star, Building2, ShieldAlert, CreditCard } from 'lucide-react';
+import { Users, DollarSign, MessageSquare, ClipboardList, User, Search, Calendar, Star, Building2, ShieldAlert, CreditCard, Eye } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import type { RootState } from '../store/store';
@@ -25,8 +25,12 @@ interface OverviewData {
 // Cards for Coach role
 const CoachDashboard = ({ overview }: { overview: OverviewData }) => {
     const { toast, ToastComponent } = useToast();
+    const user = useSelector((state: RootState) => state.auth.user);
     const [invitations, setInvitations] = useState<GymTrainerLink[]>([]);
     const [loadingInvs, setLoadingInvs] = useState(true);
+
+    // Public profile URL: /coaches/:id or /profile/public/:id
+    const publicProfileUrl = user ? `/coaches/${user.id}` : '/coaches';
 
     useEffect(() => {
         gymService.getTrainerInvitations()
@@ -94,6 +98,22 @@ const CoachDashboard = ({ overview }: { overview: OverviewData }) => {
                 ))}
             </div>
 
+            {/* Coach public profile preview banner */}
+            <div className="flex items-center justify-between gap-4 bg-gray-900 text-white rounded-xl px-5 py-4">
+                <div>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">Hồ sơ public của bạn</p>
+                    <p className="text-sm font-bold truncate max-w-xs">{window.location.origin}{publicProfileUrl}</p>
+                </div>
+                <Link
+                    to={publicProfileUrl}
+                    target="_blank"
+                    className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition-colors whitespace-nowrap shrink-0"
+                >
+                    <Eye className="w-3.5 h-3.5" />
+                    Xem ngay
+                </Link>
+            </div>
+
             {/* Quick actions */}
             <div>
                 <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Lối tắt</h3>
@@ -101,7 +121,8 @@ const CoachDashboard = ({ overview }: { overview: OverviewData }) => {
                     {[
                         { to: '/programs', icon: <ClipboardList className="w-5 h-5" />, title: 'QUẢN LÝ GÓI TẬP', desc: 'Tạo & publish chương trình' },
                         { to: '/messages', icon: <MessageSquare className="w-5 h-5" />, title: 'TIN NHẮN', desc: 'Chat với học viên' },
-                        { to: '/profile', icon: <User className="w-5 h-5" />, title: 'HỒ SƠ COACH', desc: 'Cập nhật thông tin chuyên môn' },
+                        { to: '/profile', icon: <User className="w-5 h-5" />, title: 'CẬP NHẬT HỒ SƠ', desc: 'Chỉnh sửa thông tin chuyên môn' },
+                        { to: publicProfileUrl, icon: <Eye className="w-5 h-5" />, title: 'XEM PROFILE PUBLIC', desc: 'Kiểm tra giao diện học viên nhìn thấy' },
                     ].map(card => (
                         <QuickActionCard
                             key={card.to}
