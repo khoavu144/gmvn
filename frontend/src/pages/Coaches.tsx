@@ -139,7 +139,18 @@ export default function Coaches() {
             <Helmet>
                 <title>{currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET</title>
                 <meta name="description" content={currentType === 'athlete' ? 'Khám phá hồ sơ và hành trình của các vận động viên chuyên nghiệp trên GYMERVIET.' : 'Tìm huấn luyện viên cá nhân theo chuyên môn, mức giá và phong cách đồng hành phù hợp với mục tiêu tập luyện của bạn.'} />
+                <link rel="canonical" href={currentType === 'athlete' ? 'https://gymerviet.vn/coaches?type=athlete' : 'https://gymerviet.vn/coaches'} />
+                <meta property="og:type" content="website" />
+                <meta property="og:title" content={`${currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET`} />
+                <meta property="og:description" content={currentType === 'athlete' ? 'Khám phá hồ sơ và hành trình của các vận động viên chuyên nghiệp trên GYMERVIET.' : 'Tìm huấn luyện viên cá nhân theo chuyên môn, mức giá và phong cách phù hợp.'} />
+                <meta property="og:url" content={currentType === 'athlete' ? 'https://gymerviet.vn/coaches?type=athlete' : 'https://gymerviet.vn/coaches'} />
+                <meta property="og:image" content="https://gymerviet.vn/og-default.jpg" />
+                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:site" content="@gymerviet" />
+                <meta name="twitter:title" content={`${currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET`} />
+                <meta name="twitter:description" content={currentType === 'athlete' ? 'Vận động viên chuyên nghiệp trên GYMERVIET.' : 'Huấn luyện viên được xác minh trên GYMERVIET.'} />
             </Helmet>
+
             <div className="page-container">
                 <section className="page-header relative">
                     {/* Tab Switcher */}

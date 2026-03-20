@@ -7,6 +7,7 @@ import type { AppDispatch, RootState } from '../store/store';
 import { getSrcSet, getOptimizedUrl } from '../utils/image';
 import ShareButton from '../components/ShareButton';
 import apiClient from '../services/api';
+import { buildProfileShareUrl } from '../utils/share';
 import '../styles/athleteProfile.css';
 
 // ─── Social helpers ────────────────────────────────────────────────
@@ -148,10 +149,10 @@ export default function AthleteDetailPage() {
         if (!profile?.trainer_id || !isAthleteProfile) return;
         apiClient.get(`/users/trainers/${profile.trainer_id}/similar?limit=6&user_type=athlete`)
             .then(res => { const d = res.data?.data; if (Array.isArray(d)) setRelatedAthletes(d); })
-            .catch(() => {});
+            .catch(() => { });
         apiClient.get(`/profiles/trainer/${profile.trainer_id}/progress-photos`)
             .then(res => { const d = res.data?.photos || res.data?.data || []; if (Array.isArray(d)) setProgressPhotos(d); })
-            .catch(() => {});
+            .catch(() => { });
     }, [profile?.trainer_id, isAthleteProfile]);
 
     const canonicalPath = useMemo(() => {
@@ -161,6 +162,8 @@ export default function AthleteDetailPage() {
     }, [profile?.slug, profile?.trainer_id, resolvedIdentifier]);
 
     const canonicalUrl = `${window.location.origin}${canonicalPath}`;
+    const shareIdentifier = profile?.slug || profile?.trainer_id || resolvedIdentifier || '';
+    const shareUrl = shareIdentifier ? buildProfileShareUrl('athlete', shareIdentifier) : canonicalUrl;
     const seoTitle = useMemo(() => `${athlete?.full_name || 'Athlete'} | Athlete Profile | GYMERVIET`, [athlete?.full_name]);
     const seoDescription = useMemo(() => {
         const bio = profile?.bio_short || profile?.bio_long || athlete?.bio || '';
@@ -238,12 +241,44 @@ export default function AthleteDetailPage() {
                 <title>{seoTitle}</title>
                 <meta name="description" content={seoDescription} />
                 <link rel="canonical" href={canonicalUrl} />
+                {/* Open Graph */}
                 <meta property="og:type" content="profile" />
                 <meta property="og:title" content={seoTitle} />
                 <meta property="og:description" content={seoDescription} />
                 <meta property="og:url" content={canonicalUrl} />
+                <meta property="og:site_name" content="GYMERVIET" />
+                <meta property="og:locale" content="vi_VN" />
                 {avatarUrl && <meta property="og:image" content={avatarUrl} />}
+                {avatarUrl && <meta property="og:image:width" content="400" />}
+                {avatarUrl && <meta property="og:image:height" content="400" />}
+                {/* Twitter Card */}
+                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:site" content="@gymerviet" />
+                <meta name="twitter:title" content={seoTitle} />
+                <meta name="twitter:description" content={seoDescription} />
+                {avatarUrl && <meta name="twitter:image" content={avatarUrl} />}
+                {/* JSON-LD: Person (Athlete) */}
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'Person',
+                    name: athlete?.full_name,
+                    description: seoDescription,
+                    image: avatarUrl || undefined,
+                    url: canonicalUrl,
+                    knowsAbout: athlete?.specialties ?? [],
+                })}</script>
+                {/* JSON-LD: BreadcrumbList */}
+                <script type="application/ld+json">{JSON.stringify({
+                    '@context': 'https://schema.org',
+                    '@type': 'BreadcrumbList',
+                    itemListElement: [
+                        { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://gymerviet.vn' },
+                        { '@type': 'ListItem', position: 2, name: 'Vận động viên', item: 'https://gymerviet.vn/coaches?type=athlete' },
+                        { '@type': 'ListItem', position: 3, name: athlete?.full_name },
+                    ],
+                })}</script>
             </Helmet>
+
 
             {/* Breadcrumb */}
             <nav className="athlete-profile-breadcrumb">
@@ -251,7 +286,14 @@ export default function AthleteDetailPage() {
                     <Link to="/coaches?type=athlete" className="athlete-profile-breadcrumb-back">
                         ← Vận động viên
                     </Link>
-                    <ShareButton title={seoTitle} text={seoDescription} label="Chia sẻ" />
+                    <ShareButton
+                        url={shareUrl}
+                        title={seoTitle}
+                        text={seoDescription}
+                        label="Chia sẻ Facebook"
+                        variant="facebook"
+                        titleAttr="Chia sẻ hồ sơ này lên Facebook"
+                    />
                 </div>
             </nav>
 
