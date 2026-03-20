@@ -84,6 +84,7 @@ const GymDetailPage = lazyWithChunkRetry(() => import('./pages/GymDetailPage'), 
 const GymRegisterPage = lazyWithChunkRetry(() => import('./pages/GymRegisterPage'), 'gym-register');
 const GymOwnerDashboard = lazyWithChunkRetry(() => import('./pages/GymOwnerDashboard'), 'gym-owner-dashboard');
 const CommunityGallery = lazyWithChunkRetry(() => import('./pages/CommunityGallery'), 'community-gallery');
+const PricingPage = lazyWithChunkRetry(() => import('./pages/PricingPage'), 'pricing');
 
 const AboutPage = lazyWithChunkRetry(() => import('./pages/legal/AboutPage'), 'about');
 const CommunityStandardsPage = lazyWithChunkRetry(() => import('./pages/legal/CommunityStandardsPage'), 'community-standards');
@@ -243,6 +244,7 @@ const router = createBrowserRouter([
       // Sprint 2: /trainer/:trainerId redirects to canonical /coaches/:trainerId (merge duplicate routes)
       { path: '/trainer/:trainerId', element: lazyRoute(<TrainerRedirect />) },
       { path: '/gallery', element: lazyRoute(<CommunityGallery />) },
+      { path: '/pricing', element: lazyRoute(<PricingPage />) },
 
       // Gym Module Routes
       { path: '/gyms', element: lazyRoute(<Gyms />) },

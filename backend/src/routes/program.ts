@@ -10,6 +10,7 @@ import {
     addWorkout,
     deleteProgram,
 } from '../controllers/programController';
+import { requireProgramLimit } from '../middleware/requirePlatformPlan';
 
 const router = Router();
 
@@ -20,7 +21,7 @@ router.get('/:id', optionalAuthenticate, getProgramById);
 
 // Trainer or verified Athlete only routes
 import { canCreateProgram } from '../middleware/auth';
-router.post('/', authenticate, canCreateProgram, createProgram);
+router.post('/', authenticate, canCreateProgram, requireProgramLimit, createProgram);
 router.put('/:id', authenticate, canCreateProgram, updateProgram);
 router.delete('/:id', authenticate, canCreateProgram, deleteProgram);
 router.post('/:id/publish', authenticate, canCreateProgram, publishProgram);

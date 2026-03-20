@@ -47,6 +47,8 @@ import { CommunityGallery } from '../entities/CommunityGallery';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken';
 import { PasswordResetToken } from '../entities/PasswordResetToken';
 import { CoachApplication } from '../entities/CoachApplication';
+import { PlatformSubscription } from '../entities/PlatformSubscription';
+import { AppSetting } from '../entities/AppSetting';
 
 const env = getEnv();
 
@@ -101,6 +103,9 @@ export const AppDataSource = new DataSource({
         PasswordResetToken,
         // Coach Application (Athlete → Coach upgrade)
         CoachApplication,
+        // Platform Subscription (Free/Pro/Elite tiers)
+        PlatformSubscription,
+        AppSetting,
     ],
     subscribers: [],
     migrations: [__dirname + '/../migrations/*.{js,ts}'],

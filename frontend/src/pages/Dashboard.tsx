@@ -15,6 +15,7 @@ import QuickActionCard from '../components/dashboard/QuickActionCard';
 import StatCard from '../components/dashboard/StatCard';
 import UpgradeToCoachBanner from '../components/dashboard/UpgradeToCoachBanner';
 import AdminCoachApplications from '../components/AdminCoachApplications';
+import BillingToggleSection from '../components/dashboard/BillingToggleSection';
 
 interface OverviewData {
     active_clients?: number;
@@ -391,7 +392,7 @@ const AdminDashboard = () => {
                     </div>
 
                     <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Truy cập nhanh</h3>
-                    <div className="grid md:grid-cols-3 gap-4">
+                    <div className="grid md:grid-cols-3 gap-4 mb-8">
                         {[
                             { onClick: () => setActiveTab('gyms'), icon: <Building2 className="w-5 h-5" />, title: 'PHÊ DUYỆT GYM', desc: 'Duyệt hồ sơ Gym Owner mới' },
                             { onClick: () => setActiveTab('reviews'), icon: <Star className="w-5 h-5" />, title: 'ĐÁNH GIÁ GYM', desc: 'Kiểm duyệt review vi phạm' },
@@ -408,8 +409,12 @@ const AdminDashboard = () => {
                             />
                         ))}
                     </div>
+
+                    <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Thu phí nền tảng</h3>
+                    <BillingToggleSection />
                 </div>
             )}
+
 
             {activeTab === 'gyms' && (
                 <div>

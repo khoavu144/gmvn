@@ -28,6 +28,9 @@ const bootstrap = async () => {
         const { rankingService } = await import('./services/rankingService');
         rankingService.scheduleCronJobs();
 
+        const { startPlatformSubCron } = await import('./scripts/expirePlatformSubs');
+        startPlatformSubCron();
+
         httpServer.listen(env.PORT, async () => {
             console.log(`🚀 Server running on port ${env.PORT}`);
             console.log(`📡 API: http://localhost:${env.PORT}/api/v1`);

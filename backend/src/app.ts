@@ -22,6 +22,8 @@ import gymAdminRoutes from './routes/gymAdmin';
 import notificationRoutes from './routes/notification';
 import communityGalleryRoutes from './routes/communityGallery';
 import coachApplicationRoutes from './routes/coachApplication';
+import shareRoutes from './routes/share';
+import platformSubscriptionRoutes from './routes/platformSubscription';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { User } from './entities/User';
@@ -56,7 +58,7 @@ app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-        
+
         if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
             callback(null, true);
         } else {
@@ -108,7 +110,10 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/gallery', communityGalleryRoutes);
 // Coach Applications (Athlete → Coach upgrade)
 app.use('/api/v1/coach-applications', coachApplicationRoutes);
-
+// Platform Subscription & Billing
+app.use('/api/v1/platform', platformSubscriptionRoutes);
+// Public share landing + dynamic OG image endpoints (for crawlers)
+app.use('/share', shareRoutes);
 
 // Health check (Public standard mode - P0-4 Security Fix)
 app.get('/api/v1/health', (_req, res) => {
