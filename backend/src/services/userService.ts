@@ -138,8 +138,8 @@ class UserService {
 
 
     async getTrainerById(id: string) {
-        const trainer = await this.repo.findOneBy({ id, user_type: 'trainer' });
-        if (!trainer) {
+        const trainer = await this.repo.findOneBy({ id });
+        if (!trainer || (trainer.user_type !== 'trainer' && trainer.user_type !== 'athlete')) {
             throw new Error('Trainer not found');
         }
 
