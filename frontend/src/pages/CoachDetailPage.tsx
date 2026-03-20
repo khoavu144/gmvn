@@ -13,15 +13,16 @@ import '../styles/coachProfile.css';
 import ProfileSidebar from '../components/profile/ProfileSidebar';
 import CoachMobileNav from '../components/profile/CoachMobileNav';
 
-// Flagship section components
-import CoachHeroFlagship from '../components/coach-flagship/CoachHeroFlagship';
-import CoachMobileStickyCta from '../components/coach-flagship/CoachMobileStickyCta';
+// Phase 3: New section components
+import ProfileHeroSection from '../components/profile/ProfileHeroSection';
+import ProfileServicesSection from '../components/profile/ProfileServicesSection';
+import ProfileExperienceSection from '../components/profile/ProfileExperienceSection';
+import ProfilePricingSection from '../components/profile/ProfilePricingSection';
+import ProfileContactSection from '../components/profile/ProfileContactSection';
+
+// Reused components
 import CoachResultsShowcase from '../components/coach-flagship/CoachResultsShowcase';
-import CoachMethodSection from '../components/coach-flagship/CoachMethodSection';
-import CoachOffersFlagship from '../components/coach-flagship/CoachOffersFlagship';
 import CoachTestimonialsWall from '../components/coach-flagship/CoachTestimonialsWall';
-import CoachAuthoritySection from '../components/coach-flagship/CoachAuthoritySection';
-import CoachClosingCta from '../components/coach-flagship/CoachClosingCta';
 import CoachRelatedFooter from '../components/coach-flagship/CoachRelatedFooter';
 
 interface Program {
@@ -271,6 +272,12 @@ export default function CoachDetailPage() {
         catch { return {}; }
     }, [trainerProfile?.social_links]);
 
+    const profileSkills = useMemo(() => trainerProfile?.skills || [], [trainerProfile?.skills]);
+    const profileExperiences = useMemo(() => trainerProfile?.experiences || [], [trainerProfile?.experiences]);
+    const profileCerts = useMemo(() => trainerProfile?.certifications || [], [trainerProfile?.certifications]);
+    const profileAwards = useMemo(() => trainerProfile?.awards || [], [trainerProfile?.awards]);
+    const profilePackages = useMemo(() => trainerProfile?.packages || programs, [trainerProfile?.packages, programs]);
+
     return (
         <div className="coach-profile-page">
             <Helmet>
@@ -309,14 +316,16 @@ export default function CoachDetailPage() {
 
                     {/* §1 Hero / About */}
                     <div id="section-about" className="profile-section-anchor">
-                        <CoachHeroFlagship
+                        <ProfileHeroSection
                             name={trainer.full_name}
                             avatarUrl={trainer.avatar_url}
                             specialties={trainer.specialties}
                             bio={trainer.bio}
+                            bioLong={trainerProfile?.bio_long || null}
                             isVerified={trainer.is_verified}
                             tagline={premium?.hero?.tagline}
                             metrics={premium?.hero?.metrics}
+                            highlights={premium?.highlights || []}
                             basePriceMonthly={trainer.base_price_monthly}
                             onMessage={handleMessage}
                         />
@@ -324,11 +333,10 @@ export default function CoachDetailPage() {
 
                     {/* §2 Services / Skills */}
                     <div id="section-services" className="profile-section-anchor">
-                        <CoachMethodSection
-                            bio={trainer.bio}
+                        <ProfileServicesSection
                             specialties={trainer.specialties}
+                            skills={profileSkills}
                             highlights={premium?.highlights || []}
-                            gymCount={gymLinks.length}
                         />
                     </div>
 
@@ -337,19 +345,20 @@ export default function CoachDetailPage() {
                         <CoachResultsShowcase photos={beforeAfterPhotos} />
                     </div>
 
-                    {/* §4 Experience / Authority */}
+                    {/* §4 Experience / Timeline */}
                     <div id="section-experience" className="profile-section-anchor">
-                        <CoachAuthoritySection
-                            gymLinks={gymLinks}
-                            mediaFeatures={premium?.mediaFeatures || []}
-                            pressMentions={premium?.pressMentions || []}
+                        <ProfileExperienceSection
+                            experiences={profileExperiences}
+                            certifications={profileCerts}
+                            awards={profileAwards}
+                            yearsExperience={trainerProfile?.years_of_experience || null}
                         />
                     </div>
 
-                    {/* §5 Packages */}
+                    {/* §5 Packages / Pricing */}
                     <div id="section-packages" className="profile-section-anchor">
-                        <CoachOffersFlagship
-                            programs={programs}
+                        <ProfilePricingSection
+                            packages={profilePackages}
                             subscribing={subscribing}
                             onSubscribe={handleSubscribe}
                         />
@@ -360,10 +369,12 @@ export default function CoachDetailPage() {
                         <CoachTestimonialsWall testimonials={testimonials} />
                     </div>
 
-                    {/* §7 Contact / Closing CTA */}
+                    {/* §7 Contact */}
                     <div id="section-contact" className="profile-section-anchor">
-                        <CoachClosingCta
+                        <ProfileContactSection
                             coachName={trainer.full_name}
+                            location={trainerProfile?.location || null}
+                            socialLinks={sidebarSocialLinks}
                             onMessage={handleMessage}
                         />
                     </div>
@@ -373,12 +384,6 @@ export default function CoachDetailPage() {
 
                 </main>
             </div>
-
-            {/* Mobile Sticky CTA — only shows on mobile */}
-            <CoachMobileStickyCta
-                coachName={trainer.full_name}
-                onMessage={handleMessage}
-            />
 
             {/* Payment Modal */}
             {pendingPayment && (
