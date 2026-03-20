@@ -138,16 +138,16 @@ const GymCard: React.FC<GymCardProps> = ({
                     />
                 ) : (
                     <div className="flex h-full w-full items-end justify-between bg-[radial-gradient(circle_at_top_left,rgba(230,203,154,0.55),transparent_34%),linear-gradient(160deg,rgba(255,255,255,0.45),rgba(223,216,206,0.85))] p-5">
-                        <span className="text-[0.7rem] font-black uppercase tracking-[0.25em] text-[color:var(--mk-muted)]">
+                        <span className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">
                             {venueLabel}
                         </span>
-                        <span className="text-[3rem] font-black leading-none tracking-[-0.08em] text-[color:var(--mk-text)]/25">
+                        <span className="text-[3rem] font-bold leading-none tracking-[-0.08em] text-[color:var(--mk-text)]/25">
                             {gym.name.slice(0, 2).toUpperCase()}
                         </span>
                     </div>
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(31,24,19,0.82)] via-[rgba(31,24,19,0.12)] to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(31,24,19,0.6)] via-[rgba(31,24,19,0.08)] to-transparent" />
 
                 <div className="absolute left-4 top-4 right-4 flex items-start justify-between gap-3">
                     <div className="flex flex-wrap gap-2">
@@ -168,16 +168,16 @@ const GymCard: React.FC<GymCardProps> = ({
 
                 <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-4 text-white">
                     <div className="min-w-0">
-                        <div className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-white/68">
+                        <div className="text-[0.62rem] font-medium uppercase tracking-[0.18em] text-white/60">
                             {locationLabel}
                         </div>
-                        <div className="mt-1 text-lg font-black tracking-[-0.04em] text-white sm:text-xl">
+                        <div className="mt-1 text-base font-bold tracking-[-0.03em] text-white sm:text-lg">
                             {priceLabel}
                         </div>
                     </div>
 
                     {!isCompact && (
-                        <div className="rounded-lg border border-white/18 bg-white/10 px-3 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-white/88 backdrop-blur-sm">
+                        <div className="rounded-md border border-white/15 bg-white/8 px-2.5 py-1 text-[0.6rem] font-medium uppercase tracking-[0.12em] text-white/75 backdrop-blur-sm">
                             {proofLabel}
                         </div>
                     )}
@@ -187,10 +187,10 @@ const GymCard: React.FC<GymCardProps> = ({
             <div className={isFeatured ? 'p-6 sm:p-7' : isCompact ? 'p-4' : 'p-5'}>
                 <div className="space-y-3">
                     <div>
-                        <h3 className={isFeatured ? 'text-[clamp(1.6rem,2.4vw,2.15rem)] font-black leading-[0.95] tracking-[-0.06em] text-[color:var(--mk-text)] line-clamp-2' : 'text-[1.28rem] font-black leading-[0.98] tracking-[-0.05em] text-[color:var(--mk-text)] line-clamp-2'}>
+                        <h3 className={isFeatured ? 'text-[clamp(1.3rem,2vw,1.7rem)] font-bold leading-[1.1] tracking-[-0.04em] text-[color:var(--mk-text)] line-clamp-2' : 'text-[1.1rem] font-bold leading-[1.1] tracking-[-0.03em] text-[color:var(--mk-text)] line-clamp-2'}>
                             {gym.name}
                         </h3>
-                        <p className="mt-2 line-clamp-3 text-[0.95rem] leading-7 text-[color:var(--mk-muted)]">
+                        <p className="mt-1.5 line-clamp-2 text-[0.85rem] leading-6 text-[color:var(--mk-muted)]">
                             {blurb}
                         </p>
                     </div>
@@ -200,7 +200,7 @@ const GymCard: React.FC<GymCardProps> = ({
                             {highlights.slice(0, isFeatured ? 4 : 3).map((item) => (
                                 <span
                                     key={item}
-                                    className="inline-flex items-center rounded-lg border border-[color:var(--mk-line)] bg-white/70 px-3 py-1.5 text-[0.75rem] font-semibold text-[color:var(--mk-text-soft)]"
+                                    className="inline-flex items-center rounded-md border border-[color:var(--mk-line)] bg-white/60 px-2.5 py-1 text-[0.7rem] font-medium text-[color:var(--mk-text-soft)]"
                                 >
                                     {item}
                                 </span>
@@ -216,7 +216,7 @@ const GymCard: React.FC<GymCardProps> = ({
                         </span>
                     </div>
 
-                    <div className="shrink-0 text-xs font-bold tracking-wide text-[color:var(--mk-text)] transition-transform duration-300 group-hover:translate-x-1">
+                    <div className="shrink-0 text-[0.7rem] font-semibold tracking-wide text-[color:var(--mk-text)] transition-transform duration-300 group-hover:translate-x-1">
                         OPEN →
                     </div>
                 </div>

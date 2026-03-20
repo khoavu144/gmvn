@@ -110,7 +110,7 @@ function SectionHeading({
 function SummaryPill({ label, value }: { label: string; value: string }) {
     return (
         <div className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
-            <div className="text-[0.66rem] font-black uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">{label}</div>
+            <div className="text-[0.66rem] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">{label}</div>
             <div className="mt-1 text-sm font-bold text-[color:var(--mk-text)]">{value}</div>
         </div>
     );
@@ -517,9 +517,9 @@ const GymDetailPage: React.FC = () => {
         return (
             <div className="marketplace-shell min-h-screen">
                 <div className="marketplace-container flex min-h-screen flex-col items-center justify-center gap-5 text-center">
-                    <div className="text-[5rem] font-black leading-none tracking-[-0.08em] text-[color:var(--mk-accent)]/45">404</div>
+                    <div className="text-[5rem] font-bold leading-none tracking-[-0.08em] text-[color:var(--mk-accent)]/45">404</div>
                     <div className="space-y-2">
-                        <h1 className="text-3xl font-black tracking-[-0.05em] text-[color:var(--mk-text)]">Không tìm thấy venue này.</h1>
+                        <h1 className="text-3xl font-bold tracking-[-0.05em] text-[color:var(--mk-text)]">Không tìm thấy venue này.</h1>
                         <p className="marketplace-lead">Liên kết có thể đã thay đổi hoặc venue hiện không còn hiển thị trên marketplace.</p>
                     </div>
                     <Link to="/gyms" className="marketplace-chip is-active">Quay lại marketplace</Link>
@@ -601,7 +601,7 @@ const GymDetailPage: React.FC = () => {
                     <button
                         type="button"
                         onClick={() => setLightboxIdx(null)}
-                        className="absolute right-5 top-5 text-3xl font-black text-white/75 transition motion-reduce:transition-none hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 rounded-full w-12 h-12 flex items-center justify-center"
+                        className="absolute right-5 top-5 text-3xl font-bold text-white/75 transition motion-reduce:transition-none hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 rounded-full w-12 h-12 flex items-center justify-center"
                         aria-label="Close gallery"
                     >
                         ×
@@ -614,7 +614,7 @@ const GymDetailPage: React.FC = () => {
                                     event.stopPropagation();
                                     setLightboxIdx((current) => current === null ? 0 : (current - 1 + gallery.length) % gallery.length);
                                 }}
-                                className="absolute left-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                className="absolute left-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-xl font-bold text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
                                 aria-label="Previous image"
                             >
                                 ‹
@@ -625,7 +625,7 @@ const GymDetailPage: React.FC = () => {
                                     event.stopPropagation();
                                     setLightboxIdx((current) => current === null ? 0 : (current + 1) % gallery.length);
                                 }}
-                                className="absolute right-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                className="absolute right-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-xl font-bold text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
                                 aria-label="Next image"
                             >
                                 ›
@@ -666,7 +666,7 @@ const GymDetailPage: React.FC = () => {
                                     />
                                 ) : (
                                     <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(230,203,154,0.45),transparent_36%),linear-gradient(155deg,rgba(255,255,255,0.55),rgba(222,214,201,0.95))]">
-                                        <span className="text-[5rem] font-black leading-none tracking-[-0.08em] text-[color:var(--mk-text)]/20">
+                                        <span className="text-[5rem] font-bold leading-none tracking-[-0.08em] text-[color:var(--mk-text)]/20">
                                             {gym.name.slice(0, 2).toUpperCase()}
                                         </span>
                                     </div>
@@ -717,7 +717,7 @@ const GymDetailPage: React.FC = () => {
                                     <div className="marketplace-eyebrow">Marketplace detail</div>
 
                                     <div>
-                                        <h1 className="text-[clamp(2.3rem,4vw,4.2rem)] font-black leading-[0.92] tracking-[-0.07em] text-[color:var(--mk-text)]">
+                                        <h1 className="text-[clamp(2.3rem,4vw,4.2rem)] font-bold leading-[0.92] tracking-[-0.07em] text-[color:var(--mk-text)]">
                                             {gym.name}
                                         </h1>
                                         <p className="mt-4 text-[1.02rem] leading-8 text-[color:var(--mk-muted)]">
@@ -753,7 +753,7 @@ const GymDetailPage: React.FC = () => {
                                     key={section.id}
                                     type="button"
                                     onClick={() => scrollToSection(section.id)}
-                                    className={`shrink-0 rounded-lg px-4 py-2 text-[0.72rem] font-black uppercase tracking-[0.16em] transition ${activeSection === section.id ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)] hover:bg-white/70'}`}
+                                    className={`shrink-0 rounded-lg px-4 py-2 text-[0.72rem] font-bold uppercase tracking-[0.16em] transition ${activeSection === section.id ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)] hover:bg-white/70'}`}
                                 >
                                     {section.label}
                                 </button>
@@ -897,9 +897,9 @@ const GymDetailPage: React.FC = () => {
 
                     <aside className="marketplace-sticky-rail space-y-4" style={{ contain: 'layout paint' }}>
                         <div className="marketplace-panel p-5 sm:p-6">
-                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Quyết định nhanh</div>
+                            <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Quyết định nhanh</div>
                             <div className="mt-3 text-sm font-semibold text-[color:var(--mk-text-soft)]">Chi nhánh đang xem</div>
-                            <h3 className="mt-1 text-[1.55rem] font-black leading-[0.98] tracking-[-0.05em] text-[color:var(--mk-text)]">
+                            <h3 className="mt-1 text-[1.55rem] font-bold leading-[0.98] tracking-[-0.05em] text-[color:var(--mk-text)]">
                                 {branchName}
                             </h3>
                             <p className="mt-3 text-sm leading-7 text-[color:var(--mk-muted)]">
@@ -907,8 +907,8 @@ const GymDetailPage: React.FC = () => {
                             </p>
 
                             <div className="mt-5 rounded-lg bg-[color:var(--mk-text)] px-5 py-5 text-white">
-                                <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-white/55">Đầu tư ban đầu</div>
-                                <div className="mt-2 text-[2.3rem] font-black leading-none tracking-[-0.07em]">
+                                <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-white/55">Đầu tư ban đầu</div>
+                                <div className="mt-2 text-[2.3rem] font-bold leading-none tracking-[-0.07em]">
                                     {lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫` : 'Liên hệ'}
                                 </div>
                                 <div className="mt-2 text-sm text-white/72">
@@ -919,12 +919,12 @@ const GymDetailPage: React.FC = () => {
                             <div className="mt-5 space-y-3">
                                 {renderActionButton(
                                     leadAction,
-                                    'block w-full rounded-lg bg-[color:var(--mk-accent)] px-4 py-4 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)] transition hover:translate-y-[-1px]'
+                                    'block w-full rounded-lg bg-[color:var(--mk-accent)] px-4 py-4 text-center text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)] transition hover:translate-y-[-1px]'
                                 )}
                                 <button
                                     type="button"
                                     onClick={() => scrollToSection(branchPrograms.length > 0 ? 'schedule' : 'pricing')}
-                                    className="block w-full rounded-lg border border-[color:var(--mk-line)] bg-white/70 px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/55"
+                                    className="block w-full rounded-lg border border-[color:var(--mk-line)] bg-white/70 px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/55"
                                 >
                                     {branchPrograms.length > 0 ? 'Xem lịch lớp' : 'Xem bảng giá'}
                                 </button>
@@ -935,7 +935,7 @@ const GymDetailPage: React.FC = () => {
 
                         {branches.length > 1 && (
                             <div className="marketplace-panel p-5">
-                                <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chuyển chi nhánh</div>
+                                <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chuyển chi nhánh</div>
                                 <div className="mt-4 space-y-2">
                                     {branches.map((branch) => (
                                         <button
@@ -944,7 +944,7 @@ const GymDetailPage: React.FC = () => {
                                             onClick={() => setActiveBranchId(branch.id)}
                                             className={`w-full rounded-lg border px-4 py-3 text-left transition ${branch.id === branchDetail?.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/70 hover:border-[color:var(--mk-accent)]/45'}`}
                                         >
-                                            <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{branch.branch_name}</div>
+                                            <div className="text-sm font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">{branch.branch_name}</div>
                                             <div className="mt-1 text-sm text-[color:var(--mk-muted)]">{[branch.district, branch.city].filter(Boolean).join(', ') || branch.address}</div>
                                         </button>
                                     ))}
@@ -953,7 +953,7 @@ const GymDetailPage: React.FC = () => {
                         )}
 
                         <div className="marketplace-panel p-5">
-                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Lưu ý tại điểm tập</div>
+                            <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Lưu ý tại điểm tập</div>
                             <div className="mt-4 space-y-3">
                                 <SummaryPill
                                     label="Hôm nay"
@@ -966,7 +966,7 @@ const GymDetailPage: React.FC = () => {
                         </div>
 
                         <div className="marketplace-panel p-5">
-                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Liên hệ nhanh</div>
+                            <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Liên hệ nhanh</div>
                             <div className="mt-4 grid gap-2">
                                 {branchPhone && (
                                     <a href={`tel:${normalizePhone(branchPhone)}`} className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
@@ -987,7 +987,7 @@ const GymDetailPage: React.FC = () => {
                         </div>
 
                         <div className="marketplace-panel p-5">
-                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chia sẻ cơ sở</div>
+                            <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chia sẻ cơ sở</div>
                             <div className="mt-4 flex flex-wrap gap-2">
                                 <ShareButton
                                     url={canonicalUrl}
@@ -1015,14 +1015,14 @@ const GymDetailPage: React.FC = () => {
                     <div className="rounded-lg border border-white/14 bg-[rgba(29,22,18,0.94)] px-4 py-3 text-white shadow-[color:var(--mk-shadow-soft)] backdrop-blur-xl">
                         <div className="flex items-center justify-between gap-3">
                             <div>
-                                <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/48">Chí phí ước tính từ</div>
-                                <div className="mt-1 text-lg font-black tracking-[-0.04em]">
+                                <div className="text-[0.64rem] font-bold uppercase tracking-[0.18em] text-white/48">Chí phí ước tính từ</div>
+                                <div className="mt-1 text-lg font-bold tracking-[-0.04em]">
                                     {lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫` : 'Liên hệ'}
                                 </div>
                             </div>
                             {renderActionButton(
                                 leadAction,
-                                'rounded-lg bg-[color:var(--mk-accent)] px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)]'
+                                'rounded-lg bg-[color:var(--mk-accent)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)]'
                             )}
                         </div>
                     </div>
@@ -1099,7 +1099,7 @@ const GymProgramsSection = React.memo(function GymProgramsSection({
                                 onClick={() => setActiveProgramId(program.id)}
                                 className={`w-full rounded-lg border px-4 py-4 text-left transition ${activeProgram?.id === program.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80 hover:border-[color:var(--mk-accent)]/45'}`}
                             >
-                                <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{program.title}</div>
+                                <div className="text-sm font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">{program.title}</div>
                                 <div className="mt-1 text-sm text-[color:var(--mk-muted)]">{formatProgramSubtitle(program)}</div>
                                 {program.description && (
                                     <p className="mt-3 line-clamp-2 text-sm leading-6 text-[color:var(--mk-text-soft)]">{program.description}</p>
@@ -1113,8 +1113,8 @@ const GymProgramsSection = React.memo(function GymProgramsSection({
                             <>
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                     <div>
-                                        <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chương trình đã chọn</div>
-                                        <h3 className="mt-2 text-2xl font-black tracking-[-0.05em] text-[color:var(--mk-text)]">{activeProgram.title}</h3>
+                                        <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chương trình đã chọn</div>
+                                        <h3 className="mt-2 text-2xl font-bold tracking-[-0.05em] text-[color:var(--mk-text)]">{activeProgram.title}</h3>
                                         <p className="mt-2 text-sm leading-7 text-[color:var(--mk-text-soft)]">{activeProgram.description || 'Chưa có mô tả chi tiết cho lớp này.'}</p>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
@@ -1132,7 +1132,7 @@ const GymProgramsSection = React.memo(function GymProgramsSection({
                                 )}
 
                                 <div className="mt-6">
-                                    <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Các buổi học sắp tới</div>
+                                    <div className="mb-3 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Các buổi học sắp tới</div>
                                     {sessionsLoading ? (
                                         <div className="space-y-3">
                                             <Skeleton className="h-16 w-full rounded-lg" />
@@ -1147,8 +1147,8 @@ const GymProgramsSection = React.memo(function GymProgramsSection({
                                                         <div className="text-sm text-[color:var(--mk-muted)]">{session.session_note || 'Đang mở đăng ký'}</div>
                                                     </div>
                                                     <div className="text-right">
-                                                        <div className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[color:var(--mk-muted)]">Còn chỗ</div>
-                                                        <div className="mt-1 text-sm font-black text-[color:var(--mk-text)]">{session.seats_remaining}/{session.seats_total}</div>
+                                                        <div className="text-[0.68rem] font-bold uppercase tracking-[0.16em] text-[color:var(--mk-muted)]">Còn chỗ</div>
+                                                        <div className="mt-1 text-sm font-bold text-[color:var(--mk-text)]">{session.seats_remaining}/{session.seats_total}</div>
                                                     </div>
                                                 </div>
                                             ))}
@@ -1206,8 +1206,8 @@ const GymReviewsSection = React.memo(function GymReviewsSection({
                         { label: 'Chi phí', value: gymTrustSummary?.dimensions?.value_rating ? gymTrustSummary.dimensions.value_rating.toFixed(1) : '—' },
                     ].map((item) => (
                         <div key={item.label} className="rounded-lg border border-white/10 bg-white/6 px-4 py-4">
-                            <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/55">{item.label}</div>
-                            <div className="mt-2 text-lg font-black tracking-[-0.04em] text-white">{item.value}</div>
+                            <div className="text-[0.64rem] font-bold uppercase tracking-[0.18em] text-white/55">{item.label}</div>
+                            <div className="mt-2 text-lg font-bold tracking-[-0.04em] text-white">{item.value}</div>
                         </div>
                     ))}
                 </div>
@@ -1246,8 +1246,8 @@ const GymZonesSection = React.memo(function GymZonesSection({ branchZones, setRe
                         <article key={zone.id} className={`rounded-lg border p-5 ${zone.is_signature_zone ? 'border-[color:var(--mk-accent)]/55 bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/75'}`}>
                             <div className="flex items-start justify-between gap-3">
                                 <div>
-                                    <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">{zone.zone_type.replace(/_/g, ' ')}</div>
-                                    <h3 className="mt-2 text-lg font-black tracking-[-0.04em] text-[color:var(--mk-text)]">{zone.name}</h3>
+                                    <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">{zone.zone_type.replace(/_/g, ' ')}</div>
+                                    <h3 className="mt-2 text-lg font-bold tracking-[-0.04em] text-[color:var(--mk-text)]">{zone.name}</h3>
                                 </div>
                                 {zone.is_signature_zone && <span className="marketplace-badge marketplace-badge--accent">Signature</span>}
                             </div>
@@ -1292,7 +1292,7 @@ const GymFacilitiesSection = React.memo(function GymFacilitiesSection({
                 <div className="space-y-8">
                     {branchAmenities.length > 0 && (
                         <div>
-                            <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Danh sách tiện ích</div>
+                            <div className="mb-3 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Danh sách tiện ích</div>
                             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                                 {branchAmenities.map((item) => (
                                     <div key={item.id} className={`rounded-lg border px-4 py-4 ${item.is_available ? 'border-[color:var(--mk-line)] bg-white/80' : 'border-[color:var(--mk-line)]/70 bg-[color:var(--mk-paper-strong)]/60 opacity-70'}`}>
@@ -1306,7 +1306,7 @@ const GymFacilitiesSection = React.memo(function GymFacilitiesSection({
 
                     {branchEquipment.length > 0 && (
                         <details className="mt-6 rounded-lg border border-[color:var(--mk-line)] bg-white/70 group">
-                            <summary className="flex cursor-pointer select-none items-center justify-between px-5 py-4 text-sm font-black uppercase tracking-[0.1em] text-[color:var(--mk-text)] transition hover:bg-white/90">
+                            <summary className="flex cursor-pointer select-none items-center justify-between px-5 py-4 text-sm font-bold uppercase tracking-[0.1em] text-[color:var(--mk-text)] transition hover:bg-white/90">
                                 Thư viện thiết bị ({Object.values(branchEquipmentGroups).flat().length} items)
                                 <span className="text-xl transition-transform group-open:rotate-180">↓</span>
                             </summary>
@@ -1315,7 +1315,7 @@ const GymFacilitiesSection = React.memo(function GymFacilitiesSection({
                                     {Object.entries(branchEquipmentGroups).map(([category, items]) => (
                                         <div key={category} className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 p-4">
                                             <div className="mb-3 flex items-center justify-between gap-3">
-                                                <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{category}</div>
+                                                <div className="text-sm font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">{category}</div>
                                                 <span className="marketplace-badge marketplace-badge--neutral">{items.length} items</span>
                                             </div>
                                             <div className="flex flex-wrap gap-2">
@@ -1359,14 +1359,14 @@ const GymTrainersSection = React.memo(function GymTrainersSection({ branchTraine
                                         {link.trainer?.avatar_url ? (
                                             <img src={link.trainer.avatar_url} alt={link.trainer.full_name} className="h-full w-full object-cover" />
                                         ) : (
-                                            <div className="flex h-full w-full items-center justify-center text-sm font-black uppercase text-[color:var(--mk-muted)]">
+                                            <div className="flex h-full w-full items-center justify-center text-sm font-bold uppercase text-[color:var(--mk-muted)]">
                                                 {(link.trainer?.full_name || 'T').slice(0, 1)}
                                             </div>
                                         )}
                                     </div>
 
                                     <div className="min-w-0 flex-1">
-                                        <div className="text-base font-black tracking-[-0.03em] text-[color:var(--mk-text)]">
+                                        <div className="text-base font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">
                                             {link.trainer?.full_name || 'Đối tác huấn luyện'}
                                         </div>
                                         <div className="mt-1 text-sm text-[color:var(--mk-muted)]">
@@ -1424,16 +1424,16 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
                         >
                             <div className="flex items-start justify-between gap-3">
                                 <div>
-                                    <div className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">
+                                    <div className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">
                                         {plan.plan_type || 'membership'}
                                     </div>
-                                    <h3 className="mt-2 text-xl font-black tracking-[-0.05em] text-[color:var(--mk-text)]">{plan.plan_name}</h3>
+                                    <h3 className="mt-2 text-xl font-bold tracking-[-0.05em] text-[color:var(--mk-text)]">{plan.plan_name}</h3>
                                 </div>
                                 {plan.is_highlighted && <span className="marketplace-badge marketplace-badge--accent">Recommended</span>}
                             </div>
 
                             <div className="mt-5 flex items-end gap-2">
-                                <div className="text-[2rem] font-black leading-none tracking-[-0.06em] text-[color:var(--mk-text)]">
+                                <div className="text-[2rem] font-bold leading-none tracking-[-0.06em] text-[color:var(--mk-text)]">
                                     {Number(plan.price).toLocaleString('vi-VN')}₫
                                 </div>
                                 <div className="pb-1 text-sm font-semibold text-[color:var(--mk-muted)]">
@@ -1463,7 +1463,7 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
                             <div className="mt-auto pt-6">
                                 {renderActionButton(
                                     leadAction,
-                                    'block w-full rounded-lg bg-[color:var(--mk-text)] px-4 py-3 text-center text-xs font-black uppercase tracking-[0.18em] text-white transition hover:translate-y-[-1px] hover:bg-[color:var(--mk-accent-ink)]'
+                                    'block w-full rounded-lg bg-[color:var(--mk-text)] px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:translate-y-[-1px] hover:bg-[color:var(--mk-accent-ink)]'
                                 )}
                             </div>
                         </article>

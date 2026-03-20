@@ -314,14 +314,14 @@ const Gyms: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setViewMode('grid')}
-                                        className={`rounded-lg px-4 py-2 text-xs font-black uppercase tracking-[0.18em] transition ${viewMode === 'grid' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
+                                        className={`rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition ${viewMode === 'grid' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
                                     >
                                         Grid
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setViewMode('map')}
-                                        className={`rounded-lg px-4 py-2 text-xs font-black uppercase tracking-[0.18em] transition ${viewMode === 'map' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
+                                        className={`rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition ${viewMode === 'map' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
                                     >
                                         Map
                                     </button>
@@ -480,7 +480,7 @@ const Gyms: React.FC = () => {
                                         { title: 'Phù hợp mục tiêu', body: 'Các thẻ như người mới, ưu tiên nữ giới hay dân thể thao giúp loại bớt lựa chọn sai.' },
                                     ].map((item) => (
                                         <div key={item.title} className="rounded-lg border border-[color:var(--mk-line)] bg-white/70 p-4">
-                                            <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{item.title}</div>
+                                            <div className="text-sm font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">{item.title}</div>
                                             <p className="mt-2 text-sm leading-6 text-[color:var(--mk-muted)]">{item.body}</p>
                                         </div>
                                     ))}
