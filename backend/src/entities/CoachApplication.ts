@@ -22,8 +22,8 @@ export class CoachApplication {
     user!: User;
 
     @Column({
-        type: 'enum',
-        enum: ['pending', 'approved', 'rejected'],
+        type: 'varchar',
+        length: 20,
         default: 'pending',
     })
     status!: 'pending' | 'approved' | 'rejected';
