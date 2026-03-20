@@ -70,27 +70,27 @@ export default function Home() {
             <Helmet>
                 <title>GYMERVIET — Hệ sinh thái Gym & Coach số 1 Việt Nam</title>
                 <meta name="description" content="Nền tảng kết nối Gymer, Coach và Gym Center hàng đầu Việt Nam. Tìm huấn luyện viên, phòng tập và giáo án cá nhân hoá." />
-                <link rel="canonical" href="https://gymerviet.vn" />
+                <link rel="canonical" href="https://gymerviet.com" />
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="GYMERVIET — Hệ sinh thái Gym & Coach số 1 Việt Nam" />
                 <meta property="og:description" content="Nền tảng kết nối Gymer, Coach và Gym Center hàng đầu Việt Nam." />
-                <meta property="og:url" content="https://gymerviet.vn" />
-                <meta property="og:image" content="https://gymerviet.vn/og-default.jpg" />
+                <meta property="og:url" content="https://gymerviet.com" />
+                <meta property="og:image" content="https://gymerviet.com/og-default.jpg" />
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@gymerviet" />
                 <meta name="twitter:title" content="GYMERVIET — Hệ sinh thái Gym & Coach số 1 Việt Nam" />
                 <meta name="twitter:description" content="Tìm huấn luyện viên được xác minh, phòng tập uy tín." />
-                <meta name="twitter:image" content="https://gymerviet.vn/og-default.jpg" />
+                <meta name="twitter:image" content="https://gymerviet.com/og-default.jpg" />
                 <script type="application/ld+json">{JSON.stringify({
                     '@context': 'https://schema.org',
                     '@type': 'WebSite',
                     name: 'GYMERVIET',
-                    url: 'https://gymerviet.vn',
+                    url: 'https://gymerviet.com',
                     potentialAction: {
                         '@type': 'SearchAction',
-                        target: { '@type': 'EntryPoint', urlTemplate: 'https://gymerviet.vn/coaches?q={search_term_string}' },
+                        target: { '@type': 'EntryPoint', urlTemplate: 'https://gymerviet.com/coaches?q={search_term_string}' },
                         'query-input': 'required name=search_term_string',
                     },
                 })}</script>
@@ -98,8 +98,8 @@ export default function Home() {
                     '@context': 'https://schema.org',
                     '@type': 'Organization',
                     name: 'GYMERVIET',
-                    url: 'https://gymerviet.vn',
-                    logo: 'https://gymerviet.vn/logo.png',
+                    url: 'https://gymerviet.com',
+                    logo: 'https://gymerviet.com/logo.png',
                     sameAs: ['https://www.facebook.com/gymerviet'],
                 })}</script>
             </Helmet>

@@ -49,7 +49,9 @@ export default function ResetPassword() {
         <form className="mt-8 space-y-6" onSubmit={handleReset}>
           <div className="space-y-4 rounded-md shadow-sm">
             <div>
+              <label htmlFor="email" className="sr-only">Địa chỉ email</label>
               <input
+                id="email"
                 type="email"
                 required
                 value={email}
@@ -59,7 +61,9 @@ export default function ResetPassword() {
               />
             </div>
             <div>
+              <label htmlFor="code" className="sr-only">Mã xác thực</label>
               <input
+                id="code"
                 type="text"
                 required
                 maxLength={6}
@@ -70,7 +74,9 @@ export default function ResetPassword() {
               />
             </div>
             <div>
+              <label htmlFor="new-password" className="sr-only">Mật khẩu mới</label>
               <input
+                id="new-password"
                 type="password"
                 required
                 value={newPassword}

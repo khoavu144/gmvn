@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-    Menu, X, User, LogOut,
-    Dumbbell, Calendar, MessageSquare, Image as ImageIcon, ChevronRight
+    Menu, X, LogOut, ChevronDown, ChevronRight,
+    Dumbbell, Users, ShoppingBag, Newspaper, Image as ImageIcon,
+    LayoutDashboard, MessageSquare, Calendar, User, UserCog,
+    ShieldCheck
 } from 'lucide-react';
 import { logout } from '../store/slices/authSlice';
 import type { RootState } from '../store/store';
@@ -11,103 +13,368 @@ import { authApi } from '../services/auth';
 import NotificationBell from './NotificationBell';
 import { cn } from '../lib/utils';
 
+// ─── Nav Structure ───────────────────────────────────────────────────────────
+
+interface NavChild {
+    to: string;
+    label: string;
+    description?: string;
+    icon: React.ReactNode;
+}
+
+interface NavGroup {
+    id: string;
+    label: string;
+    icon: React.ReactNode;
+    children: NavChild[];
+}
+
+const PUBLIC_NAV: NavGroup[] = [
+    {
+        id: 'explore',
+        label: 'Khám Phá',
+        icon: <Dumbbell className="w-4 h-4" />,
+        children: [
+            { to: '/gyms', label: 'Phòng Tập', description: 'Tìm gym center phù hợp gần bạn', icon: <Dumbbell className="w-4 h-4" /> },
+            { to: '/coaches', label: 'Huấn Luyện Viên', description: 'Kết nối với coach chuyên nghiệp', icon: <Users className="w-4 h-4" /> },
+            { to: '/coaches?type=athlete', label: 'Vận Động Viên', description: 'Hồ sơ VĐV đang hoạt động', icon: <User className="w-4 h-4" /> },
+        ],
+    },
+    {
+        id: 'community',
+        label: 'Cộng Đồng',
+        icon: <ImageIcon className="w-4 h-4" />,
+        children: [
+            { to: '/news', label: 'Tin Tức', description: 'Kiến thức và tin tức thể hình mới nhất', icon: <Newspaper className="w-4 h-4" /> },
+            { to: '/gallery', label: 'Community Gallery', description: 'Khoảnh khắc từ cộng đồng tập luyện', icon: <ImageIcon className="w-4 h-4" /> },
+        ],
+    },
+    {
+        id: 'shop',
+        label: 'Cửa Hàng',
+        icon: <ShoppingBag className="w-4 h-4" />,
+        children: [
+            { to: '/marketplace', label: 'Marketplace', description: 'Thực phẩm bổ sung, phụ kiện, trang phục thể thao', icon: <ShoppingBag className="w-4 h-4" /> },
+        ],
+    },
+];
+
+// ─── Dropdown (Desktop) ───────────────────────────────────────────────────────
+
+function DesktopDropdown({ group, isActive, onToggle }: {
+    group: NavGroup;
+    isActive: boolean;
+    onToggle: (id: string | null) => void;
+}) {
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!isActive) return;
+        const handleClick = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) {
+                onToggle(null);
+            }
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, [isActive, onToggle]);
+
+    return (
+        <div ref={ref} className="relative">
+            <button
+                type="button"
+                onClick={() => onToggle(isActive ? null : group.id)}
+                className={cn(
+                    'flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+                    isActive
+                        ? 'text-black bg-gray-100'
+                        : 'text-gray-600 hover:text-black hover:bg-gray-50'
+                )}
+                aria-expanded={isActive}
+                aria-haspopup="true"
+            >
+                {group.label}
+                <ChevronDown className={cn('w-3.5 h-3.5 transition-transform duration-200', isActive && 'rotate-180')} />
+            </button>
+
+            {isActive && (
+                <div className="absolute left-0 top-full mt-2 min-w-[22rem] rounded-xl border border-gray-100 bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    {group.children.map((child) => (
+                        <Link
+                            key={child.to}
+                            to={child.to}
+                            onClick={() => onToggle(null)}
+                            className="flex items-start gap-3 px-4 py-3.5 hover:bg-gray-50 transition-colors group"
+                        >
+                            <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-600 group-hover:bg-black/5 transition-colors">
+                                {child.icon}
+                            </span>
+                            <div>
+                                <div className="text-sm font-semibold text-gray-900">{child.label}</div>
+                                {child.description && (
+                                    <div className="mt-0.5 text-xs text-gray-500 leading-5">{child.description}</div>
+                                )}
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ─── Accordion Item (Mobile) ─────────────────────────────────────────────────
+
+function MobileAccordion({ group, isOpen, onToggle, onClose }: {
+    group: NavGroup;
+    isOpen: boolean;
+    onToggle: () => void;
+    onClose: () => void;
+}) {
+    return (
+        <div className="border-b border-gray-100 last:border-0">
+            <button
+                type="button"
+                onClick={onToggle}
+                className="w-full flex items-center justify-between px-4 py-3.5 text-sm font-semibold text-gray-800"
+                aria-expanded={isOpen}
+            >
+                <span className="flex items-center gap-2.5">
+                    <span className="text-gray-500">{group.icon}</span>
+                    {group.label}
+                </span>
+                <ChevronDown className={cn('w-4 h-4 text-gray-400 transition-transform duration-200', isOpen && 'rotate-180')} />
+            </button>
+
+            {isOpen && (
+                <div className="pb-2 space-y-0.5 bg-gray-50/60">
+                    {group.children.map((child) => (
+                        <Link
+                            key={child.to}
+                            to={child.to}
+                            onClick={onClose}
+                            className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 hover:text-black hover:bg-gray-100 transition-colors ml-6 border-l border-gray-200 pl-6"
+                        >
+                            <span className="flex items-center gap-2.5">
+                                <span className="text-gray-400">{child.icon}</span>
+                                {child.label}
+                            </span>
+                            <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                        </Link>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ─── User Menu (Desktop) ─────────────────────────────────────────────────────
+
+function UserDropdown({ user, onLogout, isActive, onToggle }: {
+    user: { full_name: string; user_type: string; avatar_url?: string | null };
+    onLogout: () => void;
+    isActive: boolean;
+    onToggle: () => void;
+}) {
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!isActive) return;
+        const handleClick = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) onToggle();
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, [isActive, onToggle]);
+
+    const dashboardLink = user.user_type === 'gym_owner' ? '/gym-owner' : '/dashboard';
+    const roleLabel: Record<string, string> = {
+        trainer: 'Coach',
+        athlete: 'Vận động viên',
+        gym_owner: 'Chủ phòng tập',
+        admin: 'Admin',
+        user: 'Thành viên',
+    };
+
+    return (
+        <div ref={ref} className="relative">
+            <button
+                type="button"
+                onClick={onToggle}
+                className={cn(
+                    'flex items-center gap-2 px-2.5 py-1.5 rounded-lg border transition-colors text-sm',
+                    isActive
+                        ? 'border-gray-300 bg-gray-50'
+                        : 'border-transparent hover:border-gray-200 hover:bg-gray-50'
+                )}
+                aria-expanded={isActive}
+            >
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-black text-white text-xs font-bold shrink-0">
+                    {user.full_name.charAt(0).toUpperCase()}
+                </div>
+                <div className="text-left hidden xl:block">
+                    <div className="font-semibold text-gray-900 leading-tight max-w-[120px] truncate">{user.full_name}</div>
+                    <div className="text-[10px] uppercase tracking-wider text-gray-500 leading-tight">
+                        {roleLabel[user.user_type] || user.user_type}
+                    </div>
+                </div>
+                <ChevronDown className={cn('w-3.5 h-3.5 text-gray-400 transition-transform duration-200', isActive && 'rotate-180')} />
+            </button>
+
+            {isActive && (
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-xl border border-gray-100 bg-white shadow-xl shadow-black/5 ring-1 ring-black/5 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                        <div className="text-sm font-semibold text-gray-900 truncate">{user.full_name}</div>
+                        <div className="text-[11px] text-gray-500 mt-0.5">{roleLabel[user.user_type] || user.user_type}</div>
+                    </div>
+
+                    <div className="py-1">
+                        <Link to={dashboardLink} onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
+                            <LayoutDashboard className="w-4 h-4 text-gray-400" />
+                            {user.user_type === 'gym_owner' ? 'Quản lý Phòng Tập' : 'Dashboard'}
+                        </Link>
+                        <Link to="/profile" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
+                            <UserCog className="w-4 h-4 text-gray-400" />
+                            Cài đặt Hồ sơ
+                        </Link>
+                        <Link to="/messages" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
+                            <MessageSquare className="w-4 h-4 text-gray-400" />
+                            Tin nhắn
+                        </Link>
+                        {(user.user_type === 'trainer' || user.user_type === 'athlete') && (
+                            <Link to="/programs" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
+                                <Calendar className="w-4 h-4 text-gray-400" />
+                                Khóa học
+                            </Link>
+                        )}
+                        {user.user_type === 'athlete' && (
+                            <Link to="/workouts" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
+                                <Dumbbell className="w-4 h-4 text-gray-400" />
+                                Lịch Tập
+                            </Link>
+                        )}
+                        {user.user_type === 'admin' && (
+                            <Link to="/dashboard" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-black transition-colors">
+                                <ShieldCheck className="w-4 h-4 text-gray-400" />
+                                Admin Panel
+                            </Link>
+                        )}
+                    </div>
+
+                    <div className="border-t border-gray-100 py-1">
+                        <button
+                            type="button"
+                            onClick={onLogout}
+                            className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                            <LogOut className="w-4 h-4" />
+                            Đăng xuất
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ─── Main Header ─────────────────────────────────────────────────────────────
+
 export default function Header() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [, setIsScrolled] = useState(false);
+    const location = useLocation();
+
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [mobileOpenGroup, setMobileOpenGroup] = useState<string | null>(null);
+    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
 
     const lastScrollY = useRef(0);
     const scrollRaf = useRef<number | null>(null);
-    const menuRef = useRef<HTMLDivElement>(null);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
 
     const { isAuthenticated, user, refreshToken } = useSelector((state: RootState) => state.auth);
 
-    // Scroll behavior: hide on scroll down, show on scroll up
+    // Close everything when route changes
+    useEffect(() => {
+        setMobileOpen(false);
+        setActiveDropdown(null);
+        setUserMenuOpen(false);
+        setMobileOpenGroup(null);
+    }, [location.pathname]);
+
+    // Scroll hide/show
     useEffect(() => {
         lastScrollY.current = window.scrollY;
-
         const handleScroll = () => {
             if (scrollRaf.current !== null) return;
-
             scrollRaf.current = requestAnimationFrame(() => {
                 const currentScrollY = window.scrollY;
-
-                // Add backdrop when scrolled
-                setIsScrolled(currentScrollY > 10);
-
-                // Hide/show header based on scroll direction
                 if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
                     setIsHidden(true);
                 } else if (currentScrollY < lastScrollY.current) {
                     setIsHidden(false);
                 }
-
                 lastScrollY.current = currentScrollY;
                 scrollRaf.current = null;
             });
         };
-
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => {
             window.removeEventListener('scroll', handleScroll);
-            if (scrollRaf.current !== null) {
-                cancelAnimationFrame(scrollRaf.current);
-            }
+            if (scrollRaf.current !== null) cancelAnimationFrame(scrollRaf.current);
         };
     }, []);
 
-    // Mobile menu accessibility & body scroll lock
+    // Mobile menu body scroll lock + Escape key
     useEffect(() => {
-        if (isMenuOpen) {
-            document.body.style.overflow = 'hidden';
+        if (!mobileOpen) return;
+        document.body.style.overflow = 'hidden';
+        const handleKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setMobileOpen(false);
+        };
+        document.addEventListener('keydown', handleKey);
+        return () => {
+            document.body.style.overflow = '';
+            document.removeEventListener('keydown', handleKey);
+        };
+    }, [mobileOpen]);
 
-            if (menuRef.current) {
-                const focusable = menuRef.current.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') as HTMLElement;
-                if (focusable) setTimeout(() => focusable.focus(), 50);
-            }
-
-            const handleKeyDown = (e: KeyboardEvent) => {
-                if (e.key === 'Escape') closeMenu();
-            };
-            document.addEventListener('keydown', handleKeyDown);
-
-            return () => {
-                document.body.style.overflow = '';
-                document.removeEventListener('keydown', handleKeyDown);
-            };
-        }
-    }, [isMenuOpen]);
-
-    const handleLogout = async () => {
+    const handleLogout = useCallback(async () => {
         try {
             await authApi.logout(refreshToken || localStorage.getItem('refresh_token') || undefined);
-        } catch {
-            // Keep client-side logout resilient even when the session is already invalid.
-        } finally {
+        } catch { /* silent */ } finally {
             dispatch(logout());
-            setIsMenuOpen(false);
+            setMobileOpen(false);
             navigate('/login');
         }
-    };
+    }, [dispatch, navigate, refreshToken]);
 
-    const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-    const closeMenu = () => setIsMenuOpen(false);
+    const handleDropdownToggle = useCallback((id: string | null) => {
+        setActiveDropdown((prev) => (prev === id ? null : id));
+        setUserMenuOpen(false);
+    }, []);
+
+    const handleUserMenuToggle = useCallback(() => {
+        setUserMenuOpen((prev) => !prev);
+        setActiveDropdown(null);
+    }, []);
 
     return (
         <header
             className={cn(
                 'fixed top-0 left-0 right-0 z-header h-header',
-                'bg-white',
+                'bg-white/95 backdrop-blur-sm',
                 'border-b border-gray-200',
                 'transition-transform duration-150',
                 isHidden && '-translate-y-full'
             )}
         >
-            <div className="max-w-page mx-auto px-4 sm:px-6 h-full flex justify-between items-center">
+            <div className="max-w-page mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-4">
+
                 {/* Logo */}
-                <Link to="/" onClick={closeMenu} className="flex items-center shrink-0">
+                <Link to="/" className="flex items-center shrink-0" aria-label="GYMERVIET - Trang chủ">
                     <img
                         src="/logo.png"
                         alt="GYMERVIET"
@@ -117,69 +384,29 @@ export default function Header() {
                     />
                 </Link>
 
-                {/* Desktop Nav */}
-                <nav className="hidden lg:flex items-center gap-1">
-                    <Link to="/coaches" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
-                        Coach
-                    </Link>
-                    <Link to="/gallery" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
-                        Gallery
-                    </Link>
-                    <Link
-                        to="/gyms"
-                        className="text-sm font-semibold px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-sm transition-colors"
-                    >
-                        Gym Center
-                    </Link>
-                    <Link to="/coaches?type=athlete" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
-                        Vận động viên
-                    </Link>
-                    {isAuthenticated && (
-                        <>
-                            {(user?.user_type === 'trainer' || user?.user_type === 'athlete') && (
-                                <Link to="/programs" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
-                                    Khóa học
-                                </Link>
-                            )}
-                            {user?.user_type === 'athlete' && (
-                                <Link to="/workouts" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
-                                    Lịch tập
-                                </Link>
-                            )}
-                            <Link to="/messages" className="text-sm font-medium text-gray-600 hover:text-black transition-colors px-3 py-2 rounded-sm">
-                                Tin nhắn
-                            </Link>
-                        </>
-                    )}
+                {/* Desktop Nav — Mega Menu Groups */}
+                <nav className="hidden lg:flex items-center gap-1" aria-label="Điều hướng chính">
+                    {PUBLIC_NAV.map((group) => (
+                        <DesktopDropdown
+                            key={group.id}
+                            group={group}
+                            isActive={activeDropdown === group.id}
+                            onToggle={handleDropdownToggle}
+                        />
+                    ))}
                 </nav>
 
                 {/* Right side */}
-                <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex items-center gap-2">
                     <NotificationBell />
 
                     {isAuthenticated && user ? (
-                        <div className="hidden lg:flex items-center gap-3">
-                            <div className="text-right">
-                                <p className="text-sm font-semibold text-gray-900">{user.full_name}</p>
-                                <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
-                                    {user.user_type === 'trainer' ? 'COACH' : user.user_type === 'athlete' ? 'VĐV' : user.user_type === 'gym_owner' ? 'CHỦ GYM' : 'USER'}
-                                </p>
-                            </div>
-                            <div className="h-6 w-px bg-gray-200" />
-                            <Link
-                                to={user.user_type === 'gym_owner' ? '/gym-owner' : '/dashboard'}
-                                className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
-                            >
-                                {user.user_type === 'gym_owner' ? 'Quản lý Gym' : 'Cá nhân'}
-                            </Link>
-                            <button
-                                onClick={handleLogout}
-                                className="text-sm text-gray-500 hover:text-black transition-colors flex items-center gap-1"
-                            >
-                                <LogOut className="w-4 h-4" />
-                                Thoát
-                            </button>
-                        </div>
+                        <UserDropdown
+                            user={user}
+                            onLogout={handleLogout}
+                            isActive={userMenuOpen}
+                            onToggle={handleUserMenuToggle}
+                        />
                     ) : (
                         <div className="hidden lg:flex items-center gap-2">
                             <Link
@@ -190,136 +417,113 @@ export default function Header() {
                             </Link>
                             <Link
                                 to="/register"
-                                className="text-sm font-medium px-4 py-2 bg-black text-white hover:bg-gray-800 rounded transition-colors"
+                                className="text-sm font-semibold px-4 py-2 bg-black text-white hover:bg-gray-800 rounded-lg transition-colors"
                             >
                                 Đăng ký
                             </Link>
                         </div>
                     )}
 
-                    {/* Mobile menu toggle */}
+                    {/* Mobile toggle */}
                     <button
-                        onClick={toggleMenu}
-                        className="lg:hidden p-2 text-gray-700 hover:text-black transition-colors"
-                        aria-label="Toggle menu"
-                        aria-expanded={isMenuOpen}
+                        type="button"
+                        onClick={() => setMobileOpen((v) => !v)}
+                        className="lg:hidden p-2 text-gray-700 hover:text-black transition-colors rounded-lg hover:bg-gray-100"
+                        aria-label="Mở menu"
+                        aria-expanded={mobileOpen}
+                        aria-controls="mobile-menu"
                     >
-                        {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                        {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                     </button>
                 </div>
             </div>
 
-            {/* Mobile Menu */}
-            {isMenuOpen && (
+            {/* Mobile Menu Drawer */}
+            {mobileOpen && (
                 <div
-                    ref={menuRef}
+                    id="mobile-menu"
+                    ref={mobileMenuRef}
                     role="dialog"
                     aria-modal="true"
-                    aria-label="Mobile navigation"
-                    className="lg:hidden fixed inset-0 top-header bg-white z-modal overflow-y-auto"
+                    aria-label="Menu điều hướng"
+                    className="lg:hidden fixed inset-0 top-header z-modal bg-white overflow-y-auto"
                 >
-                    <nav className="p-4 space-y-1">
-                        <MobileNavItem to="/coaches" onClick={closeMenu}>
-                            <User className="w-5 h-5" />
-                            Coach
-                        </MobileNavItem>
-                        <MobileNavItem to="/gallery" onClick={closeMenu}>
-                            <ImageIcon className="w-5 h-5" />
-                            Gallery
-                        </MobileNavItem>
-                        <MobileNavItem to="/gyms" onClick={closeMenu} highlight>
-                            <Dumbbell className="w-5 h-5" />
-                            Gym Center
-                        </MobileNavItem>
-                        <MobileNavItem to="/coaches?type=athlete" onClick={closeMenu}>
-                            <User className="w-5 h-5" />
-                            Vận động viên
-                        </MobileNavItem>
+                    {/* Public nav groups (Accordion) */}
+                    <div className="mt-2">
+                        {PUBLIC_NAV.map((group) => (
+                            <MobileAccordion
+                                key={group.id}
+                                group={group}
+                                isOpen={mobileOpenGroup === group.id}
+                                onToggle={() => setMobileOpenGroup((v) => (v === group.id ? null : group.id))}
+                                onClose={() => setMobileOpen(false)}
+                            />
+                        ))}
+                    </div>
 
-                        {isAuthenticated ? (
-                            <>
-                                <div className="h-px bg-gray-200 my-3" />
-                                <MobileNavItem to={user?.user_type === 'gym_owner' ? '/gym-owner' : '/dashboard'} onClick={closeMenu}>
-                                    {user?.user_type === 'gym_owner' ? 'Quản lý Gym' : 'Dashboard'}
-                                </MobileNavItem>
-                                {(user?.user_type === 'trainer' || user?.user_type === 'athlete') && (
-                                    <MobileNavItem to="/programs" onClick={closeMenu}>
-                                        Khóa học
-                                    </MobileNavItem>
-                                )}
-                                {user?.user_type === 'athlete' && (
-                                    <MobileNavItem to="/workouts" onClick={closeMenu}>
-                                        <Calendar className="w-5 h-5" />
-                                        Lịch tập
-                                    </MobileNavItem>
-                                )}
-                                <MobileNavItem to="/messages" onClick={closeMenu}>
-                                    <MessageSquare className="w-5 h-5" />
-                                    Tin nhắn
-                                </MobileNavItem>
-                                <MobileNavItem to="/profile" onClick={closeMenu}>
-                                    Hồ sơ
-                                </MobileNavItem>
-                                <div className="h-px bg-gray-200 my-3" />
+                    {/* Authenticated quick links */}
+                    {isAuthenticated && user ? (
+                        <div className="mt-2 border-t border-gray-200 pt-3">
+                            <div className="px-4 py-2">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Của Tôi</p>
+                            </div>
+                            <Link to={user.user_type === 'gym_owner' ? '/gym-owner' : '/dashboard'} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors">
+                                <LayoutDashboard className="w-4 h-4 text-gray-400" />
+                                {user.user_type === 'gym_owner' ? 'Quản lý Gym' : 'Dashboard'}
+                                <ChevronRight className="w-4 h-4 text-gray-300 ml-auto" />
+                            </Link>
+                            <Link to="/messages" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors">
+                                <MessageSquare className="w-4 h-4 text-gray-400" />
+                                Tin nhắn
+                                <ChevronRight className="w-4 h-4 text-gray-300 ml-auto" />
+                            </Link>
+                            <Link to="/profile" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors">
+                                <UserCog className="w-4 h-4 text-gray-400" />
+                                Hồ sơ cá nhân
+                                <ChevronRight className="w-4 h-4 text-gray-300 ml-auto" />
+                            </Link>
+                            {user.user_type === 'athlete' && (
+                                <Link to="/workouts" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-800 hover:bg-gray-50 transition-colors">
+                                    <Dumbbell className="w-4 h-4 text-gray-400" />
+                                    Lịch Tập
+                                    <ChevronRight className="w-4 h-4 text-gray-300 ml-auto" />
+                                </Link>
+                            )}
+                            <div className="mt-2 px-4 pb-4 border-t border-gray-100 pt-3">
                                 <button
+                                    type="button"
                                     onClick={handleLogout}
-                                    className="w-full flex items-center justify-between px-4 py-3 text-red-600 font-medium"
+                                    className="flex w-full items-center gap-3 py-2.5 text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
                                 >
-                                    <span className="flex items-center gap-3">
-                                        <LogOut className="w-5 h-5" />
-                                        Đăng xuất
-                                    </span>
+                                    <LogOut className="w-4 h-4" />
+                                    Đăng xuất
                                 </button>
-                            </>
-                        ) : (
-                            <>
-                                <div className="h-px bg-gray-200 my-3" />
-                                <MobileNavItem to="/login" onClick={closeMenu}>
-                                    Đăng nhập
-                                </MobileNavItem>
-                                <MobileNavItem to="/register" onClick={closeMenu} highlight>
-                                    Đăng ký thành viên
-                                </MobileNavItem>
-                            </>
-                        )}
-                    </nav>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="mt-2 border-t border-gray-200 p-4 space-y-3">
+                            <Link
+                                to="/login"
+                                onClick={() => setMobileOpen(false)}
+                                className="flex w-full items-center justify-center rounded-lg border border-gray-200 py-3 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition-colors"
+                            >
+                                Đăng nhập
+                            </Link>
+                            <Link
+                                to="/register"
+                                onClick={() => setMobileOpen(false)}
+                                className="flex w-full items-center justify-center rounded-lg bg-black py-3 text-sm font-semibold text-white hover:bg-gray-800 transition-colors"
+                            >
+                                Đăng ký miễn phí
+                            </Link>
+                        </div>
+                    )}
 
-                    <div className="p-4 border-t border-gray-200">
-                        <p className="text-xs text-gray-400 italic">
-                            GYMERVIET — Hệ sinh thái Gym & Coach số 1 VN
-                        </p>
+                    <div className="px-4 py-6 border-t border-gray-100">
+                        <p className="text-xs text-gray-400">GYMERVIET — Hệ sinh thái Thể thao Số 1 Việt Nam</p>
                     </div>
                 </div>
             )}
         </header>
-    );
-}
-
-// Mobile nav item component
-function MobileNavItem({
-    to,
-    onClick,
-    highlight,
-    children,
-}: {
-    to: string;
-    onClick: () => void;
-    highlight?: boolean;
-    children: React.ReactNode;
-}) {
-    return (
-        <Link
-            to={to}
-            onClick={onClick}
-            className={cn(
-                'flex items-center justify-between px-4 py-3 rounded-lg transition-colors',
-                highlight
-                    ? 'bg-black text-white font-semibold'
-                    : 'text-gray-700 hover:bg-gray-100'
-            )}
-        >
-            <span className="flex items-center gap-3">{children}</span>
-            <ChevronRight className="w-4 h-4 opacity-50" />
-        </Link>
     );
 }

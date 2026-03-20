@@ -70,6 +70,9 @@ import { ProductOrderItem } from '../entities/ProductOrderItem';
 import { ProductWishlist } from '../entities/ProductWishlist';
 import { ProhibitedKeyword } from '../entities/ProhibitedKeyword';
 
+// News Module
+import { NewsArticle } from '../entities/NewsArticle';
+
 const env = getEnv();
 
 export const AppDataSource = new DataSource({
@@ -145,6 +148,8 @@ export const AppDataSource = new DataSource({
         ProductOrderItem,
         ProductWishlist,
         ProhibitedKeyword,
+        // News / Tin Tức
+        NewsArticle,
     ],
     subscribers: [],
     migrations: [__dirname + '/../migrations/*.{js,ts}'],

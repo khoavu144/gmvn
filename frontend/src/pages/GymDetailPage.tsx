@@ -552,7 +552,7 @@ const GymDetailPage: React.FC = () => {
 
     const venueLabel = getPrimaryVenueLabel(gym);
     const leadAction = resolveLeadRoute(gym, branchDetail);
-    const canonicalUrl = `https://gymerviet.vn/gyms/${gym.slug || gym.id}`;
+    const canonicalUrl = `https://gymerviet.com/gyms/${gym.slug || gym.id}`;
     const seoTitle = `${gym.name} — ${venueLabel} trên GYMERVIET`;
     const seoDescription = gym.discovery_blurb || gym.tagline || gym.description || `${gym.name} — ${venueLabel} trên GYMERVIET.`;
     const seoImage = heroImage?.image_url || gym.cover_image_url || gym.logo_url || '';
@@ -575,6 +575,29 @@ const GymDetailPage: React.FC = () => {
             value: getTaxonomyLabels(gym, 'audience', 1)[0] || 'Người đang tìm venue phù hợp',
         },
     ];
+
+    useEffect(() => {
+        if (lightboxIdx === null) return;
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setLightboxIdx(null);
+            } else if (e.key === 'ArrowLeft' && gallery.length > 1) {
+                setLightboxIdx((current) => current === null ? 0 : (current - 1 + gallery.length) % gallery.length);
+            } else if (e.key === 'ArrowRight' && gallery.length > 1) {
+                setLightboxIdx((current) => current === null ? 0 : (current + 1) % gallery.length);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        // Prevent body scroll when lightbox is open
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            document.body.style.overflow = '';
+        };
+    }, [lightboxIdx, gallery.length]);
 
     return (
         <>
@@ -612,11 +635,18 @@ const GymDetailPage: React.FC = () => {
             </Helmet>
 
             {activeImage && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(16,12,10,0.96)] p-4" onClick={() => setLightboxIdx(null)}>
+                <div 
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(16,12,10,0.96)] p-4" 
+                    onClick={() => setLightboxIdx(null)}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Image gallery"
+                >
                     <button
                         type="button"
                         onClick={() => setLightboxIdx(null)}
-                        className="absolute right-5 top-5 text-3xl font-black text-white/75 transition hover:text-white"
+                        className="absolute right-5 top-5 text-3xl font-black text-white/75 transition motion-reduce:transition-none hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 rounded-full w-12 h-12 flex items-center justify-center"
+                        aria-label="Close gallery"
                     >
                         ×
                     </button>
@@ -628,7 +658,8 @@ const GymDetailPage: React.FC = () => {
                                     event.stopPropagation();
                                     setLightboxIdx((current) => current === null ? 0 : (current - 1 + gallery.length) % gallery.length);
                                 }}
-                                className="absolute left-4 rounded-full border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition hover:bg-white/12"
+                                className="absolute left-4 rounded-full border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                aria-label="Previous image"
                             >
                                 ‹
                             </button>
@@ -638,7 +669,8 @@ const GymDetailPage: React.FC = () => {
                                     event.stopPropagation();
                                     setLightboxIdx((current) => current === null ? 0 : (current + 1) % gallery.length);
                                 }}
-                                className="absolute right-4 rounded-full border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition hover:bg-white/12"
+                                className="absolute right-4 rounded-full border border-white/15 bg-white/5 px-4 py-3 text-xl font-black text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
+                                aria-label="Next image"
                             >
                                 ›
                             </button>
@@ -647,7 +679,7 @@ const GymDetailPage: React.FC = () => {
                     <img
                         src={activeImage.image_url}
                         alt={activeImage.alt_text || activeImage.caption || gym.name}
-                        className="max-h-[88vh] max-w-full object-contain"
+                        className="max-h-[88vh] max-w-full object-contain transition-transform motion-reduce:transition-none"
                         onClick={(event) => event.stopPropagation()}
                     />
                 </div>
@@ -779,8 +811,8 @@ const GymDetailPage: React.FC = () => {
                         <FadeIn>
                             <section ref={setRef('overview')} id="overview" className="marketplace-panel p-6 sm:p-8">
                                 <SectionHeading
-                                    kicker="Overview"
-                                    title="Venue summary"
+                                    kicker="Tổng quan"
+                                    title="Tóm tắt về cơ sở"
                                     description="Một bức chân dung nhanh để biết nơi này có đúng phong cách tập, mức đầu tư và trải nghiệm bạn đang tìm hay không."
                                 />
 
@@ -822,9 +854,9 @@ const GymDetailPage: React.FC = () => {
                             <FadeIn>
                                 <section ref={setRef('zones')} id="zones" className="marketplace-panel p-6 sm:p-8">
                                     <SectionHeading
-                                        kicker="Signature zones"
+                                        kicker="Khu vực nổi bật"
                                         title="Những không gian quyết định cảm giác tập"
-                                        description="Không chỉ là danh sách máy móc — đây là các zone giúp bạn đánh giá ngay venue này hợp thói quen tập của mình đến đâu."
+                                        description="Không chỉ là danh sách máy móc — đây là các khu vực giúp bạn đánh giá ngay cơ sở này hợp thói quen tập của mình đến đâu."
                                     />
 
                                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -860,15 +892,15 @@ const GymDetailPage: React.FC = () => {
                             <FadeIn>
                                 <section ref={setRef('facilities')} id="facilities" className="marketplace-panel p-6 sm:p-8">
                                     <SectionHeading
-                                        kicker="Facilities"
+                                        kicker="Tiện ích"
                                         title="Tiện ích và thiết bị hỗ trợ quyết định"
-                                        description="Những chi tiết nhỏ như locker, shower, towel service hay chất lượng equipment thường là thứ quyết định bạn có quay lại đều hay không."
+                                        description="Những chi tiết nhỏ như tủ để đồ, phòng tắm, dịch vụ khăn hay chất lượng trang thiết bị thường là thứ quyết định bạn có duy trì thói quen tạp luyện hay không."
                                     />
 
                                     <div className="space-y-8">
                                         {branchAmenities.length > 0 && (
                                             <div>
-                                                <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Amenity snapshot</div>
+                                                <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Danh sách tiện ích</div>
                                                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                                                     {branchAmenities.map((item) => (
                                                         <div key={item.id} className={`rounded-[1.2rem] border px-4 py-4 ${item.is_available ? 'border-[color:var(--mk-line)] bg-white/80' : 'border-[color:var(--mk-line)]/70 bg-[color:var(--mk-paper-strong)]/60 opacity-70'}`}>
@@ -882,7 +914,7 @@ const GymDetailPage: React.FC = () => {
 
                                         {branchEquipment.length > 0 && (
                                             <div>
-                                                <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Equipment library</div>
+                                                <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Thư viện thiết bị</div>
                                                 <div className="grid gap-4 md:grid-cols-2">
                                                     {Object.entries(branchEquipmentGroups).map(([category, items]) => (
                                                         <div key={category} className="rounded-[1.3rem] border border-[color:var(--mk-line)] bg-white/75 p-4">
@@ -911,9 +943,9 @@ const GymDetailPage: React.FC = () => {
                             <FadeIn>
                                 <section ref={setRef('trainers')} id="trainers" className="marketplace-panel p-6 sm:p-8">
                                     <SectionHeading
-                                        kicker="Specialists"
+                                        kicker="Chuyên gia"
                                         title="Ai đang dẫn dắt trải nghiệm tại chi nhánh này"
-                                        description="Không chỉ là danh sách HLV — hãy nhìn specialization, ngôn ngữ và cách họ xuất hiện tại chi nhánh này để đo được chất lượng fit."
+                                        description="Không chỉ là danh sách Huấn luyện viên — hãy nhìn chuyên môn, ngôn ngữ và nền tảng của họ để đánh giá độ phù hợp với cá nhân bạn."
                                     />
 
                                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -935,17 +967,17 @@ const GymDetailPage: React.FC = () => {
 
                                                         <div className="min-w-0 flex-1">
                                                             <div className="text-base font-black tracking-[-0.03em] text-[color:var(--mk-text)]">
-                                                                {link.trainer?.full_name || 'Coach partner'}
+                                                                {link.trainer?.full_name || 'Đối tác huấn luyện'}
                                                             </div>
                                                             <div className="mt-1 text-sm text-[color:var(--mk-muted)]">
-                                                                {link.specialization_summary || link.role_at_gym || 'Trainer linked with this branch'}
+                                                                {link.specialization_summary || link.role_at_gym || 'Huấn luyện viên tại cơ sở này'}
                                                             </div>
                                                         </div>
                                                     </div>
 
                                                     <div className="mt-4 flex flex-wrap gap-2">
-                                                        {link.featured_at_branch && <span className="marketplace-badge marketplace-badge--accent">Featured at branch</span>}
-                                                        {link.accepts_private_clients && <span className="marketplace-badge marketplace-badge--neutral">Private clients</span>}
+                                                        {link.featured_at_branch && <span className="marketplace-badge marketplace-badge--accent">Huấn luyện viên nổi bật</span>}
+                                                        {link.accepts_private_clients && <span className="marketplace-badge marketplace-badge--neutral">Có nhận học viên riêng</span>}
                                                         {(link.languages || []).slice(0, 2).map((language) => (
                                                             <span key={language} className="marketplace-badge marketplace-badge--neutral">{language}</span>
                                                         ))}
@@ -976,9 +1008,9 @@ const GymDetailPage: React.FC = () => {
                             <FadeIn>
                                 <section ref={setRef('pricing')} id="pricing" className="marketplace-panel p-6 sm:p-8">
                                     <SectionHeading
-                                        kicker="Pricing"
+                                        kicker="Bảng giá"
                                         title="Các gói vào cửa và cách bắt đầu"
-                                        description="Đừng chỉ nhìn gói nổi bật. Hãy nhìn gói entry, included services và chính sách freeze/cancel để biết chi phí thực sự của việc bắt đầu."
+                                        description="Đừng chỉ nhìn gói nổi bật. Hãy nhìn gói khởi điểm, các dịch vụ đi kèm và chính sách để biết chi phí thực sự của việc tập luyện."
                                     />
 
                                     <div className="grid gap-4 xl:grid-cols-3">
@@ -1042,9 +1074,9 @@ const GymDetailPage: React.FC = () => {
                             <FadeIn>
                                 <section ref={setRef('schedule')} id="schedule" className="marketplace-panel p-6 sm:p-8">
                                     <SectionHeading
-                                        kicker="Schedule"
+                                        kicker="Lịch tập"
                                         title="Lịch lớp và nhịp hoạt động tại chi nhánh"
-                                        description="Một venue tốt không chỉ đẹp trên thumbnail — lịch lớp phải đủ rõ để bạn hình dung ngay tuần đầu tiên của mình sẽ trông như thế nào."
+                                        description="Một cơ sở tốt không chỉ hiển thị đẹp trên hình ảnh — lịch lớp phải đủ rõ để bạn hình dung ngay tuần đầu tiên tập luyện của mình sẽ trông như thế nào."
                                     />
 
                                     <div className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
@@ -1070,7 +1102,7 @@ const GymDetailPage: React.FC = () => {
                                                 <>
                                                     <div className="flex flex-wrap items-start justify-between gap-3">
                                                         <div>
-                                                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Selected program</div>
+                                                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chương trình đã chọn</div>
                                                             <h3 className="mt-2 text-2xl font-black tracking-[-0.05em] text-[color:var(--mk-text)]">{activeProgram.title}</h3>
                                                             <p className="mt-2 text-sm leading-7 text-[color:var(--mk-text-soft)]">{activeProgram.description || 'Chưa có mô tả chi tiết cho lớp này.'}</p>
                                                         </div>
@@ -1089,7 +1121,7 @@ const GymDetailPage: React.FC = () => {
                                                     )}
 
                                                     <div className="mt-6">
-                                                        <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Upcoming sessions</div>
+                                                        <div className="mb-3 text-[0.72rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Các buổi học sắp tới</div>
                                                         {sessionsLoading ? (
                                                             <div className="space-y-3 animate-pulse">
                                                                 <div className="h-16 rounded-[1rem] bg-[color:var(--mk-paper-strong)]" />
@@ -1101,7 +1133,7 @@ const GymDetailPage: React.FC = () => {
                                                                     <div key={session.id} className="flex flex-wrap items-center justify-between gap-3 rounded-[1rem] border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] px-4 py-3">
                                                                         <div>
                                                                             <div className="text-sm font-bold text-[color:var(--mk-text)]">{formatSessionDate(session.starts_at)}</div>
-                                                                            <div className="text-sm text-[color:var(--mk-muted)]">{session.session_note || 'Open booking window'}</div>
+                                                                            <div className="text-sm text-[color:var(--mk-muted)]">{session.session_note || 'Đang mở đăng ký'}</div>
                                                                         </div>
                                                                         <div className="text-right">
                                                                             <div className="text-[0.68rem] font-black uppercase tracking-[0.16em] text-[color:var(--mk-muted)]">Còn chỗ</div>
@@ -1138,12 +1170,12 @@ const GymDetailPage: React.FC = () => {
 
                                 <div className="mb-6 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
                                     {[
-                                        { label: 'Overall', value: gym.trust_summary?.avg_rating ? `★ ${gym.trust_summary.avg_rating.toFixed(1)}` : '—' },
-                                        { label: 'Equipment', value: gym.trust_summary?.dimensions.equipment_rating ? gym.trust_summary.dimensions.equipment_rating.toFixed(1) : '—' },
-                                        { label: 'Cleanliness', value: gym.trust_summary?.dimensions.cleanliness_rating ? gym.trust_summary.dimensions.cleanliness_rating.toFixed(1) : '—' },
-                                        { label: 'Coaching', value: gym.trust_summary?.dimensions.coaching_rating ? gym.trust_summary.dimensions.coaching_rating.toFixed(1) : '—' },
-                                        { label: 'Atmosphere', value: gym.trust_summary?.dimensions.atmosphere_rating ? gym.trust_summary.dimensions.atmosphere_rating.toFixed(1) : '—' },
-                                        { label: 'Value', value: gym.trust_summary?.dimensions.value_rating ? gym.trust_summary.dimensions.value_rating.toFixed(1) : '—' },
+                                        { label: 'Tổng quan', value: gym.trust_summary?.avg_rating ? `★ ${gym.trust_summary.avg_rating.toFixed(1)}` : '—' },
+                                        { label: 'Thiết bị', value: gym.trust_summary?.dimensions.equipment_rating ? gym.trust_summary.dimensions.equipment_rating.toFixed(1) : '—' },
+                                        { label: 'Sạch sẽ', value: gym.trust_summary?.dimensions.cleanliness_rating ? gym.trust_summary.dimensions.cleanliness_rating.toFixed(1) : '—' },
+                                        { label: 'Hướng dẫn', value: gym.trust_summary?.dimensions.coaching_rating ? gym.trust_summary.dimensions.coaching_rating.toFixed(1) : '—' },
+                                        { label: 'Không gian', value: gym.trust_summary?.dimensions.atmosphere_rating ? gym.trust_summary.dimensions.atmosphere_rating.toFixed(1) : '—' },
+                                        { label: 'Chi phí', value: gym.trust_summary?.dimensions.value_rating ? gym.trust_summary.dimensions.value_rating.toFixed(1) : '—' },
                                     ].map((item) => (
                                         <div key={item.label} className="rounded-[1.2rem] border border-white/10 bg-white/6 px-4 py-4">
                                             <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/55">{item.label}</div>
@@ -1162,7 +1194,7 @@ const GymDetailPage: React.FC = () => {
 
                                 {branchId && !canReview && (
                                     <div className="mt-8 rounded-[1.2rem] border border-white/10 bg-white/5 px-5 py-4 text-sm text-white/68">
-                                        Bạn cần có gói tập hoặc tương tác đủ điều kiện với venue này để để lại review xác thực trên marketplace.
+                                        Bạn cần có gói tập hoặc từng tương tác tư vấn với cơ sở này để để lại một review hợp lệ trên marketplace.
                                     </div>
                                 )}
                             </section>
@@ -1172,9 +1204,9 @@ const GymDetailPage: React.FC = () => {
                             <FadeIn>
                                 <section ref={setRef('similar')} id="similar" className="marketplace-panel p-6 sm:p-8">
                                     <SectionHeading
-                                        kicker="Similar venues"
-                                        title="Nếu venue này gần đúng, hãy nhìn thêm những lựa chọn bên cạnh"
-                                        description="Những venue tương tự được gợi ý theo loại hình, vùng giá và khu vực để bạn so nhanh trước khi quyết định."
+                                        kicker="Cơ sở tương tự"
+                                        title="Nếu địa điểm này gần đúng yêu cầu, hãy xem thêm những lựa chọn liên quan"
+                                        description="Những cơ sở tương tự được gợi ý theo loại hình, vùng giá và khu vực để bạn so sánh nhanh trước khi quyết định."
                                     />
 
                                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -1190,15 +1222,15 @@ const GymDetailPage: React.FC = () => {
                             <FadeIn>
                                 <section ref={setRef('map')} id="map" className="marketplace-panel p-6 sm:p-8">
                                     <SectionHeading
-                                        kicker="Map"
-                                        title="Định vị chi nhánh và bối cảnh quanh venue"
-                                        description="Bản đồ nên giúp bạn trả lời ngay một câu hỏi: mình có thật sự sẽ ghé nơi này đều đặn trong tuần không."
+                                        kicker="Bản đồ định vị"
+                                        title="Định vị chi nhánh và bối cảnh quanh phòng tập"
+                                        description="Bản đồ giúp bạn trả lời ngay một câu hỏi thực tế: mình có tiện đường rẽ vào nơi này đều đặn trong tuần hay không."
                                     />
 
                                     <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
                                         <div className="space-y-4">
                                             <SummaryPill label="Địa chỉ" value={branchDetail?.address || 'Chưa cập nhật'} />
-                                            <SummaryPill label="Parking" value={branchDetail?.parking_summary || 'Chưa có ghi chú parking'} />
+                                            <SummaryPill label="Gửi xe" value={branchDetail?.parking_summary || 'Chưa cập nhật chỗ gửi xe'} />
                                             <SummaryPill label="Check-in" value={branchDetail?.check_in_instructions || 'Tư vấn tại rail bên phải để được hướng dẫn nhanh'} />
                                         </div>
 
@@ -1234,22 +1266,22 @@ const GymDetailPage: React.FC = () => {
 
                     <aside className="marketplace-sticky-rail space-y-4">
                         <div className="marketplace-panel p-5 sm:p-6">
-                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Decision rail</div>
+                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Quyết định nhanh</div>
                             <div className="mt-3 text-sm font-semibold text-[color:var(--mk-text-soft)]">Chi nhánh đang xem</div>
                             <h3 className="mt-1 text-[1.55rem] font-black leading-[0.98] tracking-[-0.05em] text-[color:var(--mk-text)]">
                                 {branchName}
                             </h3>
                             <p className="mt-3 text-sm leading-7 text-[color:var(--mk-muted)]">
-                                {branchDetail?.branch_tagline || branchDetail?.description || gym.discovery_blurb || 'Chọn đúng chi nhánh trước khi đặt tư vấn để nhận câu trả lời chính xác hơn về giá, lịch và trải nghiệm thực tế.'}
+                                {branchDetail?.branch_tagline || branchDetail?.description || gym.discovery_blurb || 'Chọn đúng chi nhánh trước khi đặt hẹn tư vấn để nhận thông tin chuẩn nhất về giá mở cửa, lịch và trải nghiệm thực tế tại đó.'}
                             </p>
 
                             <div className="mt-5 rounded-[1.5rem] bg-[color:var(--mk-text)] px-5 py-5 text-white">
-                                <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-white/55">Entry point</div>
+                                <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-white/55">Đầu tư ban đầu</div>
                                 <div className="mt-2 text-[2.3rem] font-black leading-none tracking-[-0.07em]">
                                     {lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫` : 'Liên hệ'}
                                 </div>
                                 <div className="mt-2 text-sm text-white/72">
-                                    {lowestPrice ? 'Điểm vào thấp nhất tại chi nhánh đang xem' : 'Venue này chưa công bố giá public cho chi nhánh này'}
+                                    {lowestPrice ? 'Chi phí tối thiểu tại chi nhánh đang xem' : 'Cơ sở này chưa công khai bảng giá hiện hành'}
                                 </div>
                             </div>
 
@@ -1272,7 +1304,7 @@ const GymDetailPage: React.FC = () => {
 
                         {branches.length > 1 && (
                             <div className="marketplace-panel p-5">
-                                <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Branch switcher</div>
+                                <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chuyển chi nhánh</div>
                                 <div className="mt-4 space-y-2">
                                     {branches.map((branch) => (
                                         <button
@@ -1290,20 +1322,20 @@ const GymDetailPage: React.FC = () => {
                         )}
 
                         <div className="marketplace-panel p-5">
-                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Live branch notes</div>
+                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Lưu ý tại điểm tập</div>
                             <div className="mt-4 space-y-3">
                                 <SummaryPill
                                     label="Hôm nay"
                                     value={todayHours ? (todayHours.is_closed ? 'Đóng cửa' : `${todayHours.open || '—'} → ${todayHours.close || '—'}`) : 'Chưa cập nhật lịch'}
                                 />
-                                <SummaryPill label="Crowd" value={branchDetail?.crowd_level_summary || 'Chưa có note crowd'} />
-                                <SummaryPill label="Best visit" value={branchDetail?.best_visit_time_summary || 'Hỏi venue để chọn khung giờ'} />
-                                <SummaryPill label="Women / family" value={branchDetail?.women_only_summary || branchDetail?.child_friendly_summary || 'Chưa có ghi chú riêng'} />
+                                <SummaryPill label="Mật độ" value={branchDetail?.crowd_level_summary || 'Chưa cập nhật mật độ'} />
+                                <SummaryPill label="Khung giờ tốt nhất" value={branchDetail?.best_visit_time_summary || 'Gắn thẻ cơ sở để nhắc chọn giờ trải nghiệm'} />
+                                <SummaryPill label="Lưu ý đối tượng" value={branchDetail?.women_only_summary || branchDetail?.child_friendly_summary || 'Chưa có ghi chú riêng biệt'} />
                             </div>
                         </div>
 
                         <div className="marketplace-panel p-5">
-                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Fast contact</div>
+                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Liên hệ nhanh</div>
                             <div className="mt-4 grid gap-2">
                                 {branchPhone && (
                                     <a href={`tel:${normalizePhone(branchPhone)}`} className="rounded-[1rem] border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
@@ -1324,7 +1356,7 @@ const GymDetailPage: React.FC = () => {
                         </div>
 
                         <div className="marketplace-panel p-5">
-                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Share venue</div>
+                            <div className="text-[0.68rem] font-black uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chia sẻ cơ sở</div>
                             <div className="mt-4 flex flex-wrap gap-2">
                                 <ShareButton
                                     url={canonicalUrl}
@@ -1339,9 +1371,9 @@ const GymDetailPage: React.FC = () => {
                                     url={canonicalUrl}
                                     title={seoTitle}
                                     text={seoDescription}
-                                    label="Copy link"
+                                    label="Sao chép Link"
                                     className="!rounded-[1rem] !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
-                                    titleAttr="Sao chép liên kết venue"
+                                    titleAttr="Sao chép liên kết cơ sở"
                                 />
                             </div>
                         </div>
@@ -1352,7 +1384,7 @@ const GymDetailPage: React.FC = () => {
                     <div className="rounded-[1.35rem] border border-white/14 bg-[rgba(29,22,18,0.94)] px-4 py-3 text-white shadow-[0_18px_50px_rgba(0,0,0,0.26)] backdrop-blur-xl">
                         <div className="flex items-center justify-between gap-3">
                             <div>
-                                <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/48">Entry point</div>
+                                <div className="text-[0.64rem] font-black uppercase tracking-[0.18em] text-white/48">Chí phí ước tính từ</div>
                                 <div className="mt-1 text-lg font-black tracking-[-0.04em]">
                                     {lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫` : 'Liên hệ'}
                                 </div>

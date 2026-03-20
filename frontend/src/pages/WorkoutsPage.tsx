@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { logger } from '../lib/logger';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
@@ -57,6 +58,10 @@ export default function WorkoutsPage() {
 
     return (
         <div className="page-shell-muted">
+            <Helmet>
+                <title>Lịch tập của tôi — GymViet</title>
+                <meta name="robots" content="noindex,nofollow" />
+            </Helmet>
             {ToastComponent}
             <div className="page-container">
                 <section className="page-header">

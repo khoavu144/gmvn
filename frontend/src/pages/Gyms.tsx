@@ -136,15 +136,16 @@ const Gyms: React.FC = () => {
                     name="description"
                     content="Khám phá gym, fitness club, yoga studio, pilates studio và recovery spaces theo khu vực, mức giá và trải nghiệm phù hợp với mục tiêu tập luyện của bạn."
                 />
-                <link rel="canonical" href="https://gymerviet.vn/gyms" />
+                <link rel="canonical" href="https://gymerviet.com/gyms" />
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="Marketplace Phòng tập — GYMERVIET" />
                 <meta
                     property="og:description"
-                    content="Khám phá không gian tập luyện được biên tập: thumbnail-first, giá khởi điểm rõ ràng, trải nghiệm phù hợp từng mục tiêu."
+                    content="Khám phá không gian tập luyện được biên tập: thumbnail, giá khởi điểm rõ ràng, trải nghiệm phù hợp từng mục tiêu."
                 />
-                <meta property="og:url" content="https://gymerviet.vn/gyms" />
-                <meta property="og:image" content="https://gymerviet.vn/og-default.jpg" />
+                <meta property="og:url" content={import.meta.env.VITE_CANONICAL_BASE_URL ? `${import.meta.env.VITE_CANONICAL_BASE_URL}/gyms` : "https://gymerviet.com/gyms"} />
+                <meta property="og:image" content="https://gymerviet.com/og-default.jpg" />
+                <meta property="og:image:alt" content="GYMERVIET Gyms Marketplace" />
                 <meta name="twitter:card" content="summary_large_image" />
             </Helmet>
 
@@ -163,9 +164,8 @@ const Gyms: React.FC = () => {
                                         và quyết định đúng.
                                     </h1>
                                     <p className="marketplace-lead">
-                                        Một marketplace dành cho người thật sự muốn tìm đúng không gian tập: gym mainstream,
-                                        fitness club premium, yoga studio, pilates reformer và recovery spaces — với thumbnail rõ,
-                                        entry price rõ, và động lực phù hợp rõ.
+                                        Một marketplace dành cho người thật sự muốn tìm đúng không gian tập: gym chất lượng cao,
+                                        fitness club cao cấp, yoga studio, pilates reformer và không gian recovery.
                                     </p>
                                 </div>
 
@@ -190,11 +190,11 @@ const Gyms: React.FC = () => {
                                 </div>
                                 <div className="marketplace-stat-card">
                                     <strong>{featuredGyms.length > 0 ? featuredGyms.length : 0}</strong>
-                                    <span>Featured tuần này</span>
+                                    <span>Nổi bật tuần này</span>
                                 </div>
                                 <div className="marketplace-stat-card">
                                     <strong>{venueHighlights.length}</strong>
-                                    <span>Loại hình nổi bật</span>
+                                    <span>Loại hình chọn lọc</span>
                                 </div>
                             </div>
                         </div>
@@ -367,11 +367,11 @@ const Gyms: React.FC = () => {
                                 <div className="space-y-4">
                                     <div className="marketplace-results-head">
                                         <div>
-                                            <div className="marketplace-section-kicker">Featured venues</div>
+                                            <div className="marketplace-section-kicker">Lựa chọn Nổi bật</div>
                                             <h2>Những không gian đang được chọn nhiều tuần này</h2>
                                         </div>
                                         <div className="marketplace-results-meta">
-                                            Thumbnail-first, giá khởi điểm rõ, tone không gian rõ.
+                                            Hình ảnh thực tế, giá khởi điểm rõ ràng, mô tả chân thực.
                                         </div>
                                     </div>
 
@@ -393,7 +393,7 @@ const Gyms: React.FC = () => {
                                         <div key={group.key} className="space-y-4">
                                             <div className="marketplace-results-head">
                                                 <div>
-                                                    <div className="marketplace-section-kicker">Category rail</div>
+                                                    <div className="marketplace-section-kicker">Phân loại</div>
                                                     <h2>{getPrimaryVenueLabel(group.items[0])}</h2>
                                                 </div>
                                                 <div className="marketplace-results-meta">
@@ -416,11 +416,11 @@ const Gyms: React.FC = () => {
                             <div className="space-y-4">
                                 <div className="marketplace-results-head">
                                     <div>
-                                        <div className="marketplace-section-kicker">All results</div>
+                                        <div className="marketplace-section-kicker">Tất cả Kết quả</div>
                                         <h2>Tất cả lựa chọn phù hợp</h2>
                                     </div>
                                     <div className="marketplace-results-meta">
-                                        {gyms.length} venue · {venueType ? `lọc theo ${venueType}` : 'mọi loại hình'} · {cityFilter || 'toàn quốc'}
+                                        {gyms.length} cơ sở · {venueType ? `lọc theo loại ${venueType}` : 'mọi loại hình'} · {cityFilter || 'toàn quốc'}
                                     </div>
                                 </div>
 
@@ -444,19 +444,19 @@ const Gyms: React.FC = () => {
                         <div className="marketplace-panel p-6 sm:p-8">
                             <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
                                 <div className="space-y-3">
-                                    <div className="marketplace-section-kicker">Fast compare</div>
-                                    <h2 className="marketplace-section-title">Ba tín hiệu nên nhìn đầu tiên trước khi bấm vào một gym</h2>
+                                    <div className="marketplace-section-kicker">Mẹo so sánh nhanh</div>
+                                    <h2 className="marketplace-section-title">Ba tiêu chí nên xem trước khi chọn một cơ sở</h2>
                                     <p className="marketplace-lead max-w-none">
-                                        Hãy so ba thứ này trước: thumbnail có đúng kiểu không gian bạn muốn không, entry price có hợp nhịp cam kết của bạn không,
-                                        và audience tags có phản ánh người tập giống bạn không.
+                                        Hãy so sánh ba yếu tố này trước: hình ảnh không gian có đúng gu của bạn không, mức giá khởi điểm có phù hợp không,
+                                        và các thẻ phân loại có đúng với nhu cầu tập luyện của bạn không.
                                     </p>
                                 </div>
 
                                 <div className="grid gap-3 sm:grid-cols-3">
                                     {[
-                                        { title: 'Không gian', body: 'Xem thumbnail và gallery thumb để xác định vibe thật thay vì chỉ đọc tagline.' },
-                                        { title: 'Entry price', body: 'Đừng chỉ nhìn mức giá lớn nhất. Hãy nhìn điểm vào phù hợp để bắt đầu nhanh.' },
-                                        { title: 'Fit của bạn', body: 'Tags như beginner, women-focused hay athlete giúp loại bớt lựa chọn sai.' },
+                                        { title: 'Không gian', body: 'Xem hình ảnh thực tế để cảm nhận không gian thay vì chỉ đọc giới thiệu.' },
+                                        { title: 'Mức chi phí', body: 'Đừng chỉ nhìn mức giá tối đa. Hãy xem điểm giá khởi điểm để bắt đầu nhanh.' },
+                                        { title: 'Phù hợp mục tiêu', body: 'Các thẻ như người mới, ưu tiên nữ giới hay dân thể thao giúp loại bớt lựa chọn sai.' },
                                     ].map((item) => (
                                         <div key={item.title} className="rounded-[1.25rem] border border-[color:var(--mk-line)] bg-white/70 p-4">
                                             <div className="text-sm font-black tracking-[-0.03em] text-[color:var(--mk-text)]">{item.title}</div>

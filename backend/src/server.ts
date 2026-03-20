@@ -31,6 +31,10 @@ const bootstrap = async () => {
         const { startPlatformSubCron } = await import('./scripts/expirePlatformSubs');
         startPlatformSubCron();
 
+        // Start News auto-crawl cron (daily 02:00 AM Vietnam time)
+        const { startNewsCron } = await import('./services/newsCronScheduler');
+        startNewsCron();
+
         httpServer.listen(env.PORT, async () => {
             console.log(`🚀 Server running on port ${env.PORT}`);
             console.log(`📡 API: http://localhost:${env.PORT}/api/v1`);

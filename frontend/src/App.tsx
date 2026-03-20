@@ -87,6 +87,8 @@ const CommunityGallery = lazyWithChunkRetry(() => import('./pages/CommunityGalle
 const PricingPage = lazyWithChunkRetry(() => import('./pages/PricingPage'), 'pricing');
 const MarketplacePage = lazyWithChunkRetry(() => import('./pages/MarketplacePage'), 'marketplace');
 const ProductDetailPage = lazyWithChunkRetry(() => import('./pages/ProductDetailPage'), 'product-detail');
+const NewsPage = lazyWithChunkRetry(() => import('./pages/NewsPage'), 'news');
+const NewsDetailPage = lazyWithChunkRetry(() => import('./pages/NewsDetailPage'), 'news-detail');
 
 const AboutPage = lazyWithChunkRetry(() => import('./pages/legal/AboutPage'), 'about');
 const CommunityStandardsPage = lazyWithChunkRetry(() => import('./pages/legal/CommunityStandardsPage'), 'community-standards');
@@ -258,6 +260,10 @@ const router = createBrowserRouter([
       // Marketplace Routes
       { path: '/marketplace', element: lazyRoute(<MarketplacePage />) },
       { path: '/marketplace/product/:slug', element: lazyRoute(<ProductDetailPage />) },
+
+      // News Routes
+      { path: '/news', element: lazyRoute(<NewsPage />) },
+      { path: '/news/:slug', element: lazyRoute(<NewsDetailPage />) },
 
       // Legal & Community Routes
       { path: '/about', element: lazyRoute(<AboutPage />) },

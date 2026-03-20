@@ -131,7 +131,7 @@ const GymCard: React.FC<GymCardProps> = ({
             <div className={`relative overflow-hidden bg-[color:var(--mk-paper-strong)] ${imageClass}`}>
                 {imageUrl ? (
                     <img
-                        src={gym.cover_image_url || gym.logo_url!}
+                        src={imageUrl}
                         alt={gym.name}
                         width={400}
                         height={300}

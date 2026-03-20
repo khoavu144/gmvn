@@ -3,7 +3,7 @@ import { AppDataSource } from '../config/database';
 import { User } from '../entities/User';
 import { GymCenter } from '../entities/GymCenter';
 
-const BASE_URL = process.env.FRONTEND_URL || 'https://gymerviet.vn';
+const BASE_URL = process.env.FRONTEND_URL || 'https://gymerviet.com';
 
 // Static high-value pages
 const STATIC_URLS = [
@@ -49,13 +49,13 @@ export const generateSitemap = async (_req: Request, res: Response): Promise<voi
         const trainers = await AppDataSource
             .getRepository(User)
             .createQueryBuilder('u')
-            .select(['u.id', 'u.updated_at'])
+            .select(['u.id', 'u.updated_at', 'u.slug'])
             .where("u.user_type = 'trainer'")
             .getMany();
 
         for (const t of trainers) {
             urls.push(xmlUrl(
-                `${BASE_URL}/coaches/${t.id}`,
+                `${BASE_URL}/coaches/${t.slug || t.id}`,
                 toW3CDate(t.updated_at ?? new Date()),
                 'weekly',
                 '0.8',
@@ -66,12 +66,12 @@ export const generateSitemap = async (_req: Request, res: Response): Promise<voi
         const gyms = await AppDataSource
             .getRepository(GymCenter)
             .createQueryBuilder('g')
-            .select(['g.id', 'g.updated_at'])
+            .select(['g.id', 'g.updated_at', 'g.slug'])
             .getMany();
 
         for (const g of gyms) {
             urls.push(xmlUrl(
-                `${BASE_URL}/gyms/${g.id}`,
+                `${BASE_URL}/gyms/${g.slug || g.id}`,
                 toW3CDate(g.updated_at ?? new Date()),
                 'weekly',
                 '0.8',
@@ -82,13 +82,13 @@ export const generateSitemap = async (_req: Request, res: Response): Promise<voi
         const athletes = await AppDataSource
             .getRepository(User)
             .createQueryBuilder('u')
-            .select(['u.id', 'u.updated_at'])
+            .select(['u.id', 'u.updated_at', 'u.slug'])
             .where("u.user_type = 'athlete'")
             .getMany();
 
         for (const a of athletes) {
             urls.push(xmlUrl(
-                `${BASE_URL}/athlete/${a.id}`,
+                `${BASE_URL}/athlete/${a.slug || a.id}`,
                 toW3CDate(a.updated_at ?? new Date()),
                 'monthly',
                 '0.5',

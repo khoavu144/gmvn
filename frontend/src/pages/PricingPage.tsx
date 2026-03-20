@@ -114,12 +114,12 @@ export default function PricingPage() {
             <Helmet>
                 <title>Bảng giá — GYMERVIET</title>
                 <meta name="description" content="Chọn gói phù hợp để mở khoá toàn bộ tính năng GYMERVIET. Thanh toán theo năm, huỷ bất cứ lúc nào." />
-                <link rel="canonical" href="https://gymerviet.vn/pricing" />
+                <link rel="canonical" href="https://gymerviet.com/pricing" />
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="Bảng giá — GYMERVIET" />
                 <meta property="og:description" content="Chọn gói phù hợp. Thanh toán theo năm, huỷ bất cứ lúc nào." />
-                <meta property="og:url" content="https://gymerviet.vn/pricing" />
-                <meta property="og:image" content="https://gymerviet.vn/og-default.jpg" />
+                <meta property="og:url" content="https://gymerviet.com/pricing" />
+                <meta property="og:image" content="https://gymerviet.com/og-default.jpg" />
                 <meta name="twitter:card" content="summary" />
                 <meta name="twitter:site" content="@gymerviet" />
                 <meta name="twitter:title" content="Bảng giá — GYMERVIET" />

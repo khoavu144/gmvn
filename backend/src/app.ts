@@ -25,6 +25,7 @@ import coachApplicationRoutes from './routes/coachApplication';
 import shareRoutes from './routes/share';
 import platformSubscriptionRoutes from './routes/platformSubscription';
 import marketplaceRoutes from './routes/marketplace';
+import newsRoutes from './routes/news';
 import { generateSitemap } from './controllers/sitemapController';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
@@ -132,6 +133,8 @@ app.use('/api/v1/platform', platformSubscriptionRoutes);
 app.use('/share', shareRoutes);
 // Product Marketplace
 app.use('/api/v1/marketplace', marketplaceRoutes);
+// News / Tin Tức
+app.use('/api/v1/news', newsRoutes);
 
 // Health check (Public standard mode - P0-4 Security Fix)
 app.get('/api/v1/health', (_req, res) => {

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { logger } from '../lib/logger';
 import { useSearchParams, Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import apiClient from '../services/api';
@@ -195,6 +196,10 @@ export default function MessagesPage() {
 
     return (
         <div className="h-[calc(100vh-140px)] bg-white flex overflow-hidden relative">
+            <Helmet>
+                <title>Tin nhắn — GymViet</title>
+                <meta name="robots" content="noindex,nofollow" />
+            </Helmet>
             {/* Sidebar */}
             <div className={`w-full md:w-80 bg-gray-50 border-r border-gray-200 flex-col shrink-0 ${activePartner ? 'hidden md:flex' : 'flex'}`}>
                 <div className="p-4 border-b border-gray-200 bg-white">

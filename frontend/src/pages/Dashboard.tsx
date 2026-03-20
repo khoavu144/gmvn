@@ -23,6 +23,9 @@ interface OverviewData {
     unread_messages?: number;
     total_programs?: number;
     published_programs?: number;
+    week_sessions?: number;
+    active_subscriptions?: number;
+    unread_notifications?: number;
 }
 
 // Cards for Coach role
@@ -68,7 +71,7 @@ const CoachDashboard = ({ overview }: { overview: OverviewData }) => {
             {ToastComponent}
             {/* Invitations Alert */}
             {!loadingInvs && invitations.length > 0 && (
-                <div className="bg-amber-50 border-2 border-amber-500 rounded-xl p-6 animate-pulse-subtle">
+                <div className="bg-amber-50 border-2 border-amber-500 rounded-xl p-6 @media (prefers-reduced-motion: no-preference) { animate-pulse-subtle }">
                     <h3 className="font-black uppercase tracking-tight text-amber-800 mb-4 flex items-center gap-2">
                         <span>🔔</span> Bạn có {invitations.length} lời mời hợp tác mới
                     </h3>
@@ -282,9 +285,9 @@ function AthleteDashboard({ overview }: { overview: OverviewData }) {
         {/* Stats Row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-                { label: 'Số buổi tập', value: String(overview.active_clients ?? '0'), icon: <ClipboardList className="w-5 h-5" /> },
-                { label: 'Chuỗi ngày liên tục', value: '0', icon: <Star className="w-5 h-5" /> },
-                { label: 'Coach', value: overview.unread_messages ? '1' : '0', icon: <User className="w-5 h-5" /> },
+                { label: 'Số buổi tuần', value: String(overview.week_sessions ?? '0'), icon: <ClipboardList className="w-5 h-5" /> },
+                { label: 'Đăng ký đang chạy', value: String(overview.active_subscriptions ?? '0'), icon: <Star className="w-5 h-5" /> },
+                { label: 'Thông báo', value: String(overview.unread_notifications ?? '0'), icon: <User className="w-5 h-5" /> },
                 { label: 'Gói tập active', value: String(overview.published_programs ?? '0'), icon: <Calendar className="w-5 h-5" /> },
             ].map(stat => (
                 <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} />
@@ -344,41 +347,61 @@ const AdminDashboard = () => {
 
     return (
         <div className="space-y-8">
-            <div className="flex gap-4 border-b border-gray-200">
+            <div className="flex gap-4 border-b border-gray-200" role="tablist" aria-label="Admin Dashboard Tabs">
                 <button
+                    role="tab"
+                    id="tab-overview"
+                    aria-selected={activeTab === 'overview'}
+                    aria-controls="panel-overview"
                     onClick={() => setActiveTab('overview')}
-                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'overview' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
+                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-black rounded-[0.2rem] ${activeTab === 'overview' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
                 >
                     Tổng quan
                 </button>
                 <button
+                    role="tab"
+                    id="tab-gyms"
+                    aria-selected={activeTab === 'gyms'}
+                    aria-controls="panel-gyms"
                     onClick={() => setActiveTab('gyms')}
-                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'gyms' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
+                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-black rounded-[0.2rem] ${activeTab === 'gyms' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
                 >
                     Phê duyệt Gym
                 </button>
                 <button
+                    role="tab"
+                    id="tab-reviews"
+                    aria-selected={activeTab === 'reviews'}
+                    aria-controls="panel-reviews"
                     onClick={() => setActiveTab('reviews')}
-                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'reviews' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
+                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-black rounded-[0.2rem] ${activeTab === 'reviews' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
                 >
                     Đánh giá
                 </button>
                 <button
+                    role="tab"
+                    id="tab-gallery"
+                    aria-selected={activeTab === 'gallery'}
+                    aria-controls="panel-gallery"
                     onClick={() => setActiveTab('gallery')}
-                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'gallery' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
+                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-black rounded-[0.2rem] ${activeTab === 'gallery' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
                 >
                     Gallery
                 </button>
                 <button
+                    role="tab"
+                    id="tab-coach-apps"
+                    aria-selected={activeTab === 'coach-apps'}
+                    aria-controls="panel-coach-apps"
                     onClick={() => setActiveTab('coach-apps')}
-                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'coach-apps' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
+                    className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-black rounded-[0.2rem] ${activeTab === 'coach-apps' ? 'border-black text-black' : 'border-transparent text-gray-400'}`}
                 >
                     Đơn Coach
                 </button>
             </div>
 
             {activeTab === 'overview' && (
-                <div className="animate-fade-in">
+                <div id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" className="animate-fade-in focus:outline-none" tabIndex={0}>
                     <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Tổng quan Hệ thống</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                         {[
@@ -417,7 +440,7 @@ const AdminDashboard = () => {
 
 
             {activeTab === 'gyms' && (
-                <div>
+                <div id="panel-gyms" role="tabpanel" aria-labelledby="tab-gyms" className="focus:outline-none" tabIndex={0}>
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-xl font-black uppercase">Hồ sơ chờ phê duyệt</h3>
                         <button onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-black">Quay lại</button>
@@ -427,7 +450,7 @@ const AdminDashboard = () => {
             )}
 
             {activeTab === 'reviews' && (
-                <div>
+                <div id="panel-reviews" role="tabpanel" aria-labelledby="tab-reviews" className="focus:outline-none" tabIndex={0}>
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-xl font-black uppercase">Quản lý Đánh giá</h3>
                         <button onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-black">Quay lại</button>
@@ -437,7 +460,7 @@ const AdminDashboard = () => {
             )}
 
             {activeTab === 'gallery' && (
-                <div>
+                <div id="panel-gallery" role="tabpanel" aria-labelledby="tab-gallery" className="focus:outline-none" tabIndex={0}>
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="text-xl font-black uppercase">Quản lý Community Gallery</h3>
                         <button onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-black">Quay lại</button>
@@ -447,7 +470,7 @@ const AdminDashboard = () => {
             )}
 
             {activeTab === 'coach-apps' && (
-                <div>
+                <div id="panel-coach-apps" role="tabpanel" aria-labelledby="tab-coach-apps" className="focus:outline-none" tabIndex={0}>
                     <div className="flex justify-between items-center mb-6">
                         <div>
                             <h3 className="text-xl font-black uppercase">Đơn đăng ký làm Coach</h3>
@@ -488,6 +511,7 @@ export default function Dashboard() {
             <Helmet>
                 <title>Bảng điều khiển — GymViet</title>
                 <meta name="description" content="Quản lý hồ sơ, tin nhắn, và các tính năng nâng cao trên GYMERVIET." />
+                <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             <div className="bg-white border-b border-gray-200">
                 <div className="page-container py-6">

@@ -226,8 +226,9 @@ export default function CoachDetailPage() {
         navigate(`/messages?to=${trainer?.id}`);
     };
 
+    const BASE_URL = import.meta.env.VITE_CANONICAL_BASE_URL ?? 'https://gymerviet.com';
     const canonicalPath = trainer?.slug ? `/coach/${trainer.slug}` : `/coaches/${trainerId ?? ''}`;
-    const canonicalUrl = `${window.location.origin}${canonicalPath}`;
+    const canonicalUrl = `${BASE_URL}${canonicalPath}`;
     const shareIdentifier = trainer?.slug ?? trainer?.id ?? slug ?? trainerId ?? '';
     const shareUrl = shareIdentifier ? buildProfileShareUrl('coach', shareIdentifier) : canonicalUrl;
 
@@ -339,15 +340,15 @@ export default function CoachDetailPage() {
                     image: trainer.avatar_url || undefined,
                     url: canonicalUrl,
                     knowsAbout: (trainer.specialties as string[] | undefined) ?? [],
-                    worksFor: { '@type': 'Organization', name: 'GYMERVIET', url: 'https://gymerviet.vn' },
+                    worksFor: { '@type': 'Organization', name: 'GYMERVIET', url: 'https://gymerviet.com' },
                 })}</script>
                 {/* JSON-LD: BreadcrumbList */}
                 <script type="application/ld+json">{JSON.stringify({
                     '@context': 'https://schema.org',
                     '@type': 'BreadcrumbList',
                     itemListElement: [
-                        { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://gymerviet.vn' },
-                        { '@type': 'ListItem', position: 2, name: 'Coach', item: 'https://gymerviet.vn/coaches' },
+                        { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://gymerviet.com' },
+                        { '@type': 'ListItem', position: 2, name: 'Coach', item: 'https://gymerviet.com/coaches' },
                         { '@type': 'ListItem', position: 3, name: trainer.full_name },
                     ],
                 })}</script>
@@ -483,7 +484,7 @@ export default function CoachDetailPage() {
                         <div className="text-center space-y-4">
                             <p className="text-sm text-gray-600">Chuyển khoản với nội dung chính xác bên dưới.</p>
                             <img
-                                src={`https://img.vietqr.io/image/970436-0987654321-compact2.png?amount=${pendingPayment.amount}&addInfo=${encodeURIComponent(pendingPayment.transfer_content)}&accountName=GYMERVIET`}
+                                src={`https://img.vietqr.io/image/970436-${import.meta.env.VITE_PLATFORM_BANK_ACCOUNT || '0987654321'}-compact2.png?amount=${pendingPayment.amount}&addInfo=${encodeURIComponent(pendingPayment.transfer_content)}&accountName=GYMERVIET`}
                                 alt="QR Code"
                                 className="mx-auto border border-gray-200 rounded-lg w-48 h-48 object-contain"
                             />

@@ -70,6 +70,7 @@ export default function Profile() {
                 <meta name="description" content="Quản lý hồ sơ cá nhân, kinh nghiệm, gallery và FAQ trên GYMERVIET." />
                 <meta property="og:title" content="Quản lý Hồ sơ — GYMERVIET" />
                 <meta property="og:description" content="Quản lý hồ sơ cá nhân, kinh nghiệm, gallery và FAQ trên GYMERVIET." />
+                <meta name="robots" content="noindex,nofollow" />
             </Helmet>
 
             <div className="min-h-screen bg-white flex flex-col pb-16">

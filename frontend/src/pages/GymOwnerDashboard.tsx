@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { logger } from '../lib/logger';
 import { useToast } from '../components/Toast';
 import { gymService } from '../services/gymService';
@@ -35,6 +35,10 @@ const GymOwnerDashboard: React.FC = () => {
 
     // BUG-005: Stats state
     const [stats, setStats] = useState<{ total_views: number; total_trainers: number; avg_rating: number; total_reviews: number; total_branches: number; rating_distribution?: Record<number, number> } | null>(null);
+
+    // Invite Coach state
+    const [showInviteModal, setShowInviteModal] = useState(false);
+    const [inviteForm, setInviteForm] = useState({ email: '', role: 'Coach' });
 
     // BUG-006: Settings state
     const [settingsForm, setSettingsForm] = useState({ name: '', description: '' });
@@ -127,6 +131,10 @@ const GymOwnerDashboard: React.FC = () => {
 
     return (
         <div className="min-h-[calc(100vh-4rem)] flex flex-col md:flex-row bg-white relative">
+            <Helmet>
+                <title>Gym Owner Dashboard — GymViet</title>
+                <meta name="robots" content="noindex,nofollow" />
+            </Helmet>
             {/* Mobile Header Toggle */}
             <div className="md:hidden flex items-center justify-between p-4 border-b border-gray-200 bg-white sticky top-0 z-30">
                 <div className="font-black uppercase tracking-tight truncate flex-1 mr-4">{gym.name}</div>
@@ -398,7 +406,10 @@ const GymOwnerDashboard: React.FC = () => {
                                 <h1 className="text-3xl font-black uppercase tracking-tight mb-2">Quản lý Coach liên kết</h1>
                                 <p className="text-gray-500">Mời Coach tham gia chi nhánh và cấp quyền quản lý hội viên</p>
                             </div>
-                            <button className="btn-primary py-2 px-4 shadow-none flex items-center gap-2">
+                            <button 
+                                className="btn-primary py-2 px-4 shadow-none flex items-center gap-2"
+                                onClick={() => setShowInviteModal(true)}
+                            >
                                 <LinkIcon className="w-4 h-4" /> Mời Coach Mới
                             </button>
                         </div>
@@ -520,6 +531,56 @@ const GymOwnerDashboard: React.FC = () => {
                         fetchMyGym();
                     }}
                 />
+            )}
+
+            {/* Invite Coach Overlay */}
+            {showInviteModal && (
+                <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onClick={() => setShowInviteModal(false)}>
+                    <div className="bg-white rounded-xl p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-xl font-black uppercase tracking-tight mb-4">Mời Coach Tham Gia</h3>
+                        <p className="text-sm text-gray-500 mb-6">Gửi lời mời liên kết đến huấn luyện viên thông qua email.</p>
+                        
+                        <div className="space-y-4 mb-6">
+                            <div>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-1">Email của Coach</label>
+                                <input 
+                                    type="email" 
+                                    className="form-input w-full" 
+                                    placeholder="coach@example.com"
+                                    value={inviteForm.email}
+                                    onChange={e => setInviteForm(prev => ({ ...prev, email: e.target.value }))}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-1">Vai trò</label>
+                                <select 
+                                    className="form-input w-full"
+                                    value={inviteForm.role}
+                                    onChange={e => setInviteForm(prev => ({ ...prev, role: e.target.value }))}
+                                >
+                                    <option value="Coach">Coach (Huấn luyện viên)</option>
+                                    <option value="Head Coach">Head Coach (HLV Trưởng)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button 
+                                className="btn-primary flex-1 py-3"
+                                onClick={() => {
+                                    toast.success(`Đã gửi lời mời đến ${inviteForm.email}`);
+                                    setShowInviteModal(false);
+                                    setInviteForm({ email: '', role: 'Coach' });
+                                }}
+                            >
+                                Gửi lời mời
+                            </button>
+                            <button className="flex-1 py-3 border border-gray-300 rounded-lg font-bold text-sm text-gray-600 hover:border-black transition-colors" onClick={() => setShowInviteModal(false)}>
+                                Huỷ
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

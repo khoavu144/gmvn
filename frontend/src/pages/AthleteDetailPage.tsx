@@ -272,8 +272,8 @@ export default function AthleteDetailPage() {
                     '@context': 'https://schema.org',
                     '@type': 'BreadcrumbList',
                     itemListElement: [
-                        { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://gymerviet.vn' },
-                        { '@type': 'ListItem', position: 2, name: 'Vận động viên', item: 'https://gymerviet.vn/coaches?type=athlete' },
+                        { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://gymerviet.com' },
+                        { '@type': 'ListItem', position: 2, name: 'Vận động viên', item: 'https://gymerviet.com/coaches?type=athlete' },
                         { '@type': 'ListItem', position: 3, name: athlete?.full_name },
                     ],
                 })}</script>
