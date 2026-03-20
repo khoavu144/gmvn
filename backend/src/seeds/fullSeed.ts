@@ -560,14 +560,14 @@ export async function fullSeed() {
   // Coaches
   console.log('\n👔 Creating Coaches...');
   for (const c of COACHES) {
-    let user = await userRepo.findOneBy({ email: c.email });
+    let user = await userRepo.findOne({ where: [{ email: c.email }, { slug: c.slug }] });
     if (!user) {
       user = await userRepo.save(userRepo.create({
         email: c.email, full_name: c.full_name, password: hashed, user_type: 'trainer',
         avatar_url: c.avatar_url, bio: c.bio, specialties: c.specialties,
         base_price_monthly: c.base_price_monthly as any, slug: c.slug,
         is_verified: true, is_email_verified: true, onboarding_completed: true,
-      }));
+      })) as unknown as User;
       console.log(`  ✅ ${c.full_name}`);
     }
     if (!(await profileRepo.findOneBy({ trainer_id: user.id }))) {
@@ -630,7 +630,7 @@ export async function fullSeed() {
   // Athletes
   console.log('\n🏃 Creating Athletes...');
   for (const a of ATHLETES) {
-    let user = await userRepo.findOneBy({ email: a.email });
+    let user = await userRepo.findOne({ where: [{ email: a.email }, { slug: a.slug }] });
     if (!user) {
       user = await userRepo.save(userRepo.create({
         email: a.email, full_name: a.full_name, password: hashed, user_type: 'athlete',
@@ -638,7 +638,7 @@ export async function fullSeed() {
         current_weight_kg: a.current_weight_kg as any, experience_level: a.experience_level,
         specialties: a.specialties, slug: a.slug,
         is_verified: true, is_email_verified: true, onboarding_completed: true,
-      }));
+      })) as unknown as User;
       console.log(`  ✅ ${a.full_name}`);
     }
     if (!(await profileRepo.findOneBy({ trainer_id: user.id }))) {
