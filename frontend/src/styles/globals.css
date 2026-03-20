@@ -1,5 +1,5 @@
 /* GYMERVIET globals.css v2.0 */
-/* Design tokens · Dark mode media · Lexend font */
+/* Design tokens · Dark mode media · Roboto font family */
 
 /* ─── DESIGN TOKENS (Light Mode) ─────────────────────────────────────── */
 @layer base {
@@ -64,13 +64,11 @@
   }
 
   html {
-    font-family: 'Lexend', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     font-feature-settings: 'kern' 1, 'liga' 1;
-    /* Lexend specific: slight weight adjustment */
-    font-variation-settings: 'wght' 400;
   }
 
   body {
@@ -81,16 +79,17 @@
     font-size: 14px;
   }
 
-  /* Lexend: reduce spacing giữa các ký tự một chút */
+  /* Roboto Condensed for headings — tight athletic look */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
+    font-family: 'Roboto Condensed', 'Roboto', sans-serif;
     letter-spacing: -0.01em;
-    font-weight: 600;
-    line-height: 1.35;
+    font-weight: 700;
+    line-height: 1.2;
   }
 
   /* Số: tabular nums để align trong tables/stats */
