@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
-// GYMERVIET tailwind.config.js v2.0
-// Design: Black/White thuần · Lexend font · 8px radius · Dark mode media
+// GYMERVIET tailwind.config.js v2.1
+// Design: Black/White thuần · Roboto font family · 8px radius · Dark mode media
 
 export default {
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
@@ -38,13 +38,18 @@ export default {
                 info: { DEFAULT: '#2563EB', light: '#DBEAFE', dark: '#1D4ED8' },
             },
 
-            // ─── TYPOGRAPHY — Lexend (Q4) ─────────────────────────────────────
+            // ─── TYPOGRAPHY — Roboto family ───────────────────────────────────
             fontFamily: {
                 sans: [
-                    'Lexend',
+                    'Roboto',
                     '-apple-system',
                     'BlinkMacSystemFont',
                     '"Segoe UI"',
+                    'sans-serif',
+                ],
+                condensed: [
+                    '"Roboto Condensed"',
+                    'Roboto',
                     'sans-serif',
                 ],
                 mono: ['"Courier New"', 'Courier', 'monospace'],
