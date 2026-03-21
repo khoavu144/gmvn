@@ -156,15 +156,25 @@ export default function ProductDetailPage() {
 
                         <h1 className="mpd-title">{product.title}</h1>
 
-                        {/* Seller */}
+                        {/* Seller Proof */}
                         {product.seller && (
-                            <div className="mpd-seller">
-                                {product.seller.avatar_url ? (
-                                    <img src={product.seller.avatar_url} alt={product.seller.full_name} className="mpd-seller-avatar" />
-                                ) : (
-                                    <div className="mpd-seller-initials">{product.seller.full_name.charAt(0)}</div>
-                                )}
-                                <span>Bán bởi <strong>{product.seller.full_name}</strong></span>
+                            <div className="mpd-seller-proof">
+                                <div className="mpd-seller-proof-avatar">
+                                    {product.seller.avatar_url ? (
+                                        <img src={product.seller.avatar_url} alt={product.seller.full_name} />
+                                    ) : (
+                                        <div className="mpd-seller-initials">{product.seller.full_name.charAt(0)}</div>
+                                    )}
+                                </div>
+                                <div className="mpd-seller-proof-info">
+                                    <strong>{product.seller.full_name}</strong>
+                                    <div className="mpd-seller-proof-stats">
+                                        {product.sale_count > 0 && <span>{product.sale_count} đã bán</span>}
+                                        {product.review_count > 0 && (
+                                            <span>⭐ {Number(product.avg_rating ?? 0).toFixed(1)}</span>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         )}
 
@@ -188,15 +198,43 @@ export default function ProductDetailPage() {
                             )}
                         </div>
 
-                        {/* Training package metrics strip */}
-                        {tp && (
+                        {/* Metrics strip */}
+                        {tp ? (
                             <div className="mpd-metrics-strip">
                                 <span className="mpd-metric">🎯 {tp.goal.replace(/_/g, ' ')}</span>
                                 <span className="mpd-metric">📅 {tp.duration_weeks} tuần</span>
                                 <span className="mpd-metric">💪 {tp.level === 'all' ? 'Mọi level' : tp.level}</span>
                                 {tp.includes_nutrition && <span className="mpd-metric">🥗 Kèm dinh dưỡng</span>}
                             </div>
-                        )}
+                        ) : product.product_type === 'physical' ? (
+                            <div className="mpd-metrics-strip">
+                                {product.stock_quantity != null && (
+                                    <span className="mpd-metric">📦 Còn {product.stock_quantity} sp</span>
+                                )}
+                                {product.variants && product.variants.length > 0 && (
+                                    <span className="mpd-metric">🎨 {product.variants.length} lựa chọn</span>
+                                )}
+                                <span className="mpd-metric">🚚 Giao hàng toàn quốc</span>
+                            </div>
+                        ) : product.product_type === 'service' ? (
+                            <div className="mpd-metrics-strip">
+                                {!!product.attributes?.['Format'] && (
+                                    <span className="mpd-metric">🤝 {String(product.attributes['Format'])}</span>
+                                )}
+                                {!!product.attributes?.['Phù hợp'] && (
+                                    <span className="mpd-metric">🎯 {String(product.attributes['Phù hợp'])}</span>
+                                )}
+                                {product.variants && product.variants.length > 0 && (
+                                    <span className="mpd-metric">📋 {product.variants.length} gói</span>
+                                )}
+                                <span className="mpd-metric">📅 Đặt lịch trước</span>
+                            </div>
+                        ) : product.product_type === 'digital' ? (
+                            <div className="mpd-metrics-strip">
+                                <span className="mpd-metric">📥 Tải ngay sau thanh toán</span>
+                                <span className="mpd-metric">♾️ Truy cập vĩnh viễn</span>
+                            </div>
+                        ) : null}
 
                         {/* Variants */}
                         {product.variants && product.variants.length > 0 && (
