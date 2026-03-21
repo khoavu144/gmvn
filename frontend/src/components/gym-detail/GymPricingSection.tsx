@@ -67,29 +67,29 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
 
     return (
         <FadeIn>
-            <section ref={setRef('pricing')} id="pricing" className="marketplace-panel p-6 sm:p-8">
+            <section ref={setRef('pricing')} id="pricing" className="marketplace-panel p-6 sm:p-7">
                 <SectionHeading
                     kicker="Bảng giá"
                     title="Các gói vào cửa và cách bắt đầu"
                     description="Đừng chỉ nhìn gói nổi bật. Hãy nhìn gói khởi điểm, các dịch vụ đi kèm và chính sách để biết chi phí thực sự của việc tập luyện."
                 />
 
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
                     {branchPricing.map((plan) => (
                         <article
                             key={plan.id}
-                            className={`flex h-full flex-col rounded-lg border p-5 ${plan.is_highlighted ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80'}`}
+                            className={`rounded-lg border px-4 py-4 ${plan.is_highlighted ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80'}`}
                         >
                             <div className="flex items-start justify-between gap-3">
-                                <div>
+                                <div className="min-w-0 flex-1">
                                     <div className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">{plan.plan_type || 'membership'}</div>
-                                    <h3 className="mt-2 text-xl font-bold tracking-[-0.05em] text-[color:var(--mk-text)]">{plan.plan_name}</h3>
+                                    <h3 className="mt-1.5 text-lg font-bold tracking-[-0.04em] text-[color:var(--mk-text)]">{plan.plan_name}</h3>
                                 </div>
                                 {plan.is_highlighted && <span className="marketplace-badge marketplace-badge--accent">Recommended</span>}
                             </div>
 
-                            <div className="mt-5 flex items-end gap-2">
-                                <div className="text-[2rem] font-bold leading-none tracking-[-0.06em] text-[color:var(--mk-text)]">
+                            <div className="mt-4 flex items-end gap-2">
+                                <div className="text-[1.9rem] font-bold leading-none tracking-[-0.05em] text-[color:var(--mk-text)]">
                                     {Number(plan.price).toLocaleString('vi-VN')}₫
                                 </div>
                                 <div className="pb-1 text-sm font-semibold text-[color:var(--mk-muted)]">
@@ -98,25 +98,25 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
                             </div>
 
                             {plan.description && (
-                                <p className="mt-4 text-sm leading-7 text-[color:var(--mk-text-soft)]">{plan.description}</p>
+                                <p className="mt-3 text-sm leading-6 text-[color:var(--mk-text-soft)]">{plan.description}</p>
                             )}
 
                             {(plan.included_services || []).length > 0 && (
-                                <div className="mt-4 flex flex-wrap gap-2">
+                                <div className="mt-3.5 flex flex-wrap gap-1.5">
                                     {(plan.included_services || []).slice(0, 4).map((item) => (
                                         <span key={item} className="marketplace-badge marketplace-badge--neutral">{item}</span>
                                     ))}
                                 </div>
                             )}
 
-                            <div className="mt-5 space-y-2 text-sm text-[color:var(--mk-text-soft)]">
+                            <div className="mt-4 space-y-1.5 text-sm leading-6 text-[color:var(--mk-text-soft)]">
                                 {plan.highlighted_reason && <div>• {plan.highlighted_reason}</div>}
                                 {plan.trial_available && <div>• Có trial {plan.trial_price ? `${Number(plan.trial_price).toLocaleString('vi-VN')}₫` : ''}</div>}
                                 {plan.freeze_policy_summary && <div>• Freeze: {plan.freeze_policy_summary}</div>}
                                 {plan.cancellation_policy_summary && <div>• Cancel: {plan.cancellation_policy_summary}</div>}
                             </div>
 
-                            <div className="mt-auto pt-6">
+                            <div className="mt-4 pt-1">
                                 {renderActionButton(
                                     leadAction,
                                     'block w-full rounded-lg bg-[color:var(--mk-text)] px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.18em] text-white transition hover:translate-y-[-1px] hover:bg-[color:var(--mk-accent-ink)]'

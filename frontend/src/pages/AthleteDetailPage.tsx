@@ -12,7 +12,6 @@ import { fetchPublicProfile } from '../store/slices/profileSlice';
 import type { AppDispatch, RootState } from '../store/store';
 import { getSrcSet, getOptimizedUrl } from '../utils/image';
 import ShareButton from '../components/ShareButton';
-
 import apiClient from '../services/api';
 import { buildProfileShareUrl } from '../utils/share';
 
@@ -172,14 +171,14 @@ export default function AthleteDetailPage() {
         const d = res.data?.data;
         if (Array.isArray(d)) setRelatedAthletes(d);
       })
-      .catch(() => {});
+      .catch(() => { });
     apiClient
       .get(`/profiles/trainer/${profile.trainer_id}/progress-photos`)
       .then((res) => {
         const d = res.data?.photos || res.data?.data || [];
         if (Array.isArray(d)) setProgressPhotos(d);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [profile?.trainer_id, isAthleteProfile]);
 
   const canonicalPath = useMemo(() => {
@@ -209,7 +208,6 @@ export default function AthleteDetailPage() {
   );
   const socialLinks: SocialLinks = profile?.social_links || {};
   const visibleSocials = SOCIAL_META.filter((m) => !!socialLinks[m.key]);
-
 
   const displayMetrics = [
     { value: `${profile?.years_experience ?? 0}+`, label: 'Năm kinh nghiệm' },
@@ -759,7 +757,7 @@ export default function AthleteDetailPage() {
 
       {/* ── MOBILE STICKY CTA — hidden on desktop ── */}
       <div className="fixed bottom-0 inset-x-0 z-30 lg:hidden bg-white border-t border-gray-200 px-4 py-3"
-           style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
+        style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
         <button
           onClick={handleMessage}
           className="flex items-center justify-center gap-2 w-full h-11 bg-black text-white text-[14px] font-bold uppercase tracking-widest rounded-lg active:bg-gray-800 transition-colors"

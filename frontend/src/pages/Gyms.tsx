@@ -115,8 +115,8 @@ const CategoryStrip: React.FC<CategoryStripProps> = ({ label, desc, accent, item
 
                 {/* Two compact cards stacked in 1 column each */}
                 {secondaries.map((gym, idx) => (
-                    <div key={gym.id} className="flex flex-col">
-                        <GymCard gym={gym} variant="compact" index={idx + 1} className="flex-1" />
+                    <div key={gym.id}>
+                        <GymCard gym={gym} variant="compact" index={idx + 1} />
                     </div>
                 ))}
 
@@ -222,6 +222,9 @@ const Gyms: React.FC = () => {
     }, [gyms]);
 
     const hasFilters = Boolean(searchTerm || cityFilter || districtFilter || venueType || audienceTag);
+    const showEditorialSections = !hasFilters && viewMode === 'grid';
+    const resultsGyms = showEditorialSections ? standardGyms : gyms;
+    const showResultsSection = !showEditorialSections || standardGyms.length > 0;
 
     const handleFilterByCategory = (slug: string) => {
         setVenueType(slug);
@@ -505,7 +508,7 @@ const Gyms: React.FC = () => {
                     ) : (
                         <>
                             {/* ── Featured hero (2:1:1) — only in grid mode & no active filters ── */}
-                            {!hasFilters && viewMode === 'grid' && featuredGyms.length > 0 && (
+                            {showEditorialSections && featuredGyms.length > 0 && (
                                 <div className="space-y-4">
                                     <div className="marketplace-results-head">
                                         <div>
@@ -532,7 +535,7 @@ const Gyms: React.FC = () => {
                             )}
 
                             {/* ── Editorial category strips (only when no venue-type filter active) ── */}
-                            {!hasFilters && viewMode === 'grid' && (
+                            {showEditorialSections && (
                                 <div className="space-y-10">
                                     {EDITORIAL_CATEGORIES.map((cat) => {
                                         const items = categoryBuckets.get(cat.slug) || [];
@@ -551,34 +554,36 @@ const Gyms: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className="marketplace-divider" />
+                            {showEditorialSections && showResultsSection && <div className="marketplace-divider" />}
 
                             {/* ── All results (grid or list) ───────────────────────────────── */}
-                            <div className="space-y-4">
-                                <div className="marketplace-results-head">
-                                    <div>
-                                        <div className="marketplace-section-kicker">Tất cả Kết quả</div>
-                                        <h2 className="marketplace-section-title">Tất cả lựa chọn phù hợp</h2>
+                            {showResultsSection && (
+                                <div className="space-y-4">
+                                    <div className="marketplace-results-head">
+                                        <div>
+                                            <div className="marketplace-section-kicker">Tất cả Kết quả</div>
+                                            <h2 className="marketplace-section-title">Tất cả lựa chọn phù hợp</h2>
+                                        </div>
+                                        <div className="marketplace-results-meta">
+                                            {resultsGyms.length} cơ sở hiển thị · {venueType ? `lọc theo ${venueType}` : 'mọi loại hình'} · {cityFilter || 'toàn quốc'}
+                                        </div>
                                     </div>
-                                    <div className="marketplace-results-meta">
-                                        {gyms.length} cơ sở · {venueType ? `lọc theo ${venueType}` : 'mọi loại hình'} · {cityFilter || 'toàn quốc'}
-                                    </div>
-                                </div>
 
-                                {viewMode === 'list' ? (
-                                    <div className="flex flex-col gap-2">
-                                        {gyms.map((gym, idx) => (
-                                            <GymCard key={gym.id} gym={gym} variant="list" index={idx} />
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="marketplace-card-grid">
-                                        {standardGyms.map((gym, idx) => (
-                                            <GymCard key={gym.id} gym={gym} variant="standard" index={idx} />
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                                    {viewMode === 'list' ? (
+                                        <div className="flex flex-col gap-2">
+                                            {resultsGyms.map((gym, idx) => (
+                                                <GymCard key={gym.id} gym={gym} variant="list" index={idx} />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="marketplace-card-grid">
+                                            {resultsGyms.map((gym, idx) => (
+                                                <GymCard key={gym.id} gym={gym} variant="standard" index={idx} />
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </>
                     )}
                 </section>

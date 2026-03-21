@@ -174,9 +174,12 @@ const GymCard: React.FC<GymCardProps> = ({
   const audienceLabels = getTerms(gym, 'audience')
     .map((t) => t.label)
     .slice(0, 2);
+  const audienceSummary = (audienceLabels.length > 0 ? audienceLabels : ['Mọi đối tượng'])
+    .slice(0, isCompact ? 1 : 2)
+    .join(' · ');
 
   // Image aspect ratio by variant
-  const imageClass = isFeatured ? 'aspect-[16/10]' : isCompact ? 'aspect-square' : 'aspect-[3/2]';
+  const imageClass = isFeatured ? 'aspect-[16/10]' : isCompact ? 'aspect-[4/3]' : 'aspect-[3/2]';
 
   return (
     <Link
@@ -218,32 +221,26 @@ const GymCard: React.FC<GymCardProps> = ({
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/08 to-transparent" />
 
-        {/* ── TOP ROW BADGES ──────────────────────────────────────────────
-            FIX: Dùng flex row thay vì 2 absolute riêng lẻ
-            → badge trái có max-w + truncate, badge phải shrink-0
-            → KHÔNG BAO GIỜ chồng nhau dù label dài đến đâu           */}
-        <div className="absolute inset-x-3 top-3 flex items-start justify-between gap-2">
-          {/* Left: venue type */}
-          <span className="text-[10px] font-bold uppercase tracking-[0.08em] bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded max-w-[calc(100%-72px)] truncate">
-            {venueLabel}
-          </span>
+        {/* ── TOP BADGE STACK ───────────────────────────────────────────── */}
+        <div className="absolute inset-x-3 top-3 flex flex-col items-start gap-2">
+          <div className="flex w-full items-start justify-between gap-2">
+            <span className="max-w-[calc(100%-74px)] truncate rounded bg-black/72 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-white backdrop-blur-sm">
+              {venueLabel}
+            </span>
 
-          {/* Right: verified (nếu có) */}
-          {gym.is_verified && (
-            <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.08em] bg-white text-black px-2 py-1 rounded">
-              ✓{!isCompact && <span className="hidden sm:inline"> Verified</span>}
+            {gym.is_verified && (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded bg-white px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-black">
+                ✓{!isCompact && <span className="hidden sm:inline"> Verified</span>}
+              </span>
+            )}
+          </div>
+
+          {gym.response_sla_text && !isCompact && (
+            <span className="max-w-[11rem] truncate rounded border border-white/18 bg-black/28 px-2 py-1 text-[10px] font-medium text-white/88 backdrop-blur-sm">
+              {gym.response_sla_text}
             </span>
           )}
         </div>
-
-        {/* SLA badge — chỉ hiện trên non-compact, nằm riêng dưới top row */}
-        {gym.response_sla_text && !isCompact && (
-          <div className="absolute left-3 top-10">
-            <span className="text-[10px] font-medium bg-white/15 backdrop-blur-sm text-white/80 border border-white/20 px-2 py-0.5 rounded">
-              {gym.response_sla_text}
-            </span>
-          </div>
-        )}
 
         {/* ── BOTTOM ROW: location + price | proof ── */}
         <div className="absolute inset-x-3 bottom-3 flex items-end justify-between gap-3">
@@ -267,8 +264,8 @@ const GymCard: React.FC<GymCardProps> = ({
       </div>
 
       {/* ── Card body ── */}
-      <div className={isFeatured ? 'p-5 sm:p-6' : isCompact ? 'p-3' : 'p-4'}>
-        <div className="space-y-2.5">
+      <div className={isFeatured ? 'p-5 sm:p-6' : isCompact ? 'p-3.5' : 'p-4'}>
+        <div className={isCompact ? 'space-y-2' : 'space-y-2.5'}>
           {/* Name + blurb */}
           <div>
             <h3
@@ -299,18 +296,26 @@ const GymCard: React.FC<GymCardProps> = ({
               ))}
             </div>
           )}
-        </div>
 
-        {/* Footer row */}
-        <div className="mt-3 flex items-center justify-between gap-2 border-t border-gray-100 pt-3">
-          <span className="text-[12px] text-gray-500 truncate">
-            {(audienceLabels.length > 0 ? audienceLabels : ['Mọi đối tượng'])
-              .slice(0, 2)
-              .join(' · ')}
-          </span>
-          <span className="shrink-0 text-[12px] font-semibold tracking-wide text-black transition-transform duration-200 group-hover:translate-x-0.5">
-            Xem →
-          </span>
+          {/* Footer row */}
+          <div
+            className={[
+              'flex items-center justify-between gap-2',
+              isCompact ? 'pt-0.5' : 'mt-3 border-t border-gray-100 pt-3',
+            ].join(' ')}
+          >
+            <span className={isCompact ? 'truncate text-[11px] font-medium text-gray-500' : 'truncate text-[12px] text-gray-500'}>
+              {audienceSummary}
+            </span>
+            <span
+              className={[
+                'shrink-0 font-semibold tracking-wide text-black transition-transform duration-200 group-hover:translate-x-0.5',
+                isCompact ? 'text-[11px]' : 'text-[12px]',
+              ].join(' ')}
+            >
+              Xem →
+            </span>
+          </div>
         </div>
       </div>
     </Link>
