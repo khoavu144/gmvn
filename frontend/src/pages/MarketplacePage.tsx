@@ -25,7 +25,7 @@ function formatPrice(n: number | string, currency = 'VND'): string {
 
 // ─── Product Card ─────────────────────────────────────────────────────────
 
-function ProductCard({ product, variant = 'standard' }: { product: Product, variant?: 'featured' | 'standard' | 'compact' }) {
+export function ProductCard({ product, variant = 'standard' }: { product: Product, variant?: 'featured' | 'standard' | 'compact' }) {
     const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
     const discountPct = hasDiscount
         ? Math.round(((product.compare_at_price! - product.price) / product.compare_at_price!) * 100)
