@@ -1,15 +1,14 @@
 import React, { useMemo, useState, lazy, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
-import { Filter } from 'lucide-react';
+import { Filter, LayoutGrid, List } from 'lucide-react';
 import GymCard from '../components/GymCard';
 import { gymService } from '../services/gymService';
 import type { GymCenter } from '../types';
 
 const GymMapView = lazy(() => import('../components/GymMapView'));
 
-type ViewMode = 'grid' | 'map';
-
+type ViewMode = 'grid' | 'list' | 'map';
 type SortValue = 'featured' | 'views' | 'newest' | 'price_asc';
 
 const SORT_OPTIONS: Array<{ value: SortValue; label: string }> = [
@@ -36,6 +35,28 @@ const QUICK_VENUES = [
     { key: 'recovery_venue', label: 'Recovery' },
 ];
 
+/** The three editorial categories we always show */
+const EDITORIAL_CATEGORIES = [
+    {
+        slug: 'fitness_club',
+        label: 'Fitness Club',
+        desc: 'Không gian tập đầy đủ thiết bị cho người muốn ghé đều, tắm rửa và biến việc tập thành thói quen lành mạnh.',
+        accent: 'from-[#1a1a1a] to-[#3a2e22]',
+    },
+    {
+        slug: 'pilates_studio',
+        label: 'Pilates Studio',
+        desc: 'Reformer rộng rãi, giáo viên sửa form sát, không khí nhỏ gọn và chuyên biệt — không bị xô bồ.',
+        accent: 'from-[#1e2a1e] to-[#2d4a2d]',
+    },
+    {
+        slug: 'yoga_studio',
+        label: 'Yoga Studio',
+        desc: 'Phòng yoga thiết kế cho cảm giác tĩnh lặng — ánh sáng tự nhiên, sàn gỗ, lớp nhỏ.',
+        accent: 'from-[#1e1a2a] to-[#2e2845]',
+    },
+] as const;
+
 function getCityData(gyms: GymCenter[]) {
     const cities = new Map<string, Set<string>>();
 
@@ -50,18 +71,86 @@ function getCityData(gyms: GymCenter[]) {
     return cities;
 }
 
-function getPrimaryVenueLabel(gym: GymCenter) {
-    const primaryTerm = (gym.taxonomy_terms || []).find((item) => item.is_primary && item.term)?.term;
-    return primaryTerm?.label || gym.primary_venue_type_slug || 'Venue';
+// ─── Category Strip (2:1:1 layout) ───────────────────────────────────────────
+
+interface CategoryStripProps {
+    label: string;
+    desc: string;
+    accent: string;
+    items: GymCenter[];
+    onFilter: (slug: string) => void;
+    slug: string;
 }
 
+const CategoryStrip: React.FC<CategoryStripProps> = ({ label, desc, accent, items, onFilter, slug }) => {
+    if (items.length === 0) return null;
 
+    const [primary, ...rest] = items;
+    const secondaries = rest.slice(0, 2);
 
-function getSignatureText(gym: GymCenter) {
-    return gym.discovery_blurb || gym.tagline || gym.description || 'Không gian luyện tập được biên tập để giúp bạn chọn nhanh hơn.';
-}
+    return (
+        <div className="space-y-3">
+            {/* Header */}
+            <div className="flex items-end justify-between gap-4">
+                <div>
+                    <div className="marketplace-section-kicker">Phân loại</div>
+                    <h2 className="marketplace-section-title mt-0.5">{label}</h2>
+                </div>
+                <p className="hidden md:block max-w-[40%] text-sm text-[color:var(--mk-muted)] leading-relaxed text-right">{desc}</p>
+                <button
+                    type="button"
+                    onClick={() => onFilter(slug)}
+                    className="shrink-0 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[color:var(--mk-text)] border-b border-[color:var(--mk-text)] pb-0.5 hover:opacity-70 transition-opacity whitespace-nowrap"
+                >
+                    Xem tất cả →
+                </button>
+            </div>
 
+            {/* 2 : 1 : 1 grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:grid-rows-1">
+                {/* Primary — spans 2 columns */}
+                <div className="sm:col-span-2 lg:col-span-2">
+                    <GymCard gym={primary} variant="featured" index={0} />
+                </div>
 
+                {/* Two compact cards stacked in 1 column each */}
+                {secondaries.map((gym, idx) => (
+                    <div key={gym.id} className="flex flex-col">
+                        <GymCard gym={gym} variant="compact" index={idx + 1} className="flex-1" />
+                    </div>
+                ))}
+
+                {/* Filler placeholder when only 1 secondary */}
+                {secondaries.length === 1 && (
+                    <div className={`hidden lg:flex flex-col items-center justify-center rounded-xl bg-gradient-to-br ${accent} p-6 text-white/70 text-sm text-center gap-3`}>
+                        <div className="text-2xl font-bold text-white/20">{label.slice(0, 2)}</div>
+                        <p className="text-xs leading-relaxed">{desc}</p>
+                        <button
+                            type="button"
+                            onClick={() => onFilter(slug)}
+                            className="mt-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-widest text-white/80 hover:bg-white/20 transition"
+                        >
+                            Khám phá thêm
+                        </button>
+                    </div>
+                )}
+
+                {/* Both placeholders when no secondaries */}
+                {secondaries.length === 0 && (
+                    <>
+                        {[0, 1].map((i) => (
+                            <div key={i} className={`hidden lg:flex flex-col items-center justify-center rounded-xl bg-gradient-to-br ${accent} p-6 text-white/70 text-sm text-center`}>
+                                <div className="text-[0.65rem] uppercase tracking-widest">Sắp có</div>
+                            </div>
+                        ))}
+                    </>
+                )}
+            </div>
+        </div>
+    );
+};
+
+// ─── Main page ─────────────────────────────────────────────────────────────────
 
 const Gyms: React.FC = () => {
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -111,24 +200,33 @@ const Gyms: React.FC = () => {
         return Array.from(cityData.get(cityFilter) || []).sort();
     }, [cityData, cityFilter]);
 
+    /** Top 3 featured cards for the hero */
     const featuredGyms = useMemo(() => gyms.slice(0, 3), [gyms]);
+    /** Remaining gyms for the all-results section */
     const standardGyms = useMemo(() => gyms.slice(3), [gyms]);
 
-    const venueHighlights = useMemo(() => {
-        const groups = new Map<string, GymCenter[]>();
+    /** Per-category buckets for the editorial strips */
+    const categoryBuckets = useMemo(() => {
+        const buckets = new Map<string, GymCenter[]>();
+        EDITORIAL_CATEGORIES.forEach((cat) => buckets.set(cat.slug, []));
+
         gyms.forEach((gym) => {
-            const key = gym.primary_venue_type_slug || 'other';
-            if (!groups.has(key)) groups.set(key, []);
-            groups.get(key)!.push(gym);
+            const slug = gym.primary_venue_type_slug || '';
+            if (buckets.has(slug)) {
+                const arr = buckets.get(slug)!;
+                if (arr.length < 3) arr.push(gym);
+            }
         });
 
-        return Array.from(groups.entries())
-            .map(([key, items]) => ({ key, items: items.slice(0, 6) }))
-            .filter((group) => group.items.length > 0)
-            .slice(0, 3);
+        return buckets;
     }, [gyms]);
 
     const hasFilters = Boolean(searchTerm || cityFilter || districtFilter || venueType || audienceTag);
+
+    const handleFilterByCategory = (slug: string) => {
+        setVenueType(slug);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     return (
         <>
@@ -152,6 +250,8 @@ const Gyms: React.FC = () => {
             </Helmet>
 
             <div className="marketplace-shell min-h-screen pb-20">
+
+                {/* ── Hero ──────────────────────────────────────────────────────────── */}
                 <section className="marketplace-hero">
                     <div className="marketplace-container">
                         <div className="marketplace-hero-grid">
@@ -182,7 +282,7 @@ const Gyms: React.FC = () => {
                                     <span>Nổi bật tuần này</span>
                                 </div>
                                 <div className="marketplace-stat-card">
-                                    <strong>{venueHighlights.length}</strong>
+                                    <strong>{EDITORIAL_CATEGORIES.length}</strong>
                                     <span>Loại hình chọn lọc</span>
                                 </div>
                             </div>
@@ -190,6 +290,7 @@ const Gyms: React.FC = () => {
                     </div>
                 </section>
 
+                {/* ── Filter bar ───────────────────────────────────────────────────── */}
                 <section className="marketplace-container">
                     <div className="marketplace-panel marketplace-filter-bar">
                         <div className="flex flex-col gap-4">
@@ -247,7 +348,7 @@ const Gyms: React.FC = () => {
                                 <div className="marketplace-field flex items-end">
                                     <button
                                         type="button"
-                                        className={`w-full h-11 px-4 flex items-center justify-center gap-2 rounded-lg border font-bold text-sm transition-colors ${showAdvancedFilters ? 'bg-black text-white border-black' : 'bg-white text-[color:var(--mk-text)] border-[color:var(--mk-line)] hover:border-[color:var(--mk-line)]'}`}
+                                        className={`w-full h-11 px-4 flex items-center justify-center gap-2 rounded-lg border font-bold text-sm transition-colors ${showAdvancedFilters ? 'bg-black text-white border-black' : 'bg-white text-[color:var(--mk-text)] border-[color:var(--mk-line)] hover:border-[color:var(--mk-text)]'}`}
                                         onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                                     >
                                         <Filter className="w-4 h-4" />
@@ -308,20 +409,33 @@ const Gyms: React.FC = () => {
                                 </div>
                             )}
 
-                            {/* Options & Reset */}
+                            {/* View toggle + Reset */}
                             <div className="flex flex-wrap items-center gap-3 pt-2">
+                                {/* View mode toggle: Grid | List | Map */}
                                 <div className="inline-flex overflow-hidden rounded-lg border border-[color:var(--mk-line)] bg-white/70 p-1">
                                     <button
                                         type="button"
+                                        title="Dạng lưới"
                                         onClick={() => setViewMode('grid')}
-                                        className={`rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition ${viewMode === 'grid' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
+                                        className={`rounded-md px-3 py-2 transition flex items-center gap-1.5 text-xs font-bold ${viewMode === 'grid' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
                                     >
-                                        Grid
+                                        <LayoutGrid className="w-3.5 h-3.5" />
+                                        <span className="hidden sm:inline uppercase tracking-[0.14em]">Lưới</span>
                                     </button>
                                     <button
                                         type="button"
+                                        title="Dạng danh sách"
+                                        onClick={() => setViewMode('list')}
+                                        className={`rounded-md px-3 py-2 transition flex items-center gap-1.5 text-xs font-bold ${viewMode === 'list' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
+                                    >
+                                        <List className="w-3.5 h-3.5" />
+                                        <span className="hidden sm:inline uppercase tracking-[0.14em]">Danh sách</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        title="Bản đồ"
                                         onClick={() => setViewMode('map')}
-                                        className={`rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] transition ${viewMode === 'map' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
+                                        className={`rounded-md px-3 py-2 transition text-xs font-bold uppercase tracking-[0.14em] ${viewMode === 'map' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
                                     >
                                         Map
                                     </button>
@@ -340,7 +454,7 @@ const Gyms: React.FC = () => {
                                             setShowAdvancedFilters(false);
                                         }}
                                     >
-                                        Reset filters
+                                        ✕ Xóa bộ lọc
                                     </button>
                                 )}
                             </div>
@@ -348,7 +462,8 @@ const Gyms: React.FC = () => {
                     </div>
                 </section>
 
-                <section className="marketplace-container mt-6 space-y-8">
+                {/* ── Main content ─────────────────────────────────────────────────── */}
+                <section className="marketplace-container mt-6 space-y-10">
                     {isLoading ? (
                         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                             {Array.from({ length: 6 }).map((_, idx) => (
@@ -389,77 +504,86 @@ const Gyms: React.FC = () => {
                         </div>
                     ) : (
                         <>
-                            {featuredGyms.length > 0 && (
+                            {/* ── Featured hero (2:1:1) — only in grid mode & no active filters ── */}
+                            {!hasFilters && viewMode === 'grid' && featuredGyms.length > 0 && (
                                 <div className="space-y-4">
                                     <div className="marketplace-results-head">
                                         <div>
                                             <div className="marketplace-section-kicker">Lựa chọn Nổi bật</div>
-                                            <h2>Những không gian đang được chọn nhiều tuần này</h2>
+                                            <h2 className="marketplace-section-title">Những không gian đang được chọn nhiều tuần này</h2>
                                         </div>
                                         <div className="marketplace-results-meta">
                                             Hình ảnh thực tế, giá khởi điểm rõ ràng, mô tả chân thực.
                                         </div>
                                     </div>
 
-                                    <div className="marketplace-feature-grid">
-                                        <GymCard gym={featuredGyms[0]} variant="featured" />
-
-                                        <div className="marketplace-rail">
-                                            {featuredGyms.slice(1, 3).map((gym) => (
-                                                <GymCard key={gym.id} gym={gym} variant="compact" />
-                                            ))}
+                                    {/* 2 : 1 : 1 hero grid */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        {/* Primary featured — takes 2 columns */}
+                                        <div className="sm:col-span-2 lg:col-span-2">
+                                            <GymCard gym={featuredGyms[0]} variant="featured" index={0} />
                                         </div>
+                                        {/* Two compact secondaries — 1 column each */}
+                                        {featuredGyms.slice(1, 3).map((gym, idx) => (
+                                            <GymCard key={gym.id} gym={gym} variant="compact" index={idx + 1} />
+                                        ))}
                                     </div>
                                 </div>
                             )}
 
-                            {venueHighlights.length > 0 && (
-                                <div className="space-y-6">
-                                    {venueHighlights.map((group) => (
-                                        <div key={group.key} className="space-y-4">
-                                            <div className="marketplace-results-head">
-                                                <div>
-                                                    <div className="marketplace-section-kicker">Phân loại</div>
-                                                    <h2>{getPrimaryVenueLabel(group.items[0])}</h2>
-                                                </div>
-                                                <div className="marketplace-results-meta">
-                                                    {group.items[0] ? getSignatureText(group.items[0]) : ''}
-                                                </div>
-                                            </div>
-
-                                            <div className="grid gap-4 grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-                                                {group.items.map((gym) => (
-                                                    <GymCard key={gym.id} gym={gym} variant="compact" />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
+                            {/* ── Editorial category strips (only when no venue-type filter active) ── */}
+                            {!hasFilters && viewMode === 'grid' && (
+                                <div className="space-y-10">
+                                    {EDITORIAL_CATEGORIES.map((cat) => {
+                                        const items = categoryBuckets.get(cat.slug) || [];
+                                        return (
+                                            <CategoryStrip
+                                                key={cat.slug}
+                                                slug={cat.slug}
+                                                label={cat.label}
+                                                desc={cat.desc}
+                                                accent={cat.accent}
+                                                items={items}
+                                                onFilter={handleFilterByCategory}
+                                            />
+                                        );
+                                    })}
                                 </div>
                             )}
 
                             <div className="marketplace-divider" />
 
+                            {/* ── All results (grid or list) ───────────────────────────────── */}
                             <div className="space-y-4">
                                 <div className="marketplace-results-head">
                                     <div>
                                         <div className="marketplace-section-kicker">Tất cả Kết quả</div>
-                                        <h2>Tất cả lựa chọn phù hợp</h2>
+                                        <h2 className="marketplace-section-title">Tất cả lựa chọn phù hợp</h2>
                                     </div>
                                     <div className="marketplace-results-meta">
-                                        {gyms.length} cơ sở · {venueType ? `lọc theo loại ${venueType}` : 'mọi loại hình'} · {cityFilter || 'toàn quốc'}
+                                        {gyms.length} cơ sở · {venueType ? `lọc theo ${venueType}` : 'mọi loại hình'} · {cityFilter || 'toàn quốc'}
                                     </div>
                                 </div>
 
-                                <div className="marketplace-card-grid">
-                                    {standardGyms.map((gym, idx) => (
-                                        <GymCard key={gym.id} gym={gym} variant="standard" index={idx} />
-                                    ))}
-                                </div>
+                                {viewMode === 'list' ? (
+                                    <div className="flex flex-col gap-2">
+                                        {gyms.map((gym, idx) => (
+                                            <GymCard key={gym.id} gym={gym} variant="list" index={idx} />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="marketplace-card-grid">
+                                        {standardGyms.map((gym, idx) => (
+                                            <GymCard key={gym.id} gym={gym} variant="standard" index={idx} />
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </>
                     )}
                 </section>
 
+                {/* ── Editorial tip block ──────────────────────────────────────────── */}
                 {!isLoading && gyms.length > 0 && (
                     <section className="marketplace-container mt-10">
                         <div className="marketplace-panel p-6 sm:p-8">

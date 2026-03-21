@@ -2,9 +2,11 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import type { GymCenter, GymTaxonomyTerm } from '../types';
 
+export type GymCardVariant = 'standard' | 'featured' | 'compact' | 'list';
+
 interface GymCardProps {
     gym: GymCenter;
-    variant?: 'standard' | 'featured' | 'compact';
+    variant?: GymCardVariant;
     className?: string;
     index?: number;
 }
@@ -88,7 +90,7 @@ function getAudienceLabels(gym: GymCenter) {
     return getTerms(gym, 'audience').map((term) => term.label).slice(0, 2);
 }
 
-
+// ─── Card (grid / featured / compact) ─────────────────────────────────────────
 
 const GymCard: React.FC<GymCardProps> = ({
     gym,
@@ -105,9 +107,72 @@ const GymCard: React.FC<GymCardProps> = ({
     const audienceLabels = getAudienceLabels(gym);
     const highlights = (gym.hero_value_props && gym.hero_value_props.length > 0 ? gym.hero_value_props : gym.highlights) || [];
     const blurb = gym.discovery_blurb || gym.tagline || gym.description || 'Không gian tập luyện đã được tuyển chọn cho hành trình nâng cấp thể lực của bạn.';
+
     const isFeatured = variant === 'featured';
     const isCompact = variant === 'compact';
+    const isList    = variant === 'list';
 
+    // ── List row variant ──────────────────────────────────────────────────────
+    if (isList) {
+        return (
+            <Link
+                to={href}
+                className={`group flex gap-4 items-center rounded-xl border border-[color:var(--mk-line)] bg-white/80 p-3 hover:shadow-md transition-all duration-200 ${className}`}
+            >
+                {/* Thumbnail */}
+                <div className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 overflow-hidden rounded-lg bg-[color:var(--mk-paper-strong)]">
+                    {imageUrl ? (
+                        <img
+                            src={imageUrl}
+                            alt={gym.name}
+                            width={112}
+                            height={112}
+                            loading={index < 6 ? 'eager' : 'lazy'}
+                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-400"
+                        />
+                    ) : (
+                        <div className="flex h-full items-end p-2 bg-gradient-to-br from-[rgba(230,203,154,0.4)] to-[rgba(223,216,206,0.8)]">
+                            <span className="text-[1.4rem] font-bold text-[color:var(--mk-text)]/20">{gym.name.slice(0, 2).toUpperCase()}</span>
+                        </div>
+                    )}
+                    {/* Venue badge over thumbnail */}
+                    <span className="absolute top-1.5 left-1.5 marketplace-badge marketplace-badge--accent text-[0.6rem] px-1.5 py-0.5">
+                        {venueLabel}
+                    </span>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0 space-y-1">
+                    <div className="flex items-start justify-between gap-2">
+                        <div>
+                            <p className="text-[0.62rem] font-medium uppercase tracking-[0.16em] text-[color:var(--mk-muted)]">{locationLabel}</p>
+                            <h3 className="text-[0.95rem] font-bold tracking-[-0.03em] text-[color:var(--mk-text)] line-clamp-1">{gym.name}</h3>
+                        </div>
+                        <div className="shrink-0 text-right">
+                            <div className="text-sm font-bold text-[color:var(--mk-text)]">{priceLabel}</div>
+                            <div className="text-[0.65rem] text-[color:var(--mk-muted)]">{proofLabel}</div>
+                        </div>
+                    </div>
+                    <p className="line-clamp-1 text-[0.78rem] text-[color:var(--mk-muted)]">{blurb}</p>
+                    {highlights.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-0.5">
+                            {highlights.slice(0, 3).map((item) => (
+                                <span key={item} className="inline-flex items-center rounded border border-[color:var(--mk-line)] bg-white/60 px-2 py-0.5 text-[0.65rem] font-medium text-[color:var(--mk-text-soft)]">
+                                    {item}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <span className="shrink-0 text-[0.7rem] font-semibold tracking-wide text-[color:var(--mk-text)] transition-transform duration-300 group-hover:translate-x-1 pr-1">
+                    OPEN →
+                </span>
+            </Link>
+        );
+    }
+
+    // ── Card variants (standard / featured / compact) ─────────────────────────
     const wrapperClass = [
         'group relative overflow-hidden marketplace-panel transition duration-300',
         'hover:-translate-y-1 hover:shadow-[0_22px_60px_rgba(53,41,26,0.1)]',
@@ -149,23 +214,26 @@ const GymCard: React.FC<GymCardProps> = ({
 
                 <div className="absolute inset-0 bg-gradient-to-t from-[rgba(31,24,19,0.6)] via-[rgba(31,24,19,0.08)] to-transparent" />
 
-                <div className="absolute left-4 top-4 right-4 flex items-start justify-between gap-3">
-                    <div className="flex flex-wrap gap-2">
-                        <span className="marketplace-badge marketplace-badge--accent">
-                            {venueLabel}
-                        </span>
-                        {gym.is_verified && (
-                            <span className="marketplace-badge marketplace-badge--verified">Verified</span>
-                        )}
-                    </div>
-
-                    {gym.response_sla_text && !isCompact && (
-                        <span className="marketplace-badge marketplace-badge--neutral max-w-[12rem] justify-center text-center">
-                            {gym.response_sla_text}
-                        </span>
+                {/* ── Top-left: venue + verified only — no SLA here to prevent overlap ── */}
+                <div className="absolute left-3 top-3 flex items-center gap-1.5">
+                    <span className="marketplace-badge marketplace-badge--accent">
+                        {venueLabel}
+                    </span>
+                    {gym.is_verified && (
+                        <span className="marketplace-badge marketplace-badge--verified">Verified</span>
                     )}
                 </div>
 
+                {/* ── Top-right: SLA badge separately to avoid collision ── */}
+                {gym.response_sla_text && !isCompact && (
+                    <div className="absolute right-3 top-3">
+                        <span className="marketplace-badge marketplace-badge--neutral text-center">
+                            {gym.response_sla_text}
+                        </span>
+                    </div>
+                )}
+
+                {/* ── Bottom: location + price (left) | proof (right) ── */}
                 <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-4 text-white">
                     <div className="min-w-0">
                         <div className="text-[0.62rem] font-medium uppercase tracking-[0.18em] text-white/60">
