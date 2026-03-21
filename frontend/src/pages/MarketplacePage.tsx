@@ -25,7 +25,7 @@ function formatPrice(n: number | string, currency = 'VND'): string {
 
 // ─── Product Card ─────────────────────────────────────────────────────────
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, variant = 'standard' }: { product: Product, variant?: 'featured' | 'standard' | 'compact' }) {
     const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
     const discountPct = hasDiscount
         ? Math.round(((product.compare_at_price! - product.price) / product.compare_at_price!) * 100)
@@ -34,7 +34,7 @@ function ProductCard({ product }: { product: Product }) {
     return (
         <Link
             to={`/marketplace/product/${product.slug}`}
-            className="marketplace-product-card"
+            className={`marketplace-product-card marketplace-card--${variant}`}
             aria-label={product.title}
         >
             <div className="marketplace-card-thumb">
@@ -50,7 +50,7 @@ function ProductCard({ product }: { product: Product }) {
                         {product.category?.icon_emoji ?? '📦'}
                     </div>
                 )}
-                {product.product_type === 'digital' && (
+                {product.product_type === 'digital' && variant !== 'compact' && (
                     <span className="marketplace-badge marketplace-badge--digital">Digital</span>
                 )}
                 {discountPct > 0 && (
@@ -59,13 +59,15 @@ function ProductCard({ product }: { product: Product }) {
             </div>
 
             <div className="marketplace-card-body">
-                <span className="marketplace-card-category">
-                    {product.category?.icon_emoji} {product.category?.label}
-                </span>
+                {variant !== 'compact' && (
+                    <span className="marketplace-card-category">
+                        {product.category?.icon_emoji} {product.category?.label}
+                    </span>
+                )}
                 <h3 className="marketplace-card-title">{product.title}</h3>
 
-                <div className="marketplace-card-meta">
-                    {product.seller && (
+                {variant !== 'compact' && product.seller && (
+                    <div className="marketplace-card-meta">
                         <div className="marketplace-card-seller">
                             {product.seller.avatar_url ? (
                                 <img src={product.seller.avatar_url} alt={product.seller.full_name} className="marketplace-card-seller-avatar" />
@@ -76,8 +78,8 @@ function ProductCard({ product }: { product: Product }) {
                             )}
                             <span>{product.seller.full_name}</span>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
 
                 <div className="marketplace-card-footer">
                     <div className="marketplace-card-price">
@@ -86,7 +88,7 @@ function ProductCard({ product }: { product: Product }) {
                             <s className="marketplace-card-price-orig">{formatPrice(product.compare_at_price!, product.currency)}</s>
                         )}
                     </div>
-                    {product.review_count > 0 && (
+                    {product.review_count > 0 && variant !== 'compact' && (
                         <div className="marketplace-card-rating">
                             <span>⭐</span>
                             <span>{product.avg_rating != null ? Number(product.avg_rating).toFixed(1) : '—'}</span>
