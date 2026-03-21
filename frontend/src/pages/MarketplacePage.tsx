@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
@@ -15,11 +15,12 @@ const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001/api/v1';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────
 
-function formatPrice(n: number, currency = 'VND'): string {
+function formatPrice(n: number | string, currency = 'VND'): string {
+    const num = Number(n);
     if (currency === 'VND') {
-        return n.toLocaleString('vi-VN') + 'đ';
+        return num.toLocaleString('vi-VN') + 'đ';
     }
-    return n.toLocaleString('en-US', { style: 'currency', currency });
+    return num.toLocaleString('en-US', { style: 'currency', currency });
 }
 
 // ─── Product Card ─────────────────────────────────────────────────────────
@@ -133,6 +134,7 @@ export default function MarketplacePage() {
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [searchInput, setSearchInput] = useState(searchParams.get('q') ?? '');
+    const filterRef = useRef<HTMLElement>(null);
 
     const activeCategory = searchParams.get('category') ?? '';
     const activeSearch = searchParams.get('q') ?? '';
@@ -197,6 +199,7 @@ export default function MarketplacePage() {
     function handleSearch(e: React.FormEvent) {
         e.preventDefault();
         setFilter('q', searchInput.trim());
+        filterRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     const showHero = !activeCategory && !activeSearch;
@@ -237,7 +240,7 @@ export default function MarketplacePage() {
 
                 <div className="marketplace-layout">
                     {/* Category filter bar */}
-                    <nav className="marketplace-cat-bar" aria-label="Danh mục sản phẩm">
+                    <nav ref={filterRef} className="marketplace-cat-bar" aria-label="Danh mục sản phẩm">
                         <CategoryPill
                             category={{ slug: '', label: 'Tất cả', icon_emoji: '🏪' }}
                             active={!activeCategory}

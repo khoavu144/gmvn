@@ -392,7 +392,14 @@ export default function Header() {
                 </nav>
 
                 {/* Right side */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
+                    <Link
+                        to="/cart"
+                        className="relative p-2 text-[color:var(--mk-text-soft)] hover:text-black hover:bg-[color:var(--mk-paper)] rounded-full transition-colors"
+                        aria-label="Giỏ hàng"
+                    >
+                        <ShoppingBag className="w-5 h-5" />
+                    </Link>
                     <NotificationBell />
 
                     {isAuthenticated && user ? (

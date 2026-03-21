@@ -530,6 +530,22 @@
 
 /* CTA */
 .mpd-cta-row { display: flex; gap: .75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+
+@media (max-width: 768px) {
+  .mpd-page { padding-bottom: 6rem; }
+  .mpd-cta-row {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    margin: 0;
+    background: var(--mk-bg);
+    border-top: 1px solid rgba(0,0,0,.08);
+    z-index: 50;
+    box-shadow: 0 -4px 12px rgba(0,0,0,.04);
+  }
+}
 .mpd-btn-primary {
   flex: 1; min-width: 160px;
   height: 52px; border-radius: 12px;

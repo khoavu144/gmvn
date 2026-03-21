@@ -7,9 +7,10 @@ import type { Product, ProductReview } from '../types';
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001/api/v1';
 
-function formatPrice(n: number, currency = 'VND'): string {
-    if (currency === 'VND') return n.toLocaleString('vi-VN') + 'đ';
-    return n.toLocaleString('en-US', { style: 'currency', currency });
+function formatPrice(n: number | string, currency = 'VND'): string {
+    const num = Number(n);
+    if (currency === 'VND') return num.toLocaleString('vi-VN') + 'đ';
+    return num.toLocaleString('en-US', { style: 'currency', currency });
 }
 
 function StarRating({ rating }: { rating: number }) {
