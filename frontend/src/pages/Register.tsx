@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch } from 'react-redux';
@@ -8,6 +8,20 @@ import { authApi } from '../services/auth';
 export default function Register() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const { isAuthenticated, user: authUser, isLoading: authLoading } = useSelector((state: RootState) => state.auth);
+
+    useEffect(() => {
+        if (isAuthenticated && authUser && !authLoading) {
+            if (authUser.user_type === 'gym_owner' && !authUser.onboarding_completed) {
+                navigate('/gym-owner/register');
+            } else if (!authUser.onboarding_completed) {
+                navigate('/onboarding');
+            } else {
+                navigate('/dashboard');
+            }
+        }
+    }, [isAuthenticated, authUser, authLoading, navigate]);
+
     const [form, setForm] = useState({
         full_name: '',
         email: '',

@@ -10,6 +10,7 @@
     "start": "node dist/server.js",
     "migrate:check": "ts-node src/scripts/checkMigrationState.ts",
     "migrate:run": "ts-node src/scripts/runMigrations.ts",
+    "seed": "ts-node src/seeds/fullSeed.ts",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write src/**/*.ts"

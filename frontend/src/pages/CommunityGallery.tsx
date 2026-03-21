@@ -61,7 +61,7 @@ export default function CommunityGallery() {
                     <div className="inline-block px-3 py-1 mb-6 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-xs font-bold tracking-widest text-white/70 uppercase">
                         Gymerviet Community
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tight leading-none group">
+                    <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight leading-none group">
                         <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500">
                             THE WALL
                         </span>

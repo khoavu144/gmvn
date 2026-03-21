@@ -82,7 +82,7 @@ export default {
                 'sm': '4px',
                 DEFAULT: '8px',   // rounded — default cho inputs, badges
                 'md': '8px',    // rounded-md — default cho cards
-                'lg': '12px',   // rounded-lg — modals, large cards
+                'lg': '8px',   // rounded-lg — standardized to 8px
                 'xl': '16px',
                 '2xl': '20px',
                 'full': '9999px', // pills, avatars

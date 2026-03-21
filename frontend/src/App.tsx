@@ -167,7 +167,7 @@ const RouteErrorFallback = () => {
     <div className="min-h-[70vh] flex items-center justify-center px-6 py-12 bg-white">
       <div className="w-full max-w-xl rounded-lg border border-gray-200 bg-white p-8 shadow-sm text-center">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">GYMERVIET</p>
-        <h1 className="mt-4 text-2xl font-black text-black tracking-tight">
+        <h1 className="mt-4 text-2xl font-bold text-black tracking-tight">
           {isChunkError ? 'Ứng dụng vừa cập nhật, vui lòng tải lại trang' : 'Không thể tải trang này'}
         </h1>
         <p className="mt-3 text-sm text-gray-600 leading-6">

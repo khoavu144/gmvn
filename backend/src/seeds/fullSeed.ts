@@ -25,7 +25,14 @@ import { GymLeadRoute } from '../entities/GymLeadRoute';
 import { GymReview } from '../entities/GymReview';
 import { GymTrainerLink } from '../entities/GymTrainerLink';
 import { CommunityGallery } from '../entities/CommunityGallery';
+import { Product } from '../entities/Product';
+import { ProductCategory } from '../entities/ProductCategory';
+import { ProductVariant } from '../entities/ProductVariant';
+import { ProductReview } from '../entities/ProductReview';
+import { SellerProfile } from '../entities/SellerProfile';
+import { TrainingPackage } from '../entities/TrainingPackage';
 import { generateSlug } from '../utils/slugify';
+import { MARKETPLACE_PRODUCTS, MARKETPLACE_SELLERS } from './marketplaceMockData';
 import bcrypt from 'bcryptjs';
 
 const PASS = 'Demo@123456';
@@ -2364,6 +2371,12 @@ export async function fullSeed() {
   const reviewRepo = AppDataSource.getRepository(GymReview);
   const trainerLinkRepo = AppDataSource.getRepository(GymTrainerLink);
   const communityRepo = AppDataSource.getRepository(CommunityGallery);
+  const productCategoryRepo = AppDataSource.getRepository(ProductCategory);
+  const sellerProfileRepo = AppDataSource.getRepository(SellerProfile);
+  const productRepo = AppDataSource.getRepository(Product);
+  const productVariantRepo = AppDataSource.getRepository(ProductVariant);
+  const productReviewRepo = AppDataSource.getRepository(ProductReview);
+  const trainingPackageRepo = AppDataSource.getRepository(TrainingPackage);
   const hashed = await bcrypt.hash(PASS, 10);
 
   // Admin
@@ -2681,6 +2694,201 @@ export async function fullSeed() {
     console.log(`  ✅ ${g.gym.name}`);
   }
 
+  // Marketplace
+  console.log('\n🛍️ Creating Marketplace...');
+  const categoryBySlug = new Map(
+    (await productCategoryRepo.find()).map((category) => [category.slug, category]),
+  );
+  const sellerProfileByEmail = new Map<string, SellerProfile>();
+  const sellerUserByEmail = new Map<string, User>();
+  const coachByEmail = new Map(COACHES.map((coach) => [coach.email, coach]));
+  const gymOwnerByEmail = new Map(GYMS.map((gym) => [gym.owner.email, gym.owner]));
+
+  for (const sellerSeed of MARKETPLACE_SELLERS) {
+    let sellerUser = await userRepo.findOneBy({ email: sellerSeed.email });
+    const coachSeed = coachByEmail.get(sellerSeed.email);
+    const gymOwnerSeed = gymOwnerByEmail.get(sellerSeed.email);
+
+    if (!sellerUser && coachSeed?.slug) {
+      sellerUser = await userRepo.findOneBy({ slug: coachSeed.slug });
+    }
+
+    if (!sellerUser) {
+      if (coachSeed) {
+        sellerUser = await userRepo.save(userRepo.create({
+          email: coachSeed.email,
+          full_name: coachSeed.full_name,
+          password: hashed,
+          user_type: 'trainer',
+          avatar_url: coachSeed.avatar_url,
+          bio: coachSeed.bio,
+          specialties: coachSeed.specialties,
+          base_price_monthly: coachSeed.base_price_monthly as any,
+          slug: coachSeed.slug,
+          is_verified: true,
+          is_email_verified: true,
+          onboarding_completed: true,
+        })) as unknown as User;
+      } else if (gymOwnerSeed) {
+        sellerUser = await userRepo.save(userRepo.create({
+          email: gymOwnerSeed.email,
+          full_name: gymOwnerSeed.full_name,
+          password: hashed,
+          user_type: 'gym_owner',
+          gym_owner_status: 'approved' as any,
+          avatar_url: sellerSeed.shop_logo_url ?? null,
+          bio: sellerSeed.shop_description ?? null,
+          is_verified: true,
+          is_email_verified: true,
+          onboarding_completed: true,
+        })) as unknown as User;
+      } else {
+        sellerUser = await userRepo.save(userRepo.create({
+          email: sellerSeed.email,
+          full_name: sellerSeed.shop_name,
+          password: hashed,
+          user_type: sellerSeed.business_type === 'gym' ? 'gym_owner' : 'user',
+          gym_owner_status: sellerSeed.business_type === 'gym' ? 'approved' as any : null,
+          avatar_url: sellerSeed.shop_logo_url ?? null,
+          bio: sellerSeed.shop_description ?? null,
+          is_verified: !!sellerSeed.is_verified,
+          is_email_verified: true,
+          onboarding_completed: true,
+          slug: generateSlug(sellerSeed.shop_slug),
+        })) as unknown as User;
+      }
+
+      console.log(`  ✅ Created seller user ${sellerSeed.email}`);
+    }
+
+    sellerUserByEmail.set(sellerSeed.email, sellerUser);
+
+    const existingSellerProfile = await sellerProfileRepo.findOne({
+      where: [{ user_id: sellerUser.id }, { shop_slug: sellerSeed.shop_slug }],
+    });
+
+    const sellerProfileEntity = existingSellerProfile ?? sellerProfileRepo.create();
+    Object.assign(sellerProfileEntity, {
+      user_id: sellerUser.id,
+      ...sellerSeed,
+    });
+
+    const savedSellerProfile = await sellerProfileRepo.save(sellerProfileEntity as any) as unknown as SellerProfile;
+    sellerProfileByEmail.set(sellerSeed.email, savedSellerProfile);
+  }
+
+  let seededMarketplaceCount = 0;
+  for (const productSeed of MARKETPLACE_PRODUCTS) {
+    const sellerUser = sellerUserByEmail.get(productSeed.seller_email) ?? null;
+    const sellerProfile = sellerProfileByEmail.get(productSeed.seller_email);
+    const category = categoryBySlug.get(productSeed.category_slug);
+
+    if (!sellerUser || !category) {
+      console.warn(`  ⚠️ Skip product ${productSeed.slug}: missing seller or category`);
+      continue;
+    }
+
+    const variantStockTotal = (productSeed.variants || [])
+      .filter((variant: any) => variant.is_active !== false)
+      .reduce((total: number, variant: any) => total + (variant.stock_quantity ?? 0), 0);
+    const resolvedStockQuantity = productSeed.track_inventory
+      ? ((productSeed.variants || []).length > 0 ? variantStockTotal : (productSeed.stock_quantity ?? 0))
+      : null;
+    const resolvedStatus = productSeed.track_inventory && (resolvedStockQuantity ?? 0) <= 0
+      ? 'sold_out'
+      : 'active';
+
+    const existingProduct = await productRepo
+      .createQueryBuilder('product')
+      .withDeleted()
+      .where('product.slug = :slug', { slug: productSeed.slug })
+      .getOne();
+
+    const productEntity = existingProduct ?? productRepo.create();
+    Object.assign(productEntity, {
+      seller_id: sellerUser.id,
+      seller_profile_id: sellerProfile?.id ?? null,
+      category_id: category.id,
+      title: productSeed.title,
+      slug: productSeed.slug,
+      description: productSeed.description ?? null,
+      product_type: productSeed.product_type,
+      status: resolvedStatus,
+      price: productSeed.price,
+      compare_at_price: productSeed.compare_at_price ?? null,
+      currency: productSeed.currency ?? 'VND',
+      stock_quantity: resolvedStockQuantity,
+      track_inventory: productSeed.track_inventory ?? false,
+      sku: productSeed.sku ?? null,
+      digital_file_url: productSeed.digital_file_url ?? null,
+      preview_content: productSeed.preview_content ?? null,
+      thumbnail_url: productSeed.thumbnail_url ?? null,
+      gallery: productSeed.gallery ?? null,
+      attributes: productSeed.attributes ?? null,
+      tags: productSeed.tags ?? null,
+      view_count: productSeed.view_count ?? 0,
+      sale_count: productSeed.sale_count ?? 0,
+      wishlist_count: productSeed.wishlist_count ?? 0,
+      avg_rating: null,
+      review_count: 0,
+      featured_weight: productSeed.featured_weight ?? 0,
+      moderation_note: null,
+      moderated_by: null,
+      moderated_at: null,
+      deleted_at: null,
+    });
+
+    const savedProduct = await productRepo.save(productEntity as any) as unknown as Product;
+
+    await productVariantRepo.delete({ product_id: savedProduct.id });
+    await productReviewRepo.delete({ product_id: savedProduct.id });
+    await trainingPackageRepo.delete({ product_id: savedProduct.id });
+
+    for (let index = 0; index < (productSeed.variants || []).length; index++) {
+      const variant = productSeed.variants[index];
+      await productVariantRepo.save(productVariantRepo.create({
+        product_id: savedProduct.id,
+        sort_order: variant.sort_order ?? index,
+        ...variant,
+      } as any));
+    }
+
+    if (productSeed.training_package) {
+      await trainingPackageRepo.save(trainingPackageRepo.create({
+        product_id: savedProduct.id,
+        ...productSeed.training_package,
+      } as any));
+    }
+
+    let ratingTotal = 0;
+    let ratingCount = 0;
+    for (const reviewSeed of productSeed.reviews || []) {
+      const athlete = athleteByEmail.get(reviewSeed.athlete_email);
+      if (!athlete) continue;
+      const { athlete_email, ...reviewData } = reviewSeed;
+      await productReviewRepo.save(productReviewRepo.create({
+        product_id: savedProduct.id,
+        user_id: athlete.id,
+        order_item_id: null,
+        is_visible: true,
+        ...reviewData,
+      } as any));
+      ratingTotal += reviewData.rating;
+      ratingCount += 1;
+    }
+
+    savedProduct.avg_rating = ratingCount > 0
+      ? Math.round((ratingTotal / ratingCount) * 100) / 100
+      : null;
+    savedProduct.review_count = ratingCount;
+    savedProduct.status = resolvedStatus;
+    await productRepo.save(savedProduct);
+
+    seededMarketplaceCount += 1;
+  }
+
+  console.log(`  ✅ ${seededMarketplaceCount} marketplace products`);
+
   // Community Gallery
   console.log('\n🖼️ Creating Community Gallery...');
   if (!(await communityRepo.count())) {
@@ -2696,7 +2904,7 @@ export async function fullSeed() {
   }
 
   console.log('\n✨ Full Seed completed!');
-  console.log(`  Coaches: ${COACHES.length} | Athletes: ${ATHLETES.length} | Gyms: ${GYMS.length}`);
+  console.log(`  Coaches: ${COACHES.length} | Athletes: ${ATHLETES.length} | Gyms: ${GYMS.length} | Marketplace: ${MARKETPLACE_PRODUCTS.length}`);
   console.log('  🔑 Password for all demo accounts: Demo@123456');
 }
 

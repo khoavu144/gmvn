@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,18 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const { isAuthenticated, user: authUser, isLoading: authLoading } = useSelector((state: RootState) => state.auth);
+
+    useEffect(() => {
+        if (isAuthenticated && authUser && !authLoading) {
+            if (!authUser.onboarding_completed) {
+                navigate('/onboarding');
+            } else {
+                navigate('/dashboard');
+            }
+        }
+    }, [isAuthenticated, authUser, authLoading, navigate]);
+
     const loading = useSelector((state: RootState) => state.auth.isLoading);
 
     const handleSubmit = async (e: React.FormEvent) => {
