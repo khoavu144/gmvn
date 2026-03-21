@@ -29,43 +29,43 @@ export default function LegalPageLayout({
     }[maxWidth];
 
     return (
-        <div className="min-h-screen bg-[color:var(--mk-paper)]">
-            {/* Page header */}
-            <div className="bg-white border-b border-[color:var(--mk-line)]">
-                <div className={`${widthClass} mx-auto px-4 py-10 sm:py-14`}>
-                    {/* Breadcrumb */}
+        <div className="page-shell">
+            <div className="border-b border-[color:var(--mk-line)] bg-white">
+                <div className={`page-container ${widthClass} py-10 sm:py-14`}>
                     {breadcrumbs && breadcrumbs.length > 0 && (
-                        <nav className="flex items-center gap-2 text-xs text-[color:var(--mk-muted)] mb-6">
-                            <Link to="/" className="hover:text-black transition-colors">Trang chủ</Link>
+                        <nav className="mb-6 flex items-center gap-2 text-xs text-[color:var(--mk-muted)]" aria-label="Breadcrumb">
+                            <Link to="/" className="font-medium transition-colors hover:text-black">Trang chủ</Link>
                             {breadcrumbs.map((crumb, i) => (
                                 <span key={i} className="flex items-center gap-2">
                                     <span className="text-gray-300">/</span>
                                     {crumb.to ? (
-                                        <Link to={crumb.to} className="hover:text-black transition-colors">
+                                        <Link to={crumb.to} className="font-medium transition-colors hover:text-black">
                                             {crumb.label}
                                         </Link>
                                     ) : (
-                                        <span className="text-[color:var(--mk-text-soft)] font-medium">{crumb.label}</span>
+                                        <span className="font-semibold text-[color:var(--mk-text-soft)]">{crumb.label}</span>
                                     )}
                                 </span>
                             ))}
                         </nav>
                     )}
 
-                    <h1 className="text-2xl sm:text-3xl font-bold text-black tracking-tight">{title}</h1>
-                    {subtitle && (
-                        <p className="text-base text-[color:var(--mk-text-soft)] mt-3 leading-relaxed max-w-xl">{subtitle}</p>
-                    )}
-                    {lastUpdated && (
-                        <p className="text-xs text-[color:var(--mk-muted)] mt-4 uppercase tracking-wider">
-                            Cập nhật lần cuối: {lastUpdated}
-                        </p>
-                    )}
+                    <div className="page-header mb-0 border-b-0 pb-0">
+                        <p className="page-kicker">Hỗ trợ & chính sách</p>
+                        <h1 className="page-title max-w-3xl">{title}</h1>
+                        {subtitle && (
+                            <p className="page-description max-w-2xl">{subtitle}</p>
+                        )}
+                        {lastUpdated && (
+                            <p className="mt-4 text-xs font-bold uppercase tracking-[0.14em] text-[color:var(--mk-muted)]">
+                                Cập nhật lần cuối: {lastUpdated}
+                            </p>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            {/* Content */}
-            <div className={`${widthClass} mx-auto px-4 py-10 sm:py-14`}>
+            <div className={`page-container ${widthClass} py-10 sm:py-12`}>
                 {children}
             </div>
         </div>
@@ -76,9 +76,9 @@ export default function LegalPageLayout({
 
 export function LegalSection({ title, children }: { title: string; children: React.ReactNode }) {
     return (
-        <section className="mb-10">
-            <h2 className="text-lg font-bold text-black mb-4 pb-3 border-b border-[color:var(--mk-line)]">{title}</h2>
-            <div className="space-y-3 text-sm text-[color:var(--mk-text-soft)] leading-relaxed">
+        <section className="mb-6 rounded-lg border border-[color:var(--mk-line)] bg-white p-5 shadow-sm sm:p-6">
+            <h2 className="mb-4 border-b border-[color:var(--mk-line)] pb-3 text-lg font-bold tracking-tight text-black">{title}</h2>
+            <div className="space-y-3 text-sm leading-7 text-[color:var(--mk-text-soft)]">
                 {children}
             </div>
         </section>
@@ -107,12 +107,12 @@ export function LegalCallout({
 }) {
     const styles = {
         info: 'border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] text-[color:var(--mk-text-soft)]',
-        warning: 'border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] text-[color:var(--mk-text)]',
+        warning: 'border-amber-200 bg-amber-50 text-amber-800',
         danger: 'border-black bg-black text-white',
     }[type];
 
     return (
-        <div className={`border-l-4 px-4 py-3 rounded-r-xs text-sm leading-relaxed ${styles}`}>
+        <div className={`rounded-lg border px-4 py-3 text-sm leading-7 shadow-sm ${styles}`}>
             {children}
         </div>
     );

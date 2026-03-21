@@ -86,31 +86,35 @@ export default function WorkoutsPage() {
                     </div>
                 ) : (
                     <>
-                        {/* Sub selector */}
-                        <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
-                            {subs.map(s => (
-                                <button key={s.id} onClick={() => { setActiveSub(s.id); loadWorkouts(s.id, selectedWeek); }}
-                                    className={`flex-shrink-0 px-4 py-2 rounded-xs text-sm font-semibold transition-colors border ${activeSub === s.id ? 'bg-black text-white border-black' : 'bg-white text-[color:var(--mk-text-soft)] border-[color:var(--mk-line)] hover:border-[color:var(--mk-line)]'}`}>
-                                    {s.program?.name}
-                                </button>
-                            ))}
+                        <div className="page-section mb-6">
+                            <div className="page-kicker mb-3">Chương trình đang theo</div>
+                            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                                {subs.map(s => (
+                                    <button key={s.id} onClick={() => { setActiveSub(s.id); loadWorkouts(s.id, selectedWeek); }}
+                                        className={`filter-chip flex-shrink-0 whitespace-nowrap ${activeSub === s.id ? 'filter-chip-active' : 'filter-chip-idle'}`}>
+                                        {s.program?.name}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
-                        {/* Week selector */}
-                        <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-none">
-                            {Array.from({ length: subs.find(s => s.id === activeSub)?.program?.duration_weeks || 12 }, (_, i) => i + 1).map(w => (
-                                <button key={w} onClick={() => { setSelectedWeek(w); if (activeSub) loadWorkouts(activeSub, w); }}
-                                    className={`flex-shrink-0 w-10 h-10 rounded-full text-sm font-semibold transition-colors border ${selectedWeek === w ? 'bg-black text-white border-black' : 'bg-white text-[color:var(--mk-text-soft)] border-[color:var(--mk-line)] hover:border-[color:var(--mk-line)]'}`}>
-                                    {w}
-                                </button>
-                            ))}
+                        <div className="page-section mb-8">
+                            <div className="page-kicker mb-3">Chọn tuần</div>
+                            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                                {Array.from({ length: subs.find(s => s.id === activeSub)?.program?.duration_weeks || 12 }, (_, i) => i + 1).map(w => (
+                                    <button key={w} onClick={() => { setSelectedWeek(w); if (activeSub) loadWorkouts(activeSub, w); }}
+                                        className={`filter-chip min-w-[2.75rem] flex-shrink-0 ${selectedWeek === w ? 'filter-chip-active' : 'filter-chip-idle'}`}>
+                                        {w}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         {/* Workouts */}
                         {loading ? (
                             <div className="space-y-6 animate-pulse">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="card border border-[color:var(--mk-line)] p-5">
+                                    <div key={i} className="page-section">
                                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-[color:var(--mk-line)] pb-4">
                                             <div className="space-y-2 w-full sm:w-1/2">
                                                 <div className="h-4 bg-[color:var(--mk-paper-strong)] w-24 rounded-sm"></div>
@@ -145,16 +149,16 @@ export default function WorkoutsPage() {
                                 {workouts.map(w => {
                                     const isDone = loggedIds.has(w.id);
                                     return (
-                                        <div key={w.id} className={`card ${isDone ? 'border-[color:var(--mk-line)] bg-[color:var(--mk-paper)]' : ''}`}>
-                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-[color:var(--mk-line)] pb-4">
+                                        <div key={w.id} className={`page-section ${isDone ? 'bg-[color:var(--mk-paper)]' : ''}`}>
+                                            <div className="mb-4 flex flex-col justify-between gap-4 border-b border-[color:var(--mk-line)] pb-4 sm:flex-row sm:items-center">
                                                 <div>
-                                                    <div className="flex items-center gap-2 mb-1">
-                                                        <span className="text-[10px] font-bold uppercase tracking-wider bg-[color:var(--mk-paper)] text-[color:var(--mk-text-soft)] px-2 py-0.5 rounded-xs">
+                                                    <div className="mb-1 flex items-center gap-2">
+                                                        <span className="page-pill">
                                                             {w.day_number ? dayNames[w.day_number] : 'Chưa xếp ngày'}
                                                         </span>
-                                                        {w.duration_minutes && <span className="text-xs text-[color:var(--mk-muted)] font-medium">{w.duration_minutes} phút</span>}
+                                                        {w.duration_minutes && <span className="text-xs font-medium text-[color:var(--mk-muted)]">{w.duration_minutes} phút</span>}
                                                     </div>
-                                                    <h3 className={`text-lg font-bold ${isDone ? 'text-[color:var(--mk-muted)] line-through' : 'text-black'}`}>
+                                                    <h3 className={`text-lg font-bold tracking-tight ${isDone ? 'text-[color:var(--mk-muted)] line-through' : 'text-black'}`}>
                                                         {w.name || `Buổi tập ngày ${w.day_number}`}
                                                     </h3>
                                                 </div>
@@ -162,13 +166,13 @@ export default function WorkoutsPage() {
                                                     {!isDone && (
                                                         <textarea
                                                             placeholder="Ghi chú buổi tập..."
-                                                            className="form-input text-xs h-10 min-h-[40px] w-48 resize-none py-2"
+                                                            className="form-input h-11 min-h-[44px] w-48 resize-none py-2 text-xs"
                                                             value={notes[w.id] || ''}
                                                             onChange={(e) => setNotes(prev => ({ ...prev, [w.id]: e.target.value }))}
                                                         />
                                                     )}
                                                     <button onClick={() => handleLog(w.id)} disabled={isDone}
-                                                        className={`shrink-0 px-4 py-2 rounded-xs text-sm font-semibold transition-colors border ${isDone ? 'bg-transparent text-[color:var(--mk-muted)] border-transparent cursor-not-allowed' : 'btn-primary'}`}>
+                                                        className={`shrink-0 ${isDone ? 'btn-secondary border-transparent bg-[color:var(--mk-paper)] text-[color:var(--mk-muted)] shadow-none' : 'btn-primary'}`}>
                                                         {isDone ? 'Đã hoàn thành' : 'Đánh dấu xong'}
                                                     </button>
                                                 </div>

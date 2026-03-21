@@ -45,44 +45,47 @@
   --mk-shadow-soft: 0 18px 50px rgba(53, 41, 26, 0.06);
 
   /* ── Curator surface tokens (from DESIGN.md) ── */
-  --cur-surface:          #fcf9f8;
-  --cur-surface-low:      #f6f3f2;
-  --cur-surface-lowest:   #ffffff;
-  --cur-surface-high:     #eae7e7;
-  --cur-surface-highest:  #e5e2e1;
+  --cur-surface: #fcf9f8;
+  --cur-surface-low: #f6f3f2;
+  --cur-surface-lowest: #ffffff;
+  --cur-surface-high: #eae7e7;
+  --cur-surface-highest: #e5e2e1;
 
-  --cur-primary:          #904800;
-  --cur-primary-container:#b55d00;
-  --cur-on-primary:       #ffffff;
-  --cur-on-surface:       #1c1b1b;
-  --cur-on-surface-var:   #4d4544;
-  --cur-outline-var:      #e0c0b2;
-  --cur-error:            #d43e30;
-  --cur-tertiary-container:#d43e30;
-  --cur-on-tertiary:      #ffffff;
+  --cur-primary: #904800;
+  --cur-primary-container: #b55d00;
+  --cur-on-primary: #ffffff;
+  --cur-on-surface: #1c1b1b;
+  --cur-on-surface-var: #4d4544;
+  --cur-outline-var: #e0c0b2;
+  --cur-error: #d43e30;
+  --cur-tertiary-container: #d43e30;
+  --cur-on-tertiary: #ffffff;
 
-  --cur-radius-sm:  0.25rem;
-  --cur-radius-md:  0.75rem;
-  --cur-radius-lg:  1rem;
-  --cur-radius-xl:  1.5rem;
-  --cur-radius-full:999px;
+  --cur-radius-sm: 0.25rem;
+  --cur-radius-md: 0.75rem;
+  --cur-radius-lg: 1rem;
+  --cur-radius-xl: 1.5rem;
+  --cur-radius-full: 999px;
 
   --cur-shadow-ambient: 0 12px 32px rgba(28, 27, 27, 0.06);
-  --cur-shadow-soft:    0 18px 50px rgba(53, 41, 26, 0.06);
+  --cur-shadow-soft: 0 18px 50px rgba(53, 41, 26, 0.06);
 
   /* ── Curator type scale ── */
   --font-display: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --type-display-lg:   clamp(2rem, 5vw, 3.5rem);
-  --type-headline-sm:  clamp(1.1rem, 2.5vw, 1.4rem);
-  --type-title-md:     1.125rem;
-  --type-body-md:      0.9375rem;
-  --type-label-md:     0.875rem;
-  --type-label-sm:     0.75rem;
+  --type-display-lg: clamp(2rem, 5vw, 3.5rem);
+  --type-headline-sm: clamp(1.1rem, 2.5vw, 1.4rem);
+  --type-title-md: 1.125rem;
+  --type-body-md: 0.9375rem;
+  --type-label-md: 0.875rem;
+  --type-label-sm: 0.75rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -126,49 +129,49 @@ body {
 
   /* Button base styles */
   .btn-base {
-    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-sm font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] touch-manipulation;
+    @apply inline-flex min-h-[44px] touch-manipulation items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold tracking-[0.01em] transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-black disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-primary {
-    @apply btn-base bg-black text-white border border-black hover:bg-gray-900;
+    @apply btn-base border border-black bg-black text-white shadow-sm hover:border-gray-900 hover:bg-gray-900;
   }
 
   .btn-secondary {
-    @apply btn-base bg-white text-black border border-gray-200 hover:bg-gray-100;
+    @apply btn-base border border-gray-200 bg-white text-black shadow-sm hover:border-gray-300 hover:bg-gray-50;
   }
 
   .btn-tertiary {
-    @apply btn-base bg-transparent text-black border border-transparent hover:bg-gray-100;
+    @apply btn-base border border-transparent bg-transparent text-gray-600 hover:bg-gray-100 hover:text-black;
   }
 
   /* Form utilities */
   .form-input {
-    @apply w-full px-3 py-2.5 bg-white border border-gray-200 rounded-sm text-base text-black font-normal placeholder:text-gray-500 transition duration-200 focus:outline-none focus:border-black focus:ring-1 focus:ring-black disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed min-h-[44px] touch-manipulation;
+    @apply min-h-[44px] w-full touch-manipulation rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-medium text-black placeholder:text-gray-400 transition duration-150 focus:outline-none focus:border-black focus:ring-2 focus:ring-black/5 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400;
   }
 
   .form-label {
-    @apply block text-sm font-medium text-black mb-2;
+    @apply mb-2 block text-[0.72rem] font-bold uppercase tracking-[0.14em] text-gray-500;
   }
 
   .form-helper {
-    @apply text-xs text-gray-600 mt-1;
+    @apply mt-1.5 text-xs text-gray-500;
   }
 
   /* Card utilities */
   .card {
-    @apply bg-white border border-gray-200 rounded-sm p-5 md:p-6 hover:border-gray-300 transition duration-200;
+    @apply rounded-lg border border-gray-200 bg-white p-5 shadow-sm transition duration-150 md:p-6;
   }
 
   .card-header {
-    @apply text-base font-semibold text-black mb-4 pb-3 border-b border-gray-200;
+    @apply mb-4 border-b border-gray-200 pb-3 text-base font-bold tracking-tight text-black;
   }
 
   .card-body {
-    @apply text-base text-gray-700 leading-relaxed;
+    @apply text-sm leading-7 text-gray-600;
   }
 
   .card-footer {
-    @apply pt-3 mt-4 border-t border-gray-200;
+    @apply mt-5 border-t border-gray-200 pt-4;
   }
 
   /* Missing utility classes (referenced in pages) */
@@ -228,19 +231,19 @@ body {
 
   /* Homepage-inspired layout tokens */
   .page-shell {
-    @apply min-h-screen bg-white pb-16;
-  }
-
-  .page-shell-muted {
     @apply min-h-screen bg-gray-50 pb-16;
   }
 
+  .page-shell-muted {
+    @apply min-h-screen bg-stone-50 pb-16;
+  }
+
   .page-container {
-    @apply max-w-5xl mx-auto px-4 sm:px-6 py-8;
+    @apply mx-auto max-w-6xl px-4 py-8 sm:px-6;
   }
 
   .page-container-wide {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
   .page-header {
@@ -248,62 +251,108 @@ body {
   }
 
   .page-kicker {
-    @apply text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3;
+    @apply mb-3 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-gray-500;
   }
 
   .page-title {
-    @apply text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight text-black;
+    @apply text-3xl font-black leading-tight tracking-tight text-black sm:text-4xl;
   }
 
   .page-description {
-    @apply text-base text-gray-600 leading-relaxed mt-3 max-w-2xl;
+    @apply mt-3 max-w-2xl text-sm leading-7 text-gray-600 sm:text-base;
   }
 
   .section-title {
-    @apply text-xl sm:text-2xl font-bold tracking-tight text-black;
+    @apply text-xl font-bold tracking-tight text-black sm:text-2xl;
   }
 
   .surface-panel {
-    @apply bg-white border border-gray-200 rounded-sm;
+    @apply rounded-lg border border-gray-200 bg-white shadow-sm;
   }
 
   .filter-chip {
-    @apply px-3 py-1.5 rounded-full text-sm font-medium border transition-colors;
+    @apply inline-flex min-h-[40px] items-center justify-center rounded-lg border px-3.5 py-2 text-sm font-semibold transition-colors;
   }
 
   .filter-chip-active {
-    @apply bg-black text-white border-black;
+    @apply border-black bg-black text-white shadow-sm;
   }
 
   .filter-chip-idle {
-    @apply border-gray-300 text-gray-600 hover:border-black;
+    @apply border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-black;
   }
 
   .empty-state {
-    @apply surface-panel text-center py-16 px-6;
+    @apply surface-panel px-6 py-14 text-center;
   }
 
   .empty-state-number {
-    @apply text-5xl font-black text-gray-100 mb-3;
+    @apply mb-3 text-5xl font-black text-black/10;
   }
 
   .back-link {
-    @apply text-sm font-medium text-gray-500 hover:text-black transition-colors inline-flex items-center gap-1.5;
+    @apply inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 transition-colors hover:text-black;
   }
 
-  /* Marketplace system — editorial light, thumbnail-first */
+  .page-section {
+    @apply rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6;
+  }
+
+  .page-toolbar {
+    @apply flex flex-col gap-4 border-b border-gray-200 pb-4 sm:flex-row sm:items-end sm:justify-between;
+  }
+
+  .page-pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-gray-600;
+  }
+
+  .page-tabs {
+    @apply flex flex-wrap gap-4 border-b border-gray-200;
+  }
+
+  .page-tab {
+    @apply inline-flex items-center gap-2 border-b-2 px-1 pb-2 text-sm font-bold uppercase tracking-[0.14em] transition-colors;
+  }
+
+  .page-tab-active {
+    @apply border-black text-black;
+  }
+
+  .page-tab-idle {
+    @apply border-transparent text-gray-500 hover:text-black;
+  }
+
+  .page-list-row {
+    @apply flex items-start justify-between gap-4 border-t border-gray-200 pt-4;
+  }
+
+  .page-status-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-[0.14em];
+  }
+
+  .page-status-chip-success {
+    @apply border-green-200 bg-green-50 text-green-700;
+  }
+
+  .page-status-chip-danger {
+    @apply border-red-200 bg-red-50 text-red-700;
+  }
+
+  .page-status-chip-muted {
+    @apply border-gray-200 bg-gray-50 text-gray-600;
+  }
+
+  /* Marketplace system — flattened to match dashboard standard */
   .marketplace-shell {
-    background:
-      radial-gradient(circle at top left, color-mix(in oklab, var(--mk-accent-soft) 28%, transparent) 0%, transparent 34%),
-      linear-gradient(180deg, var(--mk-bg-elevated) 0%, var(--mk-bg) 18%, var(--mk-bg) 100%);
+    background: linear-gradient(180deg, #fafaf9 0%, #f5f5f4 100%);
     color: var(--mk-text);
-    font-family: 'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   .marketplace-shell h1,
   .marketplace-shell h2,
   .marketplace-shell h3 {
-    font-family: 'Noto Sans Display', 'Noto Sans', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
   .marketplace-container {
@@ -317,7 +366,7 @@ body {
     align-items: center;
     gap: 0.5rem;
     font-size: 0.68rem;
-    letter-spacing: 0.24em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     font-weight: 800;
     color: var(--mk-muted);
@@ -327,23 +376,23 @@ body {
     content: '';
     width: 1.65rem;
     height: 1px;
-    background: color-mix(in oklab, var(--mk-accent) 30%, var(--mk-line));
+    background: var(--mk-line);
   }
 
   .marketplace-title {
-    font-size: clamp(2.4rem, 5vw, 4.2rem);
-    line-height: 0.96;
+    font-size: clamp(2.2rem, 4.4vw, 3.7rem);
+    line-height: 1.02;
     letter-spacing: -0.04em;
     font-weight: 800;
-    color: var(--mk-text);
+    color: #111111;
     text-wrap: balance;
   }
 
   .marketplace-lead {
-    max-width: 44rem;
-    font-size: clamp(1rem, 1.6vw, 1.18rem);
-    line-height: 1.75;
-    color: var(--mk-muted);
+    max-width: 42rem;
+    font-size: clamp(0.98rem, 1.4vw, 1.08rem);
+    line-height: 1.8;
+    color: var(--mk-text-soft);
   }
 
   .marketplace-hero {
@@ -365,11 +414,11 @@ body {
   }
 
   .marketplace-stat-card {
-    background: color-mix(in oklab, var(--mk-paper) 85%, white 15%);
+    background: #ffffff;
     border: 1px solid var(--mk-line);
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     padding: 1rem 1rem 1.05rem;
-    box-shadow: var(--mk-shadow-soft);
+    box-shadow: 0 1px 2px rgba(17, 17, 17, 0.06);
   }
 
   .marketplace-stat-card strong {
@@ -391,14 +440,14 @@ body {
   }
 
   .marketplace-panel {
-    background: color-mix(in oklab, var(--mk-paper) 86%, white 14%);
+    background: #ffffff;
     border: 1px solid var(--mk-line);
-    border-radius: 0.5rem;
-    box-shadow: var(--mk-shadow-soft);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgba(17, 17, 17, 0.06);
   }
 
   .marketplace-panel--inset {
-    background: color-mix(in oklab, var(--mk-paper) 55%, var(--mk-paper-strong) 45%);
+    background: #fafaf9;
   }
 
   .marketplace-filter-bar {
@@ -432,22 +481,22 @@ body {
     width: 100%;
     min-height: 3.15rem;
     padding: 0.9rem 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid color-mix(in oklab, var(--mk-line) 82%, var(--mk-accent-soft) 18%);
-    background: color-mix(in oklab, var(--mk-paper) 88%, white 12%);
+    border-radius: 0.75rem;
+    border: 1px solid var(--mk-line);
+    background: #ffffff;
     color: var(--mk-text);
     outline: none;
-    transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
   }
 
   .marketplace-input::placeholder {
-    color: color-mix(in oklab, var(--mk-muted) 72%, white 28%);
+    color: color-mix(in oklab, var(--mk-muted) 78%, white 22%);
   }
 
   .marketplace-input:focus,
   .marketplace-select:focus {
-    border-color: color-mix(in oklab, var(--mk-accent) 52%, var(--mk-line));
-    box-shadow: 0 0 0 4px color-mix(in oklab, var(--mk-accent-soft) 44%, transparent);
+    border-color: #111111;
+    box-shadow: 0 0 0 4px rgba(17, 17, 17, 0.05);
   }
 
   .marketplace-chip-row {
@@ -463,24 +512,25 @@ body {
     gap: 0.45rem;
     min-height: 2.35rem;
     padding: 0.58rem 0.95rem;
-    border-radius: 0.5rem;
-    border: 1px solid color-mix(in oklab, var(--mk-line) 78%, var(--mk-accent-soft) 22%);
-    background: color-mix(in oklab, var(--mk-paper) 92%, white 8%);
+    border-radius: 0.75rem;
+    border: 1px solid var(--mk-line);
+    background: #ffffff;
     color: var(--mk-text-soft);
     font-size: 0.82rem;
     font-weight: 700;
-    transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, color 180ms ease;
+    transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
   }
 
   .marketplace-chip:hover {
-    transform: translateY(-1px);
-    border-color: color-mix(in oklab, var(--mk-accent) 46%, var(--mk-line));
+    border-color: color-mix(in oklab, #111111 25%, var(--mk-line));
+    background: #fafaf9;
+    color: var(--mk-text);
   }
 
   .marketplace-chip.is-active {
-    background: var(--mk-accent);
-    border-color: var(--mk-accent);
-    color: var(--mk-accent-ink);
+    background: #111111;
+    border-color: #111111;
+    color: #ffffff;
   }
 
   .marketplace-results-head {

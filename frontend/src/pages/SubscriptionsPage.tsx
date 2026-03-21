@@ -51,54 +51,60 @@ export default function SubscriptionsPage() {
                 <div className="page-header">
                     <p className="page-kicker">Tài khoản</p>
                     <h1 className="page-title">Quản lý Gói tập</h1>
-                    <p className="page-description">Theo dõi và quản lý các lượt đăng ký chương trình của bạn.</p>
+                    <p className="page-description">Theo dõi, rà soát chu kỳ thanh toán và giữ quyền truy cập của bạn trong cùng một bề mặt quản trị thống nhất.</p>
                 </div>
 
                 {loading ? (
-                    <div className="flex justify-center py-12"><div className="h-8 w-8 animate-spin rounded-full border-b-2 border-black" /></div>
+                    <div className="page-section py-12">
+                        <div className="flex justify-center"><div className="h-8 w-8 animate-spin rounded-full border-b-2 border-black" /></div>
+                    </div>
                 ) : subscriptions.length === 0 ? (
-                    <div className="card text-center py-12 bg-white border border-[color:var(--mk-line)] shadow-sm rounded-lg">
-                        <CreditCard className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                        <h3 className="text-xl font-bold mb-2 tracking-tight">Bạn chưa đăng ký gói tập nào</h3>
-                        <p className="text-[color:var(--mk-muted)] mb-6 text-sm">Khám phá các Coach chuyên nghiệp và tham gia chuyên đề để bắt đầu lộ trình.</p>
-                        <Link to="/coaches" className="btn-primary inline-block uppercase tracking-widest text-xs">Tìm Coach ngay</Link>
+                    <div className="empty-state py-12">
+                        <CreditCard className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+                        <h3 className="mb-2 text-xl font-bold tracking-tight text-black">Bạn chưa đăng ký gói tập nào</h3>
+                        <p className="mx-auto mb-6 max-w-md text-sm text-[color:var(--mk-muted)]">Khám phá các Coach chuyên nghiệp và tham gia chuyên đề để bắt đầu lộ trình.</p>
+                        <Link to="/coaches" className="btn-primary inline-flex text-xs uppercase tracking-[0.14em]">Tìm Coach ngay</Link>
                     </div>
                 ) : (
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                         {subscriptions.map((sub: any) => (
-                            <div key={sub.id} className="card bg-white p-6 rounded-lg shadow-sm border border-[color:var(--mk-line)] flex flex-col sm:flex-row gap-6 justify-between items-start sm:items-center transition hover:shadow-md">
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-3">
-                                        <h3 className="text-lg font-black tracking-tight uppercase">{sub.program?.name || 'Gói tập'}</h3>
+                            <div key={sub.id} className="page-section flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                                <div className="space-y-3">
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        <h3 className="text-lg font-black tracking-tight text-black">{sub.program?.name || 'Gói tập'}</h3>
                                         {sub.status === 'active' ? (
-                                            <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 bg-green-50 border border-green-200 text-green-700 rounded-md uppercase tracking-wider">
-                                                <CheckCircle2 className="w-3.5 h-3.5" /> Hoạt động
+                                            <span className="page-status-chip page-status-chip-success">
+                                                <CheckCircle2 className="h-3.5 w-3.5" /> Hoạt động
                                             </span>
                                         ) : sub.status === 'cancelled' ? (
-                                            <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 bg-red-50 border border-red-200 text-red-700 rounded-md uppercase tracking-wider">
-                                                <XCircle className="w-3.5 h-3.5" /> Đã hủy
+                                            <span className="page-status-chip page-status-chip-danger">
+                                                <XCircle className="h-3.5 w-3.5" /> Đã hủy
                                             </span>
                                         ) : (
-                                            <span className="flex items-center gap-1 text-xs font-bold px-2 py-1 bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)] rounded-md uppercase tracking-wider">
-                                                <AlertCircle className="w-3.5 h-3.5" /> Tạm dừng
+                                            <span className="page-status-chip page-status-chip-muted">
+                                                <AlertCircle className="h-3.5 w-3.5" /> Tạm dừng
                                             </span>
                                         )}
                                     </div>
+
                                     <p className="text-sm text-[color:var(--mk-text-soft)]">Huấn luyện viên: <span className="font-semibold text-black">{sub.trainer?.full_name}</span></p>
-                                    <div className="flex items-center gap-4 text-xs font-medium text-[color:var(--mk-muted)] mt-2">
-                                        <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Chu kỳ: {sub.subscription_type === 'monthly' ? 'Hàng tháng' : 'Mua đứt (Vĩnh viễn)'}</span>
-                                        <span className="flex items-center gap-1"><CreditCard className="w-3.5 h-3.5" /> {Number(sub.price_paid || 0).toLocaleString('vi-VN')} đ</span>
+
+                                    <div className="flex flex-wrap gap-4 text-xs font-medium text-[color:var(--mk-muted)]">
+                                        <span className="inline-flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> Chu kỳ: {sub.subscription_type === 'monthly' ? 'Hàng tháng' : 'Mua đứt (Vĩnh viễn)'}</span>
+                                        <span className="inline-flex items-center gap-1.5"><CreditCard className="h-3.5 w-3.5" /> {Number(sub.price_paid || 0).toLocaleString('vi-VN')} đ</span>
                                     </div>
+
                                     {sub.next_billing_date && sub.status === 'active' && (
-                                        <p className="text-xs text-[color:var(--mk-muted)] mt-1 font-mono bg-[color:var(--mk-paper)] p-1.5 rounded inline-block">Gia hạn tiếp theo: {new Date(sub.next_billing_date).toLocaleDateString('vi-VN')}</p>
+                                        <p className="page-pill bg-[color:var(--mk-paper)] text-[color:var(--mk-muted)]">Gia hạn tiếp theo: {new Date(sub.next_billing_date).toLocaleDateString('vi-VN')}</p>
                                     )}
                                 </div>
-                                <div className="w-full sm:w-auto flex sm:flex-col gap-3">
-                                    <Link to={`/programs/${sub.program_id}`} className="flex-1 text-center py-2 px-6 shadow-sm border border-[color:var(--mk-line)] rounded-md font-bold text-xs uppercase tracking-widest text-black hover:bg-[color:var(--mk-paper)] transition-colors whitespace-nowrap">
+
+                                <div className="flex w-full flex-col gap-3 sm:w-auto sm:min-w-[11rem]">
+                                    <Link to={`/programs/${sub.program_id}`} className="btn-secondary justify-center whitespace-nowrap text-xs uppercase tracking-[0.14em]">
                                         Xem lớp học
                                     </Link>
                                     {sub.status === 'active' && sub.subscription_type === 'monthly' && (
-                                        <button onClick={() => handleCancel(sub.id)} className="flex-1 py-2 px-6 text-xs font-bold uppercase tracking-widest text-red-500 hover:bg-red-50 rounded-md transition-colors whitespace-nowrap">
+                                        <button onClick={() => handleCancel(sub.id)} className="btn-tertiary justify-center whitespace-nowrap text-xs uppercase tracking-[0.14em] text-red-600 hover:bg-red-50 hover:text-red-700">
                                             Hủy gia hạn
                                         </button>
                                     )}
