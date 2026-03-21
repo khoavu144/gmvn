@@ -16,81 +16,79 @@
   padding: 0 1rem 4rem;
 }
 
-/* ── Hero ────────────────────────────────────────────────────── */
-.marketplace-hero {
-  background: linear-gradient(135deg, var(--mk-bg-elevated) 0%, var(--mk-bg) 60%, var(--mk-paper) 100%);
-  border-bottom: 1px solid rgba(0,0,0,.07);
-  padding: 4rem 1rem 3rem;
-  text-align: center;
+/* ── Editorial Intro ─────────────────────────────────────────── */
+.marketplace-editorial-intro {
+  padding: 3rem 1rem 2rem;
+  max-width: 800px;
 }
 
-.marketplace-hero-inner {
-  max-width: 700px;
-  margin: 0 auto;
-}
-
-.marketplace-hero-title {
-  font-size: clamp(1.6rem, 4vw, 2.8rem);
+.marketplace-editorial-title {
+  font-family: var(--font-display);
+  font-size: var(--type-display-lg);
   font-weight: 800;
-  background: linear-gradient(135deg, var(--mk-text) 30%, var(--mk-accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1.2;
-  margin-bottom: .75rem;
+  color: var(--cur-on-surface);
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
 }
 
-.marketplace-hero-sub {
-  font-size: .95rem;
-  color: rgba(0,0,0,.55);
+.marketplace-editorial-sub {
+  font-family: var(--font-body);
+  font-size: var(--type-body-md);
+  color: var(--cur-on-surface-var);
   margin-bottom: 2rem;
+  max-width: 600px;
+  line-height: 1.6;
 }
 
-.marketplace-hero-search {
+.marketplace-editorial-search {
   display: flex;
   gap: .5rem;
   max-width: 560px;
-  margin: 0 auto;
 }
 
-.marketplace-hero-search-input {
+.marketplace-editorial-search-input {
   flex: 1;
   height: 48px;
-  background: rgba(0,0,0,.08);
-  border: 1.5px solid rgba(0,0,0,.12);
-  border-radius: 12px;
-  padding: 0 1.1rem;
-  color: var(--mk-text);
+  background: var(--cur-surface-lowest);
+  border: 1.5px solid transparent;
+  border-radius: var(--cur-radius-full);
+  padding: 0 1.25rem;
+  color: var(--cur-on-surface);
+  font-family: var(--font-body);
   font-size: 1rem;
   outline: none;
-  transition: border-color .2s;
+  transition: border-color .2s, box-shadow .2s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
-.marketplace-hero-search-input:focus {
-  border-color: var(--mk-accent);
+.marketplace-editorial-search-input:focus {
+  border-color: var(--cur-primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--cur-primary) 15%, transparent);
 }
-.marketplace-hero-search-input::placeholder { color: rgba(0,0,0,.4); }
+.marketplace-editorial-search-input::placeholder { color: var(--cur-on-surface-var); opacity: 0.6; }
 
-.marketplace-hero-search-btn {
+.marketplace-editorial-search-btn {
   height: 48px;
   padding: 0 1.5rem;
-  border-radius: 12px;
-  background: var(--mk-accent);
-  color: var(--mk-text);
-  font-weight: 700;
+  border-radius: var(--cur-radius-full);
+  background: linear-gradient(135deg, var(--cur-primary), var(--cur-primary-container));
+  color: var(--cur-on-primary);
+  font-family: var(--font-body);
+  font-weight: 600;
   font-size: .95rem;
   border: none;
   cursor: pointer;
-  transition: background .2s, transform .15s;
+  transition: transform .15s, filter .2s;
   white-space: nowrap;
 }
-.marketplace-hero-search-btn:hover { background: var(--mk-accent-ink); transform: translateY(-1px); }
+.marketplace-editorial-search-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
 /* ── Category pills ──────────────────────────────────────────── */
 .marketplace-cat-bar {
   display: flex;
-  gap: .5rem;
+  gap: .75rem;
   flex-wrap: wrap;
-  padding: 1.5rem 0 .75rem;
+  padding: 1rem 0;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -99,27 +97,29 @@
 .marketplace-cat-pill {
   display: inline-flex;
   align-items: center;
-  gap: .35rem;
-  padding: .45rem 1rem;
-  border-radius: 999px;
-  background: rgba(0,0,0,.06);
-  border: 1.5px solid rgba(0,0,0,.1);
-  color: rgba(0,0,0,.7);
-  font-size: .875rem;
-  font-weight: 500;
+  gap: .4rem;
+  padding: .4rem 1rem;
+  border-radius: var(--cur-radius-sm);
+  background: var(--cur-surface-high);
+  border: none;
+  color: var(--cur-on-surface-var);
+  font-family: var(--font-body);
+  font-size: var(--type-label-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  transition: all .18s;
+  transition: all .2s;
   white-space: nowrap;
 }
 .marketplace-cat-pill:hover {
-  background: color-mix(in oklab, var(--mk-accent) 20%, transparent);
-  border-color: var(--mk-accent);
-  color: var(--mk-text);
+  background: var(--cur-surface-highest);
+  color: var(--cur-on-surface);
 }
 .marketplace-cat-pill--active {
-  background: var(--mk-accent);
-  border-color: var(--mk-accent);
-  color: var(--mk-text);
+  background: var(--cur-surface-lowest);
+  color: var(--cur-primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 /* ── Toolbar ─────────────────────────────────────────────────── */
@@ -127,24 +127,45 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: .5rem 0 1rem;
+  padding: 1rem 0 1.5rem;
 }
 
 .marketplace-toolbar-count {
-  font-size: .875rem;
-  color: rgba(0,0,0,.45);
+  font-family: var(--font-body);
+  font-size: var(--type-body-md);
+  font-weight: 500;
+  color: var(--cur-on-surface-var);
 }
 
 .marketplace-sort-select {
-  background: rgba(0,0,0,.07);
-  border: 1.5px solid rgba(0,0,0,.12);
-  border-radius: 8px;
-  color: var(--mk-text);
-  padding: .4rem .8rem;
-  font-size: .875rem;
+  background: var(--cur-surface-lowest);
+  border: 1px solid var(--cur-outline-var);
+  border-radius: var(--cur-radius-md);
+  color: var(--cur-on-surface);
+  font-family: var(--font-body);
+  padding: .5rem 1rem;
+  font-size: var(--type-body-md);
+  font-weight: 500;
   cursor: pointer;
   outline: none;
 }
+
+/* ── Section & Bento ─────────────────────────────────────────── */
+.marketplace-bento {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 768px) {
+  .marketplace-bento {
+    grid-template-columns: 1.25fr 1fr;
+    grid-template-rows: auto auto;
+  }
+  .marketplace-bento > :first-child {
+    grid-row: 1 / 3;
+  }
+}
+
 
 /* ── Section ─────────────────────────────────────────────────── */
 .marketplace-section { margin-bottom: 2.5rem; }

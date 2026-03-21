@@ -216,27 +216,25 @@ export default function MarketplacePage() {
             <div className="marketplace-page">
                 {/* Hero */}
                 {showHero && (
-                    <section className="marketplace-hero">
-                        <div className="marketplace-hero-inner">
-                            <h1 className="marketplace-hero-title">
-                                Mọi thứ bạn cần cho hành trình fitness
-                            </h1>
-                            <p className="marketplace-hero-sub">
-                                Gói tập từ coach uy tín · Gear chính hãng · Supplements An toàn · Máy tập chất lượng
-                            </p>
-                            <form className="marketplace-hero-search" onSubmit={handleSearch}>
-                                <input
-                                    type="search"
-                                    placeholder="Tìm gói tập, whey protein, găng tay..."
-                                    value={searchInput}
-                                    onChange={e => setSearchInput(e.target.value)}
-                                    className="marketplace-hero-search-input"
-                                />
-                                <button type="submit" className="marketplace-hero-search-btn">
-                                    🔍 Tìm kiếm
-                                </button>
-                            </form>
-                        </div>
+                    <section className="marketplace-editorial-intro">
+                        <h1 className="marketplace-editorial-title">
+                            Mọi thứ bạn cần cho hành trình fitness
+                        </h1>
+                        <p className="marketplace-editorial-sub">
+                            Gói tập từ coach uy tín · Gear chính hãng · Supplements an toàn · Máy tập chất lượng. Khám phá các lựa chọn tốt nhất được tuyển chọn cho bạn.
+                        </p>
+                        <form className="marketplace-editorial-search" onSubmit={handleSearch}>
+                            <input
+                                type="search"
+                                placeholder="Tìm gói tập, whey protein, găng tay..."
+                                value={searchInput}
+                                onChange={e => setSearchInput(e.target.value)}
+                                className="marketplace-editorial-search-input"
+                            />
+                            <button type="submit" className="marketplace-editorial-search-btn">
+                                🔍 Tìm kiếm
+                            </button>
+                        </form>
                     </section>
                 )}
 
@@ -282,26 +280,41 @@ export default function MarketplacePage() {
                         </div>
                     </div>
 
-                    {/* Featured rail — only on homepage */}
+                    {/* Featured bento — only on homepage */}
                     {showHero && featured.length > 0 && (
                         <section className="marketplace-section">
                             <h2 className="marketplace-section-title">⭐ Nổi bật</h2>
-                            <div className="marketplace-rail">
-                                {featured.map(p => (
-                                    <ProductCard key={p.id} product={p} />
+                            <div className="marketplace-bento">
+                                {featured.slice(0, 3).map(p => (
+                                    <ProductCard key={p.id} product={p} variant="featured" />
                                 ))}
                             </div>
                         </section>
                     )}
 
-                    {/* New arrivals — only on homepage */}
+                    {/* New arrivals rail — only on homepage */}
                     {showHero && newArrivals.length > 0 && (
                         <section className="marketplace-section">
                             <h2 className="marketplace-section-title">🆕 Mới nhất</h2>
                             <div className="marketplace-rail">
                                 {newArrivals.map(p => (
-                                    <ProductCard key={p.id} product={p} />
+                                    <ProductCard key={p.id} product={p} variant="compact" />
                                 ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Curated Picks — only on homepage */}
+                    {showHero && (
+                        <section className="marketplace-section">
+                            <h2 className="marketplace-section-title">🏆 Gợi ý tuyển chọn</h2>
+                            <div className="marketplace-grid">
+                                {products
+                                    .filter(p => (p.featured_weight ?? 0) > 80 && !featured.some(f => f.id === p.id))
+                                    .slice(0, 4)
+                                    .map(p => (
+                                        <ProductCard key={p.id} product={p} variant="standard" />
+                                    ))}
                             </div>
                         </section>
                     )}
