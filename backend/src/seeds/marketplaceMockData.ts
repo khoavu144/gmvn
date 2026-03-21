@@ -2105,7 +2105,7 @@ export const MARKETPLACE_PRODUCTS: any[] = [
         preview_content: null,
         thumbnail_url: 'https://images.unsplash.com/photo-1556228578-dd6e4b9f1f31?w=1200&q=80',
         gallery: [
-            'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=1200&q=80',
+            'https://images.unsplash.com/photo-1607631568010-a87245c0daf8?w=1200&q=80',
             'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=1200&q=80',
             'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1200&q=80',
         ],
@@ -2140,7 +2140,7 @@ export const MARKETPLACE_PRODUCTS: any[] = [
                 compare_at_price: 460000,
                 stock_quantity: 26,
                 sku: 'RRS-BALM-100',
-                image_url: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800&q=80',
+                image_url: 'https://images.unsplash.com/photo-1556228578-dd6e4b9f1f31?w=800&q=80',
                 is_active: true,
                 sort_order: 1,
             },

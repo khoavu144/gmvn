@@ -116,7 +116,7 @@ export default function WorkoutsPage() {
                                                 <div className="h-4 bg-[color:var(--mk-paper-strong)] w-24 rounded-sm"></div>
                                                 <div className="h-6 bg-[color:var(--mk-paper-strong)] w-3/4 rounded-sm"></div>
                                             </div>
-                                            <div className="flex items-center gap-2 hidden sm:flex">
+                                            <div className="hidden sm:flex items-center gap-2">
                                                 <div className="h-10 w-48 bg-[color:var(--mk-paper)] rounded-sm"></div>
                                                 <div className="h-10 w-28 bg-[color:var(--mk-paper-strong)] rounded-sm"></div>
                                             </div>

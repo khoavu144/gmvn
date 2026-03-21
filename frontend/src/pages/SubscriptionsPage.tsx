@@ -41,9 +41,10 @@ export default function SubscriptionsPage() {
     };
 
     return (
-        <div className="page-shell">
+        <div className="page-shell-muted">
             <Helmet>
                 <title>Quản lý Gói tập — GymViet</title>
+                <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             {ToastComponent}
             <div className="page-container max-w-4xl py-12">

@@ -1,89 +1,196 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { RootState } from '../store/store';
 import apiClient from '../services/api';
 
+type PlanKey = 'free' | 'coach_pro' | 'coach_elite' | 'athlete_premium' | 'gym_business';
 
-const PLAN_LABELS: Record<string, string> = {
-    free: 'Miễn phí', coach_pro: 'Coach Pro', coach_elite: 'Coach Elite',
-    athlete_premium: 'Athlete Premium', gym_business: 'Gym Business',
+type CheckoutInfo = {
+    description: string;
+    amount: number;
+    plan: PlanKey;
 };
 
-const DESCRIPTIONS: Record<string, string[]> = {
-    free:             ['Tạo tối đa 3 chương trình tập', 'Tối đa 10 học viên', '1 chi nhánh Gym'],
-    coach_pro:        ['Không giới hạn chương trình', '50 học viên cùng lúc', 'Badge Pro trên hồ sơ', 'Ưu tiên tìm kiếm', 'Share card tuỳ chỉnh'],
-    coach_elite:      ['Không giới hạn chương trình & học viên', 'Top tìm kiếm', 'Badge Elite nổi bật', 'Share card tuỳ chỉnh', 'Hỗ trợ ưu tiên'],
-    athlete_premium:  ['Ảnh tiến trình không giới hạn', 'Lịch sử đăng ký đầy đủ', 'So sánh nhiều Coach', 'Ẩn quảng cáo'],
-    gym_business:     ['Chi nhánh không giới hạn', 'Số HLV không giới hạn', 'Gallery không giới hạn', 'Featured trong tìm kiếm', 'Analytics lượt xem'],
+const PLAN_LABELS: Record<PlanKey, string> = {
+    free: 'Miễn phí',
+    coach_pro: 'Coach Pro',
+    coach_elite: 'Coach Elite',
+    athlete_premium: 'Athlete Premium',
+    gym_business: 'Gym Business',
 };
 
-const PRICES: Record<string, number> = {
-    free: 0, coach_pro: 499999, coach_elite: 999999,
-    athlete_premium: 999999, gym_business: 999999,
+const PLAN_SUMMARIES: Record<PlanKey, string> = {
+    free: 'Khởi động với những tính năng nền tảng để làm quen với hệ sinh thái trước khi nâng cấp.',
+    coach_pro: 'Phù hợp cho coach đang mở rộng số học viên, muốn có hiện diện rõ ràng hơn trong hệ thống.',
+    coach_elite: 'Dành cho coach xem GYMERVIET là một kênh tăng trưởng chính và cần ưu tiên hiển thị mạnh hơn.',
+    athlete_premium: 'Dành cho người tập muốn lưu giữ tiến độ dài hạn, theo dõi sâu hơn và so sánh nhiều lựa chọn.',
+    gym_business: 'Phù hợp cho gym center cần trình bày nhiều chi nhánh, nhiều coach và tối ưu khả năng được khám phá.',
 };
 
-function formatPrice(p: number) {
-    if (p === 0) return 'Miễn phí';
-    return p.toLocaleString('vi-VN') + 'đ / năm';
+const DESCRIPTIONS: Record<PlanKey, string[]> = {
+    free: ['Tạo tối đa 3 chương trình tập', 'Tối đa 10 học viên', '1 chi nhánh Gym'],
+    coach_pro: ['Không giới hạn chương trình', '50 học viên cùng lúc', 'Badge Pro trên hồ sơ', 'Ưu tiên tìm kiếm', 'Share card tuỳ chỉnh'],
+    coach_elite: ['Không giới hạn chương trình & học viên', 'Top tìm kiếm', 'Badge Elite nổi bật', 'Share card tuỳ chỉnh', 'Hỗ trợ ưu tiên'],
+    athlete_premium: ['Ảnh tiến trình không giới hạn', 'Lịch sử đăng ký đầy đủ', 'So sánh nhiều Coach', 'Ẩn quảng cáo'],
+    gym_business: ['Chi nhánh không giới hạn', 'Số HLV không giới hạn', 'Gallery không giới hạn', 'Featured trong tìm kiếm', 'Analytics lượt xem'],
+};
+
+const PRICES: Record<PlanKey, number> = {
+    free: 0,
+    coach_pro: 499999,
+    coach_elite: 999999,
+    athlete_premium: 999999,
+    gym_business: 999999,
+};
+
+const FAQ_ITEMS = [
+    {
+        question: 'Gói Coach Pro có những gì?',
+        answer: 'Không giới hạn chương trình, 50 học viên cùng lúc, Badge Pro trên hồ sơ, ưu tiên tìm kiếm và share card tuỳ chỉnh. Giá 499.999đ/năm.',
+    },
+    {
+        question: 'Gói Coach Elite có những gì?',
+        answer: 'Không giới hạn chương trình và học viên, top tìm kiếm, Badge Elite nổi bật, share card tuỳ chỉnh và hỗ trợ ưu tiên. Giá 999.999đ/năm.',
+    },
+    {
+        question: 'Có thể huỷ bất kỳ lúc nào không?',
+        answer: 'Có. Bạn có thể huỷ bất kỳ lúc nào và gói sẽ hết hiệu lực sau khi chu kỳ hiện tại kết thúc.',
+    },
+    {
+        question: 'GYMERVIET hỗ trợ phương thức thanh toán nào?',
+        answer: 'Hiện tại hỗ trợ chuyển khoản ngân hàng qua SePay. Gói được kích hoạt tự động ngay sau khi xác nhận giao dịch.',
+    },
+] as const;
+
+const HERO_POINTS = [
+    {
+        title: 'Thanh toán minh bạch',
+        body: 'Toàn bộ gói đang dùng cấu trúc giá theo năm, giúp người dùng so sánh nhanh và ít nhiễu hơn.',
+    },
+    {
+        title: 'Nâng cấp theo vai trò',
+        body: 'Coach, athlete và gym center có nhu cầu rất khác nhau, nên bảng giá được tách rõ theo đúng job-to-be-done.',
+    },
+    {
+        title: 'Kích hoạt tự động',
+        body: 'Sau khi thanh toán đúng nội dung chuyển khoản, gói sẽ được hệ thống xử lý và kích hoạt trong vài phút.',
+    },
+] as const;
+
+function formatPrice(price: number) {
+    if (price === 0) return 'Miễn phí';
+    return `${price.toLocaleString('vi-VN')}đ / năm`;
 }
 
-function PlanColumn({ planKey, highlighted, onUpgrade, isLoading }: {
-    planKey: string; highlighted?: boolean;
-    onUpgrade: (plan: string) => void; isLoading: string | null;
+function PlanColumn({
+    planKey,
+    highlighted,
+    onUpgrade,
+    isLoading,
+}: {
+    planKey: PlanKey;
+    highlighted?: boolean;
+    onUpgrade: (plan: PlanKey) => void;
+    isLoading: PlanKey | null;
 }) {
     const price = PRICES[planKey];
     const isFree = price === 0;
+
     return (
-        <div style={{
-            flex: 1, border: highlighted ? '2px solid #111' : '1.5px solid #e5e7eb',
-            borderRadius: 8, padding: '28px 24px',
-            background: highlighted ? '#0f172a' : '#fff',
-            color: highlighted ? '#fff' : '#111',
-            display: 'flex', flexDirection: 'column', gap: 16,
-            boxShadow: highlighted ? '0 12px 40px rgba(0,0,0,0.18)' : 'none',
-            position: 'relative',
-        }}>
+        <article
+            className="marketplace-panel relative flex h-full flex-col gap-6 p-6 sm:p-7"
+            style={highlighted ? {
+                background: 'color-mix(in oklab, var(--mk-accent-soft) 52%, white 48%)',
+                borderColor: 'color-mix(in oklab, var(--mk-accent) 38%, var(--mk-line) 62%)',
+            } : undefined}
+        >
             {highlighted && (
-                <span style={{
-                    position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
-                    background: '#fff', color: '#0f172a',
-                    padding: '3px 16px', borderRadius: 8,
-                    fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.1em',
-                    textTransform: 'uppercase', whiteSpace: 'nowrap',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                }}>Phổ biến nhất</span>
+                <span className="marketplace-badge marketplace-badge--accent absolute right-5 top-5">
+                    Phổ biến nhất
+                </span>
             )}
-            <div>
-                <p style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', opacity: 0.6, margin: '0 0 6px' }}>
-                    {PLAN_LABELS[planKey]}
+
+            <div className={`space-y-3 ${highlighted ? 'pr-14' : ''}`}>
+                <div className="marketplace-section-kicker">{PLAN_LABELS[planKey]}</div>
+                <h3 className="text-[1.7rem] font-bold tracking-[-0.05em] text-[color:var(--mk-text)]">
+                    {formatPrice(price)}
+                </h3>
+                <p className="text-sm leading-7 text-[color:var(--mk-text-soft)]">
+                    {PLAN_SUMMARIES[planKey]}
                 </p>
-                <p style={{ fontSize: '1.6rem', fontWeight: 800, margin: 0 }}>{formatPrice(price)}</p>
             </div>
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10, flex: 1 }}>
-                {DESCRIPTIONS[planKey]?.map(feat => (
-                    <li key={feat} style={{ fontSize: '0.82rem', display: 'flex', alignItems: 'flex-start', gap: 8, opacity: highlighted ? 1 : 0.85 }}>
-                        <span style={{ color: highlighted ? '#4ade80' : '#16a34a', flexShrink: 0, fontWeight: 800 }}>✓</span>
-                        {feat}
+
+            <ul className="space-y-3 border-t border-[color:var(--mk-line)] pt-5">
+                {DESCRIPTIONS[planKey].map((feature) => (
+                    <li key={feature} className="flex items-start gap-3 text-sm leading-6 text-[color:var(--mk-text-soft)]">
+                        <span
+                            className="mt-2 h-2 w-2 shrink-0 rounded-full"
+                            style={{ background: 'var(--mk-forest)' }}
+                            aria-hidden="true"
+                        />
+                        <span>{feature}</span>
                     </li>
                 ))}
             </ul>
-            {!isFree && (
-                <button
-                    onClick={() => onUpgrade(planKey)}
-                    disabled={isLoading === planKey}
-                    style={{
-                        width: '100%', padding: '13px 0', borderRadius: 8, border: 'none',
-                        background: highlighted ? '#fff' : '#0f172a',
-                        color: highlighted ? '#0f172a' : '#fff',
-                        fontSize: '0.85rem', fontWeight: 800, cursor: 'pointer',
-                        opacity: isLoading === planKey ? 0.6 : 1,
-                    }}
-                >
-                    {isLoading === planKey ? 'Đang xử lý...' : 'Nâng cấp ngay'}
-                </button>
-            )}
+
+            <div className="mt-auto border-t border-[color:var(--mk-line)] pt-5">
+                {isFree ? (
+                    <div className="rounded-lg border border-[color:var(--mk-line)] bg-white/60 px-4 py-3 text-sm font-medium leading-6 text-[color:var(--mk-text-soft)]">
+                        Gói miễn phí luôn sẵn sàng để bạn bắt đầu trước khi cần mở rộng sâu hơn.
+                    </div>
+                ) : (
+                    <button
+                        type="button"
+                        onClick={() => onUpgrade(planKey)}
+                        disabled={isLoading === planKey}
+                        className={`${highlighted ? 'btn-primary' : 'btn-secondary'} w-full text-sm font-bold uppercase tracking-[0.16em]`}
+                    >
+                        {isLoading === planKey ? 'Đang xử lý...' : 'Nâng cấp ngay'}
+                    </button>
+                )}
+            </div>
+        </article>
+    );
+}
+
+function Section({
+    kicker,
+    title,
+    subtitle,
+    columnsClassName,
+    children,
+}: {
+    kicker: string;
+    title: string;
+    subtitle: string;
+    columnsClassName: string;
+    children: ReactNode;
+}) {
+    return (
+        <section className="space-y-5">
+            <div className="space-y-3">
+                <div className="marketplace-section-kicker">{kicker}</div>
+                <h2 className="marketplace-section-title">{title}</h2>
+                <p className="marketplace-lead max-w-3xl">{subtitle}</p>
+            </div>
+            <div className={`grid gap-4 ${columnsClassName}`}>
+                {children}
+            </div>
+        </section>
+    );
+}
+
+function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+    return (
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[color:var(--mk-line)] py-3 last:border-b-0 last:pb-0 first:pt-0">
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--mk-muted)]">
+                {label}
+            </span>
+            <span className={`max-w-[18rem] text-right text-sm font-semibold text-[color:var(--mk-text)] ${mono ? 'font-mono break-all' : ''}`}>
+                {value}
+            </span>
         </div>
     );
 }
@@ -91,17 +198,27 @@ function PlanColumn({ planKey, highlighted, onUpgrade, isLoading }: {
 export default function PricingPage() {
     const user = useSelector((state: RootState) => state.auth.user);
     const navigate = useNavigate();
-    const [upgradeLoading, setUpgradeLoading] = useState<string | null>(null);
-    const [checkoutInfo, setCheckoutInfo] = useState<{ description: string; amount: number; plan: string } | null>(null);
+    const [upgradeLoading, setUpgradeLoading] = useState<PlanKey | null>(null);
+    const [checkoutInfo, setCheckoutInfo] = useState<CheckoutInfo | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const canonicalBase = import.meta.env.VITE_CANONICAL_BASE_URL || 'https://gymerviet.com';
 
-    const handleUpgrade = async (plan: string) => {
-        if (!user) { navigate('/login'); return; }
+    const handleUpgrade = async (plan: PlanKey) => {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+
         setUpgradeLoading(plan);
         setError(null);
+
         try {
             const res = await apiClient.post('/platform/checkout', { plan });
-            setCheckoutInfo({ description: res.data.description, amount: res.data.amount, plan: res.data.plan });
+            setCheckoutInfo({
+                description: res.data.description,
+                amount: res.data.amount,
+                plan: res.data.plan,
+            });
         } catch (err: any) {
             setError(err?.response?.data?.error ?? 'Lỗi khi tạo đơn thanh toán');
         } finally {
@@ -110,127 +227,180 @@ export default function PricingPage() {
     };
 
     return (
-        <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: "'Roboto', sans-serif" }}>
+        <main className="marketplace-shell min-h-screen pb-24">
             <Helmet>
                 <title>Bảng giá — GYMERVIET</title>
-                <meta name="description" content="Chọn gói phù hợp để mở khoá toàn bộ tính năng GYMERVIET. Thanh toán theo năm, huỷ bất cứ lúc nào." />
-                <link rel="canonical" href="https://gymerviet.com/pricing" />
+                <meta
+                    name="description"
+                    content="Chọn gói phù hợp để mở khoá toàn bộ tính năng GYMERVIET. Bảng giá được tách rõ theo từng vai trò trong hệ sinh thái."
+                />
+                <link rel="canonical" href={`${canonicalBase}/pricing`} />
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="Bảng giá — GYMERVIET" />
-                <meta property="og:description" content="Chọn gói phù hợp. Thanh toán theo năm, huỷ bất cứ lúc nào." />
-                <meta property="og:url" content="https://gymerviet.com/pricing" />
+                <meta
+                    property="og:description"
+                    content="Coach, athlete và gym center có bảng giá rõ ràng, thanh toán theo năm và kích hoạt tự động qua SePay."
+                />
+                <meta property="og:url" content={`${canonicalBase}/pricing`} />
                 <meta property="og:image" content="https://gymerviet.com/og-default.jpg" />
-                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@gymerviet" />
                 <meta name="twitter:title" content="Bảng giá — GYMERVIET" />
-                <meta name="twitter:description" content="Chọn gói phù hợp. Thanh toán theo năm, huỷ bất cứ lúc nào." />
-                {/* JSON-LD: FAQPage — helps Google show rich results for pricing questions */}
+                <meta
+                    name="twitter:description"
+                    content="Chọn gói phù hợp để mở khoá các tính năng dành cho coach, athlete và gym center trên GYMERVIET."
+                />
                 <script type="application/ld+json">{JSON.stringify({
                     '@context': 'https://schema.org',
                     '@type': 'FAQPage',
-                    mainEntity: [
-                        {
-                            '@type': 'Question',
-                            name: 'Gói Coach Pro có những gì?',
-                            acceptedAnswer: { '@type': 'Answer', text: 'Không giới hạn chương trình, 50 học viên cùng lúc, Badge Pro trên hồ sơ, ưu tiên tìm kiếm, share card tuỳ chỉnh. Giá 499.999đ/năm.' },
+                    mainEntity: FAQ_ITEMS.map((item) => ({
+                        '@type': 'Question',
+                        name: item.question,
+                        acceptedAnswer: {
+                            '@type': 'Answer',
+                            text: item.answer,
                         },
-                        {
-                            '@type': 'Question',
-                            name: 'Gói Coach Elite có những gì?',
-                            acceptedAnswer: { '@type': 'Answer', text: 'Không giới hạn chương trình & học viên, top tìm kiếm, Badge Elite nổi bật, share card tuỳ chỉnh, hỗ trợ ưu tiên. Giá 999.999đ/năm.' },
-                        },
-                        {
-                            '@type': 'Question',
-                            name: 'Có thể huỷ bất kỳ lúc nào không?',
-                            acceptedAnswer: { '@type': 'Answer', text: 'Có. Bạn có thể huỷ bất kỳ lúc nào. Gói sẽ hết hiệu lực sau khi chu kỳ hiện tại kết thúc.' },
-                        },
-                        {
-                            '@type': 'Question',
-                            name: 'GYMERVIET hỗ trợ phương thức thanh toán nào?',
-                            acceptedAnswer: { '@type': 'Answer', text: 'Hỗ trợ chuyển khoản ngân hàng qua SePay. Gói được kích hoạt tự động ngay sau khi xác nhận giao dịch.' },
-                        },
-                    ],
+                    })),
                 })}</script>
             </Helmet>
 
+            <section className="marketplace-hero pt-header">
+                <div className="marketplace-container">
+                    <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)] lg:items-end">
+                        <div className="space-y-5">
+                            <span className="marketplace-eyebrow">Pricing & plans</span>
+                            <h1 className="marketplace-title max-w-4xl text-balance">
+                                Bảng giá rõ ràng cho từng vai trò trong hệ sinh thái GYMERVIET.
+                            </h1>
+                            <p className="marketplace-lead max-w-2xl">
+                                Không còn cảm giác như một microsite riêng. Bảng giá này dùng cùng ngôn ngữ với marketplace và gym routes: ít nhiễu hơn, dễ so sánh hơn và tập trung đúng vào quyết định nâng cấp.
+                            </p>
 
-            {/* Hero */}
-            <div style={{ background: '#0f172a', color: '#fff', textAlign: 'center', padding: '72px 24px 80px' }}>
-                <p style={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', opacity: 0.5, marginBottom: 16 }}>Bảng giá</p>
-                <h1 style={{ fontSize: 'clamp(1.6rem, 4vw, 2.8rem)', fontWeight: 900, margin: '0 0 16px' }}>Đầu tư vào hành trình của bạn</h1>
-                <p style={{ fontSize: '0.95rem', opacity: 0.65, maxWidth: 480, margin: '0 auto' }}>
-                    Thanh toán theo năm. Huỷ bất cứ lúc nào. Mọi gói đều bao gồm toàn bộ tính năng cơ bản.
-                </p>
-            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {['Thanh toán theo năm', 'Kích hoạt tự động qua SePay', 'Huỷ bất kỳ lúc nào'].map((item) => (
+                                    <span key={item} className="marketplace-badge marketplace-badge--neutral">
+                                        {item}
+                                    </span>
+                                ))}
+                            </div>
 
-            <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 16px 80px' }}>
+                            <div className="flex flex-wrap gap-3">
+                                <Link
+                                    to="/register"
+                                    className="btn-primary px-6 text-sm font-bold uppercase tracking-[0.16em]"
+                                >
+                                    Tạo tài khoản
+                                </Link>
+                                <Link
+                                    to="/coaches"
+                                    className="btn-secondary px-6 text-sm font-bold uppercase tracking-[0.16em]"
+                                >
+                                    Khám phá Coach
+                                </Link>
+                            </div>
+                        </div>
 
-                {/* Error */}
+                        <div className="marketplace-panel p-6 sm:p-8">
+                            <div className="marketplace-section-kicker">Tóm tắt nhanh</div>
+                            <h2 className="marketplace-section-title mt-2">
+                                Mỗi gói được tổ chức theo đúng job-to-be-done của từng nhóm người dùng.
+                            </h2>
+                            <div className="mt-6 space-y-4">
+                                {HERO_POINTS.map((item) => (
+                                    <div key={item.title} className="rounded-lg border border-[color:var(--mk-line)] bg-white/70 p-4">
+                                        <div className="text-sm font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">
+                                            {item.title}
+                                        </div>
+                                        <p className="mt-2 text-sm leading-6 text-[color:var(--mk-text-soft)]">
+                                            {item.body}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className="marketplace-container mt-8 space-y-12">
                 {error && (
-                    <div style={{ margin: '32px 0 0', padding: '14px 20px', background: '#fef2f2', border: '1.5px solid #fecaca', borderRadius: 8, color: '#991b1b', fontSize: '0.85rem' }}>
+                    <div
+                        role="alert"
+                        className="marketplace-panel border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700"
+                    >
                         ⚠ {error}
                     </div>
                 )}
 
-                {/* Checkout modal */}
-                {checkoutInfo && (
-                    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-                        <div style={{ background: '#fff', borderRadius: 8, padding: 32, maxWidth: 420, width: '100%', textAlign: 'center' }}>
-                            <p style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: 8 }}>Thanh toán qua SePay</p>
-                            <p style={{ fontSize: '0.82rem', color: '#6b7280', marginBottom: 20 }}>
-                                Chuyển khoản đúng số tiền và nội dung để kích hoạt gói tự động.
-                            </p>
-                            <div style={{ background: '#f8fafc', borderRadius: 8, padding: '16px 20px', marginBottom: 20, textAlign: 'left' }}>
-                                <Row label="Gói" value={PLAN_LABELS[checkoutInfo.plan]} />
-                                <Row label="Số tiền" value={checkoutInfo.amount.toLocaleString('vi-VN') + 'đ'} />
-                                <Row label="Nội dung CK" value={checkoutInfo.description} mono />
-                            </div>
-                            <p style={{ fontSize: '0.72rem', color: '#9ca3af', marginBottom: 20 }}>
-                                Sau khi chuyển khoản thành công, gói sẽ được kích hoạt tự động trong vài phút.
-                            </p>
-                            <button onClick={() => setCheckoutInfo(null)} style={{ padding: '10px 28px', borderRadius: 8, border: '1.5px solid #e5e7eb', background: '#fff', cursor: 'pointer', fontWeight: 700 }}>Đóng</button>
-                        </div>
-                    </div>
-                )}
-
-                {/* Coach Plans */}
-                <Section title="Dành cho Coach" subtitle="Mở rộng quy mô huấn luyện không giới hạn">
+                <Section
+                    kicker="Coach plans"
+                    title="Dành cho Coach"
+                    subtitle="Từ giai đoạn thử nghiệm đến khi mở rộng quy mô học viên, các gói dưới đây chia rõ ngưỡng nhu cầu để bạn không phải đoán mình nên nâng cấp lúc nào."
+                    columnsClassName="lg:grid-cols-3"
+                >
                     <PlanColumn planKey="free" onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
                     <PlanColumn planKey="coach_pro" highlighted onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
                     <PlanColumn planKey="coach_elite" onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
                 </Section>
 
-                {/* Athlete Plans */}
-                <Section title="Dành cho Athlete" subtitle="Theo dõi tiến độ và phát triển chuyên sâu">
+                <Section
+                    kicker="Athlete plans"
+                    title="Dành cho Athlete"
+                    subtitle="Người tập không cần một ma trận giá phức tạp. Bảng giá athlete giữ ít lựa chọn hơn để quyết định nâng cấp diễn ra nhanh và rõ."
+                    columnsClassName="lg:grid-cols-2"
+                >
                     <PlanColumn planKey="free" onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
                     <PlanColumn planKey="athlete_premium" highlighted onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
                 </Section>
 
-                {/* Gym Plans */}
-                <Section title="Dành cho Gym Center" subtitle="Quản lý toàn diện chuỗi cơ sở">
+                <Section
+                    kicker="Gym Center plans"
+                    title="Dành cho Gym Center"
+                    subtitle="Gym center được so sánh trên cùng bề mặt với coach và athlete, nhưng lợi ích được viết đúng ngữ cảnh vận hành chi nhánh và khả năng được khám phá."
+                    columnsClassName="lg:grid-cols-2"
+                >
                     <PlanColumn planKey="free" onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
                     <PlanColumn planKey="gym_business" highlighted onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
                 </Section>
-            </div>
-        </div>
+            </section>
+
+            {checkoutInfo && (
+                <div className="fixed inset-0 z-[1000] bg-black/55 px-4 py-6" role="dialog" aria-modal="true">
+                    <div className="flex min-h-full items-center justify-center">
+                        <div className="marketplace-panel w-full max-w-xl p-6 sm:p-8">
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                <div className="space-y-3">
+                                    <div className="marketplace-section-kicker">Checkout</div>
+                                    <h2 className="marketplace-section-title">Thanh toán qua SePay</h2>
+                                    <p className="text-sm leading-7 text-[color:var(--mk-text-soft)]">
+                                        Chuyển khoản đúng số tiền và nội dung để kích hoạt gói tự động. Hệ thống sẽ xử lý trong vài phút sau khi giao dịch được xác nhận.
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setCheckoutInfo(null)}
+                                    className="btn-secondary self-start px-4 text-xs font-bold uppercase tracking-[0.16em]"
+                                >
+                                    Đóng
+                                </button>
+                            </div>
+
+                            <div
+                                className="mt-6 rounded-lg border border-[color:var(--mk-line)] p-5"
+                                style={{ background: 'color-mix(in oklab, var(--mk-paper) 56%, white 44%)' }}
+                            >
+                                <Row label="Gói" value={PLAN_LABELS[checkoutInfo.plan]} />
+                                <Row label="Số tiền" value={`${checkoutInfo.amount.toLocaleString('vi-VN')}đ`} />
+                                <Row label="Nội dung CK" value={checkoutInfo.description} mono />
+                            </div>
+
+                            <p className="mt-4 text-sm leading-6 text-[color:var(--mk-muted)]">
+                                Sau khi chuyển khoản thành công, bạn có thể đóng hộp thoại này. Gói sẽ tự cập nhật khi hệ thống xác nhận giao dịch.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </main>
     );
 }
-
-const Section = ({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) => (
-    <div style={{ marginTop: 56 }}>
-        <div style={{ marginBottom: 32, textAlign: 'center' }}>
-            <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: '0 0 6px' }}>{title}</h2>
-            <p style={{ fontSize: '0.85rem', color: '#6b7280', margin: 0 }}>{subtitle}</p>
-        </div>
-        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
-            {children}
-        </div>
-    </div>
-);
-
-const Row = ({ label, value, mono }: { label: string; value: string; mono?: boolean }) => (
-    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: '0.78rem', color: '#6b7280' }}>{label}</span>
-        <span style={{ fontSize: '0.78rem', fontWeight: 700, fontFamily: mono ? 'monospace' : undefined, wordBreak: 'break-all' }}>{value}</span>
-    </div>
-);

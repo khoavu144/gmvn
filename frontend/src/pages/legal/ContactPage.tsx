@@ -119,6 +119,7 @@ export default function ContactPage() {
                                     required
                                     rows={5}
                                     minLength={20}
+                                    maxLength={500}
                                     className="form-input resize-none"
                                     placeholder="Mô tả chi tiết vấn đề bạn gặp phải..."
                                 />

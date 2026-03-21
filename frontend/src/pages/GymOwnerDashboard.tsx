@@ -72,7 +72,7 @@ const GymOwnerDashboard: React.FC = () => {
 
     const handleCreateBranch = async () => {
         if (!newBranchForm.branch_name || !newBranchForm.address) {
-            toast.success('Vui lòng nhập tên chi nhánh và địa chỉ');
+            toast.error('Vui lòng nhập tên chi nhánh và địa chỉ');
             return;
         }
         setCreatingBranch(true);
