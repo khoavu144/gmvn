@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials, setLoading } from '../store/slices/authSlice';
 import { authApi } from '../services/auth';
+import type { RootState } from '../store/store';
 
 export default function Register() {
     const navigate = useNavigate();
