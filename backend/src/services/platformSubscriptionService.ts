@@ -152,7 +152,7 @@ class PlatformSubscriptionService {
 
         // Store checkout intent in Redis for 24 hours (86400s)
         try {
-            await redisClient.set(`checkout:${description}`, JSON.stringify({ userId, plan }), 'EX', 86400);
+            await redisClient.set(`checkout:${description}`, JSON.stringify({ userId, plan }), { EX: 86400 });
         } catch (e) {
             console.warn('[checkout] Failed to write to Redis, falling back to substring match', e);
         }
