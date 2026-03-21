@@ -62,7 +62,7 @@ const CoachCard = memo(({ trainer }: { trainer: any }) => {
                         {trainer.base_price_monthly ? `${trainer.base_price_monthly.toLocaleString('vi-VN')} ₫/tháng` : 'Liên hệ báo giá'}
                     </p>
                     <div className="flex items-center text-[10px] font-black text-black bg-[color:var(--mk-paper)] px-1.5 py-0.5 rounded-sm mt-1 w-fit">
-                        ★ {trainer.avg_rating?.toFixed(1) || '5.0'}
+                        ★ {trainer.avg_rating != null ? Number(trainer.avg_rating).toFixed(1) : '5.0'}
                     </div>
                 </div>
             </div>

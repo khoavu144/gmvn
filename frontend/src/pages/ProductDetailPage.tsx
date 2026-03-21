@@ -160,7 +160,7 @@ export default function ProductDetailPage() {
                         {product.review_count > 0 && (
                             <div className="mpd-rating-summary">
                                 <StarRating rating={product.avg_rating ?? 0} />
-                                <span className="mpd-rating-value">{product.avg_rating?.toFixed(1)}</span>
+                                <span className="mpd-rating-value">{product.avg_rating != null ? Number(product.avg_rating).toFixed(1) : '0.0'}</span>
                                 <span className="mpd-rating-count">({product.review_count} đánh giá)</span>
                             </div>
                         )}

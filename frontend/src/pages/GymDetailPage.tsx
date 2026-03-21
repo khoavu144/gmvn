@@ -546,7 +546,7 @@ const GymDetailPage: React.FC = () => {
         },
         {
             label: 'Trust score',
-            value: gym.trust_summary?.avg_rating ? `★ ${gym.trust_summary.avg_rating.toFixed(1)} · ${gym.trust_summary.review_count} reviews` : 'Đang hoàn thiện trust data',
+            value: gym.trust_summary?.avg_rating != null ? `★ ${Number(gym.trust_summary.avg_rating).toFixed(1)} · ${gym.trust_summary.review_count} reviews` : 'Đang hoàn thiện trust data',
         },
         {
             label: 'Best for',
@@ -1198,7 +1198,7 @@ const GymReviewsSection = React.memo(function GymReviewsSection({
 
                 <div className="mb-6 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
                     {[
-                        { label: 'Tổng quan', value: gymTrustSummary?.avg_rating ? `★ ${gymTrustSummary.avg_rating.toFixed(1)}` : '—' },
+                        { label: 'Tổng quan', value: gymTrustSummary?.avg_rating != null ? `★ ${Number(gymTrustSummary.avg_rating).toFixed(1)}` : '—' },
                         { label: 'Thiết bị', value: gymTrustSummary?.dimensions?.equipment_rating ? gymTrustSummary.dimensions.equipment_rating.toFixed(1) : '—' },
                         { label: 'Sạch sẽ', value: gymTrustSummary?.dimensions?.cleanliness_rating ? gymTrustSummary.dimensions.cleanliness_rating.toFixed(1) : '—' },
                         { label: 'Hướng dẫn', value: gymTrustSummary?.dimensions?.coaching_rating ? gymTrustSummary.dimensions.coaching_rating.toFixed(1) : '—' },

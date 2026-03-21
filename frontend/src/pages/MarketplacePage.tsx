@@ -88,7 +88,7 @@ function ProductCard({ product }: { product: Product }) {
                     {product.review_count > 0 && (
                         <div className="marketplace-card-rating">
                             <span>⭐</span>
-                            <span>{product.avg_rating?.toFixed(1) ?? '—'}</span>
+                            <span>{product.avg_rating != null ? Number(product.avg_rating).toFixed(1) : '—'}</span>
                             <span className="marketplace-card-review-count">({product.review_count})</span>
                         </div>
                     )}

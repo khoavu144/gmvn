@@ -189,7 +189,7 @@ const GymOwnerDashboard: React.FC = () => {
                             {[
                                 { label: 'Tổng lượt xem', val: stats?.total_views ?? gym.view_count },
                                 { label: 'Chi nhánh', val: stats?.total_branches ?? branches.length },
-                                { label: 'Đánh giá', val: stats?.avg_rating ? `★ ${stats.avg_rating.toFixed(1)}` : 'N/A' },
+                                { label: 'Đánh giá', val: stats?.avg_rating != null ? `★ ${Number(stats.avg_rating).toFixed(1)}` : 'N/A' },
                                 { label: 'HLV liên kết', val: stats?.total_trainers ?? 0 },
                             ].map((item, i) => (
                                 <div key={i} className="p-6 rounded-lg border border-[color:var(--mk-line)] bg-white shadow-sm">
