@@ -49,7 +49,7 @@ const BOOKING_MODE_LABELS: Record<string, string> = {
 function formatProgramSubtitle(program: GymProgram): string {
     const parts: string[] = [];
     if (program.program_type) parts.push(PROGRAM_TYPE_LABELS[program.program_type] || program.program_type);
-    if (program.difficulty_level) parts.push(program.difficulty_level);
+    if (program.level) parts.push(program.level);
     if (program.booking_mode) parts.push(BOOKING_MODE_LABELS[program.booking_mode] || program.booking_mode);
     return parts.join(' · ') || 'Chi tiết lịch lớp';
 }

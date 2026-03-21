@@ -12,7 +12,7 @@ import { fetchPublicProfile } from '../store/slices/profileSlice';
 import type { AppDispatch, RootState } from '../store/store';
 import { getSrcSet, getOptimizedUrl } from '../utils/image';
 import ShareButton from '../components/ShareButton';
-import StatCard from '../components/dashboard/StatCard';
+
 import apiClient from '../services/api';
 import { buildProfileShareUrl } from '../utils/share';
 
@@ -209,7 +209,7 @@ export default function AthleteDetailPage() {
   );
   const socialLinks: SocialLinks = profile?.social_links || {};
   const visibleSocials = SOCIAL_META.filter((m) => !!socialLinks[m.key]);
-  const topAchievement = athleteAchievements[0];
+
 
   const displayMetrics = [
     { value: `${profile?.years_experience ?? 0}+`, label: 'Năm kinh nghiệm' },
