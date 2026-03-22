@@ -23,7 +23,7 @@ const GymTrainersSection = React.memo(function GymTrainersSection({ branchTraine
     if (branchTrainerLinks.length === 0) return null;
 
     return (
-            <section ref={setRef('trainers')} id="trainers" className="gym-detail-section marketplace-panel p-6 sm:p-8">
+            <section ref={setRef('trainers')} id="trainers" className="gym-detail-section marketplace-panel gv-panel-pad">
                 <GymSectionHeading
                     kicker="Chuyên gia"
                     title="Ai đang dẫn dắt trải nghiệm tại chi nhánh này"

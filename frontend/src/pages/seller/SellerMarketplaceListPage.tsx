@@ -82,7 +82,7 @@ export default function SellerMarketplaceListPage() {
 
     if (user?.user_type === 'admin') {
         return (
-            <div className="page-shell-muted page-container py-12">
+            <div className="page-shell-muted page-container gv-pad-y-lg">
                 <p className="text-gray-500">Tài khoản admin không dùng kênh bán marketplace.</p>
                 <Link to="/dashboard" className="btn-secondary inline-block mt-4">
                     Về bảng điều khiển
@@ -98,7 +98,7 @@ export default function SellerMarketplaceListPage() {
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             <div className="bg-white border-b border-gray-200">
-                <div className="page-container py-8">
+                <div className="page-container gv-pad-y">
                     <p className="page-kicker mb-2 flex items-center gap-2">
                         <Store className="w-4 h-4" /> Marketplace
                     </p>
@@ -149,7 +149,7 @@ export default function SellerMarketplaceListPage() {
                 </div>
             </div>
 
-            <div className="page-container py-10 space-y-10">
+            <div className="page-container gv-pad-y-md space-y-10">
                 {error && (
                     <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
                         {error}

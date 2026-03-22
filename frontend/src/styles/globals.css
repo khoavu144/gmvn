@@ -1,5 +1,6 @@
-/* GYMERVIET globals.css v3.0 */
-/* Inter-only · Tailwind utilities thuần · No --mk-* / --cur-* tokens */
+/* GYMERVIET globals.css */
+/* Resets + base utilities + safe-area + accessibility primitives.
+   Layout/spacing primitives live in src/index.css. */
 
 /* ─── DESIGN TOKENS ───────────────────────────────────────────────────── */
 @layer base {
@@ -89,93 +90,6 @@
   .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
 }
 
-/* ─── COMPONENT LAYER ─────────────────────────────────────────────────── */
-@layer components {
-
-  /* ── Page containers ── */
-  .page-container {
-    @apply max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  /* ── Card base — dùng cho mọi content panel ── */
-  /* Pattern từ UserDashboard: bg-white border border-gray-200 rounded-lg shadow-sm */
-  .card {
-    @apply bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm;
-  }
-  .card-hover {
-    @apply card transition-shadow duration-150 hover:shadow-md;
-  }
-
-  /* ── Section heading — pattern từ Dashboard ── */
-  /* Usage: <div class="section-heading"><h2>Title</h2><p>Subtitle</p></div> */
-  .section-heading {
-    @apply mb-6;
-  }
-  .section-heading h2 {
-    @apply text-2xl font-black uppercase tracking-tight text-black;
-  }
-  .section-heading p {
-    @apply text-body text-gray-600 mt-1;
-  }
-
-  /* ── Skeleton shimmer ── */
-  .skeleton {
-    @apply bg-gray-200 rounded;
-    background-image: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255,255,255,0.4) 50%,
-      transparent 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-  }
-
-  /* ── Overline label ── */
-  .overline {
-    @apply text-[11px] font-bold uppercase tracking-[0.12em] text-gray-500;
-  }
-
-  /* ── Divider ── */
-  .divider { @apply border-t border-gray-200; }
-
-  /* ── Pill badge ── */
-  .badge {
-    @apply inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full;
-  }
-
-  /* ── Filter chip ── */
-  .chip {
-    @apply inline-flex items-center px-3 py-1.5 text-sm font-medium rounded border border-gray-200 bg-white text-gray-700 cursor-pointer transition-colors duration-150 whitespace-nowrap;
-  }
-  .chip:hover { @apply bg-gray-100 border-gray-300; }
-  .chip-active { @apply bg-black text-white border-black; }
-
-  /* ── Bottom nav item ── */
-  .bottom-nav-item {
-    @apply flex flex-col items-center justify-center gap-0.5 flex-1 text-gray-700 transition-colors duration-150;
-    min-height: 44px;
-  }
-  .bottom-nav-item.active { @apply text-black; }
-
-  /* ── Stat ── */
-  .stat-value { @apply text-2xl font-black tabular-nums text-black; }
-  .stat-label  { @apply text-[10px] font-bold text-gray-500 uppercase tracking-[0.12em] mt-0.5; }
-
-  /* ── Form input — dùng cho mọi input trên app ── */
-  .form-input {
-    @apply min-h-[44px] w-full rounded-lg border border-gray-200 bg-white px-3.5 py-2.5
-           text-body font-medium text-black placeholder:text-gray-400
-           transition duration-150
-           focus:outline-none focus:border-black focus:ring-2 focus:ring-black/5
-           disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400;
-  }
-
-  /* ── Section spacing ── */
-  /* Main section: py-10 (80px) */
-  /* Sub-section: py-6 (48px) */
-}
-
 /* ─── UTILITY LAYER ───────────────────────────────────────────────────── */
 @layer utilities {
   .text-balance { text-wrap: balance; }
@@ -184,8 +98,10 @@
   /* Content padding after header */
   .pt-header { padding-top: var(--header-height); }
 
-  /* Content padding before bottom nav */
-  .pb-nav { padding-bottom: var(--bottom-nav-height); }
+  /* Content padding before bottom nav (includes safe-area + a consistent comfort gap) */
+  .pb-nav {
+    padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--gv-space-6, 24px));
+  }
 
   /* Touch-friendly min-size */
   .touch-target { min-height: 44px; min-width: 44px; }

@@ -70,7 +70,7 @@ const GymProgramsSection = React.memo(function GymProgramsSection({ branchProgra
     if (branchPrograms.length === 0) return null;
 
     return (
-            <section ref={setRef('schedule')} id="schedule" className="gym-detail-section marketplace-panel p-6 sm:p-7">
+            <section ref={setRef('schedule')} id="schedule" className="gym-detail-section marketplace-panel gv-panel-pad">
                 <GymSectionHeading
                     kicker="Lịch tập"
                     title="Lịch lớp và nhịp hoạt động tại chi nhánh"

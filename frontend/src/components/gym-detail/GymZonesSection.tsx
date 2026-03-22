@@ -11,7 +11,7 @@ const GymZonesSection = React.memo(function GymZonesSection({ branchZones, setRe
     if (branchZones.length === 0) return null;
 
     return (
-            <section ref={setRef('zones')} id="zones" className="gym-detail-section marketplace-panel p-6 sm:p-7">
+            <section ref={setRef('zones')} id="zones" className="gym-detail-section marketplace-panel gv-panel-pad">
                 <GymSectionHeading
                     kicker="Khu vực nổi bật"
                     title="Những không gian quyết định cảm giác tập"

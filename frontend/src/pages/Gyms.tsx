@@ -290,7 +290,7 @@ const Gyms: React.FC = () => {
                 <meta name="twitter:card" content="summary_large_image" />
             </Helmet>
 
-            <div className="marketplace-shell min-h-screen pb-16 md:pb-20">
+            <div className="marketplace-shell min-h-screen">
                 <div className="gyms-marketplace">
                 {/* ── Hero ──────────────────────────────────────────────────────────── */}
                 <section className="marketplace-hero">

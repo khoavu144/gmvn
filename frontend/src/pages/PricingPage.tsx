@@ -100,7 +100,7 @@ function PlanColumn({
 
     return (
         <article
-            className={`marketplace-panel relative flex h-full flex-col gap-6 p-6 sm:p-7 ${highlighted ? '!border-amber-200 !bg-amber-50/80' : ''}`}
+            className={`marketplace-panel gv-panel-pad relative flex h-full flex-col gap-6 ${highlighted ? '!border-amber-200 !bg-amber-50/80' : ''}`}
         >
             {highlighted && (
                 <span className="marketplace-badge marketplace-badge--accent absolute right-5 top-5">
@@ -222,7 +222,7 @@ export default function PricingPage() {
     };
 
     return (
-        <main className="marketplace-shell min-h-screen pb-24">
+        <main className="marketplace-shell min-h-screen">
             <Helmet>
                 <title>Bảng giá — GYMERVIET</title>
                 <meta
@@ -259,7 +259,7 @@ export default function PricingPage() {
                 })}</script>
             </Helmet>
 
-            <section className="marketplace-hero pt-header">
+            <section className="marketplace-hero">
                 <div className="marketplace-container">
                     <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)] lg:items-end">
                         <div className="space-y-5">
@@ -295,7 +295,7 @@ export default function PricingPage() {
                             </div>
                         </div>
 
-                        <div className="marketplace-panel p-6 sm:p-8">
+                        <div className="marketplace-panel gv-panel-pad">
                             <div className="marketplace-section-kicker">Tóm tắt nhanh</div>
                             <h2 className="marketplace-section-title mt-2">
                                 Mỗi gói được tổ chức theo đúng job-to-be-done của từng nhóm người dùng.
@@ -362,7 +362,7 @@ export default function PricingPage() {
             {checkoutInfo && (
                 <div className="fixed inset-0 z-[1000] bg-black/55 px-4 py-6" role="dialog" aria-modal="true">
                     <div className="flex min-h-full items-center justify-center">
-                        <div className="marketplace-panel w-full max-w-xl p-6 sm:p-8">
+                        <div className="marketplace-panel gv-panel-pad w-full max-w-xl">
                             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                                 <div className="space-y-3">
                                     <div className="marketplace-section-kicker">Checkout</div>

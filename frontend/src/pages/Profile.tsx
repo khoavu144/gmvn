@@ -115,7 +115,7 @@ export default function Profile() {
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
 
-            <div className="min-h-screen bg-white flex flex-col pb-16">
+            <div className="min-h-screen bg-white flex flex-col pb-nav lg:pb-0">
                 {/* ── MODERN GLASSMORTPHISM HEADER ───────────────────────────── */}
                 <div className="relative h-[300px] sm:h-[350px] w-full overflow-hidden bg-black">
                     {/* Background Image / Pattern */}
@@ -358,7 +358,7 @@ export default function Profile() {
                         </div>
 
                         {/* RIGHT COLUMN: Tab Content */}
-                        <div className="flex-1 min-w-0 pb-20">
+                        <div className="flex-1 min-w-0">
                             <AnimatePresence mode="wait">
                                 <motion.div
                                     key={activeTab}

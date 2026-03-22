@@ -98,7 +98,7 @@ export default function SellerProductNewPage() {
 
     if (user?.user_type === 'admin') {
         return (
-            <div className="page-container py-12">
+            <div className="page-container gv-pad-y-lg">
                 <Link to="/dashboard">← Về bảng điều khiển</Link>
             </div>
         );
@@ -110,7 +110,7 @@ export default function SellerProductNewPage() {
                 <title>Thêm sản phẩm — Marketplace</title>
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
-            <div className="page-container py-8 max-w-2xl">
+            <div className="page-container gv-pad-y max-w-2xl">
                 <Link
                     to="/dashboard/marketplace"
                     className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black mb-6 inline-block"

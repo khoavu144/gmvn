@@ -53,7 +53,7 @@ export default function NewsDetailPage() {
     if (loading) {
         return (
             <div className="marketplace-shell min-h-screen animate-pulse">
-                <div className="marketplace-container max-w-3xl pt-10 pb-24 space-y-4">
+                <div className="marketplace-container gv-pad-y max-w-3xl space-y-4">
                     <div className="h-8 bg-gray-100 rounded-lg w-3/4" />
                     <div className="h-4 bg-gray-50 rounded-lg w-1/2" />
                     <div className="mt-6 aspect-[16/9] rounded-lg bg-gray-100" />
@@ -132,8 +132,8 @@ export default function NewsDetailPage() {
                 <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
             </Helmet>
 
-            <div className="marketplace-shell min-h-screen pb-24">
-                <div className="marketplace-container max-w-3xl pt-8">
+            <div className="marketplace-shell min-h-screen">
+                <div className="marketplace-container gv-pad-y max-w-3xl">
 
                     {/* Breadcrumb */}
                     <nav className="flex items-center gap-2 text-xs text-gray-500 mb-6" aria-label="Breadcrumb">

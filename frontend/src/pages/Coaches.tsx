@@ -385,7 +385,7 @@ export default function Coaches() {
             : 'https://gymerviet.com/coaches';
 
     return (
-        <main className="marketplace-shell min-h-screen pb-24">
+        <main className="marketplace-shell min-h-screen">
             <Helmet>
                 <title>{currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET</title>
                 <meta
@@ -408,7 +408,7 @@ export default function Coaches() {
                 <meta name="twitter:site" content="@gymerviet" />
             </Helmet>
 
-            <div className="marketplace-container pt-6 md:pt-8">
+            <div className="marketplace-container gv-pad-y">
                 <section className="mb-8 grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,0.85fr)] lg:items-start lg:gap-10">
                     <div>
                         <div className="mb-5 flex w-max max-w-full flex-wrap gap-1 rounded-full border border-gray-200 bg-gray-50 p-1">
@@ -489,7 +489,7 @@ export default function Coaches() {
                         </div>
                     </div>
 
-                    <aside className="marketplace-panel rounded-xl p-5 shadow-sm ring-1 ring-gray-900/[0.06] sm:p-6">
+                    <aside className="marketplace-panel gv-panel-pad-sm rounded-xl shadow-sm ring-1 ring-gray-900/[0.06]">
                         <p className="marketplace-section-kicker">Tổng quan</p>
                         <p className="mt-1 text-2xl font-bold tracking-tight text-gray-900 tabular-nums">
                             {!isLoading && !isError ? totalCount.toLocaleString('vi-VN') : '—'}

@@ -47,7 +47,7 @@ export default function SubscriptionsPage() {
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             {ToastComponent}
-            <div className="page-container max-w-4xl py-12">
+            <div className="page-container gv-pad-y-lg max-w-4xl">
                 <div className="page-header">
                     <p className="page-kicker">Tài khoản</p>
                     <h1 className="page-title">Quản lý Gói tập</h1>

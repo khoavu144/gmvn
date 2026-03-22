@@ -35,7 +35,7 @@ const GymMapSection = React.memo(function GymMapSection({
     const lon = Number(branchLongitude);
 
     return (
-        <section ref={setRef('map')} id="map" className="gym-detail-section marketplace-panel p-6 sm:p-8">
+        <section ref={setRef('map')} id="map" className="gym-detail-section marketplace-panel gv-panel-pad">
             <GymSectionHeading
                 kicker="Bản đồ định vị"
                 title="Định vị chi nhánh và bối cảnh quanh phòng tập"

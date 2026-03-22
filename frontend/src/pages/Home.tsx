@@ -107,7 +107,7 @@ export default function Home() {
     };
 
     return (
-        <main className="marketplace-shell min-h-screen pb-24">
+        <main className="marketplace-shell min-h-screen">
             <Helmet>
                 <title>GYMERVIET — Tìm Coach, phòng tập và kiến thức fitness</title>
                 <meta
@@ -161,7 +161,7 @@ export default function Home() {
                 })}</script>
             </Helmet>
 
-            <section className="marketplace-hero pt-header">
+            <section className="marketplace-hero">
                 <div className="marketplace-container">
                     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)] lg:items-start lg:gap-10">
                         <div className="space-y-5 lg:max-w-[40rem] lg:pt-1">
@@ -202,7 +202,7 @@ export default function Home() {
                             </div>
                         </div>
 
-                        <div className="marketplace-panel p-6 shadow-sm ring-1 ring-gray-900/[0.06] sm:p-8 lg:shadow-[0_12px_48px_-8px_rgba(15,23,42,0.12)]">
+                        <div className="marketplace-panel gv-panel-pad shadow-sm ring-1 ring-gray-900/[0.06] lg:shadow-[0_12px_48px_-8px_rgba(15,23,42,0.12)]">
                             <div className="space-y-3 border-b border-gray-200 pb-4">
                                 <div className="marketplace-section-kicker">Thành viên đang có mặt</div>
                                 <h2 className="marketplace-section-title">
@@ -291,7 +291,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <section id="ba-vai-tro" className="marketplace-container mt-10 lg:mt-14">
+            <section id="ba-vai-tro" className="marketplace-container gv-section-gap">
                 <div className="space-y-3">
                     <div className="marketplace-section-kicker">Ba nhóm chính</div>
                     <h2 className="marketplace-section-title">
@@ -307,7 +307,7 @@ export default function Home() {
                         <Link
                             key={item.title}
                             to={item.href}
-                            className="marketplace-panel group flex h-full flex-col gap-5 p-6 shadow-sm ring-1 ring-gray-900/[0.05] sm:p-7 transition duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.12)]"
+                            className="marketplace-panel gv-panel-pad group flex h-full flex-col gap-5 shadow-sm ring-1 ring-gray-900/[0.05] transition duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.12)]"
                         >
                             <div className="space-y-3">
                                 <div className="marketplace-section-kicker">{item.kicker}</div>
@@ -327,7 +327,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <section className="marketplace-container mt-12 lg:mt-16">
+            <section className="marketplace-container gv-section-gap">
                 <div className="space-y-3">
                     <div className="marketplace-section-kicker">Cách dùng GYMERVIET</div>
                     <h2 className="marketplace-section-title">
@@ -339,7 +339,7 @@ export default function Home() {
                     {ECOSYSTEM_STEPS.map((item) => (
                         <article
                             key={item.step}
-                            className="marketplace-panel p-6 shadow-sm ring-1 ring-gray-900/[0.05] sm:p-7"
+                            className="marketplace-panel gv-panel-pad shadow-sm ring-1 ring-gray-900/[0.05]"
                         >
                             <div className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-gray-500">
                                 Bước {item.step}
@@ -355,8 +355,8 @@ export default function Home() {
                 </div>
             </section>
 
-            <section className="marketplace-container mt-12 lg:mt-16">
-                <div className="marketplace-panel p-6 shadow-sm ring-1 ring-gray-900/[0.06] sm:p-8 lg:p-10 lg:shadow-[0_10px_40px_-12px_rgba(15,23,42,0.1)]">
+            <section className="marketplace-container gv-section-gap">
+                <div className="marketplace-panel gv-panel-pad-lg shadow-sm ring-1 ring-gray-900/[0.06] lg:shadow-[0_10px_40px_-12px_rgba(15,23,42,0.1)]">
                     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                         <div className="space-y-4">
                             <div className="marketplace-section-kicker">Bước tiếp theo</div>
@@ -392,8 +392,8 @@ export default function Home() {
                 </div>
             </section>
 
-            <section className="marketplace-container mt-12 lg:mt-16" aria-labelledby="home-faq-heading">
-                <div className="marketplace-panel p-6 shadow-sm ring-1 ring-gray-900/[0.05] sm:p-8">
+            <section className="marketplace-container gv-section-gap" aria-labelledby="home-faq-heading">
+                <div className="marketplace-panel gv-panel-pad shadow-sm ring-1 ring-gray-900/[0.05]">
                     <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.42fr)] lg:items-start lg:gap-10">
                         <div className="order-2 lg:order-1">
                             <div className="marketplace-section-kicker">Câu hỏi nhanh</div>

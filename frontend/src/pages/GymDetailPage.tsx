@@ -481,8 +481,8 @@ const GymDetailPage: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="marketplace-shell min-h-screen pb-20">
-                <div className="marketplace-container pt-8">
+            <div className="marketplace-shell min-h-screen">
+                <div className="marketplace-container gv-pad-y">
                     <Skeleton className="h-[28rem] w-full rounded-lg" />
                     <div className="mt-6 grid gap-4 lg:grid-cols-[1.45fr_0.55fr]">
                         <div className="space-y-4">
@@ -627,8 +627,8 @@ const GymDetailPage: React.FC = () => {
                 </div>
             )}
 
-            <div className="marketplace-shell gym-detail-page min-h-screen pb-24 lg:pb-24">
-                <div className="marketplace-container pt-4 md:pt-6">
+            <div className="marketplace-shell gym-detail-page min-h-screen">
+                <div className="marketplace-container gv-pad-y-sm">
                     <div className="mb-5 flex items-center justify-between gap-4">
                         <Link to="/gyms" className="back-link">← Quay lại marketplace</Link>
                         <div className="hidden items-center gap-2 md:flex">
@@ -793,7 +793,7 @@ const GymDetailPage: React.FC = () => {
 
                 <div className="marketplace-container mt-4 md:mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.45fr)]">
                     <div className="flex flex-col gap-8">
-                        <section ref={setRef('overview')} id="overview" className="gym-detail-section marketplace-panel p-6 sm:p-8">
+                        <section ref={setRef('overview')} id="overview" className="gym-detail-section marketplace-panel gv-panel-pad">
                                 <GymSectionHeading
                                     kicker="Tổng quan"
                                     title="Tóm tắt về cơ sở"
@@ -902,7 +902,7 @@ const GymDetailPage: React.FC = () => {
                     </div>
 
                     <aside className="gym-detail-sticky-rail space-y-4" style={{ contain: 'layout paint' }}>
-                        <div className="marketplace-panel p-5 sm:p-6">
+                        <div className="marketplace-panel gv-panel-pad-sm">
                             <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Quyết định nhanh</div>
                             <div className="mt-3 text-sm font-semibold text-[color:var(--mk-text-soft)]">Chi nhánh đang xem</div>
                             <h3 className="mt-1 text-[1.55rem] font-bold leading-[0.98] tracking-[-0.05em] text-[color:var(--mk-text)]">
@@ -940,7 +940,7 @@ const GymDetailPage: React.FC = () => {
                         </div>
 
                         {branches.length > 1 && (
-                            <div className="marketplace-panel p-5">
+                            <div className="marketplace-panel gv-panel-pad-sm">
                                 <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chuyển chi nhánh</div>
                                 <div className="mt-4 space-y-2">
                                     {branches.map((branch) => (
@@ -959,7 +959,7 @@ const GymDetailPage: React.FC = () => {
                         )}
 
                         {similarGyms.length > 0 && (
-                            <div className="marketplace-panel p-5">
+                            <div className="marketplace-panel gv-panel-pad-sm">
                                 <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Venue tương tự</div>
                                 <p className="mt-1 text-sm leading-6 text-[color:var(--mk-muted)]">
                                     Gợi ý theo loại hình và khu vực — cuộn để xem thêm.
@@ -968,7 +968,7 @@ const GymDetailPage: React.FC = () => {
                             </div>
                         )}
 
-                        <div className="marketplace-panel p-5">
+                        <div className="marketplace-panel gv-panel-pad-sm">
                             <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Lưu ý tại điểm tập</div>
                             <div className="mt-4 space-y-3">
                                 <SummaryPill
@@ -981,7 +981,7 @@ const GymDetailPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="marketplace-panel p-5">
+                        <div className="marketplace-panel gv-panel-pad-sm">
                             <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Liên hệ nhanh</div>
                             <div className="mt-4 grid gap-2">
                                 {branchPhone && (
@@ -1002,7 +1002,7 @@ const GymDetailPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="marketplace-panel p-5">
+                        <div className="marketplace-panel gv-panel-pad-sm">
                             <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chia sẻ cơ sở</div>
                             <div className="mt-4 flex flex-wrap gap-2">
                                 <ShareButton

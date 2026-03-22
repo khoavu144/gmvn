@@ -8,13 +8,11 @@
   min-height: 100vh;
   background: var(--mk-bg);
   color: var(--color-text, var(--mk-text));
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--gv-space-6));
 }
 
-/* Single column shell: hero + filters + grids share same horizontal rhythm */
-.marketplace-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 1rem 4rem;
+@media (min-width: 1024px) {
+  .marketplace-page { padding-bottom: 0; }
 }
 
 /* ── Editorial Intro ─────────────────────────────────────────── */

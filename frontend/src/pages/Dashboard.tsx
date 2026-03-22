@@ -58,7 +58,7 @@ export default function Dashboard() {
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             <div className="bg-white border-b border-gray-200">
-                <div className="page-container py-6">
+                <div className="page-container gv-pad-y-sm">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div>
                             <p className="page-kicker mb-2">
@@ -81,7 +81,7 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            <div className="page-container py-8">
+            <div className="page-container gv-pad-y">
                 <Suspense fallback={<DashboardRoleFallback />}>
                     {user.user_type === 'trainer' && <CoachDashboard overview={overview} />}
                     {user.user_type === 'athlete' && <AthleteDashboard overview={overview} />}

@@ -113,7 +113,7 @@ export default function SellerTrainingPackageNewPage() {
 
     if (!allowed) {
         return (
-            <div className="page-container py-12 max-w-lg">
+            <div className="page-container gv-pad-y-lg max-w-lg">
                 <Helmet>
                     <title>Gói tập — Marketplace</title>
                 </Helmet>
@@ -131,7 +131,7 @@ export default function SellerTrainingPackageNewPage() {
                 <title>Thêm gói tập — Marketplace</title>
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
-            <div className="page-container py-8 max-w-2xl">
+            <div className="page-container gv-pad-y max-w-2xl">
                 <Link
                     to="/dashboard/marketplace"
                     className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black mb-6 inline-block"

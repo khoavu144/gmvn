@@ -14,7 +14,7 @@ const GymFacilitiesSection = React.memo(function GymFacilitiesSection({ branchAm
     if (branchAmenities.length === 0 && branchEquipment.length === 0) return null;
 
     return (
-            <section ref={setRef('facilities')} id="facilities" className="gym-detail-section marketplace-panel p-6 sm:p-8">
+            <section ref={setRef('facilities')} id="facilities" className="gym-detail-section marketplace-panel gv-panel-pad">
                 <GymSectionHeading
                     kicker="Tiện ích"
                     title="Tiện ích và thiết bị hỗ trợ quyết định"

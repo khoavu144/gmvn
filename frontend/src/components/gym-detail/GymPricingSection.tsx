@@ -129,7 +129,7 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
     const single = branchPricing.length === 1;
 
     return (
-        <section ref={setRef('pricing')} id="pricing" className="gym-detail-section marketplace-panel p-6 sm:p-7">
+        <section ref={setRef('pricing')} id="pricing" className="gym-detail-section marketplace-panel gv-panel-pad">
             <GymSectionHeading
                 kicker="Bảng giá"
                 title="Các gói vào cửa và cách bắt đầu"

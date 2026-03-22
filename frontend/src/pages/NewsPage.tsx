@@ -161,8 +161,8 @@ export default function NewsPage() {
                 <meta property="og:url" content={`${canonicalBase}/news`} />
             </Helmet>
 
-            <main className="marketplace-shell min-h-screen pb-24">
-                <section className="marketplace-hero pt-header">
+            <main className="marketplace-shell min-h-screen">
+                <section className="marketplace-hero">
                     <div className="marketplace-container">
                         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)] lg:items-end">
                             <div className="space-y-5">
@@ -175,7 +175,7 @@ export default function NewsPage() {
                                 </p>
                             </div>
 
-                            <div className="marketplace-panel p-6 sm:p-8">
+                            <div className="marketplace-panel gv-panel-pad">
                                 <div className="marketplace-section-kicker">Trọng tâm hiện tại</div>
                                 <h2 className="marketplace-section-title mt-2">
                                     {CATEGORY_MAP[activeCategory] || 'Tổng hợp'}
@@ -207,7 +207,7 @@ export default function NewsPage() {
                 </section>
 
                 <section className="marketplace-container">
-                    <div className="marketplace-panel p-4 sm:p-5">
+                    <div className="marketplace-panel gv-panel-pad-xs">
                         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                             <div className="space-y-2">
                                 <div className="marketplace-section-kicker">Danh mục</div>
@@ -282,7 +282,7 @@ export default function NewsPage() {
 
                 {totalPages > 1 && (
                     <section className="marketplace-container mt-8">
-                        <div className="marketplace-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="marketplace-panel gv-panel-pad-sm flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <div className="marketplace-section-kicker">Phân trang</div>
                                 <p className="mt-2 text-sm leading-6 text-gray-600">

@@ -200,7 +200,7 @@ export default function MessagesPage() {
                 <title>Tin nhắn — GymViet</title>
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
-            <div className="page-container py-6 sm:py-8">
+            <div className="page-container gv-pad-y-sm">
                 <section className="page-header">
                     <p className="page-kicker">Trao đổi trực tiếp</p>
                     <h1 className="page-title">Tin nhắn</h1>

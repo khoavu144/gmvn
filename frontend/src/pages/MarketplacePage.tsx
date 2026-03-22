@@ -362,7 +362,7 @@ export default function MarketplacePage() {
             </Helmet>
 
             <div className="marketplace-page">
-                <div className="marketplace-inner">
+                <div className="marketplace-container gv-pad-y">
                 {/* Hero */}
                 {showHero && (
                     <section className="marketplace-editorial-intro">

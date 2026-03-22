@@ -37,7 +37,7 @@ export default function Footer() {
     return (
         <footer className="bg-white border-t border-gray-200">
             {/* Main footer grid */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+            <div className="page-container py-12 sm:py-16">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
                     {footerLinks.map((col) => (
                         <div key={col.title}>
@@ -63,7 +63,7 @@ export default function Footer() {
 
             {/* Bottom bar */}
             <div className="border-t border-gray-200">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-gray-500">
+                <div className="page-container py-5 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-gray-500">
                     <div className="flex items-center gap-2">
                         <span className="font-bold text-black tracking-wider">GYMERVIET</span>
                         <span>©&nbsp;{new Date().getFullYear()}</span>

@@ -63,7 +63,7 @@ export default function WorkoutsPage() {
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             {ToastComponent}
-            <div className="page-container">
+            <div className="page-container gv-pad-y">
                 <section className="page-header">
                     <button onClick={() => navigate('/dashboard')} className="back-link mb-3">← Về Dashboard</button>
                     <p className="page-kicker">Workout Tracker</p>
