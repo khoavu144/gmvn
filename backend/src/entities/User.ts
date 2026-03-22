@@ -73,6 +73,15 @@ export class User {
     @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
     slug!: string | null; // SEO-friendly URL slug for trainers (e.g., "nguyen-dieu-nhi")
 
+    @Column({ type: 'varchar', length: 120, nullable: true })
+    city!: string | null;
+
+    @Column({ type: 'decimal', precision: 3, scale: 2, nullable: true })
+    avg_rating!: number | null;
+
+    @Column({ type: 'int', default: 0 })
+    profile_view_count!: number;
+
     @CreateDateColumn()
     created_at!: Date;
 

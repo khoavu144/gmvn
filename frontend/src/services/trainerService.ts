@@ -14,7 +14,7 @@ export interface TrainerFilters {
     priceMin?: number;
     priceMax?: number;
     city?: string;
-    sort?: 'newest' | 'price_asc' | 'price_desc';
+    sort?: 'newest' | 'price_asc' | 'price_desc' | 'rating_desc' | 'views_desc';
     user_type?: 'trainer' | 'athlete';
 }
 

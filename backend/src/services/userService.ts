@@ -47,7 +47,7 @@ class UserService {
         priceMin?: number,
         priceMax?: number,
         city?: string,
-        sort?: 'newest' | 'price_asc' | 'price_desc',
+        sort?: 'newest' | 'price_asc' | 'price_desc' | 'rating_desc' | 'views_desc',
         user_type?: 'trainer' | 'athlete'
     ) {
         const queryBuilder = this.repo.createQueryBuilder('user')
@@ -89,6 +89,14 @@ class UserService {
             case 'price_desc':
                 queryBuilder.orderBy('user.base_price_monthly', 'DESC', 'NULLS LAST');
                 break;
+            case 'rating_desc':
+                queryBuilder.orderBy('user.avg_rating', 'DESC', 'NULLS LAST');
+                queryBuilder.addOrderBy('user.created_at', 'DESC');
+                break;
+            case 'views_desc':
+                queryBuilder.orderBy('user.profile_view_count', 'DESC');
+                queryBuilder.addOrderBy('user.created_at', 'DESC');
+                break;
             case 'newest':
             default:
                 queryBuilder.orderBy('user.created_at', 'DESC');
@@ -119,6 +127,7 @@ class UserService {
                 const profileRow = profileByTrainerId.get(t.id);
                 return {
                     id: t.id,
+                    user_type: t.user_type,
                     profile_slug: profileRow?.slug ?? t.slug ?? null, // for /coach/:slug URL
                     full_name: t.full_name,
                     headline: profileRow?.headline ?? null,
@@ -127,7 +136,8 @@ class UserService {
                     specialties: t.specialties,
                     base_price_monthly: t.base_price_monthly,
                     is_verified: t.is_verified,
-                    city: (t as any).city ?? null,
+                    city: t.city ?? null,
+                    avg_rating: t.avg_rating != null ? Number(t.avg_rating) : null,
                 };
             }),
             total,

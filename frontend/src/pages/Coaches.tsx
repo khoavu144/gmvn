@@ -1,122 +1,274 @@
-import { useState, useMemo, memo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { trainerService, type TrainerFilters } from '../services/trainerService';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { usePrefetchProfile } from '../hooks/usePrefetchProfile';
-
-// ─── Specialty Options ────────────────────────────────────────────────────────
-const SPECIALTIES = [
-    'Gym tổng hợp', 'Cardio', 'Yoga', 'Pilates', 'CrossFit', 'Boxing', 'Kickboxing',
-    'Bodybuilding', 'Powerlifting', 'Calisthenics', 'Zumba', 'Stretching', 'Dinh dưỡng',
-    'Phục hồi chức năng', 'HIIT', 'Muay Thai', 'Dance Fitness', 'Bơi lội',
-];
+import { SPECIALTY_CATEGORIES } from '../data/coachSpecialtyTaxonomy';
+import { CoachDirectoryCard, type CoachDirectoryTrainer } from '../components/coaches/CoachDirectoryCard';
+import '../styles/marketplace.css';
 
 const SORT_OPTIONS: { value: TrainerFilters['sort']; label: string }[] = [
     { value: 'newest', label: 'Mới nhất' },
+    { value: 'rating_desc', label: 'Đánh giá cao' },
+    { value: 'views_desc', label: 'Được xem nhiều' },
     { value: 'price_asc', label: 'Giá tăng dần' },
     { value: 'price_desc', label: 'Giá giảm dần' },
 ];
 
-// ─── Price preset helpers ─────────────────────────────────────────────────────
 const PRICE_RANGES = [
     { label: 'Tất cả', min: undefined, max: undefined },
     { label: 'Dưới 1 triệu', min: undefined, max: 1_000_000 },
     { label: '1–2 triệu', min: 1_000_000, max: 2_000_000 },
     { label: '2–5 triệu', min: 2_000_000, max: 5_000_000 },
     { label: 'Trên 5 triệu', min: 5_000_000, max: undefined },
+] as const;
+
+const COACH_CITIES: { value: string; label: string }[] = [
+    { value: '', label: 'Toàn quốc' },
+    { value: 'Hồ Chí Minh', label: 'TP. Hồ Chí Minh' },
+    { value: 'Hà Nội', label: 'Hà Nội' },
+    { value: 'Đà Nẵng', label: 'Đà Nẵng' },
+    { value: 'Khánh Hòa', label: 'Khánh Hòa' },
+    { value: 'Cần Thơ', label: 'Cần Thơ' },
 ];
 
-const CoachCard = memo(({ trainer }: { trainer: any }) => {
-    const { prefetchCoach, prefetchAthlete } = usePrefetchProfile();
+function useDebouncedValue<T>(value: T, ms: number): T {
+    const [d, setD] = useState(value);
+    useEffect(() => {
+        const t = setTimeout(() => setD(value), ms);
+        return () => clearTimeout(t);
+    }, [value, ms]);
+    return d;
+}
 
-    const detailLink = trainer.user_type === 'athlete'
-        ? (trainer.profile_slug ? `/athlete/${trainer.profile_slug}` : `/athletes/${trainer.id}`)
-        : (trainer.profile_slug ? `/coach/${trainer.profile_slug}` : `/coaches/${trainer.id}`);
+function parsePage(p: string | null): number {
+    const n = parseInt(p || '1', 10);
+    return Number.isFinite(n) && n >= 1 ? n : 1;
+}
 
-    const handlePrefetch = () => {
-        const identifier = trainer.profile_slug || trainer.id;
-        if (trainer.user_type === 'athlete') prefetchAthlete(identifier);
-        else prefetchCoach(identifier);
-    };
+function parsePriceIdx(p: string | null): number {
+    const n = parseInt(p || '0', 10);
+    return n >= 0 && n < PRICE_RANGES.length ? n : 0;
+}
 
+function parseSort(s: string | null): TrainerFilters['sort'] {
+    const allowed = SORT_OPTIONS.map((o) => o.value);
+    return (allowed.includes(s as TrainerFilters['sort']) ? s : 'newest') as TrainerFilters['sort'];
+}
+
+function FiltersBlock({
+    currentType,
+    specialty,
+    setSpecialty,
+    priceIdx,
+    setPriceIdx,
+    city,
+    setCity,
+    resetFilters,
+    hasActiveFilters,
+}: {
+    currentType: 'trainer' | 'athlete';
+    specialty: string;
+    setSpecialty: (s: string) => void;
+    priceIdx: number;
+    setPriceIdx: (i: number) => void;
+    city: string;
+    setCity: (c: string) => void;
+    resetFilters: () => void;
+    hasActiveFilters: boolean;
+}) {
     return (
-        <Link 
-            to={detailLink} 
-            className="card group hover:border-black transition-colors flex flex-col cursor-pointer"
-            onPointerEnter={handlePrefetch}
-        >
-            <div className="flex items-center gap-4 mb-4">
-                <div className="shrink-0">
-                    {trainer.avatar_url ? (
-                        <img className="w-16 h-16 rounded-xs object-cover border border-gray-200 transition-all" src={trainer.avatar_url} alt={trainer.full_name} fetchPriority="low" loading="lazy" decoding="async" />
-                    ) : (
-                        <div className="w-16 h-16 bg-gray-50 border border-gray-200 rounded-xs flex items-center justify-center text-gray-500 text-xl font-bold uppercase">
-                            {trainer.full_name.charAt(0)}
-                        </div>
-                    )}
-                </div>
-                <div className="min-w-0">
-                    <h3 className="text-base font-bold text-black truncate">{trainer.full_name}</h3>
-                    <p className="text-sm font-medium text-gray-600 mt-0.5">
-                        {trainer.base_price_monthly ? `${trainer.base_price_monthly.toLocaleString('vi-VN')} ₫/tháng` : 'Liên hệ báo giá'}
-                    </p>
-                    <div className="flex items-center text-[10px] font-black text-black bg-gray-50 px-1.5 py-0.5 rounded-sm mt-1 w-fit">
-                        ★ {trainer.avg_rating != null ? Number(trainer.avg_rating).toFixed(1) : '5.0'}
-                    </div>
+        <div className="space-y-6">
+            <div>
+                <p className="marketplace-section-kicker mb-2">Chuyên môn</p>
+                <div className="space-y-2">
+                    <button
+                        type="button"
+                        className={`w-full rounded-lg border px-3 py-2 text-left text-sm font-semibold transition-colors ${
+                            !specialty
+                                ? 'border-[color:var(--mk-text)] bg-[color:var(--mk-text)] text-white'
+                                : 'border-[color:var(--mk-line)] bg-white text-[color:var(--mk-text)] hover:border-[color:var(--mk-text)]/30'
+                        }`}
+                        onClick={() => setSpecialty('')}
+                    >
+                        Tất cả chuyên môn
+                    </button>
+                    {SPECIALTY_CATEGORIES.map((cat) => {
+                        const isOpenDefault = specialty ? cat.items.includes(specialty) : cat.id === 'strength';
+                        return (
+                            <details
+                                key={cat.id}
+                                className="group rounded-lg border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)]"
+                                open={isOpenDefault}
+                            >
+                                <summary className="cursor-pointer list-none px-3 py-2.5 text-sm font-bold text-[color:var(--mk-text)] [&::-webkit-details-marker]:hidden">
+                                    <span className="flex items-center justify-between gap-2">
+                                        {cat.label}
+                                        <span className="text-[color:var(--mk-muted)] text-xs font-normal group-open:rotate-180">▼</span>
+                                    </span>
+                                    <span className="mt-0.5 block text-xs font-normal font-body text-[color:var(--mk-muted)]">
+                                        {cat.description}
+                                    </span>
+                                </summary>
+                                <div className="flex flex-wrap gap-1.5 border-t border-[color:var(--mk-line)] px-3 py-3">
+                                    {cat.items.map((item) => (
+                                        <button
+                                            key={item}
+                                            type="button"
+                                            className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+                                                specialty === item
+                                                    ? 'border-[color:var(--mk-text)] bg-[color:var(--mk-text)] text-white'
+                                                    : 'border-[color:var(--mk-line)] bg-white text-[color:var(--mk-text-soft)] hover:border-[color:var(--mk-text)]/25'
+                                            }`}
+                                            onClick={() => setSpecialty(specialty === item ? '' : item)}
+                                        >
+                                            {item}
+                                        </button>
+                                    ))}
+                                </div>
+                            </details>
+                        );
+                    })}
                 </div>
             </div>
 
-            <p className="text-sm text-gray-600 line-clamp-3 flex-1 mb-4">
-                {trainer.bio || 'Chưa có thông tin giới thiệu.'}
-            </p>
-
-            {trainer.specialties && trainer.specialties.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                    {trainer.specialties.slice(0, 3).map((spec: string) => (
-                        <span key={spec} className="inline-flex py-0.5 px-2 bg-gray-50 border border-gray-200 text-gray-600 text-xs font-medium rounded-xs">
-                            {spec}
-                        </span>
+            <div>
+                <label className="marketplace-section-kicker mb-2 block">Khu vực</label>
+                <select
+                    className="form-input w-full py-2.5 text-sm"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                >
+                    {COACH_CITIES.map((c) => (
+                        <option key={c.label} value={c.value}>
+                            {c.label}
+                        </option>
                     ))}
-                    {trainer.specialties.length > 3 && (
-                        <span className="inline-flex py-0.5 px-2 bg-gray-50 border border-gray-200 text-gray-500 text-xs font-medium rounded-xs">
-                            +{trainer.specialties.length - 3}
-                        </span>
-                    )}
+                </select>
+            </div>
+
+            {currentType === 'trainer' && (
+                <div>
+                    <p className="marketplace-section-kicker mb-2">Mức giá / tháng</p>
+                    <div className="flex flex-col gap-1.5">
+                        {PRICE_RANGES.map((r, idx) => (
+                            <button
+                                key={r.label}
+                                type="button"
+                                className={`rounded-lg border px-3 py-2 text-left text-sm font-medium transition-colors ${
+                                    priceIdx === idx
+                                        ? 'border-[color:var(--mk-text)] bg-[color:var(--mk-text)] text-white'
+                                        : 'border-[color:var(--mk-line)] bg-white text-[color:var(--mk-text)] hover:border-[color:var(--mk-text)]/30'
+                                }`}
+                                onClick={() => setPriceIdx(idx)}
+                            >
+                                {r.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             )}
 
-            <div className="pt-3 border-t border-gray-200 flex justify-between items-center text-sm font-medium text-black">
-                Xem hồ sơ chi tiết
-                <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </div>
-        </Link>
+            {hasActiveFilters && (
+                <button
+                    type="button"
+                    className="text-sm font-semibold text-red-600 underline underline-offset-2 hover:no-underline"
+                    onClick={resetFilters}
+                >
+                    Xoá tất cả bộ lọc
+                </button>
+            )}
+        </div>
     );
-});
-CoachCard.displayName = 'CoachCard';
+}
 
 export default function Coaches() {
     const [searchParams, setSearchParams] = useSearchParams();
     const currentType = searchParams.get('type') === 'athlete' ? 'athlete' : 'trainer';
 
-    const [search, setSearch] = useState('');
-    const [specialty, setSpecialty] = useState('');
-    const [priceIdx, setPriceIdx] = useState(0);
-    const [sort, setSort] = useState<TrainerFilters['sort']>('newest');
-    const [page, setPage] = useState(1);
-    const [showFilters, setShowFilters] = useState(false);
+    const specialty = searchParams.get('specialty') || '';
+    const city = searchParams.get('city') || '';
+    const sort = parseSort(searchParams.get('sort'));
+    const page = parsePage(searchParams.get('page'));
+    const priceIdx = parsePriceIdx(searchParams.get('price'));
+
+    const [qInput, setQInput] = useState(() => searchParams.get('q') || '');
+    const debouncedQ = useDebouncedValue(qInput, 380);
+
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
     const PAGE_SIZE = 12;
 
     const priceRange = PRICE_RANGES[priceIdx];
 
-    const filters: TrainerFilters = useMemo(() => ({
-        search: search || undefined,
-        specialty: specialty || undefined,
-        priceMin: priceRange.min,
-        priceMax: priceRange.max,
-        sort,
-        user_type: currentType
-    }), [search, specialty, priceRange.min, priceRange.max, sort, currentType]);
+    const patchParams = useCallback(
+        (updates: {
+            q?: string;
+            specialty?: string;
+            city?: string;
+            priceIdx?: number;
+            sort?: TrainerFilters['sort'];
+            page?: number;
+            type?: 'trainer' | 'athlete' | 'clear_type';
+        }) => {
+            setSearchParams(
+                (prev) => {
+                    const next = new URLSearchParams(prev);
+                    if (updates.type === 'athlete') next.set('type', 'athlete');
+                    if (updates.type === 'trainer' || updates.type === 'clear_type') next.delete('type');
+
+                    if (updates.q !== undefined) {
+                        if (updates.q) next.set('q', updates.q);
+                        else next.delete('q');
+                    }
+                    if (updates.specialty !== undefined) {
+                        if (updates.specialty) next.set('specialty', updates.specialty);
+                        else next.delete('specialty');
+                    }
+                    if (updates.city !== undefined) {
+                        if (updates.city) next.set('city', updates.city);
+                        else next.delete('city');
+                    }
+                    if (updates.priceIdx !== undefined) {
+                        if (updates.priceIdx === 0) next.delete('price');
+                        else next.set('price', String(updates.priceIdx));
+                    }
+                    if (updates.sort !== undefined) {
+                        if (updates.sort === 'newest') next.delete('sort');
+                        else next.set('sort', updates.sort);
+                    }
+                    if (updates.page !== undefined) {
+                        if (updates.page <= 1) next.delete('page');
+                        else next.set('page', String(updates.page));
+                    }
+                    return next;
+                },
+                { replace: true }
+            );
+        },
+        [setSearchParams]
+    );
+
+    useEffect(() => {
+        const urlQ = searchParams.get('q') || '';
+        if (urlQ !== debouncedQ) {
+            patchParams({ q: debouncedQ, page: 1 });
+        }
+    }, [debouncedQ, patchParams, searchParams]);
+
+    const searchForQuery = searchParams.get('q') || '';
+
+    const filters: TrainerFilters = useMemo(
+        () => ({
+            search: searchForQuery || undefined,
+            specialty: specialty || undefined,
+            priceMin: priceRange.min,
+            priceMax: priceRange.max,
+            sort,
+            user_type: currentType,
+            city: city || undefined,
+        }),
+        [searchForQuery, specialty, priceRange.min, priceRange.max, sort, currentType, city]
+    );
 
     const { data, isLoading, isError, refetch } = useQuery({
         queryKey: ['trainers', page, filters],
@@ -125,225 +277,315 @@ export default function Coaches() {
     });
 
     const totalPages = data?.totalPages ?? 1;
-    const hasActiveFilters = specialty || priceIdx !== 0 || sort !== 'newest';
+    const totalCount = data?.total ?? 0;
+    const hasActiveFilters =
+        !!specialty || priceIdx !== 0 || sort !== 'newest' || !!city || !!searchForQuery;
 
     const resetFilters = () => {
-        setSpecialty('');
-        setPriceIdx(0);
-        setSort('newest');
-        setPage(1);
+        setQInput('');
+        patchParams({
+            q: '',
+            specialty: '',
+            city: '',
+            priceIdx: 0,
+            sort: 'newest',
+            page: 1,
+        });
     };
 
+    const setSpecialty = (s: string) => {
+        patchParams({ specialty: s, page: 1 });
+    };
+    const setPriceIdx = (i: number) => {
+        patchParams({ priceIdx: i, page: 1 });
+    };
+    const setCity = (c: string) => {
+        patchParams({ city: c, page: 1 });
+    };
+    const setSort = (s: TrainerFilters['sort']) => {
+        patchParams({ sort: s, page: 1 });
+    };
+    const setPage = (p: number) => {
+        patchParams({ page: p });
+    };
+
+    const canonical =
+        currentType === 'athlete'
+            ? 'https://gymerviet.com/coaches?type=athlete'
+            : 'https://gymerviet.com/coaches';
+
     return (
-        <main className="page-shell">
+        <main className="marketplace-shell min-h-screen pb-24">
             <Helmet>
                 <title>{currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET</title>
-                <meta name="description" content={currentType === 'athlete' ? 'Khám phá hồ sơ và hành trình của các vận động viên chuyên nghiệp trên GYMERVIET.' : 'Tìm huấn luyện viên cá nhân theo chuyên môn, mức giá và phong cách đồng hành phù hợp với mục tiêu tập luyện của bạn.'} />
-                <link rel="canonical" href={currentType === 'athlete' ? 'https://gymerviet.com/coaches?type=athlete' : 'https://gymerviet.com/coaches'} />
+                <meta
+                    name="description"
+                    content={
+                        currentType === 'athlete'
+                            ? 'Khám phá hồ sơ và hành trình của các vận động viên chuyên nghiệp trên GYMERVIET.'
+                            : 'Tìm huấn luyện viên cá nhân theo chuyên môn, mức giá, khu vực và phong cách đồng hành phù hợp với mục tiêu tập luyện của bạn.'
+                    }
+                />
+                <link rel="canonical" href={canonical} />
                 <meta property="og:type" content="website" />
-                <meta property="og:title" content={`${currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET`} />
-                <meta property="og:description" content={currentType === 'athlete' ? 'Khám phá hồ sơ và hành trình của các vận động viên chuyên nghiệp trên GYMERVIET.' : 'Tìm huấn luyện viên cá nhân theo chuyên môn, mức giá và phong cách phù hợp.'} />
-                <meta property="og:url" content={currentType === 'athlete' ? 'https://gymerviet.com/coaches?type=athlete' : 'https://gymerviet.com/coaches'} />
+                <meta
+                    property="og:title"
+                    content={`${currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET`}
+                />
+                <meta property="og:url" content={canonical} />
                 <meta property="og:image" content="https://gymerviet.com/og-default.jpg" />
-                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@gymerviet" />
-                <meta name="twitter:title" content={`${currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET`} />
-                <meta name="twitter:description" content={currentType === 'athlete' ? 'Vận động viên chuyên nghiệp trên GYMERVIET.' : 'Huấn luyện viên được xác minh trên GYMERVIET.'} />
             </Helmet>
 
-            <div className="page-container">
-                <section className="page-header relative">
-                    {/* Tab Switcher */}
-                    <div className="flex bg-gray-50 p-1 rounded-full w-max mx-auto lg:mx-0 mb-6 border border-gray-200">
-                        <button
-                            onClick={() => { setSearchParams({}); setPage(1); setSearch(''); setSpecialty(''); setPriceIdx(0); setSort('newest'); }}
-                            className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${currentType === 'trainer' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-black'}`}
-                        >
-                            Coach
-                        </button>
-                        <button
-                            onClick={() => { setSearchParams({ type: 'athlete' }); setPage(1); setSearch(''); setSpecialty(''); setPriceIdx(0); setSort('newest'); }}
-                            className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${currentType === 'athlete' ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:text-black'}`}
-                        >
-                            Vận động viên
-                        </button>
+            <div className="marketplace-container pt-6 md:pt-8">
+                <section className="mb-8 grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,0.85fr)] lg:items-start lg:gap-10">
+                    <div>
+                        <div className="mb-5 flex w-max max-w-full flex-wrap gap-1 rounded-full border border-[color:var(--mk-line)] bg-[color:var(--mk-bg)] p-1">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setQInput('');
+                                    setSearchParams(new URLSearchParams(), { replace: true });
+                                }}
+                                className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
+                                    currentType === 'trainer'
+                                        ? 'bg-[color:var(--mk-text)] text-white shadow-sm'
+                                        : 'text-[color:var(--mk-muted)] hover:text-[color:var(--mk-text)]'
+                                }`}
+                            >
+                                Coach
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setQInput('');
+                                    setSearchParams(new URLSearchParams({ type: 'athlete' }), { replace: true });
+                                }}
+                                className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
+                                    currentType === 'athlete'
+                                        ? 'bg-[color:var(--mk-text)] text-white shadow-sm'
+                                        : 'text-[color:var(--mk-muted)] hover:text-[color:var(--mk-text)]'
+                                }`}
+                            >
+                                Vận động viên
+                            </button>
+                        </div>
+
+                        <p className="marketplace-section-kicker">
+                            {currentType === 'athlete' ? 'Danh mục Vận động viên' : 'Danh mục Coach'}
+                        </p>
+                        <h1 className="marketplace-title mt-1 max-w-3xl text-balance">
+                            {currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'}
+                        </h1>
+                        <p className="marketplace-lead mt-3 max-w-2xl">
+                            {currentType === 'athlete'
+                                ? 'Kết nối với những cá nhân đam mê rèn luyện và chia sẻ hành trình thay đổi vóc dáng.'
+                                : 'Lọc theo nhóm chuyên môn, khu vực và ngân sách — rồi mở hồ sơ để xem phong cách đồng hành có hợp bạn không.'}
+                        </p>
+
+                        <div className="mt-5 flex flex-wrap gap-2">
+                            <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--mk-muted)]">
+                                Gợi ý nhanh:
+                            </span>
+                            {SPECIALTY_CATEGORIES.slice(0, 5).map((cat) => (
+                                <button
+                                    key={cat.id}
+                                    type="button"
+                                    className="rounded-full border border-[color:var(--mk-line)] bg-white px-3 py-1 text-xs font-semibold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-text)]/35"
+                                    onClick={() => setSpecialty(cat.shortcutSpecialty)}
+                                >
+                                    {cat.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
-                    <p className="page-kicker">{currentType === 'athlete' ? 'Danh mục Vận động viên' : 'Danh mục Coach'}</p>
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between -mt-2">
-                        <div>
-                            <h1 className="page-title">{currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'}</h1>
-                            <p className="page-description max-w-2xl text-left">
-                                {currentType === 'athlete' 
-                                    ? 'Kết nối với những cá nhân đam mê rèn luyện và chia sẻ hành trình thay đổi vóc dáng.'
-                                    : 'Tìm huấn luyện viên theo chuyên môn, mức giá và phong cách đồng hành phù hợp với mục tiêu của bạn.'}
-                            </p>
+                    <aside className="marketplace-panel rounded-xl p-5 shadow-sm ring-1 ring-gray-900/[0.06] sm:p-6">
+                        <p className="marketplace-section-kicker">Tổng quan</p>
+                        <p className="mt-1 text-2xl font-bold tracking-tight text-[color:var(--mk-text)] tabular-nums">
+                            {!isLoading && !isError ? totalCount.toLocaleString('vi-VN') : '—'}
+                        </p>
+                        <p className="mt-1 text-sm text-[color:var(--mk-muted)]">
+                            {currentType === 'athlete' ? 'VĐV khớp bộ lọc' : 'Coach khớp bộ lọc'}
+                        </p>
+                        <div className="mt-4 flex flex-col gap-2 border-t border-[color:var(--mk-line)] pt-4">
+                            <Link
+                                to="/register"
+                                className="btn-primary inline-flex justify-center px-4 py-2.5 text-center text-sm font-bold uppercase tracking-[0.12em]"
+                            >
+                                Tạo hồ sơ
+                            </Link>
+                            <Link
+                                to="/faq"
+                                className="text-center text-sm font-semibold text-[color:var(--mk-text)] underline underline-offset-4 hover:no-underline"
+                            >
+                                Câu hỏi thường gặp
+                            </Link>
                         </div>
-                        {!isLoading && !isError && (
-                            <div className="text-sm text-gray-500 font-medium">
-                                {data?.trainers.length ?? 0} kết quả ở trang này
-                            </div>
-                        )}
-                    </div>
+                    </aside>
                 </section>
 
-                {/* Search + Filter toggle row */}
-                <div className="flex gap-3 flex-wrap items-center">
-                    <div className="relative flex-1 min-w-[200px] max-w-xl">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                    <div className="relative min-w-0 flex-1 sm:max-w-xl">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <svg className="h-4 w-4 text-[color:var(--mk-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
                         </div>
                         <input
-                            type="text"
-                            className="form-input pl-10 w-full"
+                            type="search"
+                            className="form-input w-full pl-10"
                             placeholder="Tìm theo tên, chuyên môn hoặc từ khóa..."
-                            aria-label="Tìm kiếm theo tên, chuyên môn hoặc từ khóa"
-                            value={search}
-                            onChange={e => { setSearch(e.target.value); setPage(1); }}
+                            aria-label="Tìm kiếm Coach và VĐV"
+                            value={qInput}
+                            onChange={(e) => setQInput(e.target.value)}
                         />
                     </div>
 
                     <button
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg border font-semibold text-sm transition-colors ${showFilters || hasActiveFilters ? 'border-black bg-black text-white' : 'border-gray-200 text-gray-600 hover:border-black'}`}
-                        onClick={() => setShowFilters(v => !v)}
+                        type="button"
+                        className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-bold transition-colors lg:hidden ${
+                            showMobileFilters || hasActiveFilters
+                                ? 'border-[color:var(--mk-text)] bg-[color:var(--mk-text)] text-white'
+                                : 'border-[color:var(--mk-line)] text-[color:var(--mk-text)]'
+                        }`}
+                        onClick={() => setShowMobileFilters((v) => !v)}
                     >
-                        Lọc {hasActiveFilters && <span className="bg-white text-black rounded-full w-4 h-4 text-xs flex items-center justify-center font-black">!</span>}
+                        Bộ lọc
+                        {hasActiveFilters && <span className="rounded-full bg-white/20 px-1.5 text-xs">•</span>}
                     </button>
 
-                    {/* Sort */}
                     <select
-                        className="form-input py-2 text-sm font-medium"
+                        className="form-input min-w-[10rem] py-2.5 text-sm font-semibold"
                         value={sort}
-                        onChange={e => { setSort(e.target.value as TrainerFilters['sort']); setPage(1); }}
+                        onChange={(e) => setSort(e.target.value as TrainerFilters['sort'])}
                     >
-                        {SORT_OPTIONS.map(o => (
-                            <option key={o.value} value={o.value}>{o.label}</option>
+                        {SORT_OPTIONS.map((o) => (
+                            <option key={o.value} value={o.value}>
+                                {o.label}
+                            </option>
                         ))}
                     </select>
                 </div>
 
-                {/* ── Filter Panel ── */}
-                {showFilters && (
-                    <div className="mt-4 p-5 border border-gray-200 rounded-sm bg-gray-50 space-y-5">
-                        {/* Specialty */}
-                        <div>
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Chuyên môn</label>
-                            <div className="flex flex-wrap gap-2">
-                                <button
-                                    className={`filter-chip ${!specialty ? 'filter-chip-active' : 'filter-chip-idle'}`}
-                                    onClick={() => { setSpecialty(''); setPage(1); }}
-                                    aria-pressed={!specialty}
-                                >
-                                    Tất cả
-                                </button>
-                                {SPECIALTIES.map(s => (
-                                    <button
-                                        key={s}
-                                        className={`filter-chip ${specialty === s ? 'filter-chip-active' : 'filter-chip-idle'}`}
-                                        onClick={() => { setSpecialty(specialty === s ? '' : s); setPage(1); }}
-                                        aria-pressed={specialty === s}
+                {showMobileFilters && (
+                    <div className="mb-6 rounded-xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] p-4 lg:hidden">
+                        <FiltersBlock
+                            currentType={currentType}
+                            specialty={specialty}
+                            setSpecialty={setSpecialty}
+                            priceIdx={priceIdx}
+                            setPriceIdx={setPriceIdx}
+                            city={city}
+                            setCity={setCity}
+                            resetFilters={resetFilters}
+                            hasActiveFilters={hasActiveFilters}
+                        />
+                    </div>
+                )}
+
+                <div className="grid gap-8 lg:grid-cols-[minmax(240px,280px)_minmax(0,1fr)] lg:items-start">
+                    <aside className="hidden lg:block">
+                        <div className="sticky top-[calc(var(--header-height,56px)+1rem)] rounded-xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] p-5 shadow-sm">
+                            <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-[color:var(--mk-muted)]">
+                                Lọc chi tiết
+                            </h2>
+                            <FiltersBlock
+                                currentType={currentType}
+                                specialty={specialty}
+                                setSpecialty={setSpecialty}
+                                priceIdx={priceIdx}
+                                setPriceIdx={setPriceIdx}
+                                city={city}
+                                setCity={setCity}
+                                resetFilters={resetFilters}
+                                hasActiveFilters={hasActiveFilters}
+                            />
+                        </div>
+                    </aside>
+
+                    <div>
+                        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-sm text-[color:var(--mk-muted)]">
+                            <span>
+                                {isLoading
+                                    ? 'Đang tải…'
+                                    : `${(data?.trainers.length ?? 0).toLocaleString('vi-VN')} hồ sơ trên trang ${page}`}
+                            </span>
+                            {totalCount > 0 && (
+                                <span className="tabular-nums">
+                                    Tổng {totalCount.toLocaleString('vi-VN')} khớp lọc
+                                </span>
+                            )}
+                        </div>
+
+                        {isLoading ? (
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                                {Array.from({ length: 6 }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="overflow-hidden rounded-xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)]"
                                     >
-                                        {s}
-                                    </button>
+                                        <div className="aspect-[4/3] animate-pulse bg-[color:var(--mk-paper-strong)]" />
+                                        <div className="space-y-3 p-4">
+                                            <div className="h-4 w-2/3 animate-pulse rounded bg-[color:var(--mk-line)]/40" />
+                                            <div className="h-3 w-full animate-pulse rounded bg-[color:var(--mk-line)]/30" />
+                                            <div className="h-3 w-5/6 animate-pulse rounded bg-[color:var(--mk-line)]/30" />
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
-                        </div>
-
-                        {/* Price - Only for Coach */}
-                        {currentType === 'trainer' && (
-                            <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Mức giá / tháng</label>
-                                <div className="flex flex-wrap gap-2">
-                                    {PRICE_RANGES.map((r, idx) => (
-                                        <button
-                                            key={r.label}
-                                            className={`filter-chip ${priceIdx === idx ? 'filter-chip-active' : 'filter-chip-idle'}`}
-                                            onClick={() => { setPriceIdx(idx); setPage(1); }}
-                                            aria-pressed={priceIdx === idx}
-                                        >
-                                            {r.label}
-                                        </button>
+                        ) : isError ? (
+                            <div className="marketplace-panel marketplace-empty text-center">
+                                <p className="mb-4 text-sm font-medium text-red-600">Đã xảy ra lỗi khi tải dữ liệu.</p>
+                                <button type="button" onClick={() => refetch()} className="btn-primary px-5 py-2 text-sm">
+                                    Thử lại
+                                </button>
+                            </div>
+                        ) : data?.trainers.length === 0 ? (
+                            <div className="marketplace-panel marketplace-empty text-center">
+                                <p className="text-sm font-medium text-[color:var(--mk-text)]">Chưa có hồ sơ phù hợp.</p>
+                                {hasActiveFilters && (
+                                    <button type="button" className="mt-3 font-bold underline" onClick={resetFilters}>
+                                        Xoá bộ lọc
+                                    </button>
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                                    {(data?.trainers as CoachDirectoryTrainer[]).map((trainer) => (
+                                        <CoachDirectoryCard key={trainer.id} trainer={trainer} />
                                     ))}
                                 </div>
-                            </div>
-                        )}
 
-                        {hasActiveFilters && (
-                            <button className="text-sm text-red-600 font-medium hover:underline" onClick={resetFilters}>
-                                ✕ Xoá tất cả bộ lọc
-                            </button>
-                        )}
-                    </div>
-                )}
-                {/* ── Content ── */}
-                {isLoading ? (
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 animate-pulse">
-                        {[1, 2, 3, 4, 5, 6].map(i => (
-                            <div key={i} className="card border border-gray-200 flex flex-col">
-                                <div className="flex items-center gap-4 mb-4">
-                                    <div className="w-16 h-16 rounded-xs bg-gray-100 shrink-0"></div>
-                                    <div className="w-full space-y-2">
-                                        <div className="h-5 bg-gray-100 rounded-sm w-3/4"></div>
-                                        <div className="h-4 bg-gray-100 rounded-sm w-1/2"></div>
+                                {totalPages > 1 && (
+                                    <div className="mt-10 flex items-center justify-center gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => setPage(Math.max(1, page - 1))}
+                                            disabled={page === 1}
+                                            className="btn-secondary px-4 disabled:cursor-not-allowed disabled:opacity-40"
+                                        >
+                                            ← Trang trước
+                                        </button>
+                                        <span className="min-w-[5rem] text-center text-sm tabular-nums text-[color:var(--mk-muted)]">
+                                            {page} / {totalPages}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setPage(Math.min(totalPages, page + 1))}
+                                            disabled={page === totalPages}
+                                            className="btn-secondary px-4 disabled:cursor-not-allowed disabled:opacity-40"
+                                        >
+                                            Trang sau →
+                                        </button>
                                     </div>
-                                </div>
-                                <div className="space-y-2 mb-4 flex-1">
-                                    <div className="h-3 bg-gray-100 rounded-sm w-full"></div>
-                                    <div className="h-3 bg-gray-100 rounded-sm w-5/6"></div>
-                                    <div className="h-3 bg-gray-100 rounded-sm w-4/6"></div>
-                                </div>
-                                <div className="flex gap-2 mb-4">
-                                    <div className="h-5 w-16 bg-gray-100 rounded-sm"></div>
-                                    <div className="h-5 w-20 bg-gray-100 rounded-sm"></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : isError ? (
-                    <div className="empty-state p-8 text-center border-dashed border-red-200">
-                        <p className="text-sm font-medium text-red-600 mb-4">Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại.</p>
-                        <button onClick={() => refetch()} className="text-xs font-bold text-black border border-black px-4 py-2 rounded-full hover:bg-black hover:text-white transition">Thử lại</button>
-                    </div>
-                ) : data?.trainers.length === 0 ? (
-                    <div className="empty-state text-sm text-gray-500">
-                        <div className="empty-state-number">0</div>
-                        <p className="text-sm font-medium text-gray-600">Chưa có dữ liệu phù hợp.</p>
-                        {hasActiveFilters && (
-                            <button className="mt-3 text-black font-bold underline" onClick={resetFilters}>Xoá bộ lọc</button>
+                                )}
+                            </>
                         )}
                     </div>
-                ) : (
-                    <>
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {data?.trainers.map((trainer: any) => (
-                                <CoachCard key={trainer.id} trainer={trainer} />
-                            ))}
-                        </div>
-
-                        {/* Pagination */}
-                        {totalPages > 1 && (
-                            <div className="mt-10 flex items-center justify-center gap-3">
-                                <button
-                                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                                    disabled={page === 1}
-                                    className="btn-secondary px-4 disabled:opacity-40 disabled:cursor-not-allowed"
-                                >
-                                    ← Trang trước
-                                </button>
-                                <span className="text-sm tabular-nums text-gray-600 min-w-[80px] text-center">
-                                    {page} / {totalPages}
-                                </span>
-                                <button
-                                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                    disabled={page === totalPages}
-                                    className="btn-secondary px-4 disabled:opacity-40 disabled:cursor-not-allowed"
-                                >
-                                    Trang sau →
-                                </button>
-                            </div>
-                        )}
-                    </>
-                )}
+                </div>
             </div>
         </main>
     );
