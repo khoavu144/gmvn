@@ -185,16 +185,15 @@ const GymCard: React.FC<GymCardProps> = ({
     <Link
       to={href}
       className={[
-        'group relative overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm',
+        'group relative flex min-h-0 h-full flex-col overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm',
         'hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 transition-all duration-200',
-        isFeatured ? 'h-full' : '',
         className,
       ]
         .join(' ')
         .trim()}
     >
       {/* ── Thumbnail ── */}
-      <div className={`relative overflow-hidden bg-gray-100 ${imageClass}`}>
+      <div className={`relative shrink-0 overflow-hidden bg-gray-100 ${imageClass}`}>
         {thumbnailUrl ? (
           <img
             src={thumbnailUrl}
@@ -264,14 +263,21 @@ const GymCard: React.FC<GymCardProps> = ({
       </div>
 
       {/* ── Card body ── */}
-      <div className={isFeatured ? 'p-5 sm:p-6' : isCompact ? 'p-3.5' : 'p-4'}>
-        <div className={isCompact ? 'space-y-2' : 'space-y-2.5'}>
+      <div
+        className={[
+          'flex min-h-0 flex-1 flex-col',
+          isFeatured ? 'p-5 sm:p-6' : isCompact ? 'p-3.5' : 'p-4',
+        ].join(' ')}
+      >
+        <div className={`flex min-h-0 flex-1 flex-col ${isCompact ? 'space-y-2' : 'space-y-2.5'}`}>
           {/* Name + blurb */}
           <div>
             <h3
               className={[
                 'font-bold leading-tight tracking-tight text-black line-clamp-2',
-                isFeatured ? 'text-[1.35rem] sm:text-[1.5rem] tracking-[-0.03em]' : 'text-[1.05rem]',
+                isFeatured
+                  ? 'min-h-[3rem] sm:min-h-[3.45rem] text-[1.35rem] sm:text-[1.5rem] tracking-[-0.03em]'
+                  : 'min-h-[2.625rem] text-[1.05rem]',
               ].join(' ')}
             >
               {gym.name}
@@ -300,8 +306,8 @@ const GymCard: React.FC<GymCardProps> = ({
           {/* Footer row */}
           <div
             className={[
-              'flex items-center justify-between gap-2',
-              isCompact ? 'pt-0.5' : 'mt-3 border-t border-gray-100 pt-3',
+              'mt-auto flex items-center justify-between gap-2',
+              isCompact ? 'pt-1' : 'border-t border-gray-100 pt-3',
             ].join(' ')}
           >
             <span className={isCompact ? 'truncate text-[11px] font-medium text-gray-500' : 'truncate text-[12px] text-gray-500'}>

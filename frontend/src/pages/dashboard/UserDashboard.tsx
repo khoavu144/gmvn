@@ -24,7 +24,7 @@ const UserDashboard: React.FC = () => {
             <div className="bg-white border border-[color:var(--mk-line)] rounded-lg p-6 sm:p-8 shadow-sm">
                 <div className="mb-8">
                     <h2 className="text-2xl font-black uppercase tracking-tight mb-2">Bắt đầu hành trình</h2>
-                    <p className="text-[color:var(--mk-muted)]">Hoàn tất các bước dưới đây để tối ưu hóa trải nghiệm của bạn trên GYMERVIET.</p>
+                    <p className="text-[color:var(--mk-muted)]">Làm vài bước sau để dùng GYMERVIET thuận tiện hơn.</p>
                     
                     <div className="w-full bg-[color:var(--mk-paper)] h-2 mt-6 rounded-full overflow-hidden">
                         <div className="bg-black h-full transition-all duration-1000" style={{ width: `${completeness / 100 * 25 + 25}%` }}></div>
@@ -53,7 +53,7 @@ const UserDashboard: React.FC = () => {
                             <h3 className={`font-bold text-[color:var(--mk-text)] ${isProfileComplete ? 'line-through text-[color:var(--mk-muted)]' : ''}`}>
                                 Hoàn thiện hồ sơ ({completeness}%)
                             </h3>
-                            <p className="text-sm text-[color:var(--mk-muted)] mt-1">Cập nhật chiều cao, cân nặng, ảnh đại diện để nhận báo cáo BMI & gợi ý lộ trình.</p>
+                            <p className="text-sm text-[color:var(--mk-muted)] mt-1">Thêm chiều cao, cân nặng và ảnh đại diện để xem gợi ý BMI và lộ trình.</p>
                             {!isProfileComplete && (
                                 <Link to="/profile" className="inline-flex items-center gap-2 mt-3 text-sm font-bold uppercase tracking-widest hover:text-[color:var(--mk-text-soft)] transition-colors">
                                     Cập nhật ngay <ArrowRight className="w-4 h-4" />
@@ -79,7 +79,7 @@ const UserDashboard: React.FC = () => {
                         <Circle className="w-6 h-6 text-gray-300 shrink-0 mt-0.5 group-hover:text-[color:var(--mk-muted)] transition-colors" />
                         <div className="flex-1">
                             <h3 className="font-bold text-[color:var(--mk-text)]">Nâng cấp thành Athlete hoặc Coach</h3>
-                            <p className="text-sm text-[color:var(--mk-muted)] mt-1">Trở thành Athlete để mở khóa tính năng theo dõi tiến độ, hoặc Coach để khai thác học viên.</p>
+                            <p className="text-sm text-[color:var(--mk-muted)] mt-1">Nâng cấp Athlete để theo dõi tiến độ, hoặc đăng ký Coach để nhận học viên.</p>
                             <Link to="/profile" className="inline-flex items-center gap-2 mt-3 text-sm font-bold uppercase tracking-widest hover:text-[color:var(--mk-text-soft)] transition-colors">
                                 Tìm hiểu thêm <ArrowRight className="w-4 h-4" />
                             </Link>

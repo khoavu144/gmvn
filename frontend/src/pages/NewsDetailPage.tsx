@@ -53,12 +53,12 @@ export default function NewsDetailPage() {
         return (
             <div className="marketplace-shell min-h-screen animate-pulse">
                 <div className="marketplace-container max-w-3xl pt-10 pb-24 space-y-4">
-                    <div className="h-8 bg-stone-100 rounded-lg w-3/4" />
-                    <div className="h-4 bg-stone-50 rounded-lg w-1/2" />
-                    <div className="mt-6 aspect-[16/9] rounded-lg bg-stone-100" />
+                    <div className="h-8 bg-gray-100 rounded-lg w-3/4" />
+                    <div className="h-4 bg-gray-50 rounded-lg w-1/2" />
+                    <div className="mt-6 aspect-[16/9] rounded-lg bg-gray-100" />
                     <div className="mt-6 space-y-3">
                         {SKELETON_LINE_WIDTHS.map((pct, i) => (
-                            <div key={i} className="h-4 bg-stone-50 rounded-lg" style={{ width: `${pct}%` }} />
+                            <div key={i} className="h-4 bg-gray-50 rounded-lg" style={{ width: `${pct}%` }} />
                         ))}
                     </div>
                 </div>
@@ -71,8 +71,8 @@ export default function NewsDetailPage() {
             <div className="marketplace-shell min-h-screen flex items-center justify-center">
                 <div className="text-center px-6 max-w-md">
                     <div className="text-6xl font-black text-gray-200 mb-4">404</div>
-                    <h1 className="text-2xl font-black text-stone-900 mb-2">Bài viết không tìm thấy</h1>
-                    <p className="text-sm text-stone-500 mb-6">{error}</p>
+                    <h1 className="text-2xl font-black text-gray-900 mb-2">Bài viết không tìm thấy</h1>
+                    <p className="text-sm text-gray-500 mb-6">{error}</p>
                     <Link to="/news" className="btn-primary inline-flex items-center gap-2">
                         <ArrowLeft className="w-4 h-4" />
                         Về trang Tin Tức
@@ -135,42 +135,42 @@ export default function NewsDetailPage() {
                 <div className="marketplace-container max-w-3xl pt-8">
 
                     {/* Breadcrumb */}
-                    <nav className="flex items-center gap-2 text-xs text-stone-500 mb-6" aria-label="Breadcrumb">
-                        <Link to="/news" className="hover:text-stone-900 transition-colors flex items-center gap-1.5">
+                    <nav className="flex items-center gap-2 text-xs text-gray-500 mb-6" aria-label="Breadcrumb">
+                        <Link to="/news" className="hover:text-gray-900 transition-colors flex items-center gap-1.5">
                             <ArrowLeft className="w-3.5 h-3.5" />
                             Tin Tức
                         </Link>
                         <span>/</span>
-                        <span className="text-stone-900 truncate max-w-[200px]">{article.title}</span>
+                        <span className="text-gray-900 truncate max-w-[200px]">{article.title}</span>
                     </nav>
 
                     {/* Header */}
                     <header className="mb-6">
                         <div className="flex flex-wrap items-center gap-3 mb-4">
-                            <span className="rounded-full bg-stone-900 px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-white">
+                            <span className="rounded-full bg-gray-900 px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.16em] text-white">
                                 {article.category}
                             </span>
                             {dateStr && (
-                                <span className="text-xs text-stone-500">{dateStr}</span>
+                                <span className="text-xs text-gray-500">{dateStr}</span>
                             )}
                             {article.read_time_min && (
-                                <span className="flex items-center gap-1 text-xs text-stone-500">
+                                <span className="flex items-center gap-1 text-xs text-gray-500">
                                     <Clock className="w-3.5 h-3.5" />
                                     {article.read_time_min} phút đọc
                                 </span>
                             )}
-                            <span className="flex items-center gap-1 text-xs text-stone-500">
+                            <span className="flex items-center gap-1 text-xs text-gray-500">
                                 <Eye className="w-3.5 h-3.5" />
                                 {article.view_count.toLocaleString()} lượt xem
                             </span>
                         </div>
 
-                        <h1 className="text-[1.9rem] font-black leading-[1.2] tracking-[-0.04em] text-stone-900">
+                        <h1 className="text-[1.9rem] font-black leading-[1.2] tracking-[-0.04em] text-gray-900">
                             {article.title}
                         </h1>
 
                         {article.excerpt && (
-                            <p className="mt-3 text-base leading-7 text-stone-500">
+                            <p className="mt-3 text-base leading-7 text-gray-500">
                                 {article.excerpt}
                             </p>
                         )}
@@ -194,8 +194,8 @@ export default function NewsDetailPage() {
                         className="prose prose-lg prose-gray max-w-none
                             prose-headings:font-black prose-headings:tracking-tight
                             prose-h2:text-[1.4rem] prose-h3:text-[1.15rem]
-                            prose-p:leading-8 prose-p:text-stone-600
-                            prose-strong:text-stone-900 prose-strong:font-bold
+                            prose-p:leading-8 prose-p:text-gray-600
+                            prose-strong:text-gray-900 prose-strong:font-bold
                             prose-a:text-amber-700 prose-a:no-underline hover:prose-a:underline
                             prose-img:rounded-lg prose-img:shadow-md
                             prose-ul:list-disc prose-ol:list-decimal"
@@ -204,13 +204,13 @@ export default function NewsDetailPage() {
 
                     {/* Tags */}
                     {article.tags && article.tags.length > 0 && (
-                        <div className="mt-10 flex flex-wrap items-center gap-2 border-t border-stone-200 pt-6">
-                            <Tag className="w-4 h-4 text-stone-500" />
+                        <div className="mt-10 flex flex-wrap items-center gap-2 border-t border-gray-200 pt-6">
+                            <Tag className="w-4 h-4 text-gray-500" />
                             {article.tags.map((tag) => (
                                 <Link
                                     key={tag}
                                     to={`/news?tag=${encodeURIComponent(tag)}`}
-                                    className="rounded-full border border-stone-200 px-3 py-1 text-xs font-semibold text-stone-500 hover:border-stone-900 hover:text-stone-900 transition-colors"
+                                    className="rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-500 hover:border-gray-900 hover:text-gray-900 transition-colors"
                                 >
                                     #{tag}
                                 </Link>
@@ -219,10 +219,10 @@ export default function NewsDetailPage() {
                     )}
 
                     {/* Footer breadcrumb */}
-                    <div className="mt-10 pt-6 border-t border-stone-200">
+                    <div className="mt-10 pt-6 border-t border-gray-200">
                         <Link
                             to="/news"
-                            className="inline-flex items-center gap-2 text-sm font-semibold text-stone-500 hover:text-stone-900 transition-colors"
+                            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             Xem thêm bài viết khác

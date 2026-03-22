@@ -1,15 +1,7 @@
 import React from 'react';
 import type { GymAmenity, GymEquipment } from '../../types';
 
-function SectionHeading({ kicker, title, description }: { kicker: string; title: string; description?: string }) {
-    return (
-        <div className="mb-6 space-y-2">
-            <div className="marketplace-section-kicker">{kicker}</div>
-            <h2 className="marketplace-section-title">{title}</h2>
-            {description && <p className="marketplace-lead max-w-none text-[0.98rem]">{description}</p>}
-        </div>
-    );
-}
+import { GymSectionHeading } from './GymSectionHeading';
 
 interface Props {
     branchAmenities: GymAmenity[];
@@ -22,8 +14,8 @@ const GymFacilitiesSection = React.memo(function GymFacilitiesSection({ branchAm
     if (branchAmenities.length === 0 && branchEquipment.length === 0) return null;
 
     return (
-            <section ref={setRef('facilities')} id="facilities" className="marketplace-panel p-6 sm:p-8">
-                <SectionHeading
+            <section ref={setRef('facilities')} id="facilities" className="gym-detail-section marketplace-panel p-6 sm:p-8">
+                <GymSectionHeading
                     kicker="Tiện ích"
                     title="Tiện ích và thiết bị hỗ trợ quyết định"
                     description="Những chi tiết nhỏ như tủ để đồ, phòng tắm, dịch vụ khăn hay chất lượng trang thiết bị thường là thứ quyết định bạn có duy trì thói quen tạp luyện hay không."

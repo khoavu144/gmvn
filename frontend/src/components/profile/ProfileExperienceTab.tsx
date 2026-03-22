@@ -4,7 +4,7 @@ import { addExperienceThunk, updateExperienceThunk, deleteExperienceThunk } from
 import type { AppDispatch, RootState } from '../../store/store';
 import type { TrainerExperience } from '../../types';
 import { m as motion, AnimatePresence } from 'framer-motion';
-import { PencilIcon, TrashIcon, PlusIcon, BriefcaseIcon, AcademicCapIcon, DocumentTextIcon, TrophyIcon } from '@heroicons/react/24/outline';
+import { Pencil, Trash2, Plus, Briefcase, GraduationCap, FileText, Trophy } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
@@ -54,10 +54,10 @@ export function ProfileExperienceTab() {
     };
 
     const typeIcons: Record<string, React.ReactNode> = {
-        work: <BriefcaseIcon className="w-5 h-5" />,
-        education: <AcademicCapIcon className="w-5 h-5" />,
-        certification: <DocumentTextIcon className="w-5 h-5" />,
-        achievement: <TrophyIcon className="w-5 h-5" />,
+        work: <Briefcase className="w-5 h-5" strokeWidth={2} aria-hidden />,
+        education: <GraduationCap className="w-5 h-5" strokeWidth={2} aria-hidden />,
+        certification: <FileText className="w-5 h-5" strokeWidth={2} aria-hidden />,
+        achievement: <Trophy className="w-5 h-5" strokeWidth={2} aria-hidden />,
     };
 
     const typeLabels: Record<string, string> = {
@@ -201,7 +201,7 @@ export function ProfileExperienceTab() {
                                 onClick={() => setIsAdding(true)}
                                 className="flex items-center gap-2 px-5 py-2.5 bg-[color:var(--mk-paper)] hover:bg-black hover:text-white text-[color:var(--mk-text-soft)] rounded-lg transition-all duration-300 border border-[color:var(--mk-line)] hover:border-black font-medium text-sm"
                             >
-                                <PlusIcon className="w-4 h-4" /> 
+                                <Plus className="w-4 h-4" strokeWidth={2} aria-hidden /> 
                                 Thêm mới
                             </button>
                         </div>
@@ -209,7 +209,7 @@ export function ProfileExperienceTab() {
                         {experience.length === 0 ? (
                             <div className="text-center py-12 px-4 rounded-lg bg-[color:var(--mk-paper)] border border-dashed border-[color:var(--mk-line)]">
                                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm ring-1 ring-black/5">
-                                    <BriefcaseIcon className="w-8 h-8 text-[color:var(--mk-muted)]" />
+                                    <Briefcase className="w-8 h-8 text-[color:var(--mk-muted)]" strokeWidth={2} aria-hidden />
                                 </div>
                                 <h4 className="text-[color:var(--mk-text)] font-semibold mb-2">Chưa có kinh nghiệm nào</h4>
                                 <p className="text-sm text-[color:var(--mk-muted)] max-w-sm mx-auto mb-6">
@@ -236,7 +236,7 @@ export function ProfileExperienceTab() {
                                         >
                                             <div className="absolute -left-[17px] top-1 bg-white p-1 rounded-full border-2 border-[color:var(--mk-line)] group-hover:border-black transition-colors duration-300">
                                                 <div className="bg-[color:var(--mk-paper)] text-[color:var(--mk-muted)] group-hover:bg-black group-hover:text-white p-2 rounded-full transition-all duration-300">
-                                                    {typeIcons[exp.experience_type] || <BriefcaseIcon className="w-4 h-4" />}
+                                                    {typeIcons[exp.experience_type] || <Briefcase className="w-4 h-4" strokeWidth={2} aria-hidden />}
                                                 </div>
                                             </div>
                                             
@@ -256,14 +256,14 @@ export function ProfileExperienceTab() {
                                                                 className="p-2 text-[color:var(--mk-muted)] hover:text-black hover:bg-[color:var(--mk-paper)] rounded-lg transition-colors"
                                                                 title="Chỉnh sửa"
                                                             >
-                                                                <PencilIcon className="w-4 h-4" />
+                                                                <Pencil className="w-4 h-4" strokeWidth={2} aria-hidden />
                                                             </button>
                                                             <button 
                                                                 onClick={() => dispatch(deleteExperienceThunk(exp.id))} 
                                                                 className="p-2 text-[color:var(--mk-muted)] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                                 title="Xóa"
                                                             >
-                                                                <TrashIcon className="w-4 h-4" />
+                                                                <Trash2 className="w-4 h-4" strokeWidth={2} aria-hidden />
                                                             </button>
                                                         </div>
                                                     </div>

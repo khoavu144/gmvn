@@ -6,6 +6,7 @@ interface ProfileContactSectionProps {
   socialLinks: Record<string, string>;
   onMessage: () => void;
   primaryCta?: CtaProps;
+  profileVariant?: 'coach' | 'athlete';
 }
 
 const SOCIAL_LABELS: Record<string, string> = {
@@ -13,10 +14,31 @@ const SOCIAL_LABELS: Record<string, string> = {
   facebook: 'Facebook', website: 'Trang web',
 };
 
-export default function ProfileContactSection({ coachName, location, socialLinks, onMessage, primaryCta }: ProfileContactSectionProps) {
+export default function ProfileContactSection({
+  coachName, location, socialLinks, onMessage, primaryCta,
+  profileVariant = 'coach',
+}: ProfileContactSectionProps) {
   const firstName = coachName.split(' ').slice(-1)[0];
   const validSocialLinks = Object.entries(socialLinks).filter(([, url]) => Boolean(url));
   const hasSocial = validSocialLinks.length > 0;
+
+  const heading = profileVariant === 'athlete' ? (
+    <>
+      Kết nối với{' '}
+      <span className="profile-contact-heading-accent">{firstName}</span>
+    </>
+  ) : (
+    <>
+      Sẵn sàng bắt đầu{' '}
+      <span className="profile-contact-heading-accent">
+        hành trình cùng {firstName}?
+      </span>
+    </>
+  );
+
+  const subtitle = profileVariant === 'athlete'
+    ? 'Nhắn tin trên GYMERVIET hoặc theo dõi các kênh mạng xã hội bên dưới.'
+    : 'Nhắn tin để được tư vấn miễn phí và nhận lộ trình phù hợp với mục tiêu của bạn.';
 
   return (
     <section className="profile-contact-section">
@@ -27,13 +49,10 @@ export default function ProfileContactSection({ coachName, location, socialLinks
           {/* Col 1: Heading + CTA */}
           <div className="profile-contact-col-main">
             <h2 className="profile-contact-heading">
-              Sẵn sàng bắt đầu{' '}
-              <span className="profile-contact-heading-accent">
-                hành trình cùng {firstName}?
-              </span>
+              {heading}
             </h2>
             <p className="profile-contact-subtitle">
-              Nhắn tin để được tư vấn miễn phí và nhận lộ trình phù hợp với mục tiêu của bạn.
+              {subtitle}
             </p>
             <button
               onClick={primaryCta?.action || onMessage}

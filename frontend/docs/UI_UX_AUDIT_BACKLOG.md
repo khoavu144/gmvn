@@ -1,5 +1,6 @@
 # Gymerviet — UI/UX audit backlog & on-air baseline
 
+**Tình trạng codebase (snapshot):** [CODEBASE_STATUS.md](./CODEBASE_STATUS.md)  
 **Tiến độ theo thời gian:** [UI_UX_PROGRESS_LOG.md](./UI_UX_PROGRESS_LOG.md)  
 **QA tay sau release:** [MANUAL_UX_CHECKLIST.md](./MANUAL_UX_CHECKLIST.md)
 

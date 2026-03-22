@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react';
+import { BadgeCheck, MapPin, MessageCircle } from 'lucide-react';
+import { COACH_PROFILE_NAV_ITEMS } from './profileSidebarNav';
+import type { ProfileNavItem } from './profileSidebarNav';
 
 interface SocialLinks {
   instagram?: string;
@@ -24,51 +27,27 @@ interface ProfileSidebarProps {
   onContactClick?: () => void;
   primaryCta?: CtaProps;
   secondaryCta?: CtaProps;
+  /** When omitted, uses coach default nav */
+  navItems?: ProfileNavItem[];
+  /** Athlete: teal accent + slate sidebar (see coachProfile.css) */
+  profileVariant?: 'coach' | 'athlete';
+  /** Default true; set false for athlete single primary CTA */
+  showSecondaryCta?: boolean;
 }
-
-const NAV_ITEMS = [
-  {
-    id: 'about', label: 'Giới thiệu',
-    icon: <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" /></svg>
-  },
-  {
-    id: 'services', label: 'Chuyên môn',
-    icon: <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" /></svg>
-  },
-  {
-    id: 'gallery', label: 'Hình ảnh',
-    icon: <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" /></svg>
-  },
-  {
-    id: 'experience', label: 'Kinh nghiệm',
-    icon: <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" /></svg>
-  },
-  {
-    id: 'packages', label: 'Gói dịch vụ',
-    icon: <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" /></svg>
-  },
-  {
-    id: 'testimonials', label: 'Đánh giá',
-    icon: <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-  },
-  {
-    id: 'contact', label: 'Liên hệ',
-    icon: <svg viewBox="0 0 20 20" fill="currentColor" width="15" height="15"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884zM18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
-  },
-];
 
 export default function ProfileSidebar({
   name, avatarUrl, headline, isVerified, isAcceptingClients,
-  socialLinks, location, onContactClick, primaryCta, secondaryCta
+  socialLinks, location, onContactClick, primaryCta, secondaryCta,
+  navItems = COACH_PROFILE_NAV_ITEMS,
+  profileVariant = 'coach',
+  showSecondaryCta = true,
 }: ProfileSidebarProps) {
-  const [activeSection, setActiveSection] = useState('about');
-  // Guard: social_links from DB can be null even if typed as SocialLinks
+  const [activeSection, setActiveSection] = useState(navItems[0]?.id ?? 'about');
   const safeSocialLinks: SocialLinks = (socialLinks && typeof socialLinks === 'object') ? socialLinks : {};
 
-  // Intersection Observer to highlight active nav item
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
-    NAV_ITEMS.forEach(({ id }) => {
+    navItems.forEach(({ id }) => {
       const el = document.getElementById(`section-${id}`);
       if (!el) return;
       const obs = new IntersectionObserver(
@@ -79,7 +58,7 @@ export default function ProfileSidebar({
       observers.push(obs);
     });
     return () => observers.forEach(o => o.disconnect());
-  }, []);
+  }, [navItems]);
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(`section-${id}`);
@@ -88,9 +67,12 @@ export default function ProfileSidebar({
 
   const initials = name.split(' ').slice(-2).map(w => w[0]).join('').toUpperCase();
 
+  const asideClass = profileVariant === 'athlete'
+    ? 'profile-sidebar profile-sidebar--athlete'
+    : 'profile-sidebar';
+
   return (
-    <aside className="profile-sidebar">
-      {/* Avatar */}
+    <aside className={asideClass}>
       <div className="sidebar-avatar-wrap">
         {avatarUrl ? (
           <img src={avatarUrl} alt={name} className="sidebar-avatar" />
@@ -102,22 +84,20 @@ export default function ProfileSidebar({
         )}
       </div>
 
-      {/* Name + headline */}
       <div className="sidebar-identity">
         <h2 className="sidebar-name">
           {name}
           {isVerified && (
-            <svg className="sidebar-verified" viewBox="0 0 20 20" fill="currentColor" aria-label="Đã xác minh">
-              <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
+            <span className="inline-flex items-center" title="Đã xác minh">
+              <BadgeCheck className="sidebar-verified" strokeWidth={2} aria-hidden="true" />
+              <span className="sr-only">Đã xác minh</span>
+            </span>
           )}
         </h2>
         {headline && <p className="sidebar-headline">{headline}</p>}
         {location && (
           <p className="sidebar-location">
-            <svg viewBox="0 0 20 20" fill="currentColor" className="sidebar-location-icon" aria-hidden="true">
-              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-            </svg>
+            <MapPin className="sidebar-location-icon" strokeWidth={2} aria-hidden="true" />
             {location}
           </p>
         )}
@@ -127,9 +107,10 @@ export default function ProfileSidebar({
       </div>
 
       <nav className="sidebar-nav" aria-label="Điều hướng trang">
-        {NAV_ITEMS.map(({ id, label, icon }) => (
+        {navItems.map(({ id, label, icon }) => (
           <button
             key={id}
+            type="button"
             onClick={() => scrollTo(id)}
             className={`sidebar-nav-item${activeSection === id ? ' active' : ''}`}
             aria-current={activeSection === id ? 'location' : undefined}
@@ -175,22 +156,27 @@ export default function ProfileSidebar({
 
       {primaryCta && (
         <button
+          type="button"
           onClick={primaryCta.action}
-          className="sidebar-cta-btn"
-          style={{ marginBottom: '8px', background: 'var(--mk-text)', color: 'white' }}
+          className="sidebar-cta-btn sidebar-cta-btn--flat-primary"
           aria-label={primaryCta.text}
         >
           {primaryCta.text}
         </button>
       )}
-      <button
-        onClick={secondaryCta ? secondaryCta.action : onContactClick}
-        className="sidebar-cta-btn"
-        style={primaryCta ? { background: 'white', border: '1px solid var(--mk-line)', color: 'var(--mk-text)' } : undefined}
-        aria-label={secondaryCta ? secondaryCta.text : `Nhắn tin với ${name} để được tư vấn`}
-      >
-        {secondaryCta ? `💬 ${secondaryCta.text}` : 'Nhắn tin để tư vấn'}
-      </button>
+      {showSecondaryCta && (
+        <button
+          type="button"
+          onClick={secondaryCta ? secondaryCta.action : onContactClick}
+          className={`sidebar-cta-btn${primaryCta ? ' sidebar-cta-btn--outline-secondary' : ''}`}
+          aria-label={secondaryCta ? secondaryCta.text : `Nhắn tin với ${name} để được tư vấn`}
+        >
+          <span className="sidebar-cta-btn-inner">
+            <MessageCircle className="w-4 h-4 shrink-0" strokeWidth={2} aria-hidden="true" />
+            {secondaryCta ? secondaryCta.text : 'Nhắn tin để tư vấn'}
+          </span>
+        </button>
+      )}
     </aside>
   );
 }

@@ -11,21 +11,37 @@ interface BeforeAfterPhoto {
 
 interface Props {
     photos: BeforeAfterPhoto[];
+    eyebrow?: string;
+    title?: string;
+    emptyEyebrow?: string;
+    emptyTitle?: string;
+    emptyDescription?: string;
 }
 
-export default function CoachResultsShowcase({ photos }: Props) {
+export default function CoachResultsShowcase({
+    photos,
+    eyebrow = 'Kết quả thực tế',
+    title = 'Những chuyển đổi ấn tượng',
+    emptyEyebrow,
+    emptyTitle,
+    emptyDescription,
+}: Props) {
+    const eEyebrow = emptyEyebrow ?? eyebrow;
+    const eTitle = emptyTitle ?? title;
+    const eDesc = emptyDescription ?? 'Chưa có ảnh trước/sau công khai trên hồ sơ. Bạn có thể nhắn tin Coach để xem thêm minh chứng phù hợp chính sách riêng tư.';
+
     if (photos.length === 0) {
         return (
             <section className="py-12 sm:py-16">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500 mb-2">
-                        Kết quả thực tế
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2">
+                        {eEyebrow}
                     </div>
                     <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black mb-4">
-                        Những chuyển đổi ấn tượng
+                        {eTitle}
                     </h2>
-                    <p className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-5 text-sm leading-7 text-stone-600 max-w-2xl">
-                        Chưa có ảnh trước/sau công khai trên hồ sơ. Bạn có thể nhắn tin Coach để xem thêm minh chứng phù hợp chính sách riêng tư.
+                    <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-5 text-sm leading-7 text-gray-600 max-w-2xl">
+                        {eDesc}
                     </p>
                 </div>
             </section>
@@ -40,10 +56,10 @@ export default function CoachResultsShowcase({ photos }: Props) {
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="mb-8">
                     <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)] mb-2">
-                        Kết quả thực tế
+                        {eyebrow}
                     </div>
                     <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black">
-                        Những chuyển đổi ấn tượng
+                        {title}
                     </h2>
                 </div>
 

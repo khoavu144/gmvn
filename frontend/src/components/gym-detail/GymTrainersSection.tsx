@@ -1,16 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import type { GymTrainerLink } from '../../types';
-
-function SectionHeading({ kicker, title, description }: { kicker: string; title: string; description?: string }) {
-    return (
-        <div className="mb-6 space-y-2">
-            <div className="marketplace-section-kicker">{kicker}</div>
-            <h2 className="marketplace-section-title">{title}</h2>
-            {description && <p className="marketplace-lead max-w-none text-[0.98rem]">{description}</p>}
-        </div>
-    );
-}
+import { GymSectionHeading } from './GymSectionHeading';
 
 function getTrainerLinkPath(link: GymTrainerLink): string | null {
     const trainer = link.trainer;
@@ -32,8 +23,8 @@ const GymTrainersSection = React.memo(function GymTrainersSection({ branchTraine
     if (branchTrainerLinks.length === 0) return null;
 
     return (
-            <section ref={setRef('trainers')} id="trainers" className="marketplace-panel p-6 sm:p-8">
-                <SectionHeading
+            <section ref={setRef('trainers')} id="trainers" className="gym-detail-section marketplace-panel p-6 sm:p-8">
+                <GymSectionHeading
                     kicker="Chuyên gia"
                     title="Ai đang dẫn dắt trải nghiệm tại chi nhánh này"
                     description="Không chỉ là danh sách Huấn luyện viên — hãy nhìn chuyên môn, ngôn ngữ và nền tảng của họ để đánh giá độ phù hợp với cá nhân bạn."

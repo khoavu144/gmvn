@@ -12,9 +12,20 @@ interface ProfilePricingSectionProps {
   packages: Package[];
   subscribing: string | null;
   onSubscribe: (programId: string) => void;
+  /** Athlete / no checkout: CTA opens contact flow */
+  contactOnly?: boolean;
+  onContact?: () => void;
+  emptyCopy?: string;
 }
 
-export default function ProfilePricingSection({ packages, subscribing, onSubscribe }: ProfilePricingSectionProps) {
+export default function ProfilePricingSection({
+  packages,
+  subscribing,
+  onSubscribe,
+  contactOnly = false,
+  onContact,
+  emptyCopy = 'Coach chưa công bố gói công khai trên hồ sơ. Hãy nhắn tin để được tư vấn mức giá và lịch phù hợp với bạn.',
+}: ProfilePricingSectionProps) {
   return (
     <section className="profile-pricing-section">
       <div className="profile-pricing-inner">
@@ -22,8 +33,8 @@ export default function ProfilePricingSection({ packages, subscribing, onSubscri
         <p className="profile-section-subtitle">Chọn gói phù hợp với mục tiêu, lịch tập và ngân sách của bạn</p>
 
         {!packages.length ? (
-          <p className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-5 text-sm leading-7 text-stone-600">
-            Coach chưa công bố gói công khai trên hồ sơ. Hãy nhắn tin để được tư vấn mức giá và lịch phù hợp với bạn.
+          <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-5 text-sm leading-7 text-gray-600">
+            {emptyCopy}
           </p>
         ) : (
         <div className="profile-pricing-grid">
@@ -57,12 +68,16 @@ export default function ProfilePricingSection({ packages, subscribing, onSubscri
               </ul>
 
               <button
-                onClick={() => pkg.id && onSubscribe(pkg.id)}
-                disabled={!!subscribing}
+                type="button"
+                onClick={() => {
+                  if (contactOnly) onContact?.();
+                  else if (pkg.id) onSubscribe(pkg.id);
+                }}
+                disabled={!contactOnly && !!subscribing}
                 className={`profile-pricing-btn${pkg.is_popular ? ' profile-pricing-btn--popular' : ''}`}
-                aria-label={`Chọn gói ${pkg.name}`}
+                aria-label={contactOnly ? `Liên hệ về gói ${pkg.name}` : `Chọn gói ${pkg.name}`}
               >
-                {subscribing === pkg.id ? 'Đang mở thanh toán...' : 'Chọn gói này'}
+                {contactOnly ? 'Liên hệ' : (subscribing === pkg.id ? 'Đang mở thanh toán...' : 'Chọn gói này')}
               </button>
             </div>
           ))}

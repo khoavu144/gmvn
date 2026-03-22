@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 // GYMERVIET tailwind.config.js v2.1
-// Design: Black/White thuần · Roboto font family · 8px radius · Dark mode media
+// Design: Black/White thuần · Inter sans / Manrope display · 8px radius · Dark mode media
 
 export default {
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
@@ -38,18 +38,25 @@ export default {
                 info: { DEFAULT: '#2563EB', light: '#DBEAFE', dark: '#1D4ED8' },
             },
 
-            // ─── TYPOGRAPHY — Roboto family ───────────────────────────────────
+            // ─── TYPOGRAPHY — Inter (body) + Manrope (display, see index.css --font-display) ──
             fontFamily: {
                 sans: [
-                    'Roboto',
+                    'Inter',
                     '-apple-system',
                     'BlinkMacSystemFont',
                     '"Segoe UI"',
                     'sans-serif',
                 ],
+                display: [
+                    'Manrope',
+                    'Inter',
+                    '-apple-system',
+                    'BlinkMacSystemFont',
+                    'sans-serif',
+                ],
                 condensed: [
-                    '"Roboto Condensed"',
-                    'Roboto',
+                    'Manrope',
+                    'Inter',
                     'sans-serif',
                 ],
                 mono: ['"Courier New"', 'Courier', 'monospace'],

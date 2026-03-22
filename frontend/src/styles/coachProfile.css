@@ -254,6 +254,25 @@
   box-shadow: 0 8px 20px rgba(8, 12, 30, 0.25);
 }
 
+.sidebar-cta-btn.sidebar-cta-btn--flat-primary {
+  background: #0a0a0a;
+  color: #fafafa;
+  margin-bottom: 8px;
+}
+
+.sidebar-cta-btn.sidebar-cta-btn--outline-secondary {
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  color: #141414;
+}
+
+.sidebar-cta-btn-inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 /* ── MAIN CONTENT ──────────────────────────────────────────────── */
 .coach-profile-main {
   flex: 1;
@@ -2669,4 +2688,42 @@
   .coach-mobile-nav-tab:hover {
     transform: none !important;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Athlete profile — shared layout, distinct accent (teal / slate)
+═══════════════════════════════════════════════════════════════ */
+
+.coach-profile-page--athlete .profile-sidebar--athlete {
+  background: linear-gradient(180deg, #0f172a 0%, #0c1222 100%);
+  box-shadow: 1px 0 0 0 rgba(45, 212, 191, 0.12);
+}
+
+.coach-profile-page--athlete .profile-sidebar--athlete .sidebar-verified {
+  color: #2dd4bf;
+}
+
+.coach-profile-page--athlete .profile-sidebar--athlete .sidebar-nav-item.active {
+  background: rgba(45, 212, 191, 0.14);
+  color: #f0fdfa;
+}
+
+.coach-profile-page--athlete .profile-sidebar--athlete .sidebar-nav-item:hover {
+  color: #f0fdfa;
+}
+
+.coach-profile-page--athlete .profile-bento-badge {
+  background: rgba(45, 212, 191, 0.35);
+  color: #042f2e;
+}
+
+.coach-profile-page--athlete .coach-mobile-nav-tab.active {
+  background: #0f766e;
+  color: #fff;
+  border-color: #0f766e;
+}
+
+.coach-profile-page--athlete .coach-mobile-nav-tab:hover {
+  border-color: #14b8a6;
+  color: #0f766e;
 }

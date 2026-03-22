@@ -30,7 +30,7 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
                 <div className="relative z-20 max-w-2xl">
                     <span className="inline-block px-3 py-1 bg-white text-black text-[10px] font-black uppercase tracking-widest mb-4">Buổi tập tiếp theo</span>
                     <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-3">Chưa có lịch tập</h3>
-                    <p className="text-[color:var(--mk-muted)] mb-8 max-w-md">Khám phá các Coach chuyên nghiệp trên GYMERVIET để thiết kế lộ trình tập luyện cá nhân hoá cho riêng bạn.</p>
+                    <p className="text-[color:var(--mk-muted)] mb-8 max-w-md">Xem Coach trên GYMERVIET và chọn người phù hợp để lên lịch tập cùng bạn.</p>
                     <div className="flex gap-4">
                         <Link to="/coaches" className="bg-white text-black px-6 py-3 font-bold uppercase tracking-widest text-sm hover:bg-[color:var(--mk-paper-strong)] transition-colors inline-block rounded-sm">
                             Tìm Coach ngay
@@ -76,7 +76,7 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
                 <p className="page-kicker">Không gian Luyện tập</p>
                 <h2 className="section-title">Theo dõi lịch tập và xây dựng hồ sơ thi đấu</h2>
                 <p className="page-description">
-                    Tập trung vào lịch tập, hồ sơ vận động viên và kết nối với coach thay vì các công cụ quản trị chương trình.
+                    Theo dõi lịch tập, hồ sơ vận động viên và liên hệ Coach — không cần màn hình quản trị phức tạp.
                 </p>
             </section>
 

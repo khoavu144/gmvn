@@ -4,7 +4,7 @@ import { addGalleryThunk, deleteGalleryThunk } from '../../store/slices/profileS
 import type { AppDispatch, RootState } from '../../store/store';
 import type { TrainerGallery } from '../../types';
 import { m as motion, AnimatePresence } from 'framer-motion';
-import { XMarkIcon, PlusIcon, TrashIcon, ArrowsPointingOutIcon, PhotoIcon } from '@heroicons/react/24/outline';
+import { X, Plus, Trash2, Maximize2, Image as ImageIconLucide } from 'lucide-react';
 
 const typeLabels: Record<string, string> = {
     transformation: 'Transformation', workout: 'Buổi tập', event: 'Sự kiện', certificate: 'Chứng chỉ', other: 'Khác',
@@ -32,11 +32,11 @@ export function ProfileGalleryTab() {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-black uppercase tracking-tight">Thư viện Ảnh</h2>
-                    <p className="text-[color:var(--mk-muted)] mt-1">Quản lý hình ảnh, thành tích và kết quả tập luyện</p>
+                    <p className="text-[color:var(--mk-muted)] mt-1">Thêm ảnh tập, thành tích hoặc chứng chỉ để hồ sơ rõ ràng hơn.</p>
                 </div>
                 {!isAdding && (
                     <button onClick={() => setIsAdding(true)} className="btn-primary flex items-center gap-2">
-                        <PlusIcon className="w-5 h-5" />
+                        <Plus className="w-5 h-5" strokeWidth={2} aria-hidden />
                         Thêm ảnh
                     </button>
                 )}
@@ -67,7 +67,7 @@ export function ProfileGalleryTab() {
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="card-header mb-0 border-0 pb-0">Thêm ảnh mới</h3>
                                 <button onClick={() => setIsAdding(false)} className="p-2 text-[color:var(--mk-muted)] hover:text-black hover:bg-[color:var(--mk-paper)] rounded-full transition-colors">
-                                    <XMarkIcon className="w-5 h-5" />
+                                    <X className="w-5 h-5" strokeWidth={2} aria-hidden />
                                 </button>
                             </div>
                             <form onSubmit={handleSubmit} className="space-y-4">
@@ -127,7 +127,7 @@ export function ProfileGalleryTab() {
                                         className="p-2 bg-white/10 hover:bg-red-500 hover:text-white text-white backdrop-blur-sm rounded-full transition-colors"
                                         title="Xóa ảnh"
                                     >
-                                        <TrashIcon className="w-4 h-4" />
+                                        <Trash2 className="w-4 h-4" strokeWidth={2} aria-hidden />
                                     </button>
                                 </div>
                                 <div>
@@ -145,7 +145,7 @@ export function ProfileGalleryTab() {
                             {/* View Icon (center) */}
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
-                                    <ArrowsPointingOutIcon className="w-5 h-5" />
+                                    <Maximize2 className="w-5 h-5" strokeWidth={2} aria-hidden />
                                 </div>
                             </div>
                         </motion.div>
@@ -156,10 +156,10 @@ export function ProfileGalleryTab() {
             {gallery.length === 0 && !isAdding && (
                 <div className="text-center py-16 px-4 bg-[color:var(--mk-paper)] border border-dashed border-[color:var(--mk-line)] rounded-none">
                     <div className="w-16 h-16 bg-[color:var(--mk-paper-strong)] rounded-full flex items-center justify-center mx-auto mb-4">
-                        <PhotoIcon className="w-8 h-8 text-[color:var(--mk-muted)]" />
+                        <ImageIconLucide className="w-8 h-8 text-[color:var(--mk-muted)]" strokeWidth={2} aria-hidden />
                     </div>
                     <h3 className="text-lg font-bold text-black mb-1">Chưa có hình ảnh nào</h3>
-                    <p className="text-[color:var(--mk-muted)] mb-6 max-w-sm mx-auto">Thêm hình ảnh về thân hình, phòng tập, hoặc khách hàng của bạn để thu hút học viên mới.</p>
+                    <p className="text-[color:var(--mk-muted)] mb-6 max-w-sm mx-auto">Ảnh tập, phòng gym hoặc feedback học viên giúp người mới tin tưởng hơn.</p>
                     <button onClick={() => setIsAdding(true)} className="btn-primary">
                         Thêm bức ảnh đầu tiên
                     </button>
@@ -180,7 +180,7 @@ export function ProfileGalleryTab() {
                             className="absolute top-6 right-6 p-3 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors z-50"
                             onClick={() => setLightboxImage(null)}
                         >
-                            <XMarkIcon className="w-6 h-6" />
+                            <X className="w-6 h-6" strokeWidth={2} aria-hidden />
                         </button>
                         
                         <motion.div

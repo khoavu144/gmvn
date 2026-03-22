@@ -514,7 +514,7 @@ export default function ProgramsPage() {
                                                 <div className="flex gap-2 justify-end mt-4 pt-4 border-t border-[color:var(--mk-line)]">
                                                     <button onClick={() => handleEdit(prog)} className="text-sm font-medium text-[color:var(--mk-text-soft)] hover:text-black px-3 py-1.5 hover:bg-[color:var(--mk-paper)] transition rounded-xs">Sửa gói</button>
                                                     {!prog.is_published && (
-                                                        <button onClick={() => handlePublish(prog.id)} className="text-sm font-bold text-white bg-black hover:bg-zinc-800 px-4 py-1.5 transition rounded-xs shadow-sm">Phát hành</button>
+                                                        <button onClick={() => handlePublish(prog.id)} className="text-sm font-bold text-white bg-black hover:bg-gray-800 px-4 py-1.5 transition rounded-xs shadow-sm">Phát hành</button>
                                                     )}
                                                 </div>
                                             </div>

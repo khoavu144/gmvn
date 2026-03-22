@@ -47,7 +47,7 @@ export function ProductCard({ product, variant = 'standard' }: { product: Produc
                     />
                 ) : (
                     <div className="marketplace-card-thumb-placeholder">
-                        {product.category?.icon_emoji ?? '📦'}
+                        <span aria-hidden="true">{product.category?.icon_emoji ?? '📦'}</span>
                     </div>
                 )}
                 {product.product_type === 'digital' && variant !== 'compact' && (
@@ -88,11 +88,17 @@ export function ProductCard({ product, variant = 'standard' }: { product: Produc
                             <s className="marketplace-card-price-orig">{formatPrice(product.compare_at_price!, product.currency)}</s>
                         )}
                     </div>
-                    {product.review_count > 0 && variant !== 'compact' && (
-                        <div className="marketplace-card-rating">
-                            <span>⭐</span>
-                            <span>{product.avg_rating != null ? Number(product.avg_rating).toFixed(1) : '—'}</span>
-                            <span className="marketplace-card-review-count">({product.review_count})</span>
+                    {variant !== 'compact' && (
+                        <div className="marketplace-card-rating-slot">
+                            {product.review_count > 0 ? (
+                                <div className="marketplace-card-rating">
+                                    <span aria-hidden="true">⭐</span>
+                                    <span>{product.avg_rating != null ? Number(product.avg_rating).toFixed(1) : '—'}</span>
+                                    <span className="marketplace-card-review-count">({product.review_count})</span>
+                                </div>
+                            ) : (
+                                <span className="marketplace-card-rating-placeholder">Chưa có đánh giá</span>
+                            )}
                         </div>
                     )}
                 </div>
@@ -214,6 +220,7 @@ export default function MarketplacePage() {
             </Helmet>
 
             <div className="marketplace-page">
+                <div className="marketplace-inner">
                 {/* Hero */}
                 {showHero && (
                     <section className="marketplace-editorial-intro">
@@ -238,7 +245,6 @@ export default function MarketplacePage() {
                     </section>
                 )}
 
-                <div className="marketplace-layout">
                     {/* Category filter bar */}
                     <nav ref={filterRef} className="marketplace-cat-bar" aria-label="Danh mục sản phẩm">
                         <CategoryPill
@@ -259,9 +265,9 @@ export default function MarketplacePage() {
                     {/* Sort bar */}
                     <div className="marketplace-toolbar">
                         <span className="marketplace-toolbar-count">
-                            {activeSearch || activeCategory
-                                ? `${total.toLocaleString('vi-VN')} sản phẩm`
-                                : ''}
+                            {loading && total === 0
+                                ? 'Đang tải danh sách…'
+                                : `${total.toLocaleString('vi-VN')} sản phẩm`}
                         </span>
                         <div className="marketplace-sort">
                             <label htmlFor="marketplace-sort-select" className="sr-only">Sắp xếp</label>

@@ -1,14 +1,7 @@
 import { useEffect, useState } from 'react';
+import { COACH_PROFILE_NAV_ITEMS } from './profileSidebarNav';
 
-const NAV_ITEMS = [
-  { id: 'about', label: 'Giới thiệu' },
-  { id: 'services', label: 'Chuyên môn' },
-  { id: 'gallery', label: 'Hình ảnh' },
-  { id: 'experience', label: 'Kinh nghiệm' },
-  { id: 'packages', label: 'Gói dịch vụ' },
-  { id: 'testimonials', label: 'Đánh giá' },
-  { id: 'contact', label: 'Liên hệ' },
-];
+const DEFAULT_MOBILE_NAV = COACH_PROFILE_NAV_ITEMS.map(({ id, label }) => ({ id, label }));
 
 interface CtaProps { text: string; action: () => void; }
 
@@ -16,10 +9,19 @@ interface CoachMobileNavProps {
   name: string;
   onMessage: () => void;
   primaryCta?: CtaProps;
+  /** When omitted, uses coach section tabs */
+  navItems?: { id: string; label: string }[];
+  profileVariant?: 'coach' | 'athlete';
 }
 
-export default function CoachMobileNav({ name, onMessage, primaryCta }: CoachMobileNavProps) {
-  const [activeSection, setActiveSection] = useState('about');
+export default function CoachMobileNav({
+  name,
+  onMessage,
+  primaryCta,
+  navItems = DEFAULT_MOBILE_NAV,
+  profileVariant = 'coach',
+}: CoachMobileNavProps) {
+  const [activeSection, setActiveSection] = useState(navItems[0]?.id ?? 'about');
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function CoachMobileNav({ name, onMessage, primaryCta }: CoachMob
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
-    NAV_ITEMS.forEach(({ id }) => {
+    navItems.forEach(({ id }) => {
       const el = document.getElementById(`section-${id}`);
       if (!el) return;
       const obs = new IntersectionObserver(
@@ -41,16 +43,22 @@ export default function CoachMobileNav({ name, onMessage, primaryCta }: CoachMob
       observers.push(obs);
     });
     return () => observers.forEach(o => o.disconnect());
-  }, []);
+  }, [navItems]);
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(`section-${id}`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const rootClass = [
+    'coach-mobile-nav',
+    show ? 'coach-mobile-nav--visible' : '',
+    profileVariant === 'athlete' ? 'coach-mobile-nav--athlete' : '',
+  ].filter(Boolean).join(' ');
+
   return (
     <div
-      className={`coach-mobile-nav${show ? ' coach-mobile-nav--visible' : ''}`}
+      className={rootClass}
       aria-hidden={!show}
     >
       <div className="coach-mobile-nav-inner">
@@ -58,9 +66,10 @@ export default function CoachMobileNav({ name, onMessage, primaryCta }: CoachMob
         {show && (
           <>
             <nav aria-label="Điều hướng trang" className="coach-mobile-nav-tabs">
-              {NAV_ITEMS.map(({ id, label }) => (
+              {navItems.map(({ id, label }) => (
                 <button
                   key={id}
+                  type="button"
                   onClick={() => scrollTo(id)}
                   className={`coach-mobile-nav-tab${activeSection === id ? ' active' : ''}`}
                   aria-current={activeSection === id ? 'location' : undefined}
@@ -70,11 +79,11 @@ export default function CoachMobileNav({ name, onMessage, primaryCta }: CoachMob
               ))}
             </nav>
             {primaryCta ? (
-              <button onClick={primaryCta.action} className="coach-mobile-nav-message-btn" style={{ background: 'var(--mk-text)', color: 'white' }}>
+              <button type="button" onClick={primaryCta.action} className="coach-mobile-nav-message-btn" style={{ background: 'var(--mk-text)', color: 'white' }}>
                 {primaryCta.text}
               </button>
             ) : (
-              <button onClick={onMessage} className="coach-mobile-nav-message-btn">
+              <button type="button" onClick={onMessage} className="coach-mobile-nav-message-btn">
                 💬 Nhắn tin để tư vấn
               </button>
             )}

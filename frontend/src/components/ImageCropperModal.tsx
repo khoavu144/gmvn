@@ -102,21 +102,21 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-white dark:bg-zinc-900 rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800">
+            <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
 
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-zinc-100 dark:border-zinc-800">
-                    <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{title}</h3>
+                <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">{title}</h3>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 transition-colors"
+                        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-colors"
                     >
                         <i className="fi fi-rr-cross"></i>
                     </button>
                 </div>
 
                 {/* Body */}
-                <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-zinc-50 dark:bg-black/50">
+                <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-gray-50 dark:bg-black/50">
                     <ReactCrop
                         crop={crop}
                         onChange={(_, percentCrop) => setCrop(percentCrop)}
@@ -135,16 +135,16 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-3 bg-white dark:bg-zinc-900">
+                <div className="p-4 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 bg-white dark:bg-gray-900">
                     <button
                         onClick={onClose}
-                        className="px-5 py-2.5 rounded-lg font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 dark:text-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 transition"
+                        className="px-5 py-2.5 rounded-lg font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 transition"
                     >
                         Hủy
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-5 py-2.5 rounded-lg font-medium text-white bg-black hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition"
+                        className="px-5 py-2.5 rounded-lg font-medium text-white bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition"
                     >
                         Tiếp tục
                     </button>

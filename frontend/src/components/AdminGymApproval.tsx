@@ -105,7 +105,7 @@ const AdminGymApproval: React.FC = () => {
                         <div className="md:w-48 flex flex-col gap-2">
                             <button
                                 onClick={() => handleApprove(gym.id)}
-                                className="bg-black text-white py-3 px-6 rounded-xs font-bold uppercase tracking-widest text-xs hover:bg-zinc-800 transition-colors"
+                                className="bg-black text-white py-3 px-6 rounded-xs font-bold uppercase tracking-widest text-xs hover:bg-gray-800 transition-colors"
                             >
                                 Phê duyệt
                             </button>

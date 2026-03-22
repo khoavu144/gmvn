@@ -13,11 +13,12 @@ interface SimilarCoach {
 
 interface Props {
     coaches: SimilarCoach[];
+    title?: string;
 }
 
 const PAGE_SIZE = 2;
 
-export default function CoachRelatedFooter({ coaches }: Props) {
+export default function CoachRelatedFooter({ coaches, title = 'Huấn luyện viên tương tự' }: Props) {
     const [page, setPage] = useState(0);
     if (coaches.length === 0) return null;
 
@@ -29,7 +30,7 @@ export default function CoachRelatedFooter({ coaches }: Props) {
             <div className="coach-related-inner">
                 {/* Header + prev/next — always visible */}
                 <div className="coach-related-header">
-                    <h3 className="coach-related-title">Huấn luyện viên tương tự</h3>
+                    <h3 className="coach-related-title">{title}</h3>
                     <div className="coach-related-nav">
                         <button
                             onClick={() => setPage(p => Math.max(0, p - 1))}

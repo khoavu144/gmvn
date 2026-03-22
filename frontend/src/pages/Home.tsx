@@ -169,7 +169,7 @@ export default function Home() {
                             <p className="marketplace-lead max-w-2xl">
                                 Xem hồ sơ thật, so sánh giá và khu vực, đọc tin tập luyện — rồi quyết định bước tiếp theo cho mục tiêu tập luyện của bạn trên GYMERVIET.
                             </p>
-                            <p className="text-xs font-medium uppercase tracking-[0.12em] text-stone-500">
+                            <p className="text-xs font-medium uppercase tracking-[0.12em] text-gray-500">
                                 Đăng ký miễn phí · Hồ sơ có thể được xác minh · Lọc phòng tập theo khu vực
                             </p>
 
@@ -195,13 +195,13 @@ export default function Home() {
                             </div>
                         </div>
 
-                        <div className="marketplace-panel p-6 shadow-sm ring-1 ring-stone-900/[0.06] sm:p-8 lg:shadow-[0_12px_48px_-8px_rgba(15,23,42,0.12)]">
-                            <div className="space-y-3 border-b border-stone-200 pb-4">
+                        <div className="marketplace-panel p-6 shadow-sm ring-1 ring-gray-900/[0.06] sm:p-8 lg:shadow-[0_12px_48px_-8px_rgba(15,23,42,0.12)]">
+                            <div className="space-y-3 border-b border-gray-200 pb-4">
                                 <div className="marketplace-section-kicker">Thành viên đang có mặt</div>
                                 <h2 className="marketplace-section-title">
                                     Một vài gương mặt bạn có thể xem ngay.
                                 </h2>
-                                <p className="text-sm leading-7 text-stone-600">
+                                <p className="text-sm leading-7 text-gray-600">
                                     Ảnh đại diện và chuyên môn thật — bấm vào để xem hồ sơ chi tiết.
                                 </p>
                             </div>
@@ -211,12 +211,12 @@ export default function Home() {
                                     {Array.from({ length: 3 }).map((_, index) => (
                                         <div
                                             key={index}
-                                            className="flex items-center gap-4 rounded-lg bg-stone-100 p-4 animate-pulse"
+                                            className="flex items-center gap-4 rounded-lg bg-gray-100 p-4 animate-pulse"
                                         >
-                                            <div className="h-14 w-14 rounded-full bg-stone-200" />
+                                            <div className="h-14 w-14 rounded-full bg-gray-200" />
                                             <div className="min-w-0 flex-1 space-y-2">
-                                                <div className="h-4 w-1/2 rounded bg-stone-200" />
-                                                <div className="h-3 w-1/3 rounded bg-stone-200" />
+                                                <div className="h-4 w-1/2 rounded bg-gray-200" />
+                                                <div className="h-3 w-1/3 rounded bg-gray-200" />
                                             </div>
                                         </div>
                                     ))}
@@ -228,9 +228,9 @@ export default function Home() {
                                             key={coach.id}
                                             to={coachLink(coach)}
                                             onMouseEnter={() => handlePrefetch(coach)}
-                                            className="group flex items-center gap-4 rounded-lg border border-stone-200 bg-white p-4 transition duration-300 hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)]"
+                                            className="group flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 transition duration-300 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)]"
                                         >
-                                            <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-stone-100">
+                                            <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-gray-100">
                                                 {coach.avatar_url ? (
                                                     <img
                                                         src={coach.avatar_url}
@@ -243,7 +243,7 @@ export default function Home() {
                                                         decoding="async"
                                                     />
                                                 ) : (
-                                                    <div className="flex h-full w-full items-center justify-center text-xl font-black text-stone-400">
+                                                    <div className="flex h-full w-full items-center justify-center text-xl font-black text-gray-400">
                                                         {coach.full_name.charAt(0)}
                                                     </div>
                                                 )}
@@ -251,7 +251,7 @@ export default function Home() {
 
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex flex-wrap items-center gap-2">
-                                                    <div className="truncate text-base font-bold tracking-[-0.03em] text-stone-900">
+                                                    <div className="truncate text-base font-bold tracking-[-0.03em] text-gray-900">
                                                         {coach.full_name}
                                                     </div>
                                                     {coach.is_verified && (
@@ -260,12 +260,12 @@ export default function Home() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <div className="mt-1 text-sm leading-6 text-stone-600">
+                                                <div className="mt-1 text-sm leading-6 text-gray-600">
                                                     {coach.specialties?.[0] || 'Coach / vận động viên'}
                                                 </div>
                                             </div>
 
-                                            <span className="shrink-0 text-xs font-bold uppercase tracking-[0.16em] text-stone-900 transition-transform group-hover:translate-x-1">
+                                            <span className="shrink-0 text-xs font-bold uppercase tracking-[0.16em] text-gray-900 transition-transform group-hover:translate-x-1">
                                                 Xem →
                                             </span>
                                         </Link>
@@ -300,19 +300,19 @@ export default function Home() {
                         <Link
                             key={item.title}
                             to={item.href}
-                            className="marketplace-panel group flex h-full flex-col gap-5 p-6 shadow-sm ring-1 ring-stone-900/[0.05] sm:p-7 transition duration-300 hover:-translate-y-1 hover:border-stone-200 hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.12)]"
+                            className="marketplace-panel group flex h-full flex-col gap-5 p-6 shadow-sm ring-1 ring-gray-900/[0.05] sm:p-7 transition duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.12)]"
                         >
                             <div className="space-y-3">
                                 <div className="marketplace-section-kicker">{item.kicker}</div>
-                                <h3 className="text-[1.3rem] font-bold leading-[1.18] tracking-[-0.04em] text-stone-900">
+                                <h3 className="text-[1.3rem] font-bold leading-[1.18] tracking-[-0.04em] text-gray-900">
                                     {item.title}
                                 </h3>
-                                <p className="text-sm leading-7 text-stone-600">
+                                <p className="text-sm leading-7 text-gray-600">
                                     {item.body}
                                 </p>
                             </div>
 
-                            <span className="mt-auto inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-stone-900 transition-transform group-hover:translate-x-1">
+                            <span className="mt-auto inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-gray-900 transition-transform group-hover:translate-x-1">
                                 {item.cta} →
                             </span>
                         </Link>
@@ -332,15 +332,15 @@ export default function Home() {
                     {ECOSYSTEM_STEPS.map((item) => (
                         <article
                             key={item.step}
-                            className="marketplace-panel p-6 shadow-sm ring-1 ring-stone-900/[0.05] sm:p-7"
+                            className="marketplace-panel p-6 shadow-sm ring-1 ring-gray-900/[0.05] sm:p-7"
                         >
-                            <div className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-stone-500">
+                            <div className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-gray-500">
                                 Bước {item.step}
                             </div>
-                            <h3 className="mt-4 text-[1.2rem] font-bold tracking-[-0.035em] text-stone-900">
+                            <h3 className="mt-4 text-[1.2rem] font-bold tracking-[-0.035em] text-gray-900">
                                 {item.title}
                             </h3>
-                            <p className="mt-3 text-sm leading-7 text-stone-600">
+                            <p className="mt-3 text-sm leading-7 text-gray-600">
                                 {item.body}
                             </p>
                         </article>
@@ -349,7 +349,7 @@ export default function Home() {
             </section>
 
             <section className="marketplace-container mt-12 lg:mt-16">
-                <div className="marketplace-panel p-6 shadow-sm ring-1 ring-stone-900/[0.06] sm:p-8 lg:p-10 lg:shadow-[0_10px_40px_-12px_rgba(15,23,42,0.1)]">
+                <div className="marketplace-panel p-6 shadow-sm ring-1 ring-gray-900/[0.06] sm:p-8 lg:p-10 lg:shadow-[0_10px_40px_-12px_rgba(15,23,42,0.1)]">
                     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                         <div className="space-y-4">
                             <div className="marketplace-section-kicker">Bước tiếp theo</div>
@@ -386,41 +386,41 @@ export default function Home() {
             </section>
 
             <section className="marketplace-container mt-12 lg:mt-16" aria-labelledby="home-faq-heading">
-                <div className="marketplace-panel p-6 shadow-sm ring-1 ring-stone-900/[0.05] sm:p-8">
+                <div className="marketplace-panel p-6 shadow-sm ring-1 ring-gray-900/[0.05] sm:p-8">
                     <div className="marketplace-section-kicker">Câu hỏi nhanh</div>
                     <h2 id="home-faq-heading" className="marketplace-section-title mt-2">
                         Trước khi bạn bắt đầu
                     </h2>
-                    <ul className="mt-6 space-y-5 text-sm leading-7 text-stone-600">
+                    <ul className="mt-6 space-y-5 text-sm leading-7 text-gray-600">
                         <li>
-                            <p className="font-bold text-stone-900">Dùng GYMERVIET có mất phí không?</p>
+                            <p className="font-bold text-gray-900">Dùng GYMERVIET có mất phí không?</p>
                             <p className="mt-1">
                                 Đăng ký và xem hồ sơ công khai là miễn phí. Gói trả phí chỉ khi bạn chọn nâng cấp —{' '}
-                                <Link to="/pricing" className="font-semibold text-stone-900 underline underline-offset-2 hover:no-underline">
+                                <Link to="/pricing" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
                                     xem bảng giá
                                 </Link>
                                 .
                             </p>
                         </li>
                         <li>
-                            <p className="font-bold text-stone-900">Tôi tìm Coach hoặc phòng tập thế nào?</p>
+                            <p className="font-bold text-gray-900">Tôi tìm Coach hoặc phòng tập thế nào?</p>
                             <p className="mt-1">
                                 Vào{' '}
-                                <Link to="/coaches" className="font-semibold text-stone-900 underline underline-offset-2 hover:no-underline">
+                                <Link to="/coaches" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
                                     danh sách Coach
                                 </Link>
                                 {' '}hoặc{' '}
-                                <Link to="/gyms" className="font-semibold text-stone-900 underline underline-offset-2 hover:no-underline">
+                                <Link to="/gyms" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
                                     marketplace phòng tập
                                 </Link>
                                 , lọc theo chuyên môn hoặc khu vực rồi mở hồ sơ chi tiết.
                             </p>
                         </li>
                     </ul>
-                    <div className="mt-6 border-t border-stone-200 pt-5">
+                    <div className="mt-6 border-t border-gray-200 pt-5">
                         <Link
                             to="/faq"
-                            className="text-sm font-bold uppercase tracking-[0.14em] text-stone-900 hover:underline underline-offset-4"
+                            className="text-sm font-bold uppercase tracking-[0.14em] text-gray-900 hover:underline underline-offset-4"
                         >
                             Xem thêm câu hỏi thường gặp →
                         </Link>

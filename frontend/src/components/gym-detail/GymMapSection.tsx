@@ -1,21 +1,12 @@
 import React from 'react';
 import type { GymBranch } from '../../types';
-
-function SectionHeading({ kicker, title, description }: { kicker: string; title: string; description?: string }) {
-    return (
-        <div className="mb-6 space-y-2">
-            <div className="marketplace-section-kicker">{kicker}</div>
-            <h2 className="marketplace-section-title">{title}</h2>
-            {description && <p className="marketplace-lead max-w-none text-[0.98rem]">{description}</p>}
-        </div>
-    );
-}
+import { GymSectionHeading } from './GymSectionHeading';
 
 function SummaryPill({ label, value }: { label: string; value: string }) {
     return (
-        <div className="rounded-lg border border-stone-200/90 bg-white/75 px-4 py-3 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
-            <div className="text-[0.66rem] font-bold uppercase tracking-[0.2em] text-stone-500">{label}</div>
-            <div className="mt-1 text-sm font-bold text-stone-900">{value}</div>
+        <div className="rounded-lg border border-gray-200/90 bg-white/75 px-4 py-3 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
+            <div className="text-[0.66rem] font-bold uppercase tracking-[0.2em] text-gray-500">{label}</div>
+            <div className="mt-1 text-sm font-bold text-gray-900">{value}</div>
         </div>
     );
 }
@@ -44,8 +35,8 @@ const GymMapSection = React.memo(function GymMapSection({
     const lon = Number(branchLongitude);
 
     return (
-        <section ref={setRef('map')} id="map" className="marketplace-panel p-6 sm:p-8">
-            <SectionHeading
+        <section ref={setRef('map')} id="map" className="gym-detail-section marketplace-panel p-6 sm:p-8">
+            <GymSectionHeading
                 kicker="Bản đồ định vị"
                 title="Định vị chi nhánh và bối cảnh quanh phòng tập"
                 description="Bản đồ giúp bạn trả lời ngay một câu hỏi thực tế: mình có tiện đường rẽ vào nơi này đều đặn trong tuần hay không."
@@ -62,7 +53,7 @@ const GymMapSection = React.memo(function GymMapSection({
                 </div>
 
                 {branchMapEmbedUrl ? (
-                    <div className="overflow-hidden rounded-lg border border-stone-200/90 bg-stone-100">
+                    <div className="overflow-hidden rounded-lg border border-gray-200/90 bg-gray-100">
                         <iframe
                             src={branchMapEmbedUrl}
                             width="100%"
@@ -74,7 +65,7 @@ const GymMapSection = React.memo(function GymMapSection({
                         />
                     </div>
                 ) : (
-                    <div className="overflow-hidden rounded-lg border border-stone-200/90 bg-stone-100">
+                    <div className="overflow-hidden rounded-lg border border-gray-200/90 bg-gray-100">
                         <iframe
                             src={`https://www.openstreetmap.org/export/embed.html?bbox=${lon - 0.01},${lat - 0.01},${lon + 0.01},${lat + 0.01}&layer=mapnik&marker=${lat},${lon}`}
                             width="100%"

@@ -74,7 +74,7 @@ export default function Login() {
                 <div className="card">
                     <form onSubmit={handleSubmit} className="space-y-4" aria-label="Biểu mẫu đăng nhập">
                         {error && (
-                            <div role="alert" aria-live="assertive" className="bg-red-50 border border-red-200 text-stone-900 px-4 py-3 rounded-xs text-sm">
+                            <div role="alert" aria-live="assertive" className="bg-red-50 border border-red-200 text-gray-900 px-4 py-3 rounded-xs text-sm">
                                 {error}
                             </div>
                         )}
@@ -129,7 +129,7 @@ export default function Login() {
                         </button>
                     </form>
 
-                    <div className="mt-6 pt-6 border-t border-stone-200 text-center text-sm text-stone-600">
+                    <div className="mt-6 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">
                         Chưa có tài khoản?{' '}
                         <Link
                             to="/register"

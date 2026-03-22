@@ -14,6 +14,15 @@ function formatPrice(n: number | string, currency = 'VND'): string {
     return num.toLocaleString('en-US', { style: 'currency', currency });
 }
 
+function truncateMetaDescription(text: string, maxLen: number): string {
+    const t = text.trim();
+    if (t.length <= maxLen) return t;
+    const slice = t.slice(0, maxLen);
+    const lastSpace = slice.lastIndexOf(' ');
+    const head = lastSpace > 40 ? slice.slice(0, lastSpace) : slice;
+    return `${head.trimEnd()}…`;
+}
+
 function StarRating({ rating }: { rating: number }) {
     return (
         <div className="mpd-stars" aria-label={`Đánh giá ${rating}/5`}>
@@ -78,7 +87,7 @@ export default function ProductDetailPage() {
         <div className="mpd-not-found">
             <p>😞</p>
             <h2>Sản phẩm không tồn tại</h2>
-            <Link to="/marketplace" className="marketplace-btn-ghost">← Về Marketplace</Link>
+            <Link to="/marketplace" className="marketplace-btn-ghost">← Về cửa hàng</Link>
         </div>
     );
 
@@ -99,13 +108,20 @@ export default function ProductDetailPage() {
         <>
             <Helmet>
                 <title>{product.title} | GYMERVIET Marketplace</title>
-                <meta name="description" content={product.description?.substring(0, 155) ?? `Mua ${product.title} tại GYMERVIET Marketplace`} />
+                <meta
+                    name="description"
+                    content={
+                        product.description?.trim()
+                            ? truncateMetaDescription(product.description, 155)
+                            : `Mua ${product.title} tại GYMERVIET Marketplace`
+                    }
+                />
             </Helmet>
 
             <div className="mpd-page">
                 {/* Breadcrumb */}
                 <nav className="mpd-breadcrumb" aria-label="Đường dẫn">
-                    <Link to="/marketplace">Marketplace</Link>
+                    <Link to="/marketplace">Cửa hàng</Link>
                     {product.category && (
                         <>
                             <span>/</span>
@@ -125,7 +141,9 @@ export default function ProductDetailPage() {
                             {activeImage ? (
                                 <img src={activeImage} alt={product.title} className="mpd-gallery-main-img" />
                             ) : (
-                                <div className="mpd-gallery-placeholder">{product.category?.icon_emoji ?? '📦'}</div>
+                                <div className="mpd-gallery-placeholder">
+                                    <span aria-hidden="true">{product.category?.icon_emoji ?? '📦'}</span>
+                                </div>
                             )}
                         </div>
                         {allImages.length > 1 && (
@@ -172,8 +190,8 @@ export default function ProductDetailPage() {
                                     <strong>{product.seller.full_name}</strong>
                                     <div className="mpd-seller-proof-stats">
                                         {product.sale_count > 0 && <span>{product.sale_count} đã bán</span>}
-                                        {product.review_count > 0 && (
-                                            <span>⭐ {Number(product.avg_rating ?? 0).toFixed(1)}</span>
+                                        {product.review_count === 0 && product.avg_rating != null && Number(product.avg_rating) > 0 && (
+                                            <span>⭐ {Number(product.avg_rating).toFixed(1)}</span>
                                         )}
                                     </div>
                                 </div>
@@ -295,7 +313,7 @@ export default function ProductDetailPage() {
                         <h2 className="mpd-section-title">Mô tả sản phẩm</h2>
                         <div className="mpd-description">
                             {product.description ? (
-                                <p style={{ whiteSpace: 'pre-wrap' }}>{product.description}</p>
+                                <p className="mpd-description-body">{product.description}</p>
                             ) : (
                                 <p className="mpd-empty-text">Chưa có mô tả chi tiết.</p>
                             )}
@@ -311,21 +329,23 @@ export default function ProductDetailPage() {
                                                 <div key={day} className="mpd-program-day">
                                                     <strong>{plan.title}</strong>
                                                     {plan.exercises.length > 0 && (
-                                                        <table className="mpd-exercise-table">
-                                                            <thead>
-                                                                <tr><th>Bài tập</th><th>Sets</th><th>Reps</th><th>Nghỉ</th></tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {plan.exercises.map((ex, i) => (
-                                                                    <tr key={i}>
-                                                                        <td>{ex.name}</td>
-                                                                        <td>{ex.sets}</td>
-                                                                        <td>{ex.reps}</td>
-                                                                        <td>{ex.rest_seconds ? `${ex.rest_seconds}s` : '—'}</td>
-                                                                    </tr>
-                                                                ))}
-                                                            </tbody>
-                                                        </table>
+                                                        <div className="mpd-table-scroll">
+                                                            <table className="mpd-exercise-table">
+                                                                <thead>
+                                                                    <tr><th>Bài tập</th><th>Sets</th><th>Reps</th><th>Nghỉ</th></tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    {plan.exercises.map((ex, i) => (
+                                                                        <tr key={i}>
+                                                                            <td>{ex.name}</td>
+                                                                            <td>{ex.sets}</td>
+                                                                            <td>{ex.reps}</td>
+                                                                            <td>{ex.rest_seconds ? `${ex.rest_seconds}s` : '—'}</td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
                                                     )}
                                                 </div>
                                             ))}
@@ -339,16 +359,18 @@ export default function ProductDetailPage() {
                     {product.attributes && Object.keys(product.attributes).length > 0 && (
                         <section className="mpd-section" id="specs">
                             <h2 className="mpd-section-title">Thông số kỹ thuật</h2>
-                            <table className="mpd-specs-table">
-                                <tbody>
-                                    {Object.entries(product.attributes).map(([k, v]) => (
-                                        <tr key={k}>
-                                            <td className="mpd-specs-key">{k.replace(/_/g, ' ')}</td>
-                                            <td>{String(v)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                            <div className="mpd-table-scroll">
+                                <table className="mpd-specs-table">
+                                    <tbody>
+                                        {Object.entries(product.attributes).map(([k, v]) => (
+                                            <tr key={k}>
+                                                <td className="mpd-specs-key">{k.replace(/_/g, ' ')}</td>
+                                                <td>{String(v)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </section>
                     )}
 
@@ -384,7 +406,7 @@ export default function ProductDetailPage() {
                     </section>
 
                     {relatedProducts.length > 0 && (
-                        <section className="mpd-section" id="related">
+                        <section className="mpd-section mpd-section--related" id="related">
                             <h2 className="mpd-section-title">Gợi ý tương tự</h2>
                             <div className="marketplace-grid">
                                 {relatedProducts.map(p => (

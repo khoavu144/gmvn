@@ -1,4 +1,9 @@
-/* fonts.css removed — Roboto loaded via Google Fonts in index.html */
+/*
+ * Token map (UI consistency)
+ * - App shell / dashboard / forms: Tailwind gray-* + semantic success|warning|error|info.
+ * - Marketplace / editorial surfaces: CSS vars --mk-* (warm neutral) via bg-[color:var(--mk-…)].
+ * - Curator / PDP accents: --cur-* where used in marketplace.css.
+ */
 @import './styles/globals.css';
 
 @tailwind base;
@@ -235,7 +240,7 @@ body {
   }
 
   .page-shell-muted {
-    @apply min-h-screen bg-stone-50 pb-16;
+    @apply min-h-screen bg-gray-50 pb-16;
   }
 
   .page-container {
@@ -648,9 +653,54 @@ body {
     top: 6rem;
   }
 
+  /* Gym detail page — scroll anchors below fixed header + subnav */
+  .gym-detail-page {
+    --gym-detail-subnav-estimate: 3.5rem;
+    --gym-detail-scroll-margin: calc(var(--header-height, 56px) + var(--gym-detail-subnav-estimate) + 0.5rem);
+  }
+
+  .gym-detail-page section.gym-detail-section {
+    scroll-margin-top: var(--gym-detail-scroll-margin);
+  }
+
+  .gym-detail-page .gym-detail-subnav {
+    position: sticky;
+    top: var(--header-height, 56px);
+    z-index: 30;
+  }
+
+  .gym-detail-page .gym-detail-sticky-rail {
+    position: sticky;
+    top: var(--gym-detail-scroll-margin);
+    align-self: start;
+  }
+
   .marketplace-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent 0%, var(--mk-line) 12%, var(--mk-line) 88%, transparent 100%);
+  }
+
+  /* Gyms page only — tighter vertical rhythm, top-aligned hero, denser card grid */
+  .gyms-marketplace .marketplace-hero {
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+    padding-bottom: clamp(1.25rem, 2.5vw, 2rem);
+  }
+
+  .gyms-marketplace .marketplace-hero-grid {
+    align-items: start;
+  }
+
+  @media (min-width: 1024px) {
+    .gyms-marketplace .marketplace-card-grid {
+      grid-template-columns: repeat(auto-fill, minmax(19.5rem, 1fr));
+      gap: 1.125rem;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .gyms-marketplace .marketplace-card-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   @media (max-width: 1100px) {

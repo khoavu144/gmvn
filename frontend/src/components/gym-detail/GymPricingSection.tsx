@@ -1,15 +1,15 @@
 import React from 'react';
 import type { GymPricing } from '../../types';
+import { GymSectionHeading } from './GymSectionHeading';
 
-function SectionHeading({ kicker, title, description }: { kicker: string; title: string; description?: string }) {
-    return (
-        <div className="mb-6 space-y-2">
-            <div className="marketplace-section-kicker">{kicker}</div>
-            <h2 className="marketplace-section-title">{title}</h2>
-            {description && <p className="marketplace-lead max-w-none text-[0.98rem]">{description}</p>}
-        </div>
-    );
-}
+const PLAN_TYPE_LABELS: Record<string, string> = {
+    membership: 'Hội viên',
+    day_pass: 'Vé ngày',
+    class_pack: 'Gói buổi',
+    personal_training: 'PT',
+    trial: 'Dùng thử',
+    other: 'Gói khác',
+};
 
 const BILLING_LABELS: Record<string, string> = {
     per_day: '/ ngày', per_month: '/ tháng', per_quarter: '/ quý',
@@ -44,8 +44,8 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
     if (branchPricing.length === 0) return null;
 
     return (
-            <section ref={setRef('pricing')} id="pricing" className="marketplace-panel p-6 sm:p-7">
-                <SectionHeading
+            <section ref={setRef('pricing')} id="pricing" className="gym-detail-section marketplace-panel p-6 sm:p-7">
+                <GymSectionHeading
                     kicker="Bảng giá"
                     title="Các gói vào cửa và cách bắt đầu"
                     description="Đừng chỉ nhìn gói nổi bật. Hãy nhìn gói khởi điểm, các dịch vụ đi kèm và chính sách để biết chi phí thực sự của việc tập luyện."
@@ -59,10 +59,12 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
                         >
                             <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0 flex-1">
-                                    <div className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">{plan.plan_type || 'membership'}</div>
+                                    <div className="text-[0.68rem] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">
+                                        {plan.plan_type ? (PLAN_TYPE_LABELS[plan.plan_type] || plan.plan_type.replace(/_/g, ' ')) : 'Gói'}
+                                    </div>
                                     <h3 className="mt-1.5 text-lg font-bold tracking-[-0.04em] text-[color:var(--mk-text)]">{plan.plan_name}</h3>
                                 </div>
-                                {plan.is_highlighted && <span className="marketplace-badge marketplace-badge--accent">Recommended</span>}
+                                {plan.is_highlighted && <span className="marketplace-badge marketplace-badge--accent">Gợi ý</span>}
                             </div>
 
                             <div className="mt-4 flex items-end gap-2">
@@ -89,8 +91,8 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
                             <div className="mt-4 space-y-1.5 text-sm leading-6 text-[color:var(--mk-text-soft)]">
                                 {plan.highlighted_reason && <div>• {plan.highlighted_reason}</div>}
                                 {plan.trial_available && <div>• Có trial {plan.trial_price ? `${Number(plan.trial_price).toLocaleString('vi-VN')}₫` : ''}</div>}
-                                {plan.freeze_policy_summary && <div>• Freeze: {plan.freeze_policy_summary}</div>}
-                                {plan.cancellation_policy_summary && <div>• Cancel: {plan.cancellation_policy_summary}</div>}
+                                {plan.freeze_policy_summary && <div>• Tạm dừng: {plan.freeze_policy_summary}</div>}
+                                {plan.cancellation_policy_summary && <div>• Hủy: {plan.cancellation_policy_summary}</div>}
                             </div>
 
                             <div className="mt-4 pt-1">

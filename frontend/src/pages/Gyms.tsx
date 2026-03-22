@@ -90,32 +90,29 @@ const CategoryStrip: React.FC<CategoryStripProps> = ({ label, desc, accent, item
 
     return (
         <div className="space-y-3">
-            {/* Header */}
-            <div className="flex items-end justify-between gap-4">
-                <div>
+            <header className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-x-4">
+                <div className="min-w-0">
                     <div className="marketplace-section-kicker">Phân loại</div>
                     <h2 className="marketplace-section-title mt-0.5">{label}</h2>
+                    <p className="mt-2 text-sm text-gray-500 leading-relaxed max-w-prose">{desc}</p>
                 </div>
-                <p className="hidden md:block max-w-[40%] text-sm text-stone-500 leading-relaxed text-right">{desc}</p>
                 <button
                     type="button"
                     onClick={() => onFilter(slug)}
-                    className="shrink-0 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-stone-900 border-b border-stone-900 pb-0.5 hover:opacity-70 transition-opacity whitespace-nowrap"
+                    className="shrink-0 justify-self-start text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-gray-900 border-b border-gray-900 pb-0.5 hover:opacity-70 transition-opacity whitespace-nowrap md:pt-1"
                 >
                     Xem tất cả →
                 </button>
-            </div>
+            </header>
 
             {/* 2 : 1 : 1 grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:grid-rows-1">
-                {/* Primary — spans 2 columns */}
-                <div className="sm:col-span-2 lg:col-span-2">
+                <div className="sm:col-span-2 lg:col-span-2 h-full min-h-0">
                     <GymCard gym={primary} variant="featured" index={0} />
                 </div>
 
-                {/* Two compact cards stacked in 1 column each */}
                 {secondaries.map((gym, idx) => (
-                    <div key={gym.id}>
+                    <div key={gym.id} className="h-full min-h-0">
                         <GymCard gym={gym} variant="compact" index={idx + 1} />
                     </div>
                 ))}
@@ -252,21 +249,17 @@ const Gyms: React.FC = () => {
                 <meta name="twitter:card" content="summary_large_image" />
             </Helmet>
 
-            <div className="marketplace-shell min-h-screen pb-20">
-
+            <div className="marketplace-shell min-h-screen pb-16 md:pb-20">
+                <div className="gyms-marketplace">
                 {/* ── Hero ──────────────────────────────────────────────────────────── */}
                 <section className="marketplace-hero">
                     <div className="marketplace-container">
                         <div className="marketplace-hero-grid">
-                            <div className="space-y-6">
+                            <div className="space-y-4 max-w-3xl">
                                 <span className="marketplace-eyebrow">Editorial marketplace</span>
-                                <div className="space-y-5">
-                                    <h1 className="marketplace-title">
-                                        Chọn nơi tập bằng
-                                        <br />
-                                        không gian, cảm giác
-                                        <br />
-                                        và quyết định đúng.
+                                <div className="space-y-4">
+                                    <h1 className="marketplace-title max-w-[20ch] sm:max-w-none">
+                                        Chọn nơi tập bằng không gian, cảm giác và quyết định đúng.
                                     </h1>
                                     <p className="marketplace-lead">
                                         Một marketplace dành cho người thật sự muốn tìm đúng không gian tập: gym chất lượng cao,
@@ -351,7 +344,7 @@ const Gyms: React.FC = () => {
                                 <div className="marketplace-field flex items-end">
                                     <button
                                         type="button"
-                                        className={`w-full h-11 px-4 flex items-center justify-center gap-2 rounded-lg border font-bold text-sm transition-colors ${showAdvancedFilters ? 'bg-black text-white border-black' : 'bg-white text-stone-900 border-stone-200 hover:border-stone-900'}`}
+                                        className={`w-full h-11 px-4 flex items-center justify-center gap-2 rounded-lg border font-bold text-sm transition-colors ${showAdvancedFilters ? 'bg-black text-white border-black' : 'bg-white text-gray-900 border-gray-200 hover:border-gray-900'}`}
                                         onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                                     >
                                         <Filter className="w-4 h-4" />
@@ -362,7 +355,7 @@ const Gyms: React.FC = () => {
 
                             {/* Advanced Filters */}
                             {showAdvancedFilters && (
-                                <div className="pt-4 border-t border-stone-200 animate-fade-in space-y-4">
+                                <div className="pt-4 border-t border-gray-200 animate-fade-in space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="marketplace-field">
                                             <label htmlFor="marketplace-search">Tìm theo tên, đặc điểm</label>
@@ -415,12 +408,12 @@ const Gyms: React.FC = () => {
                             {/* View toggle + Reset */}
                             <div className="flex flex-wrap items-center gap-3 pt-2">
                                 {/* View mode toggle: Grid | List | Map */}
-                                <div className="inline-flex overflow-hidden rounded-lg border border-stone-200 bg-white/70 p-1">
+                                <div className="inline-flex overflow-hidden rounded-lg border border-gray-200 bg-white/70 p-1">
                                     <button
                                         type="button"
                                         title="Dạng lưới"
                                         onClick={() => setViewMode('grid')}
-                                        className={`rounded-md px-3 py-2 transition flex items-center gap-1.5 text-xs font-bold ${viewMode === 'grid' ? 'bg-stone-900 text-white' : 'text-stone-600'}`}
+                                        className={`rounded-md px-3 py-2 transition flex items-center gap-1.5 text-xs font-bold ${viewMode === 'grid' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
                                     >
                                         <LayoutGrid className="w-3.5 h-3.5" />
                                         <span className="hidden sm:inline uppercase tracking-[0.14em]">Lưới</span>
@@ -429,7 +422,7 @@ const Gyms: React.FC = () => {
                                         type="button"
                                         title="Dạng danh sách"
                                         onClick={() => setViewMode('list')}
-                                        className={`rounded-md px-3 py-2 transition flex items-center gap-1.5 text-xs font-bold ${viewMode === 'list' ? 'bg-stone-900 text-white' : 'text-stone-600'}`}
+                                        className={`rounded-md px-3 py-2 transition flex items-center gap-1.5 text-xs font-bold ${viewMode === 'list' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
                                     >
                                         <List className="w-3.5 h-3.5" />
                                         <span className="hidden sm:inline uppercase tracking-[0.14em]">Danh sách</span>
@@ -438,7 +431,7 @@ const Gyms: React.FC = () => {
                                         type="button"
                                         title="Bản đồ"
                                         onClick={() => setViewMode('map')}
-                                        className={`rounded-md px-3 py-2 transition text-xs font-bold uppercase tracking-[0.14em] ${viewMode === 'map' ? 'bg-stone-900 text-white' : 'text-stone-600'}`}
+                                        className={`rounded-md px-3 py-2 transition text-xs font-bold uppercase tracking-[0.14em] ${viewMode === 'map' ? 'bg-gray-900 text-white' : 'text-gray-600'}`}
                                     >
                                         Map
                                     </button>
@@ -466,18 +459,18 @@ const Gyms: React.FC = () => {
                 </section>
 
                 {/* ── Main content ─────────────────────────────────────────────────── */}
-                <section className="marketplace-container mt-6 space-y-10">
+                <section className="marketplace-container mt-4 md:mt-6 space-y-6 md:space-y-8">
                     {isLoading ? (
                         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                             {Array.from({ length: 6 }).map((_, idx) => (
                                 <div key={idx}>
                                     <div className="marketplace-panel overflow-hidden animate-pulse">
-                                        <div className="aspect-[4/3] bg-stone-100" />
+                                        <div className="aspect-[4/3] bg-gray-100" />
                                         <div className="space-y-3 p-5">
-                                            <div className="h-3 w-24 rounded-lg bg-stone-200" />
-                                            <div className="h-7 w-3/4 rounded-lg bg-stone-200" />
-                                            <div className="h-4 w-full rounded-lg bg-stone-200" />
-                                            <div className="h-4 w-2/3 rounded-lg bg-stone-200" />
+                                            <div className="h-3 w-24 rounded-lg bg-gray-200" />
+                                            <div className="h-7 w-3/4 rounded-lg bg-gray-200" />
+                                            <div className="h-4 w-full rounded-lg bg-gray-200" />
+                                            <div className="h-4 w-2/3 rounded-lg bg-gray-200" />
                                         </div>
                                     </div>
                                 </div>
@@ -493,7 +486,7 @@ const Gyms: React.FC = () => {
                         </div>
                     ) : viewMode === 'map' ? (
                         <div className="marketplace-panel overflow-hidden p-3">
-                            <Suspense fallback={<div className="h-[560px] animate-pulse rounded-lg bg-stone-100" />}>
+                            <Suspense fallback={<div className="h-[560px] animate-pulse rounded-lg bg-gray-100" />}>
                                 <GymMapView gyms={gyms} />
                             </Suspense>
                         </div>
@@ -509,46 +502,55 @@ const Gyms: React.FC = () => {
                         <>
                             {/* ── Featured hero (2:1:1) — only in grid mode & no active filters ── */}
                             {showEditorialSections && featuredGyms.length > 0 && (
-                                <div className="space-y-4">
-                                    <div className="marketplace-results-head">
-                                        <div>
-                                            <div className="marketplace-section-kicker">Lựa chọn Nổi bật</div>
-                                            <h2 className="marketplace-section-title">Những không gian đang được chọn nhiều tuần này</h2>
+                                <div className="rounded-xl border border-gray-200/90 bg-white p-4 md:p-5 shadow-sm">
+                                    <div className="space-y-4">
+                                        <div className="marketplace-results-head !mb-0">
+                                            <div>
+                                                <div className="marketplace-section-kicker">Lựa chọn Nổi bật</div>
+                                                <h2 className="marketplace-section-title">Những không gian đang được chọn nhiều tuần này</h2>
+                                            </div>
+                                            <div className="marketplace-results-meta">
+                                                Hình ảnh thực tế, giá khởi điểm rõ ràng, mô tả chân thực.
+                                            </div>
                                         </div>
-                                        <div className="marketplace-results-meta">
-                                            Hình ảnh thực tế, giá khởi điểm rõ ràng, mô tả chân thực.
-                                        </div>
-                                    </div>
 
-                                    {/* 2 : 1 : 1 hero grid */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                        {/* Primary featured — takes 2 columns */}
-                                        <div className="sm:col-span-2 lg:col-span-2">
-                                            <GymCard gym={featuredGyms[0]} variant="featured" index={0} />
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                            <div className="sm:col-span-2 lg:col-span-2 h-full min-h-0">
+                                                <GymCard gym={featuredGyms[0]} variant="featured" index={0} />
+                                            </div>
+                                            {featuredGyms.slice(1, 3).map((gym, idx) => (
+                                                <div key={gym.id} className="h-full min-h-0">
+                                                    <GymCard gym={gym} variant="compact" index={idx + 1} />
+                                                </div>
+                                            ))}
                                         </div>
-                                        {/* Two compact secondaries — 1 column each */}
-                                        {featuredGyms.slice(1, 3).map((gym, idx) => (
-                                            <GymCard key={gym.id} gym={gym} variant="compact" index={idx + 1} />
-                                        ))}
                                     </div>
                                 </div>
                             )}
 
                             {/* ── Editorial category strips (only when no venue-type filter active) ── */}
                             {showEditorialSections && (
-                                <div className="space-y-10">
-                                    {EDITORIAL_CATEGORIES.map((cat) => {
+                                <div className="flex flex-col gap-6 md:gap-8">
+                                    {EDITORIAL_CATEGORIES.map((cat, stripIdx) => {
                                         const items = categoryBuckets.get(cat.slug) || [];
                                         return (
-                                            <CategoryStrip
+                                            <div
                                                 key={cat.slug}
-                                                slug={cat.slug}
-                                                label={cat.label}
-                                                desc={cat.desc}
-                                                accent={cat.accent}
-                                                items={items}
-                                                onFilter={handleFilterByCategory}
-                                            />
+                                                className={
+                                                    stripIdx % 2 === 1
+                                                        ? 'rounded-xl border border-gray-200/80 border-l-[3px] border-l-gray-900/18 bg-gray-50/50 p-4 md:p-5'
+                                                        : 'rounded-xl border border-gray-200/70 bg-white/80 p-4 md:p-5'
+                                                }
+                                            >
+                                                <CategoryStrip
+                                                    slug={cat.slug}
+                                                    label={cat.label}
+                                                    desc={cat.desc}
+                                                    accent={cat.accent}
+                                                    items={items}
+                                                    onFilter={handleFilterByCategory}
+                                                />
+                                            </div>
                                         );
                                     })}
                                 </div>
@@ -590,7 +592,7 @@ const Gyms: React.FC = () => {
 
                 {/* ── Editorial tip block ──────────────────────────────────────────── */}
                 {!isLoading && gyms.length > 0 && (
-                    <section className="marketplace-container mt-10">
+                    <section className="marketplace-container mt-6 md:mt-8">
                         <div className="marketplace-panel p-6 sm:p-8">
                             <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
                                 <div className="space-y-3">
@@ -608,9 +610,9 @@ const Gyms: React.FC = () => {
                                         { title: 'Mức chi phí', body: 'Đừng chỉ nhìn mức giá tối đa. Hãy xem điểm giá khởi điểm để bắt đầu nhanh.' },
                                         { title: 'Phù hợp mục tiêu', body: 'Các thẻ như người mới, ưu tiên nữ giới hay dân thể thao giúp loại bớt lựa chọn sai.' },
                                     ].map((item) => (
-                                        <div key={item.title} className="rounded-lg border border-stone-200 bg-white/70 p-4">
-                                            <div className="text-sm font-bold tracking-[-0.03em] text-stone-900">{item.title}</div>
-                                            <p className="mt-2 text-sm leading-6 text-stone-500">{item.body}</p>
+                                        <div key={item.title} className="rounded-lg border border-gray-200 bg-white/70 p-4">
+                                            <div className="text-sm font-bold tracking-[-0.03em] text-gray-900">{item.title}</div>
+                                            <p className="mt-2 text-sm leading-6 text-gray-500">{item.body}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -618,6 +620,7 @@ const Gyms: React.FC = () => {
                         </div>
                     </section>
                 )}
+                </div>
             </div>
         </>
     );

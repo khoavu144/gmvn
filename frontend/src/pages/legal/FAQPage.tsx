@@ -28,7 +28,7 @@ const faqData: FAQCategory[] = [
             },
             {
                 q: 'Tôi quên mật khẩu thì làm thế nào?',
-                a: 'Chức năng "Quên mật khẩu" đang được phát triển. Trong thời gian này, vui lòng liên hệ đội hỗ trợ để đặt lại mật khẩu thủ công.',
+                a: 'Mục "Quên mật khẩu" đang hoàn thiện. Tạm thời hãy liên hệ hỗ trợ để được cấp lại mật khẩu.',
             },
         ],
     },
@@ -60,7 +60,7 @@ const faqData: FAQCategory[] = [
         items: [
             {
                 q: 'Badge "Verified" là gì và làm thế nào để được xác minh?',
-                a: 'Badge Verified xác nhận Coach đã được đội ngũ GYMERVIET kiểm tra chứng chỉ và kinh nghiệm thực tế. Gửi hồ sơ xác minh qua trang Liên hệ để được xem xét.',
+                a: 'Badge Verified có nghĩa đội GYMERVIET đã xem chứng chỉ và kinh nghiệm của bạn. Gửi hồ sơ qua trang Liên hệ để được xét duyệt.',
             },
             {
                 q: 'Tôi có thể tạo bao nhiêu gói tập?',

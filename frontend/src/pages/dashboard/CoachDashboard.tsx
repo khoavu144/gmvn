@@ -64,7 +64,7 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                                     <p className="text-xs text-[color:var(--mk-muted)]">Vị trí: {inv.role_at_gym || 'Coach'} • Chi nhánh: {inv.branch?.branch_name}</p>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button onClick={() => handleAccept(inv.id)} className="bg-black text-white px-3 py-1.5 rounded-xs text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors">Chấp nhận</button>
+                                    <button onClick={() => handleAccept(inv.id)} className="bg-black text-white px-3 py-1.5 rounded-xs text-[10px] font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors">Chấp nhận</button>
                                     <button onClick={() => handleDecline(inv.id)} className="text-[color:var(--mk-muted)] px-3 py-1.5 rounded-xs text-[10px] font-bold uppercase tracking-widest hover:text-red-500 transition-colors">Từ chối</button>
                                 </div>
                             </div>

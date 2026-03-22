@@ -2,16 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { gymService } from '../../services/gymService';
 import type { GymProgram, GymProgramSession } from '../../types';
 import { Skeleton } from '../ui/Skeleton';
-
-function SectionHeading({ kicker, title, description }: { kicker: string; title: string; description?: string }) {
-    return (
-        <div className="mb-6 space-y-2">
-            <div className="marketplace-section-kicker">{kicker}</div>
-            <h2 className="marketplace-section-title">{title}</h2>
-            {description && <p className="marketplace-lead max-w-none text-[0.98rem]">{description}</p>}
-        </div>
-    );
-}
+import { GymSectionHeading } from './GymSectionHeading';
 
 const PROGRAM_TYPE_LABELS: Record<string, string> = {
     yoga: 'Yoga', pilates: 'Pilates', hiit: 'HIIT', cycling: 'Cycling',
@@ -79,8 +70,8 @@ const GymProgramsSection = React.memo(function GymProgramsSection({ branchProgra
     if (branchPrograms.length === 0) return null;
 
     return (
-            <section ref={setRef('schedule')} id="schedule" className="marketplace-panel p-6 sm:p-7">
-                <SectionHeading
+            <section ref={setRef('schedule')} id="schedule" className="gym-detail-section marketplace-panel p-6 sm:p-7">
+                <GymSectionHeading
                     kicker="Lịch tập"
                     title="Lịch lớp và nhịp hoạt động tại chi nhánh"
                     description="Một cơ sở tốt không chỉ hiển thị đẹp trên hình ảnh — lịch lớp phải đủ rõ để bạn hình dung ngay tuần đầu tiên tập luyện của mình sẽ trông như thế nào."

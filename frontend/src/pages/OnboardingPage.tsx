@@ -84,16 +84,16 @@ export default function OnboardingPage() {
                     </h1>
                     <p className="text-[color:var(--mk-muted)] max-w-md text-lg">
                         {isCoach 
-                            ? 'Thiết lập hồ sơ chuyên nghiệp để bắt đầu nhận học viên và quản lý lớp học của bạn trên nền tảng GymViet.' 
-                            : 'Cung cấp một số thông tin cơ bản để chúng tôi có thể cá nhân hóa lộ trình tập luyện tốt nhất dành cho bạn.'}
+                            ? 'Hoàn tất hồ sơ để nhận học viên và quản lý lịch trên GYMERVIET.' 
+                            : 'Cho chúng tôi vài thông tin cơ bản để gợi ý lộ trình tập phù hợp với bạn.'}
                     </p>
                 </div>
                 <div className="relative z-10 opacity-50">
                     <p className="text-sm font-mono tracking-widest uppercase">Bước {step} của {isCoach ? 2 : 3}</p>
                 </div>
                 {/* Abstract graphic */}
-                <div className="absolute -bottom-[20%] -right-[10%] w-[80%] h-[80%] rounded-full border-[40px] border-zinc-900 opacity-50"></div>
-                <div className="absolute bottom-[10%] right-[10%] w-[40%] h-[40%] rounded-full border-[20px] border-zinc-800 opacity-50"></div>
+                <div className="absolute -bottom-[20%] -right-[10%] w-[80%] h-[80%] rounded-full border-[40px] border-gray-900 opacity-50"></div>
+                <div className="absolute bottom-[10%] right-[10%] w-[40%] h-[40%] rounded-full border-[20px] border-gray-800 opacity-50"></div>
             </div>
 
             {/* Right side: form */}
@@ -105,7 +105,7 @@ export default function OnboardingPage() {
                         <div className="animate-in fade-in slide-in-from-right-4 duration-500">
                             <div>
                                 <h2 className="text-3xl font-black uppercase tracking-tight text-black mb-2">Chỉ số cơ thể</h2>
-                                <p className="text-[color:var(--mk-muted)] text-sm">Thông tin này giúp tính toán năng lượng (TDEE) và BMI của bạn.</p>
+                                <p className="text-[color:var(--mk-muted)] text-sm">Dùng để ước lượng năng lượng (TDEE) và BMI.</p>
                             </div>
                             <div className="mt-8 space-y-6">
                                 <div>

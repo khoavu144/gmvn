@@ -22,7 +22,7 @@ export default function ProfileServicesSection({ skills }: ProfileServicesSectio
         </div>
 
         {!skills.length ? (
-          <p className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-5 text-sm leading-7 text-stone-600">
+          <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-5 text-sm leading-7 text-gray-600">
             Chưa có bảng kỹ năng chi tiết trên hồ sơ. Xem phần giới thiệu hoặc nhắn tin để hỏi chuyên môn cụ thể.
           </p>
         ) : (

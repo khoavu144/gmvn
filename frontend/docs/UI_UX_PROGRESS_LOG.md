@@ -5,6 +5,8 @@ File này ghi **sự kiện ngắn** theo thời gian. Chi tiết baseline, audi
 
 | Date (VN) | Event | Detail | Owner |
 |-----------|--------|--------|--------|
+| 2026-03-22 | docs | Thêm [backend/docs/CODEBASE_STATUS.md](../../backend/docs/CODEBASE_STATUS.md) — cấu trúc `src`, bảng mount API, boot/cron; frontend doc mục 7 trỏ sang đó. | — |
+| 2026-03-22 | docs | Thêm [CODEBASE_STATUS.md](./CODEBASE_STATUS.md) — snapshot tổng thể monorepo, stack frontend/backend, design tokens, trạng thái refactor (gym detail long-scroll, gyms list, profile sidebar, gray vs stone). | — |
 | 2026-03-22 | UI wave + tokens | Quy trình per-page: checklist `UI_PAGE_REVIEW_CHECKLIST.md`; thay `var(--mk-*)` → stone/amber/emerald trên Gyms, Login, Coaches, NewsPage, NewsDetailPage, PricingPage; Login title GYMERVIET; `npm run lint` + `npm run build` | — |
 | 2026-03-22 | UI Home | Desktop polish theo `ui-review-prod/home--desktop.png`: hero `items-start`, panel hồ sơ shadow/ring, thay `--mk-*` → stone trên Home, CTA bar căn giữa + nút Coach/Gym min-width | — |
 | 2026-03-22 | refactor E | Q9 ProfileCV (bỏ FadeSection + IO); tách GymSimilarSection + GymMapSection; GymZonesSection bớt `--mk-*` | — |

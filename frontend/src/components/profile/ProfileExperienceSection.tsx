@@ -17,6 +17,13 @@ interface ProfileExperienceSectionProps {
   certifications: Certification[];
   awards: Award[];
   yearsExperience: number | null;
+  emptyHint?: string;
+  /** Optional block above the grid (e.g. athlete section headline) */
+  introTitle?: string | null;
+  introSubtitle?: string | null;
+  timelineHeading?: string;
+  emptyStateTitle?: string;
+  emptyStateSubtitle?: string;
 }
 
 function formatDate(dateStr: string) {
@@ -33,15 +40,21 @@ const TYPE_DOT: Record<string, { active: boolean }> = {
 
 export default function ProfileExperienceSection({
   experiences, certifications, awards, yearsExperience,
+  emptyHint = 'Chưa có mốc kinh nghiệm hay chứng chỉ công khai. Nhắn tin Coach nếu bạn cần xác minh thêm về nền tảng chuyên môn.',
+  introTitle = null,
+  introSubtitle = null,
+  timelineHeading = 'Cột mốc sự nghiệp',
+  emptyStateTitle = 'Kinh nghiệm & chứng chỉ',
+  emptyStateSubtitle = 'Lộ trình nghề nghiệp và thành tích được cập nhật trên hồ sơ',
 }: ProfileExperienceSectionProps) {
   if (!experiences.length && !certifications.length && !awards.length) {
     return (
       <section className="profile-experience-section">
         <div className="profile-experience-inner">
-          <h2 className="profile-section-title">Kinh nghiệm & chứng chỉ</h2>
-          <p className="profile-section-subtitle">Lộ trình nghề nghiệp và thành tích được cập nhật trên hồ sơ</p>
-          <p className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-5 text-sm leading-7 text-stone-600">
-            Chưa có mốc kinh nghiệm hay chứng chỉ công khai. Nhắn tin Coach nếu bạn cần xác minh thêm về nền tảng chuyên môn.
+          <h2 className="profile-section-title">{emptyStateTitle}</h2>
+          <p className="profile-section-subtitle">{emptyStateSubtitle}</p>
+          <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-5 text-sm leading-7 text-gray-600">
+            {emptyHint}
           </p>
         </div>
       </section>
@@ -56,6 +69,12 @@ export default function ProfileExperienceSection({
   return (
     <section className="profile-experience-section">
       <div className="profile-experience-inner">
+        {introTitle && (
+          <>
+            <h2 className="profile-section-title">{introTitle}</h2>
+            {introSubtitle && <p className="profile-section-subtitle">{introSubtitle}</p>}
+          </>
+        )}
         {/* 2-col grid: Cột mốc sự nghiệp | Chứng chỉ */}
         <div className="profile-exp-grid">
 
@@ -63,7 +82,7 @@ export default function ProfileExperienceSection({
           {experiences.length > 0 && (
             <div className="profile-exp-col-left">
               <h2 className="profile-section-title">
-                Cột mốc sự nghiệp
+                {timelineHeading}
                 {yearsExperience && (
                   <span className="profile-section-title-badge">{yearsExperience} năm</span>
                 )}

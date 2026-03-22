@@ -20,15 +20,25 @@ interface ProfileHeroSectionProps {
   onMessage?: () => void;
   primaryCta?: CtaProps;
   secondaryCta?: CtaProps;
+  /** Athlete: badge copy + hide commerce affordances */
+  profileRole?: 'coach' | 'athlete';
+  /** Target section id (without `section-` prefix) for stats card link; default packages */
+  statsPortfolioSectionId?: string;
+  statsPortfolioLabel?: string;
+  hideStatsPortfolioButton?: boolean;
 }
 
 export default function ProfileHeroSection({
   name, headline, location, avatarUrl, specialties,
   bio, bioLong, isVerified, tagline, metrics, highlights,
-  basePriceMonthly, onMessage, primaryCta, secondaryCta
+  basePriceMonthly, onMessage, primaryCta, secondaryCta,
+  profileRole = 'coach',
+  statsPortfolioSectionId = 'packages',
+  statsPortfolioLabel = 'Xem gói phù hợp',
+  hideStatsPortfolioButton = false,
 }: ProfileHeroSectionProps) {
-  const scrollToPackages = () => {
-    const el = document.getElementById('section-packages');
+  const scrollToPortfolioSection = () => {
+    const el = document.getElementById(`section-${statsPortfolioSectionId}`);
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -41,6 +51,11 @@ export default function ProfileHeroSection({
 
   const displayBio = bioLong || bio || '';
   const topAchievement = highlights[0] || null;
+  const defaultBadge = profileRole === 'athlete'
+    ? (specialties?.[0] || 'Vận động viên')
+    : (specialties?.[0] || 'Huấn luyện viên');
+  const verifiedFill = profileRole === 'athlete' ? '#2dd4bf' : '#3b82f6';
+  const showPrice = profileRole === 'coach' && !!basePriceMonthly;
 
   return (
     <section className="profile-hero-bento">
@@ -58,13 +73,13 @@ export default function ProfileHeroSection({
           <div className="profile-bento-identity-inner">
             {/* Badge */}
             <span className="profile-bento-badge">
-              {specialties?.[0] || 'Huấn luyện viên'}
+              {defaultBadge}
             </span>
             {/* Name */}
             <h1 className="profile-bento-name">
               {name}
               {isVerified && (
-                <svg viewBox="0 0 20 20" fill="#3b82f6" width="22" height="22" style={{ display: 'inline', marginLeft: 6, flexShrink: 0 }} aria-label="Đã xác minh">
+                <svg viewBox="0 0 20 20" fill={verifiedFill} width="22" height="22" style={{ display: 'inline', marginLeft: 6, flexShrink: 0 }} aria-label="Đã xác minh">
                   <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
               )}
@@ -99,14 +114,16 @@ export default function ProfileHeroSection({
               </div>
             ))}
           </div>
-          <div className="profile-bento-stats-footer">
-            <button onClick={scrollToPackages} className="profile-bento-portfolio-btn">
-              Xem gói phù hợp
-              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </button>
-          </div>
+          {!hideStatsPortfolioButton && (
+            <div className="profile-bento-stats-footer">
+              <button type="button" onClick={scrollToPortfolioSection} className="profile-bento-portfolio-btn">
+                {statsPortfolioLabel}
+                <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+                  <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -136,33 +153,38 @@ export default function ProfileHeroSection({
               </button>
             ) : (
                 <button
-                  onClick={scrollToPackages}
+                  type="button"
+                  onClick={scrollToPortfolioSection}
                   className="profile-bento-cta-primary profile-bento-cta-primary--package"
-                  aria-label="Xem các gói huấn luyện phù hợp"
+                  aria-label={statsPortfolioLabel}
                 >
-                  Xem gói phù hợp
+                  {statsPortfolioLabel}
                 </button>
             )}
-            {secondaryCta ? (
-              <button
-                onClick={secondaryCta.action}
-                className="profile-bento-cta-secondary profile-bento-cta-secondary--message"
-                aria-label={secondaryCta.text}
-              >
-                💬 {secondaryCta.text}
-              </button>
-            ) : (
-              <button
-                onClick={onMessage}
-                className="profile-bento-cta-secondary profile-bento-cta-secondary--message"
-                aria-label={`Nhắn tin với ${name} để được tư vấn`}
-              >
-                💬 Nhắn tin để tư vấn
-              </button>
+            {profileRole !== 'athlete' && (
+              secondaryCta ? (
+                <button
+                  type="button"
+                  onClick={secondaryCta.action}
+                  className="profile-bento-cta-secondary profile-bento-cta-secondary--message"
+                  aria-label={secondaryCta.text}
+                >
+                  💬 {secondaryCta.text}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onMessage}
+                  className="profile-bento-cta-secondary profile-bento-cta-secondary--message"
+                  aria-label={`Nhắn tin với ${name} để được tư vấn`}
+                >
+                  💬 Nhắn tin để tư vấn
+                </button>
+              )
             )}
-            {basePriceMonthly && (
+            {showPrice && (
               <span className="profile-bento-price">
-                Từ <strong>{basePriceMonthly.toLocaleString('vi-VN')}₫</strong>/tháng
+                Từ <strong>{basePriceMonthly!.toLocaleString('vi-VN')}₫</strong>/tháng
               </span>
             )}
           </div>

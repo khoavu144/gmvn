@@ -19,8 +19,16 @@ import GymTrainersSection from '../components/gym-detail/GymTrainersSection';
 import GymPricingSection from '../components/gym-detail/GymPricingSection';
 import GymSimilarSection from '../components/gym-detail/GymSimilarSection';
 import GymMapSection from '../components/gym-detail/GymMapSection';
+import { GymSectionHeading } from '../components/gym-detail/GymSectionHeading';
 
-
+function truncateMetaDescription(text: string, maxLen: number): string {
+    const t = text.trim();
+    if (t.length <= maxLen) return t;
+    const slice = t.slice(0, maxLen);
+    const lastSpace = slice.lastIndexOf(' ');
+    const head = lastSpace > 40 ? slice.slice(0, lastSpace) : slice;
+    return `${head.trimEnd()}…`;
+}
 
 const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 const TODAY_KEY = DAY_KEYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
@@ -32,24 +40,6 @@ const BILLING_LABELS: Record<string, string> = {
     per_year: '/ năm',
     per_session: '/ buổi',
 };
-function SectionHeading({
-    kicker,
-    title,
-    description,
-}: {
-    kicker: string;
-    title: string;
-    description?: string;
-}) {
-    return (
-        <div className="mb-6 space-y-2">
-            <div className="marketplace-section-kicker">{kicker}</div>
-            <h2 className="marketplace-section-title">{title}</h2>
-            {description && <p className="marketplace-lead max-w-none text-[0.98rem]">{description}</p>}
-        </div>
-    );
-}
-
 function SummaryPill({ label, value }: { label: string; value: string }) {
     return (
         <div className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
@@ -216,11 +206,6 @@ const GymDetailPage: React.FC = () => {
     const [activeBranchId, setActiveBranchId] = useState<string | null>(null);
     const [activeSection, setActiveSection] = useState('overview');
 
-    // Reset to overview tab whenever the user switches branches
-    useEffect(() => {
-        setActiveSection('overview');
-    }, [activeBranchId]);
-
     const [similarGyms, setSimilarGyms] = useState<GymCenter[]>([]);
 
     const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
@@ -372,9 +357,64 @@ const GymDetailPage: React.FC = () => {
         sectionRefs.current[sectionId] = node;
     }, []);
 
-    const scrollToSection = useCallback((sectionId: string) => {
-        setActiveSection(sectionId);
+    const navigateToSection = useCallback((sectionId: string) => {
+        const el = sectionRefs.current[sectionId];
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            setActiveSection(sectionId);
+            const base = `${window.location.pathname}${window.location.search}`;
+            window.history.replaceState(null, '', `${base}#${sectionId}`);
+        }
     }, []);
+
+    useEffect(() => {
+        if (loading || !gym) return;
+        const hash = window.location.hash.replace(/^#/, '');
+        if (!hash) return;
+        if (!visibleSections.some((s) => s.id === hash)) return;
+        const t = window.setTimeout(() => {
+            const el = sectionRefs.current[hash];
+            if (el) {
+                el.scrollIntoView({ behavior: 'auto', block: 'start' });
+                setActiveSection(hash);
+            }
+        }, 80);
+        return () => window.clearTimeout(t);
+    }, [loading, gym, visibleSections]);
+
+    useEffect(() => {
+        if (!gym) return;
+        let ticking = false;
+        const getOffset = () => {
+            const root = document.documentElement;
+            const h = parseFloat(getComputedStyle(root).getPropertyValue('--header-height')) || 56;
+            return h + 56;
+        };
+        const updateActive = () => {
+            ticking = false;
+            const offset = getOffset() + 12;
+            let current = visibleSections[0]?.id ?? 'overview';
+            for (const s of visibleSections) {
+                const el = sectionRefs.current[s.id];
+                if (!el) continue;
+                if (el.getBoundingClientRect().top <= offset) current = s.id;
+            }
+            setActiveSection((prev) => (prev === current ? prev : current));
+        };
+        const onScroll = () => {
+            if (!ticking) {
+                ticking = true;
+                requestAnimationFrame(updateActive);
+            }
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll, { passive: true });
+        updateActive();
+        return () => {
+            window.removeEventListener('scroll', onScroll);
+            window.removeEventListener('resize', onScroll);
+        };
+    }, [gym, visibleSections]);
 
     useEffect(() => {
         if (lightboxIdx === null) return;
@@ -438,23 +478,24 @@ const GymDetailPage: React.FC = () => {
     const canonicalUrl = `https://gymerviet.com/gyms/${gym.slug || gym.id}`;
     const seoTitle = `${gym.name} — ${venueLabel} trên GYMERVIET`;
     const seoDescription = gym.discovery_blurb || gym.tagline || gym.description || `${gym.name} — ${venueLabel} trên GYMERVIET.`;
+    const metaDescription = truncateMetaDescription(seoDescription, 155);
     const seoImage = heroImage?.image_url || gym.cover_image_url || gym.logo_url || '';
 
     const quickFacts = [
+        { label: 'Loại hình', value: venueLabel },
         {
-            label: 'Venue type',
-            value: venueLabel,
-        },
-        {
-            label: 'Entry price',
+            label: 'Giá vào từ',
             value: lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫${entryBillingCycle ? ` ${BILLING_LABELS[entryBillingCycle] || ''}` : ''}` : 'Liên hệ để nhận giá',
         },
         {
-            label: 'Trust score',
-            value: gym.trust_summary?.avg_rating != null ? `★ ${Number(gym.trust_summary.avg_rating).toFixed(1)} · ${gym.trust_summary.review_count} reviews` : 'Đang hoàn thiện trust data',
+            label: 'Điểm uy tín',
+            value:
+                gym.trust_summary?.avg_rating != null
+                    ? `★ ${Number(gym.trust_summary.avg_rating).toFixed(1)} · ${gym.trust_summary.review_count} đánh giá`
+                    : 'Đang cập nhật đánh giá',
         },
         {
-            label: 'Best for',
+            label: 'Phù hợp',
             value: getTaxonomyLabels(gym, 'audience', 1)[0] || 'Người đang tìm venue phù hợp',
         },
     ];
@@ -464,11 +505,11 @@ const GymDetailPage: React.FC = () => {
         <>
             <Helmet>
                 <title>{seoTitle}</title>
-                <meta name="description" content={seoDescription} />
+                <meta name="description" content={metaDescription} />
                 <link rel="canonical" href={canonicalUrl} />
                 <meta property="og:type" content="business.business" />
                 <meta property="og:title" content={seoTitle} />
-                <meta property="og:description" content={seoDescription} />
+                <meta property="og:description" content={metaDescription} />
                 <meta property="og:url" content={canonicalUrl} />
                 <meta property="og:site_name" content="GYMERVIET" />
                 {seoImage && <meta property="og:image" content={seoImage} />}
@@ -476,7 +517,7 @@ const GymDetailPage: React.FC = () => {
                 {seoImage && <meta property="og:image:height" content="800" />}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={seoTitle} />
-                <meta name="twitter:description" content={seoDescription} />
+                <meta name="twitter:description" content={metaDescription} />
                 {seoImage && <meta name="twitter:image" content={seoImage} />}
                 <script type="application/ld+json">{JSON.stringify({
                     '@context': 'https://schema.org',
@@ -501,13 +542,13 @@ const GymDetailPage: React.FC = () => {
                     onClick={() => setLightboxIdx(null)}
                     role="dialog"
                     aria-modal="true"
-                    aria-label="Image gallery"
+                    aria-label="Thư viện ảnh"
                 >
                     <button
                         type="button"
                         onClick={() => setLightboxIdx(null)}
                         className="absolute right-5 top-5 text-3xl font-bold text-white/75 transition motion-reduce:transition-none hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 rounded-full w-12 h-12 flex items-center justify-center"
-                        aria-label="Close gallery"
+                        aria-label="Đóng thư viện ảnh"
                     >
                         ×
                     </button>
@@ -520,7 +561,7 @@ const GymDetailPage: React.FC = () => {
                                     setLightboxIdx((current) => current === null ? 0 : (current - 1 + gallery.length) % gallery.length);
                                 }}
                                 className="absolute left-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-xl font-bold text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
-                                aria-label="Previous image"
+                                aria-label="Ảnh trước"
                             >
                                 ‹
                             </button>
@@ -531,7 +572,7 @@ const GymDetailPage: React.FC = () => {
                                     setLightboxIdx((current) => current === null ? 0 : (current + 1) % gallery.length);
                                 }}
                                 className="absolute right-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-xl font-bold text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
-                                aria-label="Next image"
+                                aria-label="Ảnh sau"
                             >
                                 ›
                             </button>
@@ -546,8 +587,8 @@ const GymDetailPage: React.FC = () => {
                 </div>
             )}
 
-            <div className="marketplace-shell min-h-screen pb-24">
-                <div className="marketplace-container pt-6">
+            <div className="marketplace-shell gym-detail-page min-h-screen pb-24 lg:pb-24">
+                <div className="marketplace-container pt-4 md:pt-6">
                     <div className="mb-5 flex items-center justify-between gap-4">
                         <Link to="/gyms" className="back-link">← Quay lại marketplace</Link>
                         <div className="hidden items-center gap-2 md:flex">
@@ -581,7 +622,7 @@ const GymDetailPage: React.FC = () => {
                                 <div className="absolute left-5 right-5 top-5 flex flex-wrap items-start justify-between gap-3">
                                     <div className="flex flex-wrap gap-2">
                                         <span className="marketplace-badge marketplace-badge--accent">{venueLabel}</span>
-                                        {gym.is_verified && <span className="marketplace-badge marketplace-badge--verified">Verified</span>}
+                                        {gym.is_verified && <span className="marketplace-badge marketplace-badge--verified">Đã xác minh</span>}
                                         {branchStatusBadges.slice(0, 2).map((badge) => (
                                             <span key={badge} className="marketplace-badge marketplace-badge--neutral border-white/16 bg-white/12 text-white">
                                                 {badge}
@@ -617,9 +658,9 @@ const GymDetailPage: React.FC = () => {
                                 )}
                             </div>
 
-                            <div className="flex flex-col justify-between p-6 sm:p-8 lg:p-10">
-                                <div className="space-y-5">
-                                    <div className="marketplace-eyebrow">Marketplace detail</div>
+                            <div className="flex flex-col justify-between p-6 sm:p-7 lg:p-8">
+                                <div className="space-y-4">
+                                    <div className="marketplace-eyebrow">Chi tiết phòng tập</div>
 
                                     <div>
                                         <h1 className="text-[clamp(2.3rem,4vw,4.2rem)] font-bold leading-[0.92] tracking-[-0.07em] text-[color:var(--mk-text)]">
@@ -640,7 +681,7 @@ const GymDetailPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                                <div className="mt-6 grid gap-3 sm:grid-cols-2">
                                     {quickFacts.map((fact) => (
                                         <SummaryPill key={fact.label} label={fact.label} value={fact.value} />
                                     ))}
@@ -650,14 +691,14 @@ const GymDetailPage: React.FC = () => {
                     </section>
                 </div>
 
-                <div className="marketplace-container mt-6">
-                    <div className="sticky top-0 z-30 rounded-lg border border-[color:var(--mk-line)] bg-[rgba(255,251,244,0.82)] px-3 py-2 backdrop-blur-xl">
+                <div className="marketplace-container mt-4 md:mt-6">
+                    <div className="gym-detail-subnav rounded-lg border border-[color:var(--mk-line)] bg-[rgba(255,251,244,0.82)] px-3 py-2 backdrop-blur-xl">
                         <div className="flex items-center gap-2 overflow-x-auto">
                             {visibleSections.map((section) => (
                                 <button
                                     key={section.id}
                                     type="button"
-                                    onClick={() => setActiveSection(section.id)}
+                                    onClick={() => navigateToSection(section.id)}
                                     className={`shrink-0 rounded-lg px-4 py-2 text-[0.72rem] font-bold uppercase tracking-[0.16em] transition ${activeSection === section.id ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)] hover:bg-white/70'}`}
                                 >
                                     {section.label}
@@ -667,11 +708,10 @@ const GymDetailPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="marketplace-container mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.45fr)]">
-                    <div className="space-y-6">
-                        {activeSection === 'overview' && (
-                            <section ref={setRef('overview')} id="overview" className="marketplace-panel p-6 sm:p-8">
-                                <SectionHeading
+                <div className="marketplace-container mt-4 md:mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.45fr)]">
+                    <div className="flex flex-col gap-8">
+                        <section ref={setRef('overview')} id="overview" className="gym-detail-section marketplace-panel p-6 sm:p-8">
+                                <GymSectionHeading
                                     kicker="Tổng quan"
                                     title="Tóm tắt về cơ sở"
                                     description="Một bức chân dung nhanh để biết nơi này có đúng phong cách tập, mức đầu tư và trải nghiệm bạn đang tìm hay không."
@@ -708,39 +748,36 @@ const GymDetailPage: React.FC = () => {
                                         <SummaryPill label="Phản hồi" value={gym.response_sla_text || leadAction.helper} />
                                     </div>
                                 </div>
-                            </section>
-                        )}
+                        </section>
 
-                        {activeSection === 'zones' && branchZones.length > 0 && <GymZonesSection branchZones={branchZones} setRef={setRef} />}
+                        {branchZones.length > 0 && <GymZonesSection branchZones={branchZones} setRef={setRef} />}
 
-                        {activeSection === 'facilities' && (branchAmenities.length > 0 || branchEquipment.length > 0) && (
-                            <GymFacilitiesSection 
-                                branchAmenities={branchAmenities} 
-                                branchEquipment={branchEquipment} 
-                                branchEquipmentGroups={branchEquipmentGroups} 
-                                setRef={setRef} 
+                        {(branchAmenities.length > 0 || branchEquipment.length > 0) && (
+                            <GymFacilitiesSection
+                                branchAmenities={branchAmenities}
+                                branchEquipment={branchEquipment}
+                                branchEquipmentGroups={branchEquipmentGroups}
+                                setRef={setRef}
                             />
                         )}
 
-                        {activeSection === 'trainers' && branchTrainerLinks.length > 0 && (
+                        {branchTrainerLinks.length > 0 && (
                             <GymTrainersSection branchTrainerLinks={branchTrainerLinks} setRef={setRef} />
                         )}
 
-                        {activeSection === 'pricing' && branchPricing.length > 0 && (
+                        {branchPricing.length > 0 && (
                             <GymPricingSection branchPricing={branchPricing} setRef={setRef} leadAction={leadAction} />
                         )}
 
-                        {activeSection === 'schedule' && branchPrograms.length > 0 && (
+                        {branchPrograms.length > 0 && (
                             <GymProgramsSection branchPrograms={branchPrograms} gymId={gym.id} branchId={branchDetail?.id} setRef={setRef} />
                         )}
 
-                        {activeSection === 'reviews' && <GymReviewsSection gymId={gym.id} branchId={branchId} gymTrustSummary={gym.trust_summary} setRef={setRef} />}
+                        <GymReviewsSection gymId={gym.id} branchId={branchId} gymTrustSummary={gym.trust_summary} setRef={setRef} />
 
-                        {activeSection === 'similar' && similarGyms.length > 0 && (
-                            <GymSimilarSection similarGyms={similarGyms} setRef={setRef} />
-                        )}
+                        {similarGyms.length > 0 && <GymSimilarSection similarGyms={similarGyms} setRef={setRef} />}
 
-                        {activeSection === 'map' && (branchMapEmbedUrl || hasCoordinates) && (
+                        {(branchMapEmbedUrl || hasCoordinates) && (
                             <GymMapSection
                                 branchMapEmbedUrl={branchMapEmbedUrl}
                                 branchLatitude={branchLatitude}
@@ -752,7 +789,7 @@ const GymDetailPage: React.FC = () => {
                         )}
                     </div>
 
-                    <aside className="marketplace-sticky-rail space-y-4" style={{ contain: 'layout paint' }}>
+                    <aside className="gym-detail-sticky-rail space-y-4" style={{ contain: 'layout paint' }}>
                         <div className="marketplace-panel p-5 sm:p-6">
                             <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Quyết định nhanh</div>
                             <div className="mt-3 text-sm font-semibold text-[color:var(--mk-text-soft)]">Chi nhánh đang xem</div>
@@ -780,7 +817,7 @@ const GymDetailPage: React.FC = () => {
                                 )}
                                 <button
                                     type="button"
-                                    onClick={() => scrollToSection(branchPrograms.length > 0 ? 'schedule' : 'pricing')}
+                                    onClick={() => navigateToSection(branchPrograms.length > 0 ? 'schedule' : 'pricing')}
                                     className="block w-full rounded-lg border border-[color:var(--mk-line)] bg-white/70 px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/55"
                                 >
                                     {branchPrograms.length > 0 ? 'Xem lịch lớp' : 'Xem bảng giá'}
@@ -850,7 +887,7 @@ const GymDetailPage: React.FC = () => {
                                     url={canonicalUrl}
                                     title={seoTitle}
                                     text={seoDescription}
-                                    label="Share Facebook"
+                                    label="Chia sẻ Facebook"
                                     variant="facebook"
                                     className="!rounded-lg !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
                                     titleAttr="Chia sẻ venue này lên Facebook"
@@ -872,7 +909,7 @@ const GymDetailPage: React.FC = () => {
                     <div className="rounded-lg border border-white/14 bg-[rgba(29,22,18,0.94)] px-4 py-3 text-white shadow-[color:var(--mk-shadow-soft)] backdrop-blur-xl">
                         <div className="flex items-center justify-between gap-3">
                             <div>
-                                <div className="text-[0.64rem] font-bold uppercase tracking-[0.18em] text-white/48">Chí phí ước tính từ</div>
+                                <div className="text-[0.64rem] font-bold uppercase tracking-[0.18em] text-white/48">Chi phí ước tính từ</div>
                                 <div className="mt-1 text-lg font-bold tracking-[-0.04em]">
                                     {lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫` : 'Liên hệ'}
                                 </div>
