@@ -15,8 +15,6 @@ import type {
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001/api/v1';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────
-
 function formatPrice(n: number | string, currency = 'VND'): string {
     const num = Number(n);
     if (currency === 'VND') {
@@ -25,22 +23,30 @@ function formatPrice(n: number | string, currency = 'VND'): string {
     return num.toLocaleString('en-US', { style: 'currency', currency });
 }
 
-// ─── Product Card ─────────────────────────────────────────────────────────
+function uniqueProductsById(items: Product[]) {
+    const seen = new Set<string>();
+    return items.filter((item) => {
+        if (!item?.id || seen.has(item.id)) return false;
+        seen.add(item.id);
+        return true;
+    });
+}
 
 export const ProductCard = React.memo(function ProductCard({
     product,
-    variant = 'standard',
+    variant = 'listing',
     priorityThumb = false,
 }: {
     product: Product;
-    variant?: 'featured' | 'standard' | 'compact';
-    /** First hero row image only — improves LCP on marketplace */
+    variant?: 'spotlight' | 'listing' | 'rail';
     priorityThumb?: boolean;
 }) {
     const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
     const discountPct = hasDiscount
         ? Math.round(((product.compare_at_price! - product.price) / product.compare_at_price!) * 100)
         : 0;
+    const isRail = variant === 'rail';
+    const isSpotlight = variant === 'spotlight';
 
     return (
         <Link
@@ -62,7 +68,7 @@ export const ProductCard = React.memo(function ProductCard({
                         <span aria-hidden="true">{product.category?.icon_emoji ?? '📦'}</span>
                     </div>
                 )}
-                {product.product_type === 'digital' && variant !== 'compact' && (
+                {product.product_type === 'digital' && !isRail && (
                     <span className="marketplace-badge marketplace-badge--digital">Digital</span>
                 )}
                 {discountPct > 0 && (
@@ -71,14 +77,15 @@ export const ProductCard = React.memo(function ProductCard({
             </div>
 
             <div className="marketplace-card-body">
-                {variant !== 'compact' && (
+                {!isRail && (
                     <span className="marketplace-card-category">
                         {product.category?.icon_emoji} {product.category?.label}
                     </span>
                 )}
+
                 <h3 className="marketplace-card-title">{product.title}</h3>
 
-                {variant !== 'compact' && product.seller && (
+                {!isRail && product.seller && (
                     <div className="marketplace-card-meta">
                         <div className="marketplace-card-seller">
                             {product.seller.avatar_url ? (
@@ -96,6 +103,12 @@ export const ProductCard = React.memo(function ProductCard({
                             )}
                             <span>{product.seller.full_name}</span>
                         </div>
+                        {isSpotlight && product.review_count > 0 ? (
+                            <div className="marketplace-card-rating">
+                                <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-500" aria-hidden strokeWidth={1.5} />
+                                <span>{product.avg_rating != null ? Number(product.avg_rating).toFixed(1) : '—'}</span>
+                            </div>
+                        ) : null}
                     </div>
                 )}
 
@@ -106,7 +119,7 @@ export const ProductCard = React.memo(function ProductCard({
                             <s className="marketplace-card-price-orig">{formatPrice(product.compare_at_price!, product.currency)}</s>
                         )}
                     </div>
-                    {variant !== 'compact' && (
+                    {!isRail && !isSpotlight && (
                         <div className="marketplace-card-rating-slot">
                             {product.review_count > 0 ? (
                                 <div className="marketplace-card-rating">
@@ -125,8 +138,6 @@ export const ProductCard = React.memo(function ProductCard({
     );
 });
 ProductCard.displayName = 'ProductCard';
-
-// ─── Category Pill ────────────────────────────────────────────────────────
 
 function MarketplaceProductSkeleton() {
     return (
@@ -163,8 +174,6 @@ const CategoryPill = React.memo(function CategoryPill({
 });
 CategoryPill.displayName = 'CategoryPill';
 
-// ─── Main Page ────────────────────────────────────────────────────────────
-
 export default function MarketplacePage() {
     const [searchParams, setSearchParams] = useSearchParams();
     const [categories, setCategories] = useState<ProductCategory[]>([]);
@@ -177,7 +186,7 @@ export default function MarketplacePage() {
     const [listError, setListError] = useState(false);
     const [searchInput, setSearchInput] = useState(searchParams.get('q') ?? '');
     const filterRef = useRef<HTMLElement>(null);
-    const newArrivalsRailRef = useRef<HTMLDivElement>(null);
+    const merchRailRef = useRef<HTMLDivElement>(null);
     const railRafRef = useRef<number | null>(null);
     const [railCanPrev, setRailCanPrev] = useState(false);
     const [railCanNext, setRailCanNext] = useState(false);
@@ -185,7 +194,7 @@ export default function MarketplacePage() {
     const [heroDataLoaded, setHeroDataLoaded] = useState(false);
 
     const updateRailScrollState = useCallback(() => {
-        const el = newArrivalsRailRef.current;
+        const el = merchRailRef.current;
         if (!el) return;
         if (railRafRef.current !== null) return;
         railRafRef.current = requestAnimationFrame(() => {
@@ -197,11 +206,11 @@ export default function MarketplacePage() {
         });
     }, []);
 
-    const scrollNewArrivalsRail = useCallback(
+    const scrollMerchRail = useCallback(
         (direction: -1 | 1) => {
-            const el = newArrivalsRailRef.current;
+            const el = merchRailRef.current;
             if (!el) return;
-            const step = Math.max(240, Math.round(el.clientWidth * 0.72));
+            const step = Math.max(220, Math.round(el.clientWidth * 0.82));
             el.scrollBy({ left: direction * step, behavior: 'smooth' });
             window.setTimeout(updateRailScrollState, 320);
         },
@@ -211,13 +220,13 @@ export default function MarketplacePage() {
     const activeCategory = searchParams.get('category') ?? '';
     const activeSearch = searchParams.get('q') ?? '';
     const activeSort = searchParams.get('sort') ?? 'popular';
+    const showHero = !activeCategory && !activeSearch;
 
     const qParam = searchParams.get('q') ?? '';
     useEffect(() => {
         setSearchInput(qParam);
     }, [qParam]);
 
-    // Load categories + featured on idle to reduce main-thread contention during initial render
     useEffect(() => {
         if (heroDataLoaded) return;
         if (typeof window === 'undefined') return;
@@ -237,19 +246,19 @@ export default function MarketplacePage() {
                     cancelIdle?.(id);
                 };
             }
-            const t = setTimeout(cb, 650);
-            return () => clearTimeout(t);
+            const timeout = setTimeout(cb, 650);
+            return () => clearTimeout(timeout);
         };
 
         const cancel = runIdle(() => {
             axios.get<MarketplaceCategoriesResponse>(`${API}/marketplace/categories`)
-                .then(r => setCategories(r.data.categories))
+                .then((response) => setCategories(response.data.categories))
                 .catch(() => {});
 
             axios.get<MarketplaceFeaturedResponse>(`${API}/marketplace/featured`)
-                .then(r => {
-                    setFeatured(r.data.featured ?? []);
-                    setNewArrivals(r.data.new_arrivals ?? []);
+                .then((response) => {
+                    setFeatured(response.data.featured ?? []);
+                    setNewArrivals(response.data.new_arrivals ?? []);
                     setHeroDataLoaded(true);
                 })
                 .catch(() => {
@@ -260,7 +269,6 @@ export default function MarketplacePage() {
         return cancel;
     }, [heroDataLoaded]);
 
-    // Load products on filter change
     const pageLimit = reducedEffects ? 8 : 20;
 
     const loadProducts = useCallback(async (pg = 1) => {
@@ -275,13 +283,13 @@ export default function MarketplacePage() {
             if (activeCategory) params['category'] = activeCategory;
             if (activeSearch) params['search'] = activeSearch;
 
-            const r = await axios.get<MarketplaceListResponse>(`${API}/marketplace/products`, { params });
+            const response = await axios.get<MarketplaceListResponse>(`${API}/marketplace/products`, { params });
             if (pg === 1) {
-                setProducts(r.data.products);
+                setProducts(response.data.products);
             } else {
-                setProducts((prev) => [...prev, ...r.data.products]);
+                setProducts((prev) => [...prev, ...response.data.products]);
             }
-            setTotal(r.data.total);
+            setTotal(response.data.total);
             setPage(pg);
         } catch {
             setListError(true);
@@ -309,50 +317,79 @@ export default function MarketplacePage() {
         setSearchParams(next);
     }
 
-    function handleSearch(e: React.FormEvent) {
-        e.preventDefault();
+    function handleSearch(event: React.FormEvent) {
+        event.preventDefault();
         setFilter('q', searchInput.trim());
         filterRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    const showHero = !activeCategory && !activeSearch;
-
-    const curatedPicks = useMemo(
-        () =>
-            products
-                .filter((p) => (p.featured_weight ?? 0) > 80 && !featured.some((f) => f.id === p.id))
-                .slice(0, reducedEffects ? 1 : 3),
-        [products, featured, reducedEffects]
-    );
-
     const featuredItems = useMemo(
-        () => featured.slice(0, reducedEffects ? 1 : 3),
+        () => uniqueProductsById(featured).slice(0, reducedEffects ? 2 : 4),
         [featured, reducedEffects]
     );
 
     const newArrivalsItems = useMemo(
-        () => (reducedEffects ? newArrivals.slice(0, 4) : newArrivals),
+        () => uniqueProductsById(newArrivals).slice(0, reducedEffects ? 4 : 8),
         [newArrivals, reducedEffects]
     );
 
+    const curatedPicks = useMemo(
+        () =>
+            products
+                .filter((product) => (product.featured_weight ?? 0) > 80 && !featuredItems.some((item) => item.id === product.id))
+                .slice(0, reducedEffects ? 2 : 4),
+        [products, featuredItems, reducedEffects]
+    );
+
+    const spotlightProduct = useMemo(
+        () => featuredItems[0] ?? newArrivalsItems[0] ?? curatedPicks[0] ?? products[0] ?? null,
+        [featuredItems, newArrivalsItems, curatedPicks, products]
+    );
+
+    const merchShelfItems = useMemo(
+        () =>
+            uniqueProductsById([
+                ...featuredItems.slice(1),
+                ...newArrivalsItems,
+                ...curatedPicks,
+            ])
+                .filter((product) => product.id !== spotlightProduct?.id)
+                .slice(0, reducedEffects ? 4 : 6),
+        [featuredItems, newArrivalsItems, curatedPicks, spotlightProduct, reducedEffects]
+    );
+
+    const activeCategoryLabel = activeCategory
+        ? categories.find((category) => category.slug === activeCategory)?.label ?? 'Sản phẩm'
+        : '';
+
+    const pageKicker = showHero ? 'Browse marketplace' : activeCategory ? 'Đang lọc theo danh mục' : 'Đang lọc theo từ khóa';
+    const pageTitle = showHero
+        ? 'Mọi thứ bạn cần cho hành trình fitness'
+        : activeCategory
+            ? activeCategoryLabel
+            : `Kết quả cho "${activeSearch}"`;
+    const pageDescription = showHero
+        ? 'Gói tập, gear và supplements được gom lại để bạn duyệt nhanh và chọn gọn hơn.'
+        : 'Danh sách đang bám đúng bộ lọc bạn vừa chọn.';
+
     useEffect(() => {
-        const el = newArrivalsRailRef.current;
-        if (!el || !showHero || newArrivalsItems.length === 0) return;
+        const el = merchRailRef.current;
+        if (!el || !showHero || merchShelfItems.length === 0) return;
 
         updateRailScrollState();
         el.addEventListener('scroll', updateRailScrollState, { passive: true });
-        const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateRailScrollState) : null;
-        ro?.observe(el);
+        const resizeObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateRailScrollState) : null;
+        resizeObserver?.observe(el);
 
         return () => {
             el.removeEventListener('scroll', updateRailScrollState);
-            ro?.disconnect();
+            resizeObserver?.disconnect();
             if (railRafRef.current !== null) {
                 cancelAnimationFrame(railRafRef.current);
                 railRafRef.current = null;
             }
         };
-    }, [showHero, newArrivalsItems.length, updateRailScrollState]);
+    }, [showHero, merchShelfItems.length, updateRailScrollState]);
 
     return (
         <>
@@ -363,138 +400,121 @@ export default function MarketplacePage() {
 
             <div className="marketplace-page">
                 <div className="marketplace-container gv-pad-y">
-                {/* Hero */}
-                {showHero && (
-                    <section className="marketplace-editorial-intro">
-                        <h1 className="marketplace-editorial-title">
-                            Mọi thứ bạn cần cho hành trình fitness
-                        </h1>
-                        <p className="marketplace-editorial-sub">
-                            Gói tập từ coach uy tín · Gear chính hãng · Supplements an toàn · Máy tập chất lượng. Khám phá các lựa chọn tốt nhất được tuyển chọn cho bạn.
-                        </p>
-                        <form className="marketplace-editorial-search" onSubmit={handleSearch}>
-                            <input
-                                type="search"
-                                placeholder="Tìm gói tập, whey protein, găng tay..."
-                                value={searchInput}
-                                onChange={e => setSearchInput(e.target.value)}
-                                className="marketplace-editorial-search-input"
-                            />
-                            <button type="submit" className="marketplace-editorial-search-btn">
-                                <Search className="h-4 w-4 shrink-0" aria-hidden />
-                                Tìm kiếm
-                            </button>
-                        </form>
-                    </section>
-                )}
-
-                    {/* Category filter bar */}
-                    <nav ref={filterRef} className="marketplace-cat-bar" aria-label="Danh mục sản phẩm">
-                        <CategoryPill
-                            category={{ slug: '', label: 'Tất cả', icon_emoji: '🏪' }}
-                            active={!activeCategory}
-                            onClick={() => setFilter('category', '')}
-                        />
-                        {categories.map(cat => (
-                            <CategoryPill
-                                key={cat.id}
-                                category={cat}
-                                active={activeCategory === cat.slug}
-                                onClick={() => setFilter('category', cat.slug)}
-                            />
-                        ))}
-                    </nav>
-
-                    {!showHero && (
-                        <form className="marketplace-compact-search" onSubmit={handleSearch}>
-                            <div className="marketplace-compact-search-field">
-                                <Search className="h-4 w-4" aria-hidden />
-                                <input
-                                    type="search"
-                                    className="form-input coaches-dir-control marketplace-compact-search-input"
-                                    placeholder="Tìm gói tập, whey protein, găng tay..."
-                                    aria-label="Tìm kiếm sản phẩm marketplace"
-                                    value={searchInput}
-                                    onChange={(e) => setSearchInput(e.target.value)}
-                                />
-                            </div>
-                            <button type="submit" className="marketplace-compact-search-btn">
-                                <Search className="h-4 w-4 shrink-0" aria-hidden />
-                                Tìm kiếm
-                            </button>
-                        </form>
-                    )}
-
-                    {/* Sort bar */}
-                    <div className="marketplace-toolbar">
-                        <span className="marketplace-toolbar-count">
-                            {loading && total === 0
-                                ? 'Đang tải danh sách…'
-                                : `${total.toLocaleString('vi-VN')} sản phẩm`}
-                        </span>
-                        <div className="marketplace-sort">
-                            <label htmlFor="marketplace-sort-select" className="sr-only">Sắp xếp</label>
-                            <select
-                                id="marketplace-sort-select"
-                                value={activeSort}
-                                onChange={(e) => setFilter('sort', e.target.value)}
-                                className="form-input coaches-dir-control marketplace-sort-select min-w-[11rem] py-2 text-sm font-semibold"
-                            >
-                                <option value="popular">Phổ biến nhất</option>
-                                <option value="newest">Mới nhất</option>
-                                <option value="price_asc">Giá thấp → cao</option>
-                                <option value="price_desc">Giá cao → thấp</option>
-                                <option value="rating">Đánh giá cao</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {/* Featured bento — only on homepage */}
-                    {showHero && featuredItems.length > 0 && (
-                        <section className="marketplace-section">
-                            <div className="marketplace-section-head">
-                                <p className="marketplace-section-kicker">Lựa chọn nổi bật</p>
-                                <h2 className="marketplace-section-title">Nổi bật</h2>
-                            </div>
-                            <div className="marketplace-bento">
-                                {featuredItems.map((p, index) => (
-                                    <ProductCard
-                                        key={p.id}
-                                        product={p}
-                                        variant="featured"
-                                        priorityThumb={index === 0 && !reducedEffects}
+                    <header className="marketplace-browse-hero">
+                        <div className={`marketplace-browse-hero-grid ${showHero && spotlightProduct ? '' : 'marketplace-browse-hero-grid--single'}`}>
+                            <section className="marketplace-editorial-intro">
+                                <span className="marketplace-eyebrow">{pageKicker}</span>
+                                <h1 className="marketplace-editorial-title">{pageTitle}</h1>
+                                <p className="marketplace-editorial-sub">{pageDescription}</p>
+                                <form className="marketplace-editorial-search" onSubmit={handleSearch}>
+                                    <input
+                                        type="search"
+                                        placeholder="Tìm gói tập, whey protein, găng tay..."
+                                        value={searchInput}
+                                        onChange={(event) => setSearchInput(event.target.value)}
+                                        className="marketplace-editorial-search-input"
+                                        aria-label="Tìm kiếm sản phẩm marketplace"
                                     />
-                                ))}
-                            </div>
-                        </section>
-                    )}
+                                    <button type="submit" className="marketplace-editorial-search-btn">
+                                        <Search className="h-4 w-4 shrink-0" aria-hidden />
+                                        Tìm kiếm
+                                    </button>
+                                </form>
+                            </section>
 
-                    {/* New arrivals rail — only on homepage */}
-                    {showHero && newArrivalsItems.length > 0 && (
-                        <section className="marketplace-section">
-                            <div className="marketplace-section-head">
-                                <p className="marketplace-section-kicker">Vừa lên kệ</p>
-                                <h2 className="marketplace-section-title">Mới nhất</h2>
+                            {showHero && spotlightProduct && (
+                                <aside className="marketplace-merch-spotlight" aria-label="Sản phẩm spotlight">
+                                    <div className="marketplace-merch-spotlight-copy">
+                                        <p className="marketplace-section-kicker">Spotlight tuần này</p>
+                                        <h2 className="marketplace-section-title">Một lựa chọn để mở nhịp browse</h2>
+                                        <p className="marketplace-lead">
+                                            Mở nhịp nhanh rồi xuống thẳng danh sách chính.
+                                        </p>
+                                    </div>
+                                    <ProductCard
+                                        product={spotlightProduct}
+                                        variant="spotlight"
+                                        priorityThumb={!reducedEffects}
+                                    />
+                                </aside>
+                            )}
+                        </div>
+                    </header>
+
+                    <section ref={filterRef} className="marketplace-controls-shell" aria-label="Điều hướng marketplace">
+                        <nav className="marketplace-cat-bar" aria-label="Danh mục sản phẩm">
+                            <CategoryPill
+                                category={{ slug: '', label: 'Tất cả', icon_emoji: '🏪' }}
+                                active={!activeCategory}
+                                onClick={() => setFilter('category', '')}
+                            />
+                            {categories.map((category) => (
+                                <CategoryPill
+                                    key={category.id}
+                                    category={category}
+                                    active={activeCategory === category.slug}
+                                    onClick={() => setFilter('category', category.slug)}
+                                />
+                            ))}
+                        </nav>
+
+                        <div className="marketplace-toolbar">
+                            <div className="marketplace-toolbar-main">
+                                <p className="marketplace-section-kicker">{showHero ? 'Duyệt nhanh theo nhịp chính' : 'Bộ lọc hiện tại'}</p>
+                                <span className="marketplace-toolbar-count">
+                                    {loading && total === 0
+                                        ? 'Đang tải danh sách…'
+                                        : `${total.toLocaleString('vi-VN')} sản phẩm`}
+                                </span>
                             </div>
-                            <div className="marketplace-rail-wrap">
+                            <div className="marketplace-sort">
+                                <label htmlFor="marketplace-sort-select" className="sr-only">Sắp xếp</label>
+                                <select
+                                    id="marketplace-sort-select"
+                                    value={activeSort}
+                                    onChange={(event) => setFilter('sort', event.target.value)}
+                                    className="form-input coaches-dir-control marketplace-sort-select min-w-[11rem] py-2 text-sm font-semibold"
+                                >
+                                    <option value="popular">Phổ biến nhất</option>
+                                    <option value="newest">Mới nhất</option>
+                                    <option value="price_asc">Giá thấp → cao</option>
+                                    <option value="price_desc">Giá cao → thấp</option>
+                                    <option value="rating">Đánh giá cao</option>
+                                </select>
+                            </div>
+                        </div>
+                    </section>
+
+                    {showHero && merchShelfItems.length > 0 && (
+                        <section className="marketplace-section marketplace-merch-shelf" aria-label="Gợi ý duyệt nhanh">
+                            <div className="marketplace-section-head marketplace-section-head--split">
+                                <div>
+                                    <p className="marketplace-section-kicker">Gợi ý ngắn gọn</p>
+                                    <h2 className="marketplace-section-title">Một lane duy nhất để mở rộng lựa chọn</h2>
+                                </div>
+                                <Link to="/marketplace?sort=newest" className="marketplace-typo-cta">
+                                    Xem hàng mới
+                                </Link>
+                            </div>
+                            <div className="marketplace-rail-wrap marketplace-rail-wrap--compact">
                                 <button
                                     type="button"
                                     className="marketplace-rail-nav marketplace-rail-nav--prev"
-                                    onClick={() => scrollNewArrivalsRail(-1)}
+                                    onClick={() => scrollMerchRail(-1)}
                                     disabled={!railCanPrev}
                                     aria-label="Cuộn sản phẩm về trước"
                                 >
                                     <ChevronLeft className="h-5 w-5" aria-hidden />
                                 </button>
-                                <div ref={newArrivalsRailRef} className="marketplace-rail">
-                                    {newArrivalsItems.map((p) => (
-                                        <ProductCard key={p.id} product={p} variant="compact" />
+                                <div ref={merchRailRef} className="marketplace-rail">
+                                    {merchShelfItems.map((product) => (
+                                        <ProductCard key={product.id} product={product} variant="rail" />
                                     ))}
                                 </div>
                                 <button
                                     type="button"
                                     className="marketplace-rail-nav marketplace-rail-nav--next"
-                                    onClick={() => scrollNewArrivalsRail(1)}
+                                    onClick={() => scrollMerchRail(1)}
                                     disabled={!railCanNext}
                                     aria-label="Cuộn sản phẩm tiếp"
                                 >
@@ -504,43 +524,17 @@ export default function MarketplacePage() {
                         </section>
                     )}
 
-                    {/* Curated Picks — only when có ít nhất một sản phẩm gợi ý */}
-                    {showHero && curatedPicks.length > 0 && (
-                        <section className="marketplace-section">
-                            <div className="marketplace-section-head">
-                                <p className="marketplace-section-kicker">Gymerviet gợi ý</p>
-                                <h2 className="marketplace-section-title">Biên tập chọn</h2>
-                            </div>
-                            <div className="marketplace-grid">
-                                {curatedPicks.map((p) => (
-                                    <ProductCard key={p.id} product={p} variant="standard" />
-                                ))}
-                                <Link
-                                    to="/marketplace?sort=newest"
-                                    className="marketplace-typo-slot"
-                                >
-                                    <p className="marketplace-typo-kicker">Tiêu chí lựa chọn</p>
-                                    <h3 className="marketplace-typo-title">
-                                        Ưu tiên sản phẩm mới, đánh giá tốt và seller uy tín.
-                                    </h3>
-                                    <p className="marketplace-typo-lead">
-                                        Lưới sản phẩm bên cạnh là lựa chọn nội bộ, không phải sắp xếp theo một tiêu chí đơn lẻ. Chọn &quot;Xem hàng mới&quot; để mở bộ lọc Mới nhất và khám phá thêm.
-                                    </p>
-                                    <span className="marketplace-typo-cta">Xem hàng mới →</span>
-                                </Link>
-                            </div>
-                        </section>
-                    )}
-
-                    {/* Main grid */}
-                    <section className="marketplace-section">
-                        {(activeCategory || activeSearch) && (
+                    <section className="marketplace-section marketplace-listing-section">
+                        <div className="marketplace-section-head marketplace-section-head--tight">
+                            <p className="marketplace-section-kicker">{showHero ? 'Danh sách chính' : 'Kết quả hiện tại'}</p>
                             <h2 className="marketplace-section-title">
-                                {activeCategory
-                                    ? categories.find(c => c.slug === activeCategory)?.label ?? 'Sản phẩm'
-                                    : `Kết quả cho "${activeSearch}"`}
+                                {showHero
+                                    ? 'Sản phẩm đang mở bán'
+                                    : activeCategory
+                                        ? activeCategoryLabel
+                                        : `Kết quả cho "${activeSearch}"`}
                             </h2>
-                        )}
+                        </div>
 
                         {listError && !loading && products.length === 0 ? (
                             <div className="marketplace-load-error">
@@ -554,9 +548,9 @@ export default function MarketplacePage() {
                                 </button>
                             </div>
                         ) : loading && products.length === 0 && !listError ? (
-                            <div className="marketplace-grid" aria-busy="true" aria-label="Đang tải sản phẩm">
-                                {Array.from({ length: 8 }).map((_, i) => (
-                                    <MarketplaceProductSkeleton key={i} />
+                            <div className="marketplace-grid marketplace-grid--loading" aria-busy="true" aria-label="Đang tải sản phẩm">
+                                {Array.from({ length: reducedEffects ? 6 : 8 }).map((_, index) => (
+                                    <MarketplaceProductSkeleton key={index} />
                                 ))}
                             </div>
                         ) : products.length === 0 ? (
@@ -566,8 +560,7 @@ export default function MarketplacePage() {
                                 </div>
                                 <h3>Không tìm thấy sản phẩm</h3>
                                 <p>
-                                    Thử từ khóa ngắn hơn, bỏ bớt bộ lọc hoặc chọn một danh mục khác — đôi khi chỉ cần quay lại
-                                    &quot;Tất cả&quot; là đủ lựa chọn.
+                                    Thử từ khóa ngắn hơn, bỏ bớt bộ lọc hoặc quay lại &quot;Tất cả&quot; để danh sách chính xuất hiện lại.
                                 </p>
                                 <div className="marketplace-empty-actions">
                                     {activeCategory ? (
@@ -601,25 +594,16 @@ export default function MarketplacePage() {
                                     >
                                         Xem tất cả sản phẩm
                                     </button>
-                                    {categories[0] ? (
-                                        <Link
-                                            to={`/marketplace?category=${categories[0].slug}`}
-                                            className="marketplace-btn-ghost"
-                                        >
-                                            Gợi ý: {categories[0].label}
-                                        </Link>
-                                    ) : null}
                                 </div>
                             </div>
                         ) : (
                             <div className="marketplace-grid">
-                                {products.map(p => (
-                                    <ProductCard key={p.id} product={p} />
+                                {products.map((product) => (
+                                    <ProductCard key={product.id} product={product} variant="listing" />
                                 ))}
                             </div>
                         )}
 
-                        {/* Load more */}
                         {products.length < total && !loading && (
                             <div className="marketplace-load-more">
                                 <button
@@ -630,8 +614,9 @@ export default function MarketplacePage() {
                                 </button>
                             </div>
                         )}
+
                         {loading && products.length > 0 && (
-                            <div className="marketplace-loading-more">Đang tải...</div>
+                            <div className="marketplace-loading-more">Đang tải thêm sản phẩm…</div>
                         )}
                     </section>
                 </div>

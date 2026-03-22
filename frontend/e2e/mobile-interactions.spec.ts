@@ -103,6 +103,7 @@ test.describe('mobile interaction stability', () => {
 
     await expect(page).toHaveURL(/\/marketplace\/product\/.+/, { timeout: 20_000 });
     await expect(page.locator('.mpd-cta-row')).toBeVisible({ timeout: 20_000 });
+    await expect(page.locator('.mpd-section-nav')).toBeVisible({ timeout: 20_000 });
     await expect(page.locator('.bottom-nav-item')).toHaveCount(0);
   });
 
