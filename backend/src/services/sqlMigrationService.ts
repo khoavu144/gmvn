@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { Client } from 'pg';
-import { getEnv } from '../config/env';
+import { createPgClient, normalizeDatabaseUrl } from '../config/parseDatabaseUrl';
+import { resolvePostgresSsl } from '../config/postgresSsl';
 
 export interface SqlMigration {
     name: string;
@@ -22,11 +23,25 @@ const compareMigrations = (a: SqlMigration, b: SqlMigration) => {
 };
 
 const createMigrationClient = () => {
-    const env = getEnv();
+    // CLI migrate:run only needs DATABASE_URL — do not require JWT_* or full AppEnv.
+    const raw = process.env.DATABASE_URL;
+    if (!raw?.trim()) {
+        throw new Error(
+            'DATABASE_URL is missing. Set it in backend/.env or repo-root .env (see .env.example). ' +
+                'Local example: postgresql://USER:PASS@localhost:5432/gymerviet'
+        );
+    }
+    const databaseUrl = normalizeDatabaseUrl(raw);
+    if (!/^postgres(ql)?:\/\//i.test(databaseUrl)) {
+        throw new Error(
+            'DATABASE_URL must start with postgres:// or postgresql:// (got unrecognized scheme).'
+        );
+    }
+    const nodeEnv = process.env.NODE_ENV || 'development';
 
-    return new Client({
-        connectionString: env.DATABASE_URL,
-        ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    return createPgClient({
+        connectionString: databaseUrl,
+        ssl: resolvePostgresSsl(databaseUrl, nodeEnv),
     });
 };
 

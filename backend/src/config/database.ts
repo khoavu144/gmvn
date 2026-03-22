@@ -76,13 +76,14 @@ import { UserProfileSection } from '../entities/UserProfileSection';
 import { UserProfileTerm } from '../entities/UserProfileTerm';
 import { UserProfileTermSelection } from '../entities/UserProfileTermSelection';
 import { GoogleFormImportLog } from '../entities/GoogleFormImportLog';
+import { resolvePostgresSsl } from './postgresSsl';
 
 const env = getEnv();
 
 export const AppDataSource = new DataSource({
     type: 'postgres',
     url: env.DATABASE_URL,
-    ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: resolvePostgresSsl(env.DATABASE_URL, env.NODE_ENV),
     synchronize: false,
     logging: env.NODE_ENV === 'development',
     entities: [

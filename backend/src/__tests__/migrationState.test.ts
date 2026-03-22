@@ -18,6 +18,7 @@ describe('Migration State Guard (Integrity Test)', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
         mockClient = new Client();
         (fs.existsSync as jest.Mock).mockReturnValue(true);
     });
@@ -27,11 +28,15 @@ describe('Migration State Guard (Integrity Test)', () => {
         (fs.readdirSync as jest.Mock).mockReturnValue(['001_initial.sql', '002_add_roles.sql']);
         (fs.readFileSync as jest.Mock).mockReturnValue('-- mock sql');
 
-        // Mock DB query returning ALL applied
-        mockClient.query.mockResolvedValueOnce({ rows: [] }); // ensureMigrationsTable
-        mockClient.query.mockResolvedValueOnce({ 
-            rows: [{ name: '001_initial.sql' }, { name: '002_add_roles.sql' }] 
-        }); // getExecutedMigrationNames
+        // Two getMigrationStatus() runs (test + assertNoPendingMigrations): 2 queries each.
+        const allAppliedRows = {
+            rows: [{ name: '001_initial.sql' }, { name: '002_add_roles.sql' }],
+        };
+        mockClient.query
+            .mockResolvedValueOnce({ rows: [] })
+            .mockResolvedValueOnce(allAppliedRows)
+            .mockResolvedValueOnce({ rows: [] })
+            .mockResolvedValueOnce(allAppliedRows);
 
         const status = await getMigrationStatus();
         expect(status.expected.length).toBe(2);
@@ -47,11 +52,13 @@ describe('Migration State Guard (Integrity Test)', () => {
         (fs.readdirSync as jest.Mock).mockReturnValue(['001_init.sql', '002_users.sql']);
         (fs.readFileSync as jest.Mock).mockReturnValue('-- sql');
 
-        // DB ONLY has 1 applied
-        mockClient.query.mockResolvedValueOnce({ rows: [] });
-        mockClient.query.mockResolvedValueOnce({ 
-            rows: [{ name: '001_init.sql' }] 
-        });
+        // DB ONLY has 1 applied (same 2-query pattern per getMigrationStatus call)
+        const partialRows = { rows: [{ name: '001_init.sql' }] };
+        mockClient.query
+            .mockResolvedValueOnce({ rows: [] })
+            .mockResolvedValueOnce(partialRows)
+            .mockResolvedValueOnce({ rows: [] })
+            .mockResolvedValueOnce(partialRows);
 
         const status = await getMigrationStatus();
         expect(status.pending.length).toBe(1);

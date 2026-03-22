@@ -3,3 +3,4 @@ dist/
 .env
 .env.local
 *.log
+supabase/all_migrations_bundled.sql

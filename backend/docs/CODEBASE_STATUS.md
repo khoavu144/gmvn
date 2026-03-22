@@ -1,7 +1,8 @@
 # Tình trạng codebase — Backend API (snapshot)
 
 **Cập nhật:** 2026-03-22  
-**Bản song song frontend:** [../../frontend/docs/CODEBASE_STATUS.md](../../frontend/docs/CODEBASE_STATUS.md)
+**Bản song song frontend:** [../../frontend/docs/CODEBASE_STATUS.md](../../frontend/docs/CODEBASE_STATUS.md)  
+**Migration SQL vs TypeORM:** [MIGRATIONS.md](./MIGRATIONS.md)
 
 ---
 
@@ -39,7 +40,8 @@ API REST (Express 5) + Socket.io, PostgreSQL qua TypeORM (`AppDataSource`), Redi
 | `controllers/` | Xử lý request → gọi service |
 | `services/` | Logic nghiệp vụ, tích hợp ngoài |
 | `entities/` | TypeORM entities (User, GymCenter, Product, …) |
-| `migrations/` | SQL/TypeORM migrations |
+| `migrations/` (repo root `backend/migrations/`) | **SQL áp dụng khi deploy** — xem [MIGRATIONS.md](./MIGRATIONS.md) |
+| `src/migrations/` | Migration TypeORM TS (tham chiếu; không thay thế file `.sql` prod) |
 | `middleware/` | `auth`, `errorHandler`, `requireGymOwner`, rate limit context, … |
 | `schemas/` | Validation (vd. auth, user) |
 | `config/` | `database`, `env`, `redis` |

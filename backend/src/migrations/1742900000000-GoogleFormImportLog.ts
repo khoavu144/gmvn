@@ -1,5 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
+/** Prod applies SQL: `backend/migrations/015_google_form_import_logs.sql` (see docs/MIGRATIONS.md). */
 export class GoogleFormImportLog1742900000000 implements MigrationInterface {
     name = 'GoogleFormImportLog1742900000000';
 

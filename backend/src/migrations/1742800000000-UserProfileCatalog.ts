@@ -1,5 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
+/** Prod applies SQL: `backend/migrations/014_user_profile_catalog.sql` (see docs/MIGRATIONS.md). */
 export class UserProfileCatalog1742800000000 implements MigrationInterface {
     name = 'UserProfileCatalog1742800000000';
 

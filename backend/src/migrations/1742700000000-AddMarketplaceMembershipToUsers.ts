@@ -1,5 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
+/** Prod applies SQL: `backend/migrations/013_marketplace_membership_active.sql` (see docs/MIGRATIONS.md). */
 export class AddMarketplaceMembershipToUsers1742700000000 implements MigrationInterface {
     name = 'AddMarketplaceMembershipToUsers1742700000000';
 
