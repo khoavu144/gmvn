@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 
 interface GalleryImage {
     id: string;
@@ -27,6 +28,7 @@ export function GalleryLightbox({
 }: GalleryLightboxProps) {
     const [currentIndex, setCurrentIndex] = useState(initialIndex);
     const [isZoomed, setIsZoomed] = useState(false);
+    useBodyScrollLock('ui-gallery-lightbox', isOpen);
 
     const goToPrevious = useCallback(() => {
         setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
@@ -64,11 +66,9 @@ export function GalleryLightbox({
         };
 
         window.addEventListener('keydown', handleKeyDown);
-        document.body.style.overflow = 'hidden';
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = '';
         };
     }, [isOpen, goToNext, goToPrevious, onClose]);
 

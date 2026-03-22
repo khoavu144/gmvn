@@ -30,7 +30,7 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
                 alt={item.caption || "Community Gallery Image"}
                 loading="lazy"
                 onLoad={() => setIsLoaded(true)}
-                className={`w-full h-auto object-cover transition-all duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-90 ${
+                className={`w-full h-auto object-cover transition-[transform,opacity,filter] duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-90 ${
                     isLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-xl'
                 }`}
             />
@@ -40,14 +40,14 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
 
             {/* Featured Badge */}
             {item.is_featured && (
-                <div className="absolute top-4 right-4 bg-yellow-500/20 text-yellow-500 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                <div className="absolute top-4 right-4 bg-yellow-500/20 text-yellow-500 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-[transform,opacity] duration-300 transform translate-y-2 group-hover:translate-y-0">
                     <Star size={10} className="fill-current" />
                     Featured
                 </div>
             )}
 
             {/* Content Overlay */}
-            <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+            <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6 opacity-0 group-hover:opacity-100 transition-[transform,opacity] duration-300 transform translate-y-4 group-hover:translate-y-0">
                 {item.caption && (
                     <p className="text-white text-sm md:text-base font-medium line-clamp-2 mb-4 drop-shadow-md">
                         "{item.caption}"

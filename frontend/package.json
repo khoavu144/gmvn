@@ -17,7 +17,8 @@
     "screenshots:prod": "node scripts/capture-prod-screens.mjs",
     "test:e2e:ui": "playwright test --ui",
     "lh:a11y": "lighthouse http://127.0.0.1:4173/ --only-categories=accessibility --chrome-flags=\"--headless --no-sandbox\"",
-    "lh:a11y:routes": "node ./scripts/lighthouse-a11y-routes.mjs"
+    "lh:routes": "node ./scripts/lighthouse-a11y-routes.mjs",
+    "lh:a11y:routes": "npm run lh:routes"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

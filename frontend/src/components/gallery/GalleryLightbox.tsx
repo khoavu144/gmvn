@@ -2,6 +2,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { CommunityGalleryItem } from '../../services/communityGalleryService';
+import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
+import { useMobileReducedEffects } from '../../hooks/useMobileReducedEffects';
 
 interface GalleryLightboxProps {
     items: CommunityGalleryItem[];
@@ -15,6 +17,9 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
     const imageKey = `${currentIndex}-${item.image_url}`;
     const [loadedKey, setLoadedKey] = useState<string | null>(null);
     const isImageLoaded = loadedKey === imageKey;
+    const reducedEffects = useMobileReducedEffects();
+
+    useBodyScrollLock('community-gallery-lightbox', true);
 
     useEffect(() => {
         if (currentIndex < items.length - 1) {
@@ -30,17 +35,15 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
     }, [currentIndex, items.length, onClose, onNavigate]);
 
     useEffect(() => {
-        document.body.style.overflow = 'hidden';
         window.addEventListener('keydown', handleKeyDown);
         return () => {
-            document.body.style.overflow = 'unset';
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, [handleKeyDown]);
 
     return (
         <div 
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md"
+            className={`fixed inset-0 z-50 flex items-center justify-center ${reducedEffects ? 'bg-black/98' : 'bg-black/95 backdrop-blur-md'}`}
             onClick={onClose}
         >
             {/* Top Bar Navigation */}
@@ -50,7 +53,7 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
                 </div>
                 <button 
                     onClick={onClose}
-                    className="p-2 text-white/70 hover:text-white rounded-full bg-white/10 hover:bg-white/20 transition-all font-medium flex items-center gap-2"
+                    className="p-2 text-white/70 hover:text-white rounded-full bg-white/10 hover:bg-white/20 transition-[color,background-color] font-medium flex items-center gap-2"
                 >
                     Đóng <X size={20} />
                 </button>
@@ -60,7 +63,7 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
             {currentIndex > 0 && (
                 <button 
                     onClick={(e) => { e.stopPropagation(); onNavigate(currentIndex - 1); }}
-                    className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 p-3 sm:p-4 rounded-full bg-black/50 text-white/50 hover:text-white hover:bg-white/10 transition-all z-10 hidden sm:flex"
+                    className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 p-3 sm:p-4 rounded-full bg-black/50 text-white/50 hover:text-white hover:bg-white/10 transition-[color,background-color] z-10 hidden sm:flex"
                 >
                     <ChevronLeft size={32} />
                 </button>
@@ -69,7 +72,7 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
             {currentIndex < items.length - 1 && (
                 <button 
                     onClick={(e) => { e.stopPropagation(); onNavigate(currentIndex + 1); }}
-                    className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 p-3 sm:p-4 rounded-full bg-black/50 text-white/50 hover:text-white hover:bg-white/10 transition-all z-10 hidden sm:flex"
+                    className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 p-3 sm:p-4 rounded-full bg-black/50 text-white/50 hover:text-white hover:bg-white/10 transition-[color,background-color] z-10 hidden sm:flex"
                 >
                     <ChevronRight size={32} />
                 </button>
@@ -125,7 +128,7 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-1.5 mb-1">
-                                        <h3 className="text-lg font-bold truncate group-hover:bg-clip-text group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-400 transition-all">
+                                        <h3 className="text-lg font-bold truncate group-hover:bg-clip-text group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-400 transition-colors">
                                             {item.linked_user.full_name}
                                         </h3>
                                         {item.linked_user.user_type === 'trainer' && <CheckCircle2 size={16} className="text-blue-400" />}

@@ -473,10 +473,12 @@ export const gymService = {
         sort?: 'featured' | 'rating' | 'newest' | 'price_asc' | 'views';
         page?: number;
         limit?: number;
+        lite?: boolean;
     }) {
         const page = Math.max(1, query.page || 1);
         const limit = Math.min(query.limit || 12, 50);
         const skip = (page - 1) * limit;
+        const liteMode = Boolean(query.lite);
 
         const qb = AppDataSource.getRepository(GymCenter)
             .createQueryBuilder('gc')
@@ -484,6 +486,37 @@ export const gymService = {
             .where('gc.is_verified = true')
             .andWhere('gc.is_active = true')
             .andWhere('gc.deleted_at IS NULL');
+
+        if (liteMode) {
+            qb.select([
+                'gc.id',
+                'gc.owner_id',
+                'gc.name',
+                'gc.slug',
+                'gc.logo_url',
+                'gc.cover_image_url',
+                'gc.description',
+                'gc.tagline',
+                'gc.is_verified',
+                'gc.is_active',
+                'gc.view_count',
+                'gc.primary_venue_type_slug',
+                'gc.price_from_amount',
+                'gc.price_from_billing_cycle',
+                'gc.positioning_tier',
+                'gc.discovery_blurb',
+                'gc.response_sla_text',
+                'gc.featured_weight',
+                'gc.created_at',
+                'gc.updated_at',
+                'branch.id',
+                'branch.branch_name',
+                'branch.city',
+                'branch.district',
+                'branch.neighborhood_label',
+                'branch.is_active',
+            ]);
+        }
 
         if (query.search) {
             qb.andWhere(
@@ -499,6 +532,19 @@ export const gymService = {
         }
         if (query.venue_type) {
             qb.andWhere('gc.primary_venue_type_slug = :vt', { vt: query.venue_type });
+        }
+        if (query.audience_tag) {
+            qb.andWhere(
+                `EXISTS (
+                    SELECT 1
+                    FROM gym_center_taxonomy_terms gct
+                    INNER JOIN gym_taxonomy_terms gtt ON gtt.id = gct.term_id
+                    WHERE gct.gym_center_id = gc.id
+                    AND gtt.term_type = 'audience'
+                    AND gtt.slug = :audienceTag
+                )`,
+                { audienceTag: query.audience_tag }
+            );
         }
         if (query.positioning_tier) {
             qb.andWhere('gc.positioning_tier = :tier', { tier: query.positioning_tier });
@@ -533,12 +579,25 @@ export const gymService = {
             // Get listing thumbnails via branches
             const branchIds = gyms.flatMap(g => (g.branches || []).map(b => b.id));
             if (branchIds.length > 0) {
-                const thumbs = await AppDataSource.getRepository(GymGallery)
+                const thumbsQb = AppDataSource.getRepository(GymGallery)
                     .createQueryBuilder('img')
                     .where('img.branch_id IN (:...ids)', { ids: branchIds })
                     .andWhere('img.is_listing_thumb = true')
-                    .orderBy('img.order_number', 'ASC')
-                    .getMany();
+                    .orderBy('img.order_number', 'ASC');
+
+                if (liteMode) {
+                    thumbsQb.select([
+                        'img.id',
+                        'img.branch_id',
+                        'img.image_url',
+                        'img.alt_text',
+                        'img.caption',
+                        'img.order_number',
+                        'img.is_listing_thumb',
+                    ]);
+                }
+
+                const thumbs = await thumbsQb.getMany();
 
                 // Map branch → first thumb, then branch → gym
                 const branchToGym = new Map<string, string>();
@@ -555,11 +614,23 @@ export const gymService = {
                         .filter(g => gymsMissingThumb.includes(g.id))
                         .flatMap(g => (g.branches || []).map(b => b.id));
                     if (branchIdsMissing.length > 0) {
-                        const fallbacks = await AppDataSource.getRepository(GymGallery)
+                        const fallbackQb = AppDataSource.getRepository(GymGallery)
                             .createQueryBuilder('img')
                             .where('img.branch_id IN (:...ids)', { ids: branchIdsMissing })
-                            .orderBy('img.order_number', 'ASC')
-                            .getMany();
+                            .orderBy('img.order_number', 'ASC');
+
+                        if (liteMode) {
+                            fallbackQb.select([
+                                'img.id',
+                                'img.branch_id',
+                                'img.image_url',
+                                'img.alt_text',
+                                'img.caption',
+                                'img.order_number',
+                            ]);
+                        }
+
+                        const fallbacks = await fallbackQb.getMany();
                         fallbacks.forEach(t => {
                             const gymId = branchToGym.get(t.branch_id);
                             if (gymId && !thumbnailMap.has(gymId)) thumbnailMap.set(gymId, t);
@@ -569,23 +640,73 @@ export const gymService = {
             }
 
             // Taxonomy terms
-            const ctTerms = await AppDataSource.getRepository(GymCenterTaxonomyTerm)
-                .find({
-                    where: { gym_center_id: In(gymIds) },
-                    relations: ['term'],
-                    order: { sort_order: 'ASC' },
-                });
+            const ctTermsQb = AppDataSource.getRepository(GymCenterTaxonomyTerm)
+                .createQueryBuilder('ct')
+                .leftJoinAndSelect('ct.term', 'term')
+                .where('ct.gym_center_id IN (:...ids)', { ids: gymIds })
+                .orderBy('ct.sort_order', 'ASC');
+
+            if (liteMode) {
+                ctTermsQb.select([
+                    'ct.id',
+                    'ct.gym_center_id',
+                    'ct.term_id',
+                    'ct.is_primary',
+                    'ct.sort_order',
+                    'term.id',
+                    'term.slug',
+                    'term.label',
+                    'term.term_type',
+                ]);
+            }
+
+            const ctTerms = await ctTermsQb.getMany();
             ctTerms.forEach(ct => {
                 if (!taxonomyMap.has(ct.gym_center_id)) taxonomyMap.set(ct.gym_center_id, []);
                 taxonomyMap.get(ct.gym_center_id)!.push(ct);
             });
         }
 
-        const enriched = gyms.map(g => ({
-            ...g,
-            listing_thumbnail: thumbnailMap.get(g.id) ?? null,
-            taxonomy_terms: taxonomyMap.get(g.id) ?? [],
-        }));
+        const enriched = gyms.map(g => {
+            const baseGym = liteMode
+                ? {
+                    id: g.id,
+                    owner_id: g.owner_id,
+                    name: g.name,
+                    slug: g.slug,
+                    logo_url: g.logo_url,
+                    cover_image_url: g.cover_image_url,
+                    description: g.description,
+                    tagline: g.tagline,
+                    is_verified: g.is_verified,
+                    is_active: g.is_active,
+                    view_count: g.view_count,
+                    primary_venue_type_slug: g.primary_venue_type_slug,
+                    price_from_amount: g.price_from_amount,
+                    price_from_billing_cycle: g.price_from_billing_cycle,
+                    positioning_tier: g.positioning_tier,
+                    discovery_blurb: g.discovery_blurb,
+                    response_sla_text: g.response_sla_text,
+                    featured_weight: g.featured_weight,
+                    created_at: g.created_at,
+                    updated_at: g.updated_at,
+                    branches: (g.branches || []).map((branch) => ({
+                        id: branch.id,
+                        branch_name: branch.branch_name,
+                        city: branch.city,
+                        district: branch.district,
+                        neighborhood_label: branch.neighborhood_label,
+                        is_active: branch.is_active,
+                    })),
+                }
+                : g;
+
+            return {
+                ...baseGym,
+                listing_thumbnail: thumbnailMap.get(g.id) ?? null,
+                taxonomy_terms: taxonomyMap.get(g.id) ?? [],
+            };
+        });
 
         return {
             gyms: enriched,

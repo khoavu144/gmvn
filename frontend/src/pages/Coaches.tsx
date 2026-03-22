@@ -7,6 +7,7 @@ import { ChevronDown } from 'lucide-react';
 import { SPECIALTY_CATEGORIES } from '../data/coachSpecialtyTaxonomy';
 import { CoachDirectoryCard, type CoachDirectoryTrainer } from '../components/coaches/CoachDirectoryCard';
 import '../styles/marketplace.css';
+import { useMobileReducedEffects } from '../hooks/useMobileReducedEffects';
 
 const SORT_OPTIONS: { value: TrainerFilters['sort']; label: string }[] = [
     { value: 'newest', label: 'Mới nhất' },
@@ -263,7 +264,9 @@ export default function Coaches() {
 
     const [showMobileFilters, setShowMobileFilters] = useState(false);
     const filtersSidebarRef = useRef<HTMLElement>(null);
-    const PAGE_SIZE = 12;
+    const reducedEffects = useMobileReducedEffects();
+    const PAGE_SIZE = reducedEffects ? 8 : 12;
+    const quickCategories = reducedEffects ? SPECIALTY_CATEGORIES.slice(0, 4) : SPECIALTY_CATEGORIES;
 
     const priceRange = PRICE_RANGES[priceIdx];
 
@@ -338,7 +341,7 @@ export default function Coaches() {
     );
 
     const { data, isLoading, isError, refetch } = useQuery({
-        queryKey: ['trainers', page, filters],
+        queryKey: ['trainers', page, PAGE_SIZE, filters],
         queryFn: () => trainerService.getTrainers(page, PAGE_SIZE, filters),
         staleTime: 60000,
     });
@@ -455,7 +458,7 @@ export default function Coaches() {
                             <span className="text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
                                 Gợi ý nhanh:
                             </span>
-                            {SPECIALTY_CATEGORIES.map((cat) => (
+                            {quickCategories.map((cat) => (
                                 <button
                                     key={cat.id}
                                     type="button"
@@ -581,24 +584,26 @@ export default function Coaches() {
                 )}
 
                 <div className="grid gap-8 lg:grid-cols-[minmax(240px,280px)_minmax(0,1fr)] lg:items-start">
-                    <aside ref={filtersSidebarRef} id="coaches-filters-sidebar" className="hidden lg:block">
-                        <div className="sticky top-[calc(var(--header-height,56px)+1rem)] rounded-xl border border-gray-200 bg-gray-50 p-5 shadow-sm">
-                            <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-gray-500">
-                                Lọc chi tiết
-                            </h2>
-                            <FiltersBlock
-                                currentType={currentType}
-                                specialty={specialty}
-                                setSpecialty={setSpecialty}
-                                priceIdx={priceIdx}
-                                setPriceIdx={setPriceIdx}
-                                city={city}
-                                setCity={setCity}
-                                resetFilters={resetFilters}
-                                hasActiveFilters={hasActiveFilters}
-                            />
-                        </div>
-                    </aside>
+                    {!reducedEffects && (
+                        <aside ref={filtersSidebarRef} id="coaches-filters-sidebar" className="hidden lg:block">
+                            <div className="sticky top-[calc(var(--header-height,56px)+1rem)] rounded-xl border border-gray-200 bg-gray-50 p-5 shadow-sm">
+                                <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-gray-500">
+                                    Lọc chi tiết
+                                </h2>
+                                <FiltersBlock
+                                    currentType={currentType}
+                                    specialty={specialty}
+                                    setSpecialty={setSpecialty}
+                                    priceIdx={priceIdx}
+                                    setPriceIdx={setPriceIdx}
+                                    city={city}
+                                    setCity={setCity}
+                                    resetFilters={resetFilters}
+                                    hasActiveFilters={hasActiveFilters}
+                                />
+                            </div>
+                        </aside>
+                    )}
 
                     <div>
                         <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-sm text-gray-500">
@@ -683,9 +688,14 @@ export default function Coaches() {
                             </div>
                         ) : (
                             <>
-                                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                                    {(data?.trainers as CoachDirectoryTrainer[]).map((trainer) => (
-                                        <CoachDirectoryCard key={trainer.id} trainer={trainer} />
+                                <div className="coaches-grid grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                                    {(data?.trainers as CoachDirectoryTrainer[]).map((trainer, index) => (
+                                        <CoachDirectoryCard
+                                            key={trainer.id}
+                                            trainer={trainer}
+                                            index={index}
+                                            reducedEffects={reducedEffects}
+                                        />
                                     ))}
                                 </div>
 

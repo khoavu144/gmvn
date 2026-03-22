@@ -15,6 +15,12 @@ type LazyModule<TProps = Record<string, unknown>> = {
   default: React.ComponentType<TProps>;
 };
 
+const warnDev = (...args: unknown[]) => {
+  if (!import.meta.env.PROD) {
+    console.warn(...args);
+  }
+};
+
 const lazyWithChunkRetry = <TProps extends Record<string, unknown> = Record<string, unknown>>(
   importer: () => Promise<LazyModule<TProps>>,
   chunkKey: string,
@@ -33,7 +39,7 @@ const lazyWithChunkRetry = <TProps extends Record<string, unknown> = Record<stri
       const reloadKey = `lazy-chunk-reload:${chunkKey}`;
       const alreadyReloaded = sessionStorage.getItem(reloadKey) === '1';
 
-      console.warn('[lazy-chunk-retry] dynamic import failed', {
+      warnDev('[lazy-chunk-retry] dynamic import failed', {
         chunkKey,
         message,
         alreadyReloaded,
@@ -43,7 +49,7 @@ const lazyWithChunkRetry = <TProps extends Record<string, unknown> = Record<stri
 
       if (!alreadyReloaded) {
         sessionStorage.setItem(reloadKey, '1');
-        console.warn('[lazy-chunk-retry] forcing hard reload to recover chunk mismatch', {
+        warnDev('[lazy-chunk-retry] forcing hard reload to recover chunk mismatch', {
           chunkKey,
           href: window.location.href,
         });
@@ -51,7 +57,7 @@ const lazyWithChunkRetry = <TProps extends Record<string, unknown> = Record<stri
       }
     }
 
-    console.warn('[lazy-chunk-retry] rethrowing import error', { chunkKey, message });
+    warnDev('[lazy-chunk-retry] rethrowing import error', { chunkKey, message });
     throw error;
   }
 });
@@ -130,7 +136,7 @@ const RouteFallback = () => {
   const location = useLocation();
 
   useEffect(() => {
-    console.warn('[route-fallback] suspense fallback visible', {
+    warnDev('[route-fallback] suspense fallback visible', {
       pathname: location.pathname,
       search: location.search,
       hash: location.hash,
@@ -200,7 +206,7 @@ function RouteDiagnostics() {
   const navigationType = useNavigationType();
 
   useEffect(() => {
-    console.warn('[route-diagnostics] navigation event', {
+    warnDev('[route-diagnostics] navigation event', {
       pathname: location.pathname,
       search: location.search,
       hash: location.hash,

@@ -19,6 +19,7 @@ export const gymService = {
         sort?: string;
         page?: number;
         limit?: number;
+        lite?: boolean;
     }) {
         const response = await apiClient.get('/gyms/marketplace', { params });
         return response.data; // { success, gyms, pagination }

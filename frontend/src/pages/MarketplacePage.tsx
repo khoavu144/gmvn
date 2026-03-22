@@ -4,6 +4,7 @@ import { AlertCircle, ChevronLeft, ChevronRight, Search, Star } from 'lucide-rea
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import '../styles/marketplace.css';
+import { useMobileReducedEffects } from '../hooks/useMobileReducedEffects';
 import type {
     Product,
     ProductCategory,
@@ -26,7 +27,7 @@ function formatPrice(n: number | string, currency = 'VND'): string {
 
 // ─── Product Card ─────────────────────────────────────────────────────────
 
-export function ProductCard({
+export const ProductCard = React.memo(function ProductCard({
     product,
     variant = 'standard',
     priorityThumb = false,
@@ -122,7 +123,8 @@ export function ProductCard({
             </div>
         </Link>
     );
-}
+});
+ProductCard.displayName = 'ProductCard';
 
 // ─── Category Pill ────────────────────────────────────────────────────────
 
@@ -139,7 +141,7 @@ function MarketplaceProductSkeleton() {
     );
 }
 
-function CategoryPill({
+const CategoryPill = React.memo(function CategoryPill({
     category,
     active,
     onClick,
@@ -158,7 +160,8 @@ function CategoryPill({
             {category.label}
         </button>
     );
-}
+});
+CategoryPill.displayName = 'CategoryPill';
 
 // ─── Main Page ────────────────────────────────────────────────────────────
 
@@ -175,16 +178,23 @@ export default function MarketplacePage() {
     const [searchInput, setSearchInput] = useState(searchParams.get('q') ?? '');
     const filterRef = useRef<HTMLElement>(null);
     const newArrivalsRailRef = useRef<HTMLDivElement>(null);
+    const railRafRef = useRef<number | null>(null);
     const [railCanPrev, setRailCanPrev] = useState(false);
     const [railCanNext, setRailCanNext] = useState(false);
+    const reducedEffects = useMobileReducedEffects();
+    const [heroDataLoaded, setHeroDataLoaded] = useState(false);
 
     const updateRailScrollState = useCallback(() => {
         const el = newArrivalsRailRef.current;
         if (!el) return;
-        const { scrollLeft, scrollWidth, clientWidth } = el;
-        const max = scrollWidth - clientWidth;
-        setRailCanPrev(scrollLeft > 2);
-        setRailCanNext(max > 2 && scrollLeft < max - 2);
+        if (railRafRef.current !== null) return;
+        railRafRef.current = requestAnimationFrame(() => {
+            railRafRef.current = null;
+            const { scrollLeft, scrollWidth, clientWidth } = el;
+            const max = scrollWidth - clientWidth;
+            setRailCanPrev(scrollLeft > 2);
+            setRailCanNext(max > 2 && scrollLeft < max - 2);
+        });
     }, []);
 
     const scrollNewArrivalsRail = useCallback(
@@ -207,28 +217,59 @@ export default function MarketplacePage() {
         setSearchInput(qParam);
     }, [qParam]);
 
-    // Load categories + featured on mount
+    // Load categories + featured on idle to reduce main-thread contention during initial render
     useEffect(() => {
-        axios.get<MarketplaceCategoriesResponse>(`${API}/marketplace/categories`)
-            .then(r => setCategories(r.data.categories))
-            .catch(() => {});
+        if (heroDataLoaded) return;
+        if (typeof window === 'undefined') return;
 
-        axios.get<MarketplaceFeaturedResponse>(`${API}/marketplace/featured`)
-            .then(r => {
-                setFeatured(r.data.featured ?? []);
-                setNewArrivals(r.data.new_arrivals ?? []);
-            })
-            .catch(() => {});
-    }, []);
+        const runIdle = (cb: () => void) => {
+            const requestIdle = (globalThis as unknown as {
+                requestIdleCallback?: (fn: () => void) => number;
+                cancelIdleCallback?: (id: number) => void;
+            }).requestIdleCallback;
+            const cancelIdle = (globalThis as unknown as {
+                cancelIdleCallback?: (id: number) => void;
+            }).cancelIdleCallback;
+
+            if (requestIdle) {
+                const id = requestIdle(cb);
+                return () => {
+                    cancelIdle?.(id);
+                };
+            }
+            const t = setTimeout(cb, 650);
+            return () => clearTimeout(t);
+        };
+
+        const cancel = runIdle(() => {
+            axios.get<MarketplaceCategoriesResponse>(`${API}/marketplace/categories`)
+                .then(r => setCategories(r.data.categories))
+                .catch(() => {});
+
+            axios.get<MarketplaceFeaturedResponse>(`${API}/marketplace/featured`)
+                .then(r => {
+                    setFeatured(r.data.featured ?? []);
+                    setNewArrivals(r.data.new_arrivals ?? []);
+                    setHeroDataLoaded(true);
+                })
+                .catch(() => {
+                    setHeroDataLoaded(true);
+                });
+        });
+
+        return cancel;
+    }, [heroDataLoaded]);
 
     // Load products on filter change
+    const pageLimit = reducedEffects ? 8 : 20;
+
     const loadProducts = useCallback(async (pg = 1) => {
         setLoading(true);
         setListError(false);
         try {
             const params: Record<string, string> = {
                 page: String(pg),
-                limit: '20',
+                limit: String(pageLimit),
                 sort: activeSort,
             };
             if (activeCategory) params['category'] = activeCategory;
@@ -251,7 +292,7 @@ export default function MarketplacePage() {
         } finally {
             setLoading(false);
         }
-    }, [activeCategory, activeSearch, activeSort]);
+    }, [activeCategory, activeSearch, activeSort, pageLimit]);
 
     useEffect(() => {
         loadProducts(1);
@@ -276,9 +317,27 @@ export default function MarketplacePage() {
 
     const showHero = !activeCategory && !activeSearch;
 
+    const curatedPicks = useMemo(
+        () =>
+            products
+                .filter((p) => (p.featured_weight ?? 0) > 80 && !featured.some((f) => f.id === p.id))
+                .slice(0, reducedEffects ? 1 : 3),
+        [products, featured, reducedEffects]
+    );
+
+    const featuredItems = useMemo(
+        () => featured.slice(0, reducedEffects ? 1 : 3),
+        [featured, reducedEffects]
+    );
+
+    const newArrivalsItems = useMemo(
+        () => (reducedEffects ? newArrivals.slice(0, 4) : newArrivals),
+        [newArrivals, reducedEffects]
+    );
+
     useEffect(() => {
         const el = newArrivalsRailRef.current;
-        if (!el || !showHero || newArrivals.length === 0) return;
+        if (!el || !showHero || newArrivalsItems.length === 0) return;
 
         updateRailScrollState();
         el.addEventListener('scroll', updateRailScrollState, { passive: true });
@@ -288,16 +347,12 @@ export default function MarketplacePage() {
         return () => {
             el.removeEventListener('scroll', updateRailScrollState);
             ro?.disconnect();
+            if (railRafRef.current !== null) {
+                cancelAnimationFrame(railRafRef.current);
+                railRafRef.current = null;
+            }
         };
-    }, [showHero, newArrivals.length, updateRailScrollState]);
-
-    const curatedPicks = useMemo(
-        () =>
-            products
-                .filter((p) => (p.featured_weight ?? 0) > 80 && !featured.some((f) => f.id === p.id))
-                .slice(0, 3),
-        [products, featured]
-    );
+    }, [showHero, newArrivalsItems.length, updateRailScrollState]);
 
     return (
         <>
@@ -395,19 +450,19 @@ export default function MarketplacePage() {
                     </div>
 
                     {/* Featured bento — only on homepage */}
-                    {showHero && featured.length > 0 && (
+                    {showHero && featuredItems.length > 0 && (
                         <section className="marketplace-section">
                             <div className="marketplace-section-head">
                                 <p className="marketplace-section-kicker">Lựa chọn nổi bật</p>
                                 <h2 className="marketplace-section-title">Nổi bật</h2>
                             </div>
                             <div className="marketplace-bento">
-                                {featured.slice(0, 3).map((p, index) => (
+                                {featuredItems.map((p, index) => (
                                     <ProductCard
                                         key={p.id}
                                         product={p}
                                         variant="featured"
-                                        priorityThumb={index === 0}
+                                        priorityThumb={index === 0 && !reducedEffects}
                                     />
                                 ))}
                             </div>
@@ -415,7 +470,7 @@ export default function MarketplacePage() {
                     )}
 
                     {/* New arrivals rail — only on homepage */}
-                    {showHero && newArrivals.length > 0 && (
+                    {showHero && newArrivalsItems.length > 0 && (
                         <section className="marketplace-section">
                             <div className="marketplace-section-head">
                                 <p className="marketplace-section-kicker">Vừa lên kệ</p>
@@ -432,7 +487,7 @@ export default function MarketplacePage() {
                                     <ChevronLeft className="h-5 w-5" aria-hidden />
                                 </button>
                                 <div ref={newArrivalsRailRef} className="marketplace-rail">
-                                    {newArrivals.map((p) => (
+                                    {newArrivalsItems.map((p) => (
                                         <ProductCard key={p.id} product={p} variant="compact" />
                                     ))}
                                 </div>

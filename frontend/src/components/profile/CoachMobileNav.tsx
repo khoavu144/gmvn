@@ -25,24 +25,62 @@ export default function CoachMobileNav({
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setShow(window.scrollY > 80);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const firstSectionId = navItems[0]?.id;
+    if (!firstSectionId) return;
+
+    const firstSection = document.getElementById(`section-${firstSectionId}`);
+    if (!firstSection) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShow(!entry.isIntersecting);
+      },
+      {
+        root: null,
+        rootMargin: '-80px 0px 0px 0px',
+        threshold: [0.2, 0.5, 0.8],
+      }
+    );
+
+    observer.observe(firstSection);
+    return () => observer.disconnect();
+  }, [navItems]);
 
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
+    const activeCandidates = new Map<string, number>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = (entry.target as HTMLElement).dataset.navId;
+          if (!id) return;
+
+          if (entry.isIntersecting) {
+            activeCandidates.set(id, entry.boundingClientRect.top);
+          } else {
+            activeCandidates.delete(id);
+          }
+        });
+
+        if (activeCandidates.size === 0) return;
+        const nearest = [...activeCandidates.entries()].sort(
+          (a, b) => Math.abs(a[1]) - Math.abs(b[1])
+        )[0]?.[0];
+
+        if (nearest) {
+          setActiveSection(nearest);
+        }
+      },
+      { rootMargin: '-25% 0px -55% 0px', threshold: [0, 0.15, 0.35, 0.6, 0.85] }
+    );
+
     navItems.forEach(({ id }) => {
       const el = document.getElementById(`section-${id}`);
       if (!el) return;
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) setActiveSection(id); },
-        { rootMargin: '-30% 0px -60% 0px' }
-      );
-      obs.observe(el);
-      observers.push(obs);
+      el.dataset.navId = id;
+      observer.observe(el);
     });
-    return () => observers.forEach(o => o.disconnect());
+
+    return () => observer.disconnect();
   }, [navItems]);
 
   const scrollTo = (id: string) => {

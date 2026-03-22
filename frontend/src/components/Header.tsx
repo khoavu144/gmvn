@@ -12,6 +12,8 @@ import type { RootState } from '../store/store';
 import { authApi } from '../services/auth';
 import NotificationBell from './NotificationBell';
 import { cn } from '../lib/utils';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { useMobileReducedEffects } from '../hooks/useMobileReducedEffects';
 
 // ─── Nav Structure ───────────────────────────────────────────────────────────
 
@@ -284,12 +286,14 @@ export default function Header() {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [isHidden, setIsHidden] = useState(false);
+    const reducedEffects = useMobileReducedEffects();
 
     const lastScrollY = useRef(0);
     const scrollRaf = useRef<number | null>(null);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
 
     const { isAuthenticated, user, refreshToken } = useSelector((state: RootState) => state.auth);
+    useBodyScrollLock('header-mobile-menu', mobileOpen);
 
     // Close everything when route changes
     useEffect(() => {
@@ -322,16 +326,14 @@ export default function Header() {
         };
     }, []);
 
-    // Mobile menu body scroll lock + Escape key
+    // Mobile menu escape key
     useEffect(() => {
         if (!mobileOpen) return;
-        document.body.style.overflow = 'hidden';
         const handleKey = (e: KeyboardEvent) => {
             if (e.key === 'Escape') setMobileOpen(false);
         };
         document.addEventListener('keydown', handleKey);
         return () => {
-            document.body.style.overflow = '';
             document.removeEventListener('keydown', handleKey);
         };
     }, [mobileOpen]);
@@ -360,7 +362,7 @@ export default function Header() {
         <header
             className={cn(
                 'fixed top-0 left-0 right-0 z-header h-header',
-                'bg-white/95 backdrop-blur-sm',
+                reducedEffects ? 'bg-white/98' : 'bg-white/95 backdrop-blur-sm',
                 'border-b border-gray-200',
                 'transition-transform duration-150',
                 isHidden && '-translate-y-full'
@@ -431,7 +433,7 @@ export default function Header() {
                         type="button"
                         onClick={() => setMobileOpen((v) => !v)}
                         className="lg:hidden p-2 text-gray-600 hover:text-black transition-colors rounded-lg hover:bg-gray-50"
-                        aria-label="Mở menu"
+                        aria-label={mobileOpen ? 'Đóng menu' : 'Mở menu'}
                         aria-expanded={mobileOpen}
                         aria-controls="mobile-menu"
                     >

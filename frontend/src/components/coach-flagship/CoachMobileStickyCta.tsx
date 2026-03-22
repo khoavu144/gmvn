@@ -1,11 +1,17 @@
+import { useMobileReducedEffects } from '../../hooks/useMobileReducedEffects';
+
 interface Props {
     coachName: string;
     onMessage: () => void;
 }
 
 export default function CoachMobileStickyCta({ coachName, onMessage }: Props) {
+    const reducedEffects = useMobileReducedEffects();
+
     return (
-        <div className="fixed bottom-0 inset-x-0 z-50 lg:hidden bg-white/95 backdrop-blur-md border-t border-[color:var(--mk-line)] safe-area-pb">
+        <div
+            className={`fixed bottom-0 inset-x-0 z-50 lg:hidden border-t border-[color:var(--mk-line)] safe-area-pb ${reducedEffects ? 'bg-white' : 'bg-white/95 backdrop-blur-md'}`}
+        >
             <div className="flex items-center gap-3 px-4 py-3 max-w-lg mx-auto">
                 <div className="flex-1 min-w-0">
                     <div className="text-xs font-bold text-[color:var(--mk-muted)] truncate">{coachName}</div>

@@ -428,6 +428,29 @@ a.marketplace-typo-slot:hover {
   }
 }
 
+@supports (content-visibility: auto) {
+  .marketplace-section {
+    content-visibility: auto;
+    contain-intrinsic-size: 800px;
+  }
+  .marketplace-grid {
+    content-visibility: auto;
+    contain-intrinsic-size: 1000px;
+  }
+  .marketplace-bento {
+    content-visibility: auto;
+    contain-intrinsic-size: 700px;
+  }
+  .marketplace-rail {
+    content-visibility: auto;
+    contain-intrinsic-size: 360px;
+  }
+  .coaches-grid {
+    content-visibility: auto;
+    contain-intrinsic-size: 900px;
+  }
+}
+
 /* ── Product card ────────────────────────────────────────────── */
 .marketplace-product-card {
   display: flex;
@@ -459,6 +482,12 @@ a.marketplace-typo-slot:hover {
   transition: transform .3s;
 }
 .marketplace-product-card:hover .marketplace-card-thumb img { transform: scale(1.05); }
+
+@media (max-width: 1023px) {
+  .marketplace-product-card { transition: none; }
+  .marketplace-product-card:hover { transform: none; box-shadow: none; }
+  .marketplace-card-thumb img { transition: none; }
+}
 
 .marketplace-card-thumb-placeholder {
   position: relative;
@@ -1171,9 +1200,10 @@ a.marketplace-typo-slot:hover {
   .mpd-cta-row {
     position: fixed; bottom: 0; left: 0; right: 0;
     padding: 1rem; margin: 0;
-    background: color-mix(in oklab, var(--cur-surface) 90%, transparent);
-    backdrop-filter: blur(20px);
-    z-index: 50; box-shadow: 0 -4px 24px rgba(0,0,0,.06);
+    background: color-mix(in oklab, var(--cur-surface) 98%, var(--cur-surface-low));
+    z-index: 50;
+    box-shadow: 0 -4px 18px rgba(0,0,0,.06);
+    border-top: 1px solid color-mix(in oklab, var(--cur-surface-highest) 75%, transparent);
   }
   .mpd-section--related {
     padding-bottom: 2rem;

@@ -215,6 +215,7 @@ const Gyms: React.FC = () => {
                 venue_type: venueType || undefined,
                 audience_tag: audienceTag || undefined,
                 sort: sortBy,
+                lite: true,
             });
 
             if (!response.success) {

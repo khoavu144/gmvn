@@ -177,7 +177,10 @@ export const gymController = {
                 sort,
                 page,
                 limit,
+                lite,
             } = req.query;
+
+            const liteMode = ['1', 'true', 'yes'].includes(String(lite || '').toLowerCase());
 
             const result = await gymService.listGymsMarketplace({
                 search: search as string,
@@ -189,6 +192,7 @@ export const gymController = {
                 sort: sort as any,
                 page: page ? parseInt(String(page), 10) : 1,
                 limit: limit ? parseInt(String(limit), 10) : 12,
+                lite: liteMode,
             });
 
             res.json({ success: true, ...result });

@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import {
     Users,
@@ -55,26 +56,23 @@ const AdminDashboard: React.FC = () => {
         [setSearchParams]
     );
 
-    const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
-    const [statsLoad, setStatsLoad] = useState<'loading' | 'ok' | 'err'>('loading');
+    const {
+        data: adminStats,
+        isLoading: statsLoading,
+        isError: statsError,
+        refetch: refetchStats,
+    } = useQuery({
+        queryKey: ['admin-dashboard-stats'],
+        queryFn: async () => {
+            const res = await apiClient.get('/dashboard/admin/stats');
+            return (res?.data?.stats ?? null) as AdminStats | null;
+        },
+        staleTime: 60_000,
+        retry: 1,
+    });
 
-    const loadStats = useCallback(() => {
-        setStatsLoad('loading');
-        apiClient
-            .get('/dashboard/admin/stats')
-            .then((r) => {
-                setAdminStats(r.data.stats);
-                setStatsLoad('ok');
-            })
-            .catch(() => {
-                setAdminStats(null);
-                setStatsLoad('err');
-            });
-    }, []);
-
-    useEffect(() => {
-        loadStats();
-    }, [loadStats]);
+    const statsLoad: 'loading' | 'ok' | 'err' =
+        statsLoading ? 'loading' : statsError || !adminStats ? 'err' : 'ok';
 
     const fmt = useCallback((n: number | undefined) => (n !== undefined ? n.toLocaleString('vi') : '—'), []);
 
@@ -106,7 +104,7 @@ const AdminDashboard: React.FC = () => {
     return (
         <AdminDashboardShell activeTab={activeTab} onTabChange={setTab}>
             {activeTab === 'overview' && (
-                <div id="panel-overview" className="animate-fade-in focus:outline-none" tabIndex={0}>
+                <div id="panel-overview" className="animate-fade-in focus:outline-none">
                     <h2 className="text-h3 mb-4 border-b border-gray-200 pb-2">Tổng quan hệ thống</h2>
 
                     {statsLoad === 'err' && (
@@ -117,7 +115,9 @@ const AdminDashboard: React.FC = () => {
                             <span>Không tải được số liệu. Kiểm tra mạng hoặc quyền admin, rồi thử lại.</span>
                             <button
                                 type="button"
-                                onClick={() => loadStats()}
+                                onClick={() => {
+                                    void refetchStats();
+                                }}
                                 className="shrink-0 rounded-md bg-gray-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-gray-800"
                             >
                                 Thử lại
@@ -200,43 +200,43 @@ const AdminDashboard: React.FC = () => {
             )}
 
             {activeTab === 'ops' && (
-                <div id="panel-ops" role="tabpanel" className="focus:outline-none" tabIndex={0}>
+                <div id="panel-ops" className="focus:outline-none">
                     <AdminOperationalPanel />
                 </div>
             )}
 
             {activeTab === 'users' && (
-                <div id="panel-users" role="tabpanel" className="focus:outline-none" tabIndex={0}>
+                <div id="panel-users" className="focus:outline-none">
                     <AdminUsersPanel />
                 </div>
             )}
 
             {activeTab === 'content' && (
-                <div id="panel-content" role="tabpanel" className="focus:outline-none" tabIndex={0}>
+                <div id="panel-content" className="focus:outline-none">
                     <AdminContentMarketplacePanel />
                 </div>
             )}
 
             {activeTab === 'gyms' && (
-                <div id="panel-gyms" role="tabpanel" className="focus:outline-none" tabIndex={0}>
+                <div id="panel-gyms" className="focus:outline-none">
                     <AdminGymApproval />
                 </div>
             )}
 
             {activeTab === 'reviews' && (
-                <div id="panel-reviews" role="tabpanel" className="focus:outline-none" tabIndex={0}>
+                <div id="panel-reviews" className="focus:outline-none">
                     <AdminReviewManagement />
                 </div>
             )}
 
             {activeTab === 'gallery' && (
-                <div id="panel-gallery" role="tabpanel" className="focus:outline-none" tabIndex={0}>
+                <div id="panel-gallery" className="focus:outline-none">
                     <AdminGalleryManagement />
                 </div>
             )}
 
             {activeTab === 'coach-apps' && (
-                <div id="panel-coach-apps" role="tabpanel" className="focus:outline-none" tabIndex={0}>
+                <div id="panel-coach-apps" className="focus:outline-none">
                     <AdminCoachApplications />
                 </div>
             )}

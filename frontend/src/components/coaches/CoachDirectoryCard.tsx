@@ -24,12 +24,26 @@ function coachHref(t: CoachDirectoryTrainer): string {
     return t.profile_slug ? `/coach/${t.profile_slug}` : `/coaches/${t.id}`;
 }
 
-export const CoachDirectoryCard = memo(({ trainer }: { trainer: CoachDirectoryTrainer }) => {
+export const CoachDirectoryCard = memo(
+    ({
+        trainer,
+        index = 0,
+        reducedEffects = false,
+    }: {
+        trainer: CoachDirectoryTrainer;
+        index?: number;
+        reducedEffects?: boolean;
+    }) => {
     const { prefetchCoach, prefetchAthlete } = usePrefetchProfile();
     const href = coachHref(trainer);
     const isAthlete = trainer.user_type === 'athlete';
 
     const handlePrefetch = () => {
+        if (typeof window !== 'undefined') {
+            const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            if (!canHover) return;
+        }
+
         const identifier = trainer.profile_slug || trainer.id;
         if (isAthlete) prefetchAthlete(identifier);
         else prefetchCoach(identifier);
@@ -47,19 +61,32 @@ export const CoachDirectoryCard = memo(({ trainer }: { trainer: CoachDirectoryTr
 
     const specs = trainer.specialties?.filter(Boolean) ?? [];
 
+    const cardClassName = reducedEffects
+        ? 'group flex min-h-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm'
+        : 'group flex min-h-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-gray-900/25 hover:shadow-md';
+
+    const heroImageClassName = reducedEffects
+        ? 'h-full w-full object-cover'
+        : 'h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]';
+
+    const badgeClassName = reducedEffects
+        ? 'absolute left-3 top-3 inline-flex items-center rounded border border-white/30 bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white'
+        : 'absolute left-3 top-3 inline-flex items-center rounded border border-white/30 bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white backdrop-blur-sm';
+
+    const ratingClassName = reducedEffects
+        ? 'shrink-0 rounded-md border border-white/25 bg-black/35 px-2 py-1 text-xs font-bold tabular-nums text-white'
+        : 'shrink-0 rounded-md border border-white/25 bg-black/35 px-2 py-1 text-xs font-bold tabular-nums text-white backdrop-blur-sm';
+
     return (
-        <Link
-            to={href}
-            className="group flex min-h-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-gray-900/25 hover:shadow-md"
-            onPointerEnter={handlePrefetch}
-        >
+        <Link to={href} className={cardClassName} onPointerEnter={handlePrefetch}>
             <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-gray-100">
                 {trainer.avatar_url ? (
                     <img
                         src={trainer.avatar_url}
                         alt={trainer.full_name}
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                        loading="lazy"
+                        className={heroImageClassName}
+                        loading={index < 2 ? 'eager' : 'lazy'}
+                        fetchPriority={index < 2 ? 'high' : 'auto'}
                         decoding="async"
                     />
                 ) : (
@@ -69,7 +96,7 @@ export const CoachDirectoryCard = memo(({ trainer }: { trainer: CoachDirectoryTr
                 )}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-900/55 via-transparent to-transparent" />
                 {trainer.is_verified && (
-                    <span className="absolute left-3 top-3 inline-flex items-center rounded border border-white/30 bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white backdrop-blur-sm">
+                    <span className={badgeClassName}>
                         Đã xác minh
                     </span>
                 )}
@@ -83,7 +110,7 @@ export const CoachDirectoryCard = memo(({ trainer }: { trainer: CoachDirectoryTr
                         )}
                     </div>
                     {rating && (
-                        <span className="shrink-0 rounded-md border border-white/25 bg-black/35 px-2 py-1 text-xs font-bold tabular-nums text-white backdrop-blur-sm">
+                        <span className={ratingClassName}>
                             ★ {rating}
                         </span>
                     )}
@@ -127,7 +154,15 @@ export const CoachDirectoryCard = memo(({ trainer }: { trainer: CoachDirectoryTr
 
                 <div className="mt-auto flex items-center justify-between border-t border-gray-200 pt-3 text-sm font-semibold text-gray-900">
                     Xem hồ sơ
-                    <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                    <span
+                        className={
+                            reducedEffects
+                                ? ''
+                                : 'transition-transform duration-200 group-hover:translate-x-1'
+                        }
+                    >
+                        →
+                    </span>
                 </div>
             </div>
         </Link>

@@ -98,7 +98,7 @@ function GymCardList({ gym, className }: { gym: GymCenter; className?: string })
       to={href}
       className={[
         'group flex gap-4 bg-white border border-gray-200 rounded-lg p-4 shadow-sm',
-        'hover:border-black hover:shadow-md transition-all duration-150',
+        'hover:border-black hover:shadow-md transition-[border-color,box-shadow,transform] duration-150',
         className || '',
       ]
         .join(' ')
@@ -186,7 +186,7 @@ const GymCard: React.FC<GymCardProps> = ({
       to={href}
       className={[
         'group relative flex min-h-0 h-full flex-col overflow-hidden bg-white border border-gray-200 rounded-lg shadow-sm',
-        'hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 transition-all duration-200',
+        'hover:-translate-y-0.5 hover:shadow-lg hover:border-gray-300 transition-[transform,box-shadow,border-color] duration-200',
         className,
       ]
         .join(' ')
@@ -203,7 +203,7 @@ const GymCard: React.FC<GymCardProps> = ({
             loading={index < 4 ? 'eager' : 'lazy'}
             fetchPriority={index < 4 ? 'high' : 'auto'}
             decoding="async"
-            className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500"
+            className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-[transform,filter,opacity] duration-500"
           />
         ) : (
           /* Placeholder */

@@ -21,6 +21,8 @@ import GymPricingSection from '../components/gym-detail/GymPricingSection';
 import GymSimilarSection from '../components/gym-detail/GymSimilarSection';
 import GymMapSection from '../components/gym-detail/GymMapSection';
 import { GymSectionHeading } from '../components/gym-detail/GymSectionHeading';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { useMobileReducedEffects } from '../hooks/useMobileReducedEffects';
 
 function truncateMetaDescription(text: string, maxLen: number): string {
     const t = text.trim();
@@ -223,6 +225,7 @@ const GymDetailPage: React.FC = () => {
     const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
     const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+    const reducedEffects = useMobileReducedEffects();
 
     useEffect(() => {
         if (!id) return;
@@ -409,37 +412,52 @@ const GymDetailPage: React.FC = () => {
 
     useEffect(() => {
         if (!gym) return;
-        let ticking = false;
         const getOffset = () => {
             const root = document.documentElement;
             const h = parseFloat(getComputedStyle(root).getPropertyValue('--header-height')) || 56;
-            return h + 56;
+            return h + 56 + 12;
         };
-        const updateActive = () => {
-            ticking = false;
-            const offset = getOffset() + 12;
-            let current = visibleSections[0]?.id ?? 'overview';
-            for (const s of visibleSections) {
-                const el = sectionRefs.current[s.id];
-                if (!el) continue;
-                if (el.getBoundingClientRect().top <= offset) current = s.id;
+
+        const offset = getOffset();
+        const activeMap = new Map<string, number>();
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    const id = (entry.target as HTMLElement).id;
+                    if (!id) return;
+                    if (entry.isIntersecting) {
+                        activeMap.set(id, entry.boundingClientRect.top);
+                    } else {
+                        activeMap.delete(id);
+                    }
+                });
+
+                if (activeMap.size === 0) return;
+
+                const nearest = [...activeMap.entries()].sort(
+                    (a, b) => Math.abs(a[1] - offset) - Math.abs(b[1] - offset)
+                )[0]?.[0];
+
+                if (nearest) {
+                    setActiveSection((prev) => (prev === nearest ? prev : nearest));
+                }
+            },
+            {
+                root: null,
+                rootMargin: `-${offset}px 0px -55% 0px`,
+                threshold: [0, 0.15, 0.35, 0.6, 0.85],
             }
-            setActiveSection((prev) => (prev === current ? prev : current));
-        };
-        const onScroll = () => {
-            if (!ticking) {
-                ticking = true;
-                requestAnimationFrame(updateActive);
-            }
-        };
-        window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('resize', onScroll, { passive: true });
-        updateActive();
-        return () => {
-            window.removeEventListener('scroll', onScroll);
-            window.removeEventListener('resize', onScroll);
-        };
+        );
+
+        visibleSections.forEach((section) => {
+            const el = sectionRefs.current[section.id];
+            if (el) observer.observe(el);
+        });
+
+        return () => observer.disconnect();
     }, [gym, visibleSections]);
+
+    useBodyScrollLock('gym-detail-lightbox', lightboxIdx !== null);
 
     useEffect(() => {
         if (lightboxIdx === null) return;
@@ -455,12 +473,9 @@ const GymDetailPage: React.FC = () => {
         };
 
         window.addEventListener('keydown', handleKeyDown);
-        // Prevent body scroll when lightbox is open
-        document.body.style.overflow = 'hidden';
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
-            document.body.style.overflow = '';
         };
     }, [lightboxIdx, gallery.length]);
 
@@ -670,7 +685,9 @@ const GymDetailPage: React.FC = () => {
                                         ))}
                                     </div>
                                     {branchDetail?.best_visit_time_summary && (
-                                        <div className="rounded-lg border border-white/16 bg-white/10 px-4 py-2 text-[0.72rem] font-semibold text-white/84 backdrop-blur-sm">
+                                        <div
+                                            className={`rounded-lg border border-white/16 bg-white/10 px-4 py-2 text-[0.72rem] font-semibold text-white/84 ${reducedEffects ? '' : 'backdrop-blur-sm'}`}
+                                        >
                                             {branchDetail?.best_visit_time_summary}
                                         </div>
                                     )}
@@ -756,7 +773,9 @@ const GymDetailPage: React.FC = () => {
                 </div>
 
                 <div className="marketplace-container mt-4 md:mt-6">
-                    <div className="gym-detail-subnav rounded-lg border border-[color:var(--mk-line)] bg-[rgba(255,251,244,0.82)] px-3 py-2 backdrop-blur-xl">
+                    <div
+                        className={`gym-detail-subnav rounded-lg border border-[color:var(--mk-line)] px-3 py-2 ${reducedEffects ? 'bg-[rgba(255,251,244,0.96)]' : 'bg-[rgba(255,251,244,0.82)] backdrop-blur-xl'}`}
+                    >
                         <div className="flex items-center gap-2 overflow-x-auto">
                             {visibleSections.map((section) => (
                                 <button
@@ -1009,7 +1028,9 @@ const GymDetailPage: React.FC = () => {
                 </div>
 
                 <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden" style={{ contain: 'layout paint' }}>
-                    <div className="rounded-lg border border-white/14 bg-[rgba(29,22,18,0.94)] px-4 py-3 text-white shadow-[color:var(--mk-shadow-soft)] backdrop-blur-xl">
+                    <div
+                        className={`rounded-lg border border-white/14 px-4 py-3 text-white shadow-[color:var(--mk-shadow-soft)] ${reducedEffects ? 'bg-[rgba(29,22,18,0.98)]' : 'bg-[rgba(29,22,18,0.94)] backdrop-blur-xl'}`}
+                    >
                         <div className="flex items-center justify-between gap-3">
                             <div>
                                 <div className="text-[0.64rem] font-bold uppercase tracking-[0.18em] text-white/48">Chi phí ước tính từ</div>

@@ -78,9 +78,15 @@
     -ms-overflow-style: none;
   }
   .scroll-x-hidden::-webkit-scrollbar { display: none; }
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
 
   /* Safe area mobile */
   .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-area-pb { padding-bottom: env(safe-area-inset-bottom); }
 }
 
 /* ─── COMPONENT LAYER ─────────────────────────────────────────────────── */
