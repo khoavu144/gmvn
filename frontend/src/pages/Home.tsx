@@ -5,6 +5,7 @@ import { logger } from '../lib/logger';
 import apiClient from '../services/api';
 import type { Trainer } from '../types';
 import { usePrefetchProfile } from '../hooks/usePrefetchProfile';
+import { HomeProfileSpotlight } from '../components/home/HomeProfileSpotlight';
 
 type FeaturedTrainer = Trainer & {
     is_verified?: boolean;
@@ -173,22 +174,26 @@ export default function Home() {
                                 Đăng ký miễn phí · Hồ sơ có thể được xác minh · Lọc phòng tập theo khu vực
                             </p>
 
-                            <div className="flex flex-wrap gap-3">
+                            <div
+                                className="-mx-1 flex flex-row flex-nowrap items-stretch gap-2 overflow-x-auto scroll-x-hidden scroll-smooth px-1 sm:gap-3"
+                                role="group"
+                                aria-label="Lối vào nhanh"
+                            >
                                 <a
                                     href="#ba-vai-tro"
-                                    className="btn-primary px-6 text-sm font-bold uppercase tracking-[0.16em]"
+                                    className="btn-primary shrink-0 whitespace-nowrap px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.14em] sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.16em]"
                                 >
                                     Khám phá 3 vai trò
                                 </a>
                                 <Link
                                     to="/gyms"
-                                    className="btn-secondary px-6 text-sm font-bold uppercase tracking-[0.16em]"
+                                    className="btn-secondary shrink-0 whitespace-nowrap px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.14em] sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.16em]"
                                 >
                                     Tìm phòng tập
                                 </Link>
                                 <Link
                                     to="/register"
-                                    className="btn-secondary px-6 text-sm font-bold uppercase tracking-[0.16em]"
+                                    className="btn-secondary shrink-0 whitespace-nowrap px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.14em] sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.16em]"
                                 >
                                     Tạo tài khoản
                                 </Link>
@@ -387,43 +392,63 @@ export default function Home() {
 
             <section className="marketplace-container mt-12 lg:mt-16" aria-labelledby="home-faq-heading">
                 <div className="marketplace-panel p-6 shadow-sm ring-1 ring-gray-900/[0.05] sm:p-8">
-                    <div className="marketplace-section-kicker">Câu hỏi nhanh</div>
-                    <h2 id="home-faq-heading" className="marketplace-section-title mt-2">
-                        Trước khi bạn bắt đầu
-                    </h2>
-                    <ul className="mt-6 space-y-5 text-sm leading-7 text-gray-600">
-                        <li>
-                            <p className="font-bold text-gray-900">Dùng GYMERVIET có mất phí không?</p>
-                            <p className="mt-1">
-                                Đăng ký và xem hồ sơ công khai là miễn phí. Gói trả phí chỉ khi bạn chọn nâng cấp —{' '}
-                                <Link to="/pricing" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
-                                    xem bảng giá
+                    <div className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.42fr)] lg:items-start lg:gap-10">
+                        <div className="order-2 lg:order-1">
+                            <div className="marketplace-section-kicker">Câu hỏi nhanh</div>
+                            <h2 id="home-faq-heading" className="marketplace-section-title mt-2">
+                                Trước khi bạn bắt đầu
+                            </h2>
+                            <ul className="mt-6 space-y-5 text-sm leading-7 text-gray-600">
+                                <li>
+                                    <p className="font-bold text-gray-900">Dùng GYMERVIET có mất phí không?</p>
+                                    <p className="mt-1">
+                                        Đăng ký và xem hồ sơ công khai là miễn phí. Gói trả phí chỉ khi bạn chọn nâng cấp —{' '}
+                                        <Link to="/pricing" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
+                                            xem bảng giá
+                                        </Link>
+                                        .
+                                    </p>
+                                </li>
+                                <li>
+                                    <p className="font-bold text-gray-900">Tôi tìm Coach hoặc phòng tập thế nào?</p>
+                                    <p className="mt-1">
+                                        Vào{' '}
+                                        <Link to="/coaches" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
+                                            danh sách Coach
+                                        </Link>
+                                        {' '}hoặc{' '}
+                                        <Link to="/gyms" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
+                                            marketplace phòng tập
+                                        </Link>
+                                        , lọc theo chuyên môn hoặc khu vực rồi mở hồ sơ chi tiết.
+                                    </p>
+                                </li>
+                            </ul>
+                            <div className="mt-6 border-t border-gray-200 pt-5">
+                                <Link
+                                    to="/faq"
+                                    className="text-sm font-bold uppercase tracking-[0.14em] text-gray-900 hover:underline underline-offset-4"
+                                >
+                                    Xem thêm câu hỏi thường gặp →
                                 </Link>
-                                .
-                            </p>
-                        </li>
-                        <li>
-                            <p className="font-bold text-gray-900">Tôi tìm Coach hoặc phòng tập thế nào?</p>
-                            <p className="mt-1">
-                                Vào{' '}
-                                <Link to="/coaches" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
-                                    danh sách Coach
-                                </Link>
-                                {' '}hoặc{' '}
-                                <Link to="/gyms" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
-                                    marketplace phòng tập
-                                </Link>
-                                , lọc theo chuyên môn hoặc khu vực rồi mở hồ sơ chi tiết.
-                            </p>
-                        </li>
-                    </ul>
-                    <div className="mt-6 border-t border-gray-200 pt-5">
-                        <Link
-                            to="/faq"
-                            className="text-sm font-bold uppercase tracking-[0.14em] text-gray-900 hover:underline underline-offset-4"
-                        >
-                            Xem thêm câu hỏi thường gặp →
-                        </Link>
+                            </div>
+                        </div>
+
+                        <div className="order-1 lg:order-2 lg:sticky lg:top-[calc(var(--header-height)+1rem)]">
+                            {isLoading ? (
+                                <div
+                                    className="animate-pulse rounded-xl border border-gray-200 bg-gray-100"
+                                    style={{ aspectRatio: '4 / 5' }}
+                                    aria-hidden
+                                />
+                            ) : (
+                                <HomeProfileSpotlight
+                                    profiles={sorted}
+                                    resolveHref={coachLink}
+                                    onPrefetch={handlePrefetch}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
             </section>

@@ -33,6 +33,79 @@ function StarRating({ rating }: { rating: number }) {
     );
 }
 
+const REGION_ATTR_HINTS = ['khu vực', 'ship từ', 'tỉnh thành', 'địa điểm', 'phạm vi', 'giao hàng'];
+
+function normalizeKey(s: string) {
+    return s
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{M}/gu, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function pickSalesRegionFromAttributes(attrs: Record<string, unknown> | null | undefined): string | null {
+    if (!attrs) return null;
+    for (const [k, v] of Object.entries(attrs)) {
+        const nk = normalizeKey(k);
+        if (REGION_ATTR_HINTS.some((h) => nk.includes(normalizeKey(h)))) {
+            return String(v);
+        }
+    }
+    for (const [k, v] of Object.entries(attrs)) {
+        if (/khu|vực|ship|tỉnh|thành|giao|phạm/i.test(k)) {
+            return String(v);
+        }
+    }
+    return null;
+}
+
+function salesAreaFallbackCopy(product: Product): string {
+    switch (product.product_type) {
+        case 'digital':
+            return 'Sản phẩm số — giao nhận trực tuyến, áp dụng trên toàn quốc sau thanh toán.';
+        case 'service':
+            return 'Dịch vụ — phạm vi và địa điểm theo lịch hẹn với người bán; xem mô tả hoặc liên hệ để xác nhận.';
+        default:
+            return 'Hàng vật lý — giao hàng theo chính sách người bán (thường toàn quốc trừ khi có ghi chú riêng).';
+    }
+}
+
+/** OpenStreetMap embed — bbox Việt Nam (min_lon, min_lat, max_lon, max_lat) */
+const VN_OSM_EMBED =
+    'https://www.openstreetmap.org/export/embed.html?bbox=102.14%2C8.18%2C109.46%2C23.39&layer=mapnik';
+
+function ProductSalesAreaPanel({ product, id }: { product: Product; id?: string }) {
+    const fromAttrs = pickSalesRegionFromAttributes(product.attributes ?? null);
+    const desc = fromAttrs ?? salesAreaFallbackCopy(product);
+    const titleId = id ?? 'mpd-sales-map-heading';
+
+    return (
+        <aside className="mpd-sales-map-panel" aria-labelledby={titleId}>
+            <h3 className="mpd-sales-map-panel-title" id={titleId}>
+                Khu vực bán hàng
+            </h3>
+            <p className="mpd-sales-map-panel-desc">{desc}</p>
+            <div className="mpd-sales-map-frame-wrap">
+                <iframe
+                    title="Bản đồ phạm vi tham chiếu Việt Nam"
+                    src={VN_OSM_EMBED}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                />
+            </div>
+            <a
+                className="mpd-sales-map-link"
+                href="https://www.openstreetmap.org/#map=6/16.06/107.83"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Mở bản đồ đầy đủ
+            </a>
+        </aside>
+    );
+}
+
 export default function ProductDetailPage() {
     const { slug } = useParams<{ slug: string }>();
     const [product, setProduct] = useState<Product | null>(null);
@@ -67,10 +140,10 @@ export default function ProductDetailPage() {
             
         if (product.category) {
             axios.get(`${API}/marketplace/products`, {
-                params: { category: product.category.slug, limit: '4' }
-            }).then(r => {
+                params: { category: product.category.slug, limit: '12' },
+            }).then((r) => {
                 setRelatedProducts(
-                    (r.data.products ?? []).filter((p: Product) => p.id !== product.id).slice(0, 4)
+                    (r.data.products ?? []).filter((p: Product) => p.id !== product.id).slice(0, 10)
                 );
             }).catch(() => {});
         }
@@ -103,6 +176,7 @@ export default function ProductDetailPage() {
     ].filter((url, idx, arr) => arr.indexOf(url) === idx);
 
     const tp = product.training_package;
+    const hasSpecs = Boolean(product.attributes && Object.keys(product.attributes).length > 0);
 
     return (
         <>
@@ -311,66 +385,91 @@ export default function ProductDetailPage() {
                 <div className="mpd-stacked-sections">
                     <section className="mpd-section" id="description">
                         <h2 className="mpd-section-title">Mô tả sản phẩm</h2>
-                        <div className="mpd-description">
-                            {product.description ? (
-                                <p className="mpd-description-body">{product.description}</p>
-                            ) : (
-                                <p className="mpd-empty-text">Chưa có mô tả chi tiết.</p>
-                            )}
+                        <div className="mpd-detail-main-grid">
+                            <div className="mpd-detail-main-col">
+                                <div className="mpd-description">
+                                    {product.description ? (
+                                        <p className="mpd-description-body">{product.description}</p>
+                                    ) : (
+                                        <p className="mpd-empty-text">Chưa có mô tả chi tiết.</p>
+                                    )}
 
-                            {/* Training package program preview */}
-                            {tp?.program_structure && tp.preview_weeks > 0 && (
-                                <div className="mpd-program-preview">
-                                    <h3>📋 Xem trước lịch tập (Tuần 1)</h3>
-                                    {Object.entries(tp.program_structure).slice(0, tp.preview_weeks).map(([week, days]) => (
-                                        <div key={week} className="mpd-program-week">
-                                            <h4>{week.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}</h4>
-                                            {Object.entries(days).map(([day, plan]) => (
-                                                <div key={day} className="mpd-program-day">
-                                                    <strong>{plan.title}</strong>
-                                                    {plan.exercises.length > 0 && (
-                                                        <div className="mpd-table-scroll">
-                                                            <table className="mpd-exercise-table">
-                                                                <thead>
-                                                                    <tr><th>Bài tập</th><th>Sets</th><th>Reps</th><th>Nghỉ</th></tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {plan.exercises.map((ex, i) => (
-                                                                        <tr key={i}>
-                                                                            <td>{ex.name}</td>
-                                                                            <td>{ex.sets}</td>
-                                                                            <td>{ex.reps}</td>
-                                                                            <td>{ex.rest_seconds ? `${ex.rest_seconds}s` : '—'}</td>
-                                                                        </tr>
-                                                                    ))}
-                                                                </tbody>
-                                                            </table>
+                                    {tp?.program_structure && tp.preview_weeks > 0 && (
+                                        <div className="mpd-program-preview">
+                                            <h3>📋 Xem trước lịch tập (Tuần 1)</h3>
+                                            {Object.entries(tp.program_structure).slice(0, tp.preview_weeks).map(([week, days]) => (
+                                                <div key={week} className="mpd-program-week">
+                                                    <h4>{week.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</h4>
+                                                    {Object.entries(days).map(([day, plan]) => (
+                                                        <div key={day} className="mpd-program-day">
+                                                            <strong>{plan.title}</strong>
+                                                            {plan.exercises.length > 0 && (
+                                                                <div className="mpd-table-scroll">
+                                                                    <table className="mpd-exercise-table">
+                                                                        <thead>
+                                                                            <tr><th>Bài tập</th><th>Sets</th><th>Reps</th><th>Nghỉ</th></tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {plan.exercises.map((ex, i) => (
+                                                                                <tr key={i}>
+                                                                                    <td>{ex.name}</td>
+                                                                                    <td>{ex.sets}</td>
+                                                                                    <td>{ex.reps}</td>
+                                                                                    <td>{ex.rest_seconds ? `${ex.rest_seconds}s` : '—'}</td>
+                                                                                </tr>
+                                                                            ))}
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                    )}
+                                                    ))}
                                                 </div>
                                             ))}
                                         </div>
-                                    ))}
+                                    )}
+                                </div>
+                            </div>
+                            {relatedProducts.length > 0 && (
+                                <div className="mpd-similar-rail-cq">
+                                    <aside className="mpd-similar-rail" aria-label="Sản phẩm tương tự">
+                                        <h3 className="mpd-similar-rail-title">Gợi ý tương tự</h3>
+                                        <div className="mpd-similar-rail-scroll">
+                                            <div className="mpd-similar-rail-grid">
+                                                {relatedProducts.map((p) => (
+                                                    <ProductCard key={p.id} product={p} variant="compact" />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </aside>
                                 </div>
                             )}
                         </div>
                     </section>
 
-                    {product.attributes && Object.keys(product.attributes).length > 0 && (
+                    {hasSpecs ? (
                         <section className="mpd-section" id="specs">
                             <h2 className="mpd-section-title">Thông số kỹ thuật</h2>
-                            <div className="mpd-table-scroll">
-                                <table className="mpd-specs-table">
-                                    <tbody>
-                                        {Object.entries(product.attributes).map(([k, v]) => (
-                                            <tr key={k}>
-                                                <td className="mpd-specs-key">{k.replace(/_/g, ' ')}</td>
-                                                <td>{String(v)}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                            <div className="mpd-specs-layout">
+                                <div className="mpd-specs-col mpd-table-scroll">
+                                    <table className="mpd-specs-table">
+                                        <tbody>
+                                            {Object.entries(product.attributes!).map(([k, v]) => (
+                                                <tr key={k}>
+                                                    <td className="mpd-specs-key">{k.replace(/_/g, ' ')}</td>
+                                                    <td>{String(v)}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <ProductSalesAreaPanel product={product} id="mpd-sales-map-heading-specs" />
                             </div>
+                        </section>
+                    ) : (
+                        <section className="mpd-section" id="sales-area">
+                            <h2 className="mpd-section-title">Phạm vi phục vụ</h2>
+                            <ProductSalesAreaPanel product={product} id="mpd-sales-map-heading-standalone" />
                         </section>
                     )}
 
@@ -405,16 +504,6 @@ export default function ProductDetailPage() {
                         </div>
                     </section>
 
-                    {relatedProducts.length > 0 && (
-                        <section className="mpd-section mpd-section--related" id="related">
-                            <h2 className="mpd-section-title">Gợi ý tương tự</h2>
-                            <div className="marketplace-grid">
-                                {relatedProducts.map(p => (
-                                    <ProductCard key={p.id} product={p} variant="standard" />
-                                ))}
-                            </div>
-                        </section>
-                    )}
                 </div>
             </div>
         </>

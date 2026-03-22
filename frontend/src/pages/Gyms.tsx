@@ -76,17 +76,55 @@ function getCityData(gyms: GymCenter[]) {
 interface CategoryStripProps {
     label: string;
     desc: string;
-    accent: string;
     items: GymCenter[];
     onFilter: (slug: string) => void;
     slug: string;
+    /** Desktop only: alternate big card left / right between strips */
+    reverseLayout?: boolean;
 }
 
-const CategoryStrip: React.FC<CategoryStripProps> = ({ label, desc, accent, items, onFilter, slug }) => {
+const CategoryStrip: React.FC<CategoryStripProps> = ({
+    label,
+    desc,
+    items,
+    onFilter,
+    slug,
+    reverseLayout = false,
+}) => {
     if (items.length === 0) return null;
 
     const [primary, ...rest] = items;
     const secondaries = rest.slice(0, 2);
+    const secCount = secondaries.length;
+
+    const gridLg =
+        secCount === 0 ? 'lg:grid-cols-1' : secCount === 1 ? 'lg:grid-cols-3' : 'lg:grid-cols-4';
+
+    const primaryCell =
+        secCount === 0
+            ? 'h-full min-h-0 sm:col-span-2 lg:col-span-1 order-1'
+            : secCount === 1
+              ? reverseLayout
+                  ? 'h-full min-h-0 sm:col-span-2 lg:col-span-2 lg:col-start-2 order-1 lg:order-2'
+                  : 'h-full min-h-0 sm:col-span-2 lg:col-span-2 lg:col-start-1 order-1'
+              : reverseLayout
+                ? 'h-full min-h-0 sm:col-span-2 lg:col-span-2 lg:col-start-3 order-1 lg:order-3'
+                : 'h-full min-h-0 sm:col-span-2 lg:col-span-2 lg:col-start-1 order-1';
+
+    const secondaryCell = (idx: number) => {
+        if (reverseLayout) {
+            if (secCount >= 2) {
+                return idx === 0
+                    ? 'h-full min-h-0 order-2 lg:order-1 lg:col-start-1'
+                    : 'h-full min-h-0 order-3 lg:order-2 lg:col-start-2';
+            }
+            return 'h-full min-h-0 order-2 lg:order-1 lg:col-start-1';
+        }
+        if (secCount === 1) {
+            return 'h-full min-h-0 order-2 lg:col-start-3';
+        }
+        return idx === 0 ? 'h-full min-h-0 order-2' : 'h-full min-h-0 order-3';
+    };
 
     return (
         <div className="space-y-3">
@@ -105,43 +143,16 @@ const CategoryStrip: React.FC<CategoryStripProps> = ({ label, desc, accent, item
                 </button>
             </header>
 
-            {/* 2 : 1 : 1 grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:grid-rows-1">
-                <div className="sm:col-span-2 lg:col-span-2 h-full min-h-0">
+            <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 lg:grid-rows-1 ${gridLg}`}>
+                <div className={primaryCell}>
                     <GymCard gym={primary} variant="featured" index={0} />
                 </div>
 
                 {secondaries.map((gym, idx) => (
-                    <div key={gym.id} className="h-full min-h-0">
+                    <div key={gym.id} className={secondaryCell(idx)}>
                         <GymCard gym={gym} variant="compact" index={idx + 1} />
                     </div>
                 ))}
-
-                {/* Filler placeholder when only 1 secondary */}
-                {secondaries.length === 1 && (
-                    <div className={`hidden lg:flex flex-col items-center justify-center rounded-xl bg-gradient-to-br ${accent} p-6 text-white/70 text-sm text-center gap-3`}>
-                        <div className="text-2xl font-bold text-white/20">{label.slice(0, 2)}</div>
-                        <p className="text-xs leading-relaxed">{desc}</p>
-                        <button
-                            type="button"
-                            onClick={() => onFilter(slug)}
-                            className="mt-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-widest text-white/80 hover:bg-white/20 transition"
-                        >
-                            Khám phá thêm
-                        </button>
-                    </div>
-                )}
-
-                {/* Both placeholders when no secondaries */}
-                {secondaries.length === 0 && (
-                    <>
-                        {[0, 1].map((i) => (
-                            <div key={i} className={`hidden lg:flex flex-col items-center justify-center rounded-xl bg-gradient-to-br ${accent} p-6 text-white/70 text-sm text-center`}>
-                                <div className="text-[0.65rem] uppercase tracking-widest">Sắp có</div>
-                            </div>
-                        ))}
-                    </>
-                )}
             </div>
         </div>
     );
@@ -255,9 +266,9 @@ const Gyms: React.FC = () => {
                 <section className="marketplace-hero">
                     <div className="marketplace-container">
                         <div className="marketplace-hero-grid">
-                            <div className="space-y-4 max-w-3xl">
+                            <div className="space-y-3 md:space-y-4 max-w-3xl">
                                 <span className="marketplace-eyebrow">Editorial marketplace</span>
-                                <div className="space-y-4">
+                                <div className="space-y-3 md:space-y-4">
                                     <h1 className="marketplace-title max-w-[20ch] sm:max-w-none">
                                         Chọn nơi tập bằng không gian, cảm giác và quyết định đúng.
                                     </h1>
@@ -289,7 +300,7 @@ const Gyms: React.FC = () => {
                 {/* ── Filter bar ───────────────────────────────────────────────────── */}
                 <section className="marketplace-container">
                     <div className="marketplace-panel marketplace-filter-bar">
-                        <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-3 md:gap-4">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div className="marketplace-field">
                                     <label htmlFor="marketplace-venue">Loại hình</label>
@@ -514,8 +525,22 @@ const Gyms: React.FC = () => {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                                            <div className="sm:col-span-2 lg:col-span-2 h-full min-h-0">
+                                        <div
+                                            className={
+                                                featuredGyms.length === 1
+                                                    ? 'grid grid-cols-1 gap-4'
+                                                    : featuredGyms.length === 2
+                                                      ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4'
+                                                      : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'
+                                            }
+                                        >
+                                            <div
+                                                className={
+                                                    featuredGyms.length >= 3
+                                                        ? 'sm:col-span-2 lg:col-span-2 h-full min-h-0'
+                                                        : 'h-full min-h-0'
+                                                }
+                                            >
                                                 <GymCard gym={featuredGyms[0]} variant="featured" index={0} />
                                             </div>
                                             {featuredGyms.slice(1, 3).map((gym, idx) => (
@@ -546,9 +571,9 @@ const Gyms: React.FC = () => {
                                                     slug={cat.slug}
                                                     label={cat.label}
                                                     desc={cat.desc}
-                                                    accent={cat.accent}
                                                     items={items}
                                                     onFilter={handleFilterByCategory}
+                                                    reverseLayout={stripIdx % 2 === 1}
                                                 />
                                             </div>
                                         );

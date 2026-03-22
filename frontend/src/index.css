@@ -690,6 +690,29 @@ body {
     align-items: start;
   }
 
+  @media (max-width: 768px) {
+    .gyms-marketplace .marketplace-hero {
+      padding-top: clamp(0.875rem, 2.2vw, 1.25rem);
+      padding-bottom: clamp(0.65rem, 1.8vw, 1rem);
+    }
+
+    .gyms-marketplace .marketplace-hero .marketplace-title {
+      font-size: clamp(1.45rem, 5.2vw, 2.35rem);
+    }
+
+    .gyms-marketplace .marketplace-panel.marketplace-filter-bar {
+      padding: 0.65rem 0.75rem;
+    }
+
+    .gyms-marketplace .marketplace-stat-card {
+      padding: 0.65rem 0.75rem 0.7rem;
+    }
+
+    .gyms-marketplace .marketplace-stat-card strong {
+      font-size: clamp(1.2rem, 5vw, 1.45rem);
+    }
+  }
+
   @media (min-width: 1024px) {
     .gyms-marketplace .marketplace-card-grid {
       grid-template-columns: repeat(auto-fill, minmax(19.5rem, 1fr));

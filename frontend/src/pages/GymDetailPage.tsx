@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { getOptimizedUrl, getSrcSet } from '../utils/image';
 import { gymService } from '../services/gymService';
@@ -45,6 +46,15 @@ function SummaryPill({ label, value }: { label: string; value: string }) {
         <div className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
             <div className="text-[0.66rem] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">{label}</div>
             <div className="mt-1 text-sm font-bold text-[color:var(--mk-text)]">{value}</div>
+        </div>
+    );
+}
+
+function OverviewMetaRow({ label, value }: { label: string; value: string }) {
+    return (
+        <div className="flex flex-row items-baseline justify-between gap-3 border-b border-[color:var(--mk-line)] py-2 last:border-b-0">
+            <span className="shrink-0 text-[0.66rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">{label}</span>
+            <span className="min-w-0 truncate text-right text-sm font-semibold text-[color:var(--mk-text)]">{value}</span>
         </div>
     );
 }
@@ -212,6 +222,8 @@ const GymDetailPage: React.FC = () => {
 
     const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
+    const [heroSlideIndex, setHeroSlideIndex] = useState(0);
+
     useEffect(() => {
         if (!id) return;
 
@@ -307,6 +319,19 @@ const GymDetailPage: React.FC = () => {
 
     const activeImage = lightboxIdx !== null ? gallery[lightboxIdx] : null;
     const heroImage = gallery.find((item) => item.is_hero) || gallery[0] || null;
+
+    const heroIndexInGallery = useMemo(() => {
+        if (!gallery.length) return 0;
+        const idx = gallery.findIndex((item) => item.is_hero);
+        return idx >= 0 ? idx : 0;
+    }, [gallery]);
+
+    useEffect(() => {
+        setHeroSlideIndex(heroIndexInGallery);
+    }, [heroIndexInGallery]);
+
+    const safeSlideIndex = gallery.length > 0 ? Math.min(heroSlideIndex, gallery.length - 1) : 0;
+    const heroSlideItem = gallery[safeSlideIndex] || heroImage;
 
     const todayHours = getTodayHours(branchDetail);
     const lowestPrice = useMemo(() => {
@@ -600,16 +625,31 @@ const GymDetailPage: React.FC = () => {
 
                     <section className="marketplace-panel overflow-hidden">
                         <div className="grid gap-0 lg:grid-cols-[1fr_1fr]">
-                            <div className="relative min-h-[24rem] overflow-hidden bg-[color:var(--mk-paper-strong)] lg:min-h-[36rem]">
-                                {heroImage ? (
-                                    <img
-                                        src={getOptimizedUrl(heroImage.image_url, 1440) || heroImage.image_url}
-                                        srcSet={getSrcSet(heroImage.image_url, [640, 1024, 1600])}
-                                        sizes="(max-width: 1024px) 100vw, 60vw"
-                                        alt={heroImage.alt_text || heroImage.caption || gym.name}
-                                        className="h-full w-full object-cover"
-                                        fetchPriority="high"
-                                    />
+                            <div className="relative min-h-[13rem] max-h-[14rem] overflow-hidden bg-[color:var(--mk-paper-strong)] sm:min-h-[15rem] sm:max-h-[16rem] lg:min-h-[18rem] lg:max-h-[20rem]">
+                                {gallery.length > 0 && heroSlideItem && (
+                                    <p className="sr-only" aria-live="polite" aria-atomic="true">
+                                        {`Ảnh ${safeSlideIndex + 1} trên ${gallery.length}`}
+                                    </p>
+                                )}
+                                {heroSlideItem ? (
+                                    <>
+                                        <img
+                                            src={getOptimizedUrl(heroSlideItem.image_url, 1440) || heroSlideItem.image_url}
+                                            srcSet={getSrcSet(heroSlideItem.image_url, [640, 1024, 1600])}
+                                            sizes="(max-width: 1024px) 100vw, 50vw"
+                                            alt={heroSlideItem.alt_text || heroSlideItem.caption || gym.name}
+                                            className="h-full w-full object-cover"
+                                            fetchPriority="high"
+                                        />
+                                        {gallery.length > 0 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setLightboxIdx(safeSlideIndex)}
+                                                className="absolute inset-0 z-[1] cursor-zoom-in bg-transparent"
+                                                aria-label="Phóng to ảnh"
+                                            />
+                                        )}
+                                    </>
                                 ) : (
                                     <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(230,203,154,0.45),transparent_36%),linear-gradient(155deg,rgba(255,255,255,0.55),rgba(222,214,201,0.95))]">
                                         <span className="text-[5rem] font-bold leading-none tracking-[-0.08em] text-[color:var(--mk-text)]/20">
@@ -617,9 +657,9 @@ const GymDetailPage: React.FC = () => {
                                         </span>
                                     </div>
                                 )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(26,20,16,0.82)] via-[rgba(26,20,16,0.14)] to-transparent" />
+                                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(26,20,16,0.82)] via-[rgba(26,20,16,0.14)] to-transparent" />
 
-                                <div className="absolute left-5 right-5 top-5 flex flex-wrap items-start justify-between gap-3">
+                                <div className="absolute left-5 right-5 top-5 z-[2] flex flex-wrap items-start justify-between gap-3">
                                     <div className="flex flex-wrap gap-2">
                                         <span className="marketplace-badge marketplace-badge--accent">{venueLabel}</span>
                                         {gym.is_verified && <span className="marketplace-badge marketplace-badge--verified">Đã xác minh</span>}
@@ -635,27 +675,6 @@ const GymDetailPage: React.FC = () => {
                                         </div>
                                     )}
                                 </div>
-
-                                {gallery.length > 1 && (
-                                    <div className="absolute inset-x-5 bottom-5 flex gap-2 overflow-x-auto pb-1">
-                                        {gallery.slice(0, 6).map((item, index) => (
-                                            <button
-                                                key={item.id}
-                                                type="button"
-                                                onClick={() => setLightboxIdx(index)}
-                                                className="relative h-20 w-24 shrink-0 overflow-hidden rounded-lg border border-white/14 bg-black/20 transition hover:-translate-y-0.5 hover:border-white/35"
-                                            >
-                                                <img
-                                                    src={getOptimizedUrl(item.image_url, 320) || item.image_url}
-                                                    alt={item.alt_text || item.caption || gym.name}
-                                                    className="h-full w-full object-cover"
-                                                    loading="lazy"
-                                                />
-                                                <div className="absolute inset-0 bg-black/20" />
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
                             </div>
 
                             <div className="flex flex-col justify-between p-6 sm:p-7 lg:p-8">
@@ -666,10 +685,55 @@ const GymDetailPage: React.FC = () => {
                                         <h1 className="text-[clamp(2.3rem,4vw,4.2rem)] font-bold leading-[0.92] tracking-[-0.07em] text-[color:var(--mk-text)]">
                                             {gym.name}
                                         </h1>
-                                        <p className="mt-4 text-[1.02rem] leading-8 text-[color:var(--mk-muted)]">
+                                        <p className="mt-4 line-clamp-3 text-[1.02rem] leading-7 text-[color:var(--mk-muted)] lg:line-clamp-4 lg:leading-8">
                                             {seoDescription}
                                         </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => navigateToSection('overview')}
+                                            className="mt-2 text-left text-sm font-semibold text-[color:var(--mk-text)] underline decoration-[color:var(--mk-line)] underline-offset-4 transition hover:text-[color:var(--mk-accent-ink)]"
+                                        >
+                                            Xem thêm
+                                        </button>
                                     </div>
+
+                                    {gallery.length > 1 && (
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setHeroSlideIndex((i) => (i - 1 + gallery.length) % gallery.length)}
+                                                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[color:var(--mk-line)] bg-white/90 text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45"
+                                                aria-label="Ảnh trước"
+                                            >
+                                                <ChevronLeft className="h-5 w-5" aria-hidden />
+                                            </button>
+                                            <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                                                {gallery.map((item, index) => (
+                                                    <button
+                                                        key={item.id}
+                                                        type="button"
+                                                        onClick={() => setHeroSlideIndex(index)}
+                                                        className={`relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border transition sm:h-20 sm:w-24 ${index === safeSlideIndex ? 'border-[color:var(--mk-text)] ring-2 ring-[color:var(--mk-text)]/20' : 'border-[color:var(--mk-line)] hover:border-[color:var(--mk-accent)]/45'}`}
+                                                    >
+                                                        <img
+                                                            src={getOptimizedUrl(item.image_url, 320) || item.image_url}
+                                                            alt={item.alt_text || item.caption || gym.name}
+                                                            className="h-full w-full object-cover"
+                                                            loading="lazy"
+                                                        />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setHeroSlideIndex((i) => (i + 1) % gallery.length)}
+                                                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[color:var(--mk-line)] bg-white/90 text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45"
+                                                aria-label="Ảnh sau"
+                                            >
+                                                <ChevronRight className="h-5 w-5" aria-hidden />
+                                            </button>
+                                        </div>
+                                    )}
 
                                     <div className="flex flex-wrap gap-2">
                                         {overviewBadges.map((label) => (
@@ -741,11 +805,33 @@ const GymDetailPage: React.FC = () => {
                                         )}
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <SummaryPill label="Chi nhánh đang xem" value={branchDetail?.branch_name || 'Chưa chọn'} />
-                                        <SummaryPill label="Khu vực" value={[branchDetail?.district, branchDetail?.city].filter(Boolean).join(', ') || 'Chưa cập nhật'} />
-                                        <SummaryPill label="Không khí" value={getTaxonomyLabels(gym, 'atmosphere', 1)[0] || 'Tập trung vào trải nghiệm thực tế'} />
-                                        <SummaryPill label="Phản hồi" value={gym.response_sla_text || leadAction.helper} />
+                                    <div className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-3 py-1 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
+                                        <OverviewMetaRow label="Chi nhánh" value={branchDetail?.branch_name || 'Chưa chọn'} />
+                                        <OverviewMetaRow
+                                            label="Khu vực"
+                                            value={[branchDetail?.district, branchDetail?.city].filter(Boolean).join(', ') || 'Chưa cập nhật'}
+                                        />
+                                        {branchDetail?.address ? (
+                                            <OverviewMetaRow label="Địa chỉ" value={branchDetail.address} />
+                                        ) : null}
+                                        <OverviewMetaRow
+                                            label="Không khí"
+                                            value={getTaxonomyLabels(gym, 'atmosphere', 1)[0] || 'Tập trung vào trải nghiệm thực tế'}
+                                        />
+                                        <OverviewMetaRow label="Phản hồi" value={gym.response_sla_text || leadAction.helper || '—'} />
+                                        {gym.website_url ? (
+                                            <div className="flex flex-row items-baseline justify-between gap-3 py-2">
+                                                <span className="shrink-0 text-[0.66rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Website</span>
+                                                <a
+                                                    href={gym.website_url.startsWith('http') ? gym.website_url : `https://${gym.website_url}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="min-w-0 truncate text-right text-sm font-semibold text-[color:var(--mk-text)] underline decoration-[color:var(--mk-line)] underline-offset-2 hover:text-[color:var(--mk-accent-ink)]"
+                                                >
+                                                    {gym.website_url.replace(/^https?:\/\//i, '')}
+                                                </a>
+                                            </div>
+                                        ) : null}
                                     </div>
                                 </div>
                         </section>
@@ -775,7 +861,14 @@ const GymDetailPage: React.FC = () => {
 
                         <GymReviewsSection gymId={gym.id} branchId={branchId} gymTrustSummary={gym.trust_summary} setRef={setRef} />
 
-                        {similarGyms.length > 0 && <GymSimilarSection similarGyms={similarGyms} setRef={setRef} />}
+                        {similarGyms.length > 0 && (
+                            <div
+                                ref={setRef('similar')}
+                                id="similar"
+                                className="gym-detail-section h-px w-full shrink-0 scroll-mt-[var(--gym-detail-scroll-margin)] opacity-0"
+                                aria-hidden
+                            />
+                        )}
 
                         {(branchMapEmbedUrl || hasCoordinates) && (
                             <GymMapSection
@@ -843,6 +936,16 @@ const GymDetailPage: React.FC = () => {
                                         </button>
                                     ))}
                                 </div>
+                            </div>
+                        )}
+
+                        {similarGyms.length > 0 && (
+                            <div className="marketplace-panel p-5">
+                                <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Venue tương tự</div>
+                                <p className="mt-1 text-sm leading-6 text-[color:var(--mk-muted)]">
+                                    Gợi ý theo loại hình và khu vực — cuộn để xem thêm.
+                                </p>
+                                <GymSimilarSection similarGyms={similarGyms} />
                             </div>
                         )}
 

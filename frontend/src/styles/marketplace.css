@@ -184,12 +184,30 @@
 /* ── Section ─────────────────────────────────────────────────── */
 .marketplace-section { margin-bottom: 2.5rem; }
 
+.marketplace-section-head {
+  margin-bottom: 1rem;
+}
+
+.marketplace-section-kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mk-muted);
+  margin: 0 0 0.35rem;
+  padding-left: 0.1rem;
+}
+
 .marketplace-section-title {
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--mk-text);
   margin-bottom: 1rem;
   padding-left: .1rem;
+}
+
+.marketplace-section-head .marketplace-section-title {
+  margin-bottom: 0;
 }
 
 /* ── Rail (horizontal scroll) ────────────────────────────────── */
@@ -207,6 +225,112 @@
   height: auto;
   align-self: stretch;
   min-height: 280px;
+}
+
+/* Rail prev/next — scroll hidden products into view */
+.marketplace-rail-wrap {
+  position: relative;
+}
+
+.marketplace-rail-wrap .marketplace-rail {
+  padding-inline: 2.75rem;
+}
+
+.marketplace-rail-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  translate: 0 -50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in oklab, var(--mk-line) 80%, transparent);
+  background: color-mix(in oklab, var(--cur-surface-lowest) 92%, transparent);
+  color: var(--cur-on-surface);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: background .2s, border-color .2s, opacity .2s;
+}
+.marketplace-rail-nav:hover:not(:disabled) {
+  background: var(--cur-surface-lowest);
+  border-color: var(--cur-primary);
+}
+.marketplace-rail-nav:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.marketplace-rail-nav--prev {
+  left: 0.25rem;
+}
+.marketplace-rail-nav--next {
+  right: 0.25rem;
+}
+
+@media (max-width: 639px) {
+  .marketplace-rail-nav--prev { left: 0; }
+  .marketplace-rail-nav--next { right: 0; }
+}
+
+/* Editorial typo cell inside product grid (curated row) */
+.marketplace-typo-slot {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 280px;
+  padding: 1.35rem 1.25rem;
+  border-radius: var(--cur-radius-md);
+  border: 1px solid color-mix(in oklab, var(--mk-line) 70%, transparent);
+  background: linear-gradient(
+    145deg,
+    color-mix(in oklab, var(--cur-primary) 12%, var(--cur-surface-lowest)),
+    var(--cur-surface-lowest)
+  );
+  text-decoration: none;
+  color: inherit;
+  transition: transform .2s, box-shadow .2s;
+}
+a.marketplace-typo-slot:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--cur-shadow-soft);
+}
+
+.marketplace-typo-kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cur-on-surface-var);
+  margin: 0 0 0.5rem;
+}
+
+.marketplace-typo-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.65rem;
+  color: var(--cur-on-surface);
+}
+
+.marketplace-typo-lead {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--cur-on-surface-var);
+  margin: 0;
+  flex: 1;
+}
+
+.marketplace-typo-cta {
+  margin-top: 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cur-primary);
 }
 
 /* ── Grid ────────────────────────────────────────────────────── */
@@ -572,13 +696,23 @@
 }
 
 .mpd-gallery-main {
-  aspect-ratio: 1/1;
+  aspect-ratio: 4/3;
+  max-height: min(42vh, 22rem);
   background: var(--cur-surface-high);
   border-radius: var(--cur-radius-lg);
   overflow: hidden;
 }
 @media (min-width: 768px) {
-  .mpd-gallery-main { aspect-ratio: 3/4; }
+  .mpd-gallery-main {
+    aspect-ratio: 16/10;
+    max-height: min(48vh, 28rem);
+  }
+}
+@media (min-width: 1024px) {
+  .mpd-gallery-main {
+    aspect-ratio: 4/3;
+    max-height: min(46vh, 26rem);
+  }
 }
 .mpd-gallery-main-img { width: 100%; height: 100%; object-fit: cover; }
 .mpd-gallery-placeholder {
@@ -621,7 +755,7 @@
 
 /* Info column — vertical rhythm */
 .mpd-info {
-  --mpd-info-gap: 1.25rem;
+  --mpd-info-gap: 1rem;
   display: flex;
   flex-direction: column;
   gap: var(--mpd-info-gap);
@@ -639,7 +773,7 @@
 
 .mpd-title {
   font-family: var(--font-display);
-  font-size: var(--type-display-lg);
+  font-size: clamp(1.35rem, 3.2vw, var(--type-display-lg));
   font-weight: 800;
   color: var(--cur-on-surface);
   line-height: 1.15;
@@ -691,7 +825,7 @@
   display: flex; align-items: baseline; gap: 1rem; flex-wrap: wrap;
   margin: 0;
 }
-.mpd-price-main { font-size: 2.25rem; font-family: var(--font-display); font-weight: 800; color: var(--cur-primary); }
+.mpd-price-main { font-size: clamp(1.65rem, 4vw, 2.1rem); font-family: var(--font-display); font-weight: 800; color: var(--cur-primary); }
 .mpd-price-orig { font-size: 1.1rem; color: color-mix(in oklab, var(--cur-on-surface) 40%, transparent); text-decoration: line-through; }
 .mpd-price-badge {
   font-size: var(--type-label-sm); font-weight: 700;
@@ -795,6 +929,153 @@
   font-size: 1.05rem;
   margin: 0;
   max-width: 48rem;
+}
+
+/* Description + similar sidebar */
+.mpd-detail-main-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: stretch;
+}
+
+@media (min-width: 1024px) {
+  .mpd-detail-main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 20rem);
+    gap: 2rem 1.75rem;
+    align-items: start;
+  }
+}
+
+.mpd-detail-main-col {
+  min-width: 0;
+}
+
+.mpd-detail-main-col .mpd-description-body,
+.mpd-detail-main-col .mpd-description {
+  max-width: none;
+}
+
+.mpd-similar-rail-cq {
+  container-type: inline-size;
+  min-width: 0;
+  width: 100%;
+}
+
+@container (max-width: 260px) {
+  .mpd-similar-rail-cq .mpd-similar-rail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.mpd-similar-rail {
+  position: sticky;
+  top: calc(var(--header-height, 56px) + 1rem);
+  border-radius: var(--cur-radius-lg);
+  border: 1px solid var(--cur-surface-highest);
+  background: var(--cur-surface-low);
+  padding: 1rem;
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--cur-on-surface) 6%, transparent);
+}
+
+.mpd-similar-rail-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--cur-on-surface);
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.mpd-similar-rail-scroll {
+  max-height: min(70vh, 36rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.25rem;
+}
+
+.mpd-similar-rail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.mpd-similar-rail-grid .marketplace-product-card {
+  min-height: 0;
+}
+
+/* Specs + sales map */
+.mpd-specs-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+@media (min-width: 1024px) {
+  .mpd-specs-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(14rem, 22rem);
+    gap: 2rem;
+    align-items: start;
+  }
+}
+
+.mpd-specs-col {
+  min-width: 0;
+}
+
+.mpd-sales-map-panel {
+  border-radius: var(--cur-radius-lg);
+  border: 1px solid color-mix(in oklab, var(--cur-surface-highest) 55%, transparent);
+  background: transparent;
+  padding: 1rem 1rem 0.75rem;
+  min-height: 12rem;
+  box-shadow: none;
+}
+
+.mpd-sales-map-panel-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--cur-on-surface);
+  margin: 0 0 0.35rem;
+  letter-spacing: -0.02em;
+}
+
+.mpd-sales-map-panel-desc {
+  font-size: var(--type-body-md);
+  line-height: 1.5;
+  color: var(--cur-on-surface-var);
+  margin: 0 0 0.75rem;
+}
+
+.mpd-sales-map-frame-wrap {
+  position: relative;
+  border-radius: var(--cur-radius-md);
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  background: var(--cur-surface-high);
+}
+
+.mpd-sales-map-frame-wrap iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.mpd-sales-map-link {
+  display: inline-block;
+  margin-top: 0.65rem;
+  font-size: var(--type-label-md);
+  font-weight: 700;
+  color: var(--cur-primary);
+  text-decoration: none;
+}
+
+.mpd-sales-map-link:hover {
+  text-decoration: underline;
 }
 
 .mpd-description-body {

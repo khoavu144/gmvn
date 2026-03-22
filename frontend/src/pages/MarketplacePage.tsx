@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import '../styles/marketplace.css';
@@ -143,6 +144,29 @@ export default function MarketplacePage() {
     const [loading, setLoading] = useState(false);
     const [searchInput, setSearchInput] = useState(searchParams.get('q') ?? '');
     const filterRef = useRef<HTMLElement>(null);
+    const newArrivalsRailRef = useRef<HTMLDivElement>(null);
+    const [railCanPrev, setRailCanPrev] = useState(false);
+    const [railCanNext, setRailCanNext] = useState(false);
+
+    const updateRailScrollState = useCallback(() => {
+        const el = newArrivalsRailRef.current;
+        if (!el) return;
+        const { scrollLeft, scrollWidth, clientWidth } = el;
+        const max = scrollWidth - clientWidth;
+        setRailCanPrev(scrollLeft > 2);
+        setRailCanNext(max > 2 && scrollLeft < max - 2);
+    }, []);
+
+    const scrollNewArrivalsRail = useCallback(
+        (direction: -1 | 1) => {
+            const el = newArrivalsRailRef.current;
+            if (!el) return;
+            const step = Math.max(240, Math.round(el.clientWidth * 0.72));
+            el.scrollBy({ left: direction * step, behavior: 'smooth' });
+            window.setTimeout(updateRailScrollState, 320);
+        },
+        [updateRailScrollState]
+    );
 
     const activeCategory = searchParams.get('category') ?? '';
     const activeSearch = searchParams.get('q') ?? '';
@@ -211,6 +235,29 @@ export default function MarketplacePage() {
     }
 
     const showHero = !activeCategory && !activeSearch;
+
+    useEffect(() => {
+        const el = newArrivalsRailRef.current;
+        if (!el || !showHero || newArrivals.length === 0) return;
+
+        updateRailScrollState();
+        el.addEventListener('scroll', updateRailScrollState, { passive: true });
+        const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateRailScrollState) : null;
+        ro?.observe(el);
+
+        return () => {
+            el.removeEventListener('scroll', updateRailScrollState);
+            ro?.disconnect();
+        };
+    }, [showHero, newArrivals.length, updateRailScrollState]);
+
+    const curatedPicks = useMemo(
+        () =>
+            products
+                .filter((p) => (p.featured_weight ?? 0) > 80 && !featured.some((f) => f.id === p.id))
+                .slice(0, 3),
+        [products, featured]
+    );
 
     return (
         <>
@@ -289,7 +336,10 @@ export default function MarketplacePage() {
                     {/* Featured bento — only on homepage */}
                     {showHero && featured.length > 0 && (
                         <section className="marketplace-section">
-                            <h2 className="marketplace-section-title">⭐ Nổi bật</h2>
+                            <div className="marketplace-section-head">
+                                <p className="marketplace-section-kicker">Lựa chọn nổi bật</p>
+                                <h2 className="marketplace-section-title">Nổi bật</h2>
+                            </div>
                             <div className="marketplace-bento">
                                 {featured.slice(0, 3).map(p => (
                                     <ProductCard key={p.id} product={p} variant="featured" />
@@ -301,11 +351,34 @@ export default function MarketplacePage() {
                     {/* New arrivals rail — only on homepage */}
                     {showHero && newArrivals.length > 0 && (
                         <section className="marketplace-section">
-                            <h2 className="marketplace-section-title">🆕 Mới nhất</h2>
-                            <div className="marketplace-rail">
-                                {newArrivals.map(p => (
-                                    <ProductCard key={p.id} product={p} variant="compact" />
-                                ))}
+                            <div className="marketplace-section-head">
+                                <p className="marketplace-section-kicker">Vừa lên kệ</p>
+                                <h2 className="marketplace-section-title">Mới nhất</h2>
+                            </div>
+                            <div className="marketplace-rail-wrap">
+                                <button
+                                    type="button"
+                                    className="marketplace-rail-nav marketplace-rail-nav--prev"
+                                    onClick={() => scrollNewArrivalsRail(-1)}
+                                    disabled={!railCanPrev}
+                                    aria-label="Cuộn sản phẩm về trước"
+                                >
+                                    <ChevronLeft className="h-5 w-5" aria-hidden />
+                                </button>
+                                <div ref={newArrivalsRailRef} className="marketplace-rail">
+                                    {newArrivals.map((p) => (
+                                        <ProductCard key={p.id} product={p} variant="compact" />
+                                    ))}
+                                </div>
+                                <button
+                                    type="button"
+                                    className="marketplace-rail-nav marketplace-rail-nav--next"
+                                    onClick={() => scrollNewArrivalsRail(1)}
+                                    disabled={!railCanNext}
+                                    aria-label="Cuộn sản phẩm tiếp"
+                                >
+                                    <ChevronRight className="h-5 w-5" aria-hidden />
+                                </button>
                             </div>
                         </section>
                     )}
@@ -313,14 +386,27 @@ export default function MarketplacePage() {
                     {/* Curated Picks — only on homepage */}
                     {showHero && (
                         <section className="marketplace-section">
-                            <h2 className="marketplace-section-title">🏆 Gợi ý tuyển chọn</h2>
+                            <div className="marketplace-section-head">
+                                <p className="marketplace-section-kicker">Gymerviet gợi ý</p>
+                                <h2 className="marketplace-section-title">Biên tập chọn</h2>
+                            </div>
                             <div className="marketplace-grid">
-                                {products
-                                    .filter(p => (p.featured_weight ?? 0) > 80 && !featured.some(f => f.id === p.id))
-                                    .slice(0, 4)
-                                    .map(p => (
-                                        <ProductCard key={p.id} product={p} variant="standard" />
-                                    ))}
+                                {curatedPicks.map((p) => (
+                                    <ProductCard key={p.id} product={p} variant="standard" />
+                                ))}
+                                <Link
+                                    to="/marketplace?sort=newest"
+                                    className="marketplace-typo-slot"
+                                >
+                                    <p className="marketplace-typo-kicker">Tiêu chí lựa chọn</p>
+                                    <h3 className="marketplace-typo-title">
+                                        Ưu tiên sản phẩm mới, đánh giá tốt và seller uy tín.
+                                    </h3>
+                                    <p className="marketplace-typo-lead">
+                                        Lưới sản phẩm bên cạnh là lựa chọn nội bộ, không phải sắp xếp theo một tiêu chí đơn lẻ. Chọn &quot;Xem hàng mới&quot; để mở bộ lọc Mới nhất và khám phá thêm.
+                                    </p>
+                                    <span className="marketplace-typo-cta">Xem hàng mới →</span>
+                                </Link>
                             </div>
                         </section>
                     )}
