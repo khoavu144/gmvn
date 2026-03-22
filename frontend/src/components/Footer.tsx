@@ -70,12 +70,12 @@ export default function Footer() {
                     </div>
                     <div className="flex items-center gap-4">
                         <Link to="/privacy" className="hover:text-black transition-colors">Bảo mật</Link>
-                        <span className="text-gray-300">|</span>
+                        <span className="text-gray-400">|</span>
                         <Link to="/terms" className="hover:text-black transition-colors">Điều khoản</Link>
-                        <span className="text-gray-300">|</span>
+                        <span className="text-gray-400">|</span>
                         <Link to="/contact" className="hover:text-black transition-colors">Liên hệ</Link>
                     </div>
-                    <div className="text-[10px] text-gray-300 mt-2 sm:mt-0 italic">by khoavu.</div>
+                    <div className="text-[10px] text-gray-600 mt-2 sm:mt-0 italic">by khoavu.</div>
                 </div>
             </div>
         </footer>

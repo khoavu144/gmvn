@@ -1,30 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { gymService } from '../../services/gymService';
 import type { GymProgram, GymProgramSession } from '../../types';
 import { Skeleton } from '../ui/Skeleton';
-
-// ─── Shared helpers (inline to avoid cross-file coupling) ───────────────────
-function useInView(threshold = 0.08): [React.RefObject<HTMLDivElement>, boolean] {
-    const ref = React.useRef<HTMLDivElement>(null!);
-    const [inView, setInView] = React.useState(false);
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold });
-        obs.observe(el);
-        return () => obs.disconnect();
-    }, [threshold]);
-    return [ref, inView];
-}
-
-function FadeIn({ children }: { children: React.ReactNode }) {
-    const [ref, inView] = useInView();
-    return (
-        <div ref={ref} className={`transition-all duration-700 ${inView ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-            {children}
-        </div>
-    );
-}
 
 function SectionHeading({ kicker, title, description }: { kicker: string; title: string; description?: string }) {
     return (
@@ -69,35 +46,39 @@ interface Props {
 }
 
 const GymProgramsSection = React.memo(function GymProgramsSection({ branchPrograms, gymId, branchId, setRef }: Props) {
-    const [activeProgramId, setActiveProgramId] = useState<string | null>(null);
+    const [pickedProgramId, setPickedProgramId] = useState<string | null>(null);
     const [programSessions, setProgramSessions] = useState<GymProgramSession[]>([]);
     const [sessionsLoading, setSessionsLoading] = useState(false);
 
-    const activeProgram = branchPrograms.find((p) => p.id === activeProgramId) || branchPrograms[0] || null;
+    const effectiveProgramId = useMemo(() => {
+        if (!branchPrograms.length) return null;
+        if (pickedProgramId && branchPrograms.some((p) => p.id === pickedProgramId)) {
+            return pickedProgramId;
+        }
+        return branchPrograms[0].id;
+    }, [branchPrograms, pickedProgramId]);
 
-    useEffect(() => {
-        if (!branchPrograms.length) { setActiveProgramId(null); return; }
-        setActiveProgramId((current) => {
-            if (current && branchPrograms.some((p) => p.id === current)) return current;
-            return branchPrograms[0].id;
-        });
-    }, [branchPrograms]);
+    const activeProgram = branchPrograms.find((p) => p.id === effectiveProgramId) || null;
 
+    /* eslint-disable react-hooks/set-state-in-effect -- fetch lifecycle: reset/loading must run when branch/program changes */
     useEffect(() => {
-        if (!gymId || !branchId || !activeProgramId) { setProgramSessions([]); return; }
+        if (!gymId || !branchId || !effectiveProgramId) {
+            setProgramSessions([]);
+            return;
+        }
         let mounted = true;
         setSessionsLoading(true);
-        gymService.getProgramSessions(gymId, branchId, activeProgramId)
+        gymService.getProgramSessions(gymId, branchId, effectiveProgramId)
             .then((res) => { if (mounted) setProgramSessions(res.success ? (res.sessions || []) : []); })
             .catch(() => { if (mounted) setProgramSessions([]); })
             .finally(() => { if (mounted) setSessionsLoading(false); });
         return () => { mounted = false; };
-    }, [activeProgramId, branchId, gymId]);
+    }, [effectiveProgramId, branchId, gymId]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     if (branchPrograms.length === 0) return null;
 
     return (
-        <FadeIn>
             <section ref={setRef('schedule')} id="schedule" className="marketplace-panel p-6 sm:p-7">
                 <SectionHeading
                     kicker="Lịch tập"
@@ -111,7 +92,7 @@ const GymProgramsSection = React.memo(function GymProgramsSection({ branchProgra
                             <button
                                 key={program.id}
                                 type="button"
-                                onClick={() => setActiveProgramId(program.id)}
+                                onClick={() => setPickedProgramId(program.id)}
                                 className={`w-full rounded-lg border px-4 py-3.5 text-left transition ${activeProgram?.id === program.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/80 hover:border-[color:var(--mk-accent)]/45'}`}
                             >
                                 <div className="text-sm font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">{program.title}</div>
@@ -183,7 +164,6 @@ const GymProgramsSection = React.memo(function GymProgramsSection({ branchProgra
                     </div>
                 </div>
             </section>
-        </FadeIn>
     );
 });
 

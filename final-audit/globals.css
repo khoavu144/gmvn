@@ -147,7 +147,7 @@
 
   /* ── Bottom nav item ── */
   .bottom-nav-item {
-    @apply flex flex-col items-center justify-center gap-0.5 flex-1 text-gray-700 transition-colors duration-150;
+    @apply flex flex-col items-center justify-center gap-0.5 flex-1 text-gray-500 transition-colors duration-150;
     min-height: 44px;
   }
   .bottom-nav-item.active { @apply text-black; }

@@ -34,6 +34,7 @@ export default function ProductDetailPage() {
     const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
     const [activeImage, setActiveImage] = useState<string | null>(null);
 
+    /* eslint-disable react-hooks/set-state-in-effect -- product fetch lifecycle */
     useEffect(() => {
         if (!slug) return;
         setLoading(true);
@@ -47,6 +48,7 @@ export default function ProductDetailPage() {
             })
             .finally(() => setLoading(false));
     }, [slug]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     useEffect(() => {
         if (!product) return;

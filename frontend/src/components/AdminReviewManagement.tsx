@@ -39,7 +39,7 @@ const AdminReviewManagement: React.FC = () => {
                 toast.success('Đã cập nhật trạng thái hiển thị');
                 fetchReviews();
             }
-        } catch (error) {
+        } catch {
             toast.error('Lỗi khi cập nhật');
         }
     };
@@ -53,7 +53,7 @@ const AdminReviewManagement: React.FC = () => {
                 toast.success('Đã xóa đánh giá');
                 setReviews(prev => prev.filter(r => r.id !== id));
             }
-        } catch (error) {
+        } catch {
             toast.error('Lỗi khi xóa');
         }
     };

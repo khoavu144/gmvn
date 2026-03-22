@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { logger } from '../lib/logger';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
@@ -23,27 +23,27 @@ export default function WorkoutsPage() {
     const [loading, setLoading] = useState(false);
     const [notes, setNotes] = useState<Record<string, string>>({});
 
-    useEffect(() => {
-        if (!user || user.user_type !== 'athlete') { navigate('/dashboard'); return; }
-        loadSubs();
-    }, [user, navigate]);
-
-    const loadSubs = async () => {
-        try {
-            const res = await apiClient.get('/subscriptions/me');
-            const active = (res.data.subscriptions || []).filter((s: Subscription) => s.status === 'active');
-            setSubs(active);
-            if (active.length > 0) { setActiveSub(active[0].id); loadWorkouts(active[0].id, 1); }
-        } catch (err) { logger.error(err); }
-    };
-
-    const loadWorkouts = async (subId: string, week: number) => {
+    const loadWorkouts = useCallback(async (subId: string, week: number) => {
         setLoading(true);
         try {
             const res = await apiClient.get(`/subscriptions/${subId}/workouts?week=${week}`);
             setWorkouts(res.data.workouts || []);
         } catch (err) { logger.error(err); } finally { setLoading(false); }
-    };
+    }, []);
+
+    const loadSubs = useCallback(async () => {
+        try {
+            const res = await apiClient.get('/subscriptions/me');
+            const active = (res.data.subscriptions || []).filter((s: Subscription) => s.status === 'active');
+            setSubs(active);
+            if (active.length > 0) { setActiveSub(active[0].id); await loadWorkouts(active[0].id, 1); }
+        } catch (err) { logger.error(err); }
+    }, [loadWorkouts]);
+
+    useEffect(() => {
+        if (!user || user.user_type !== 'athlete') { navigate('/dashboard'); return; }
+        void loadSubs();
+    }, [user, navigate, loadSubs]);
 
     const handleLog = async (workoutId: string) => {
         const workoutNotes = notes[workoutId] || '';

@@ -34,7 +34,7 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                 toast.success('Đã chấp nhận lời mời hợp tác!');
                 setInvitations(prev => prev.filter(i => i.id !== id));
             }
-        } catch (error) { toast.error('Lỗi khi thực hiện'); }
+        } catch { toast.error('Lỗi khi thực hiện'); }
     };
 
     const handleDecline = async (id: string) => {
@@ -44,7 +44,7 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                 toast.success('Đã từ chối lời mời');
                 setInvitations(prev => prev.filter(i => i.id !== id));
             }
-        } catch (error) { toast.error('Lỗi khi thực hiện'); }
+        } catch { toast.error('Lỗi khi thực hiện'); }
     };
 
     return (

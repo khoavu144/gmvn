@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Camera, Plus, Trash2, Star, Filter, RefreshCw } from 'lucide-react';
 import { communityGalleryApiService } from '../services/communityGalleryService';
 import type { CommunityGalleryItem } from '../services/communityGalleryService';
@@ -28,7 +28,7 @@ export default function AdminGalleryManagement() {
         source: 'admin_upload',
     });
 
-    const loadGallery = async (pageNum = 1) => {
+    const loadGallery = useCallback(async (pageNum = 1) => {
         setLoading(true);
         try {
             const res = await communityGalleryApiService.adminGetGallery({ page: pageNum, limit: 12 });
@@ -37,16 +37,17 @@ export default function AdminGalleryManagement() {
                 setTotalPages(res.totalPages);
                 setPage(res.page);
             }
-        } catch (error: any) {
-            toast.error(error.message || 'Lỗi tải danh sách ảnh');
+        } catch (error: unknown) {
+            const msg = error instanceof Error ? error.message : 'Lỗi tải danh sách ảnh';
+            toast.error(msg);
         } finally {
             setLoading(false);
         }
-    };
+    }, [toast]);
 
     useEffect(() => {
-        loadGallery();
-    }, []);
+        void loadGallery();
+    }, [loadGallery]);
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -91,7 +92,7 @@ export default function AdminGalleryManagement() {
                 toast.success('Đã cập nhật trạng thái');
                 setItems(items.map(i => i.id === item.id ? { ...i, is_featured: res.item.is_featured } : i));
             }
-        } catch (error: any) {
+        } catch {
             toast.error('Lỗi cập nhật trạng thái');
         }
     };

@@ -37,7 +37,7 @@ const AdminGymApproval: React.FC = () => {
                 toast.success('Đã phê duyệt phòng tập!');
                 fetchPending();
             }
-        } catch (error) {
+        } catch {
             toast.error('Lỗi khi phê duyệt');
         } finally {
             setConfirmConfig({ isOpen: false });
@@ -63,7 +63,7 @@ const AdminGymApproval: React.FC = () => {
                 toast.success('Đã từ chối phòng tập');
                 fetchPending();
             }
-        } catch (error) {
+        } catch {
             toast.error('Lỗi khi từ chối');
         } finally {
             setRejectConfig({ isOpen: false, reason: '' });

@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import type { GymTrainerLink } from '../types';
 import { logger } from '../lib/logger';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -84,7 +83,6 @@ export default function CoachDetailPage() {
 
     const [trainer, setTrainer] = useState<Trainer | null>(null);
     const [programs, setPrograms] = useState<Program[]>([]);
-    const [_gymLinks, setGymLinks] = useState<GymTrainerLink[]>([]);
     const [testimonials, setTestimonials] = useState<any[]>([]);
     const [beforeAfterPhotos, setBeforeAfterPhotos] = useState<any[]>([]);
     const [similarCoaches, setSimilarCoaches] = useState<SimilarCoach[]>([]);
@@ -117,10 +115,9 @@ export default function CoachDetailPage() {
                     return;
                 }
 
-                const [trainerRes, programsRes, gymsRes, testimonialsRes, beforeAfterRes, similarRes, profileRes] = await Promise.all([
+                const [trainerRes, programsRes, testimonialsRes, beforeAfterRes, similarRes, profileRes] = await Promise.all([
                     apiClient.get(`/users/trainers/${resolvedTrainerId}`),
                     apiClient.get(`/programs/trainers/${resolvedTrainerId}/programs`),
-                    apiClient.get(`/gyms/trainer/${resolvedTrainerId}`).catch(() => ({ data: { gyms: [] } })),
                     apiClient.get(`/users/trainers/${resolvedTrainerId}/testimonials?limit=6`).catch(() => ({ data: { testimonials: [] } })),
                     apiClient.get(`/users/trainers/${resolvedTrainerId}/before-after`).catch(() => ({ data: [] })),
                     apiClient.get(`/users/trainers/${resolvedTrainerId}/similar?limit=3`).catch(() => ({ data: [] })),
@@ -150,7 +147,6 @@ export default function CoachDetailPage() {
                 setProfilePackagesData(profileRes?.data?.packages || []);
                 setPremium(profileRes?.data?.premium || null);
                 setPrograms(programsRes.data.programs || []);
-                setGymLinks(gymsRes.data.gyms || []);
                 setTestimonials(testimonialsRes.data.testimonials || []);
                 setBeforeAfterPhotos(Array.isArray(beforeAfterRes.data) ? beforeAfterRes.data : []);
                 setSimilarCoaches(Array.isArray(similarRes.data?.data) ? similarRes.data.data : Array.isArray(similarRes.data) ? similarRes.data : []);
@@ -162,8 +158,8 @@ export default function CoachDetailPage() {
             }
         };
 
-        load();
-    }, [trainerId, slug]);
+        void load();
+    }, [trainerId, slug, navigate]);
 
     const handleSubscribe = async (programId: string) => {
         if (!user) {

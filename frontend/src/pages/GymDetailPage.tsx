@@ -9,7 +9,6 @@ import type {
     GymGallery,
     GymTaxonomyTerm,
 } from '../types';
-import GymCard from '../components/GymCard';
 import ShareButton from '../components/ShareButton';
 import { Skeleton } from '../components/ui/Skeleton';
 import GymProgramsSection from '../components/gym-detail/GymProgramsSection';
@@ -18,6 +17,8 @@ import GymZonesSection from '../components/gym-detail/GymZonesSection';
 import GymFacilitiesSection from '../components/gym-detail/GymFacilitiesSection';
 import GymTrainersSection from '../components/gym-detail/GymTrainersSection';
 import GymPricingSection from '../components/gym-detail/GymPricingSection';
+import GymSimilarSection from '../components/gym-detail/GymSimilarSection';
+import GymMapSection from '../components/gym-detail/GymMapSection';
 
 
 
@@ -31,40 +32,6 @@ const BILLING_LABELS: Record<string, string> = {
     per_year: '/ năm',
     per_session: '/ buổi',
 };
-function useInView(threshold = 0.08): [React.RefObject<HTMLDivElement>, boolean] {
-    const ref = useRef<HTMLDivElement>(null!);
-    const [inView, setInView] = useState(false);
-
-    useEffect(() => {
-        const element = ref.current;
-        if (!element) return;
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting) setInView(true);
-            },
-            { threshold }
-        );
-
-        observer.observe(element);
-        return () => observer.disconnect();
-    }, [threshold]);
-
-    return [ref, inView];
-}
-
-function FadeIn({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-    const [ref, inView] = useInView();
-    return (
-        <div
-            ref={ref}
-            className={`transition-all duration-700 ${inView ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'} ${className}`}
-        >
-            {children}
-        </div>
-    );
-}
-
 function SectionHeading({
     kicker,
     title,
@@ -312,7 +279,7 @@ const GymDetailPage: React.FC = () => {
     }, [gym?.id]);
 
 
-    const branches = gym?.branches || [];
+    const branches = useMemo(() => gym?.branches ?? [], [gym?.branches]);
     const branchDetail = useMemo(() => {
         if (!branches.length) return null;
         return branches.find((branch) => branch.id === activeBranchId) || branches[0];
@@ -321,7 +288,7 @@ const GymDetailPage: React.FC = () => {
     const branchName = branchDetail?.branch_name || gym?.name || 'Venue branch';
     const branchStatusBadges = branchDetail?.branch_status_badges || [];
     const branchAmenities = branchDetail?.amenities || [];
-    const branchEquipment = branchDetail?.equipment || [];
+    const branchEquipment = useMemo(() => branchDetail?.equipment ?? [], [branchDetail?.equipment]);
     const branchZones = branchDetail?.zones || [];
     const branchTrainerLinks = branchDetail?.trainer_links || [];
     const branchPricing = useMemo(
@@ -702,7 +669,7 @@ const GymDetailPage: React.FC = () => {
 
                 <div className="marketplace-container mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.45fr)]">
                     <div className="space-y-6">
-                        {activeSection === 'overview' && <FadeIn>
+                        {activeSection === 'overview' && (
                             <section ref={setRef('overview')} id="overview" className="marketplace-panel p-6 sm:p-8">
                                 <SectionHeading
                                     kicker="Tổng quan"
@@ -742,7 +709,7 @@ const GymDetailPage: React.FC = () => {
                                     </div>
                                 </div>
                             </section>
-                        </FadeIn>}
+                        )}
 
                         {activeSection === 'zones' && branchZones.length > 0 && <GymZonesSection branchZones={branchZones} setRef={setRef} />}
 
@@ -770,66 +737,18 @@ const GymDetailPage: React.FC = () => {
                         {activeSection === 'reviews' && <GymReviewsSection gymId={gym.id} branchId={branchId} gymTrustSummary={gym.trust_summary} setRef={setRef} />}
 
                         {activeSection === 'similar' && similarGyms.length > 0 && (
-                            <FadeIn>
-                                <section ref={setRef('similar')} id="similar" className="marketplace-panel p-6 sm:p-8">
-                                    <SectionHeading
-                                        kicker="Cơ sở tương tự"
-                                        title="Nếu địa điểm này gần đúng yêu cầu, hãy xem thêm những lựa chọn liên quan"
-                                        description="Những cơ sở tương tự được gợi ý theo loại hình, vùng giá và khu vực để bạn so sánh nhanh trước khi quyết định."
-                                    />
-
-                                    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-                                        {similarGyms.map((item) => (
-                                            <GymCard key={item.id} gym={item} variant="compact" />
-                                        ))}
-                                    </div>
-                                </section>
-                            </FadeIn>
+                            <GymSimilarSection similarGyms={similarGyms} setRef={setRef} />
                         )}
 
                         {activeSection === 'map' && (branchMapEmbedUrl || hasCoordinates) && (
-                            <FadeIn>
-                                <section ref={setRef('map')} id="map" className="marketplace-panel p-6 sm:p-8">
-                                    <SectionHeading
-                                        kicker="Bản đồ định vị"
-                                        title="Định vị chi nhánh và bối cảnh quanh phòng tập"
-                                        description="Bản đồ giúp bạn trả lời ngay một câu hỏi thực tế: mình có tiện đường rẽ vào nơi này đều đặn trong tuần hay không."
-                                    />
-
-                                    <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-                                        <div className="space-y-4">
-                                            <SummaryPill label="Địa chỉ" value={branchDetail?.address || 'Chưa cập nhật'} />
-                                            <SummaryPill label="Gửi xe" value={branchDetail?.parking_summary || 'Chưa cập nhật chỗ gửi xe'} />
-                                            <SummaryPill label="Check-in" value={branchDetail?.check_in_instructions || 'Tư vấn tại rail bên phải để được hướng dẫn nhanh'} />
-                                        </div>
-
-                                        {branchMapEmbedUrl ? (
-                                            <div className="overflow-hidden rounded-lg border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
-                                                <iframe
-                                                    src={branchMapEmbedUrl}
-                                                    width="100%"
-                                                    height="420"
-                                                    style={{ border: 0 }}
-                                                    loading="lazy"
-                                                    referrerPolicy="no-referrer-when-downgrade"
-                                                    title={`Bản đồ ${branchName}`}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <div className="overflow-hidden rounded-lg border border-[color:var(--mk-line)] bg-[color:var(--mk-paper-strong)]">
-                                                <iframe
-                                                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${Number(branchLongitude) - 0.01},${Number(branchLatitude) - 0.01},${Number(branchLongitude) + 0.01},${Number(branchLatitude) + 0.01}&layer=mapnik&marker=${Number(branchLatitude)},${Number(branchLongitude)}`}
-                                                    width="100%"
-                                                    height="420"
-                                                    style={{ border: 0 }}
-                                                    loading="lazy"
-                                                    title={`Bản đồ ${branchName}`}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </section>
-                            </FadeIn>
+                            <GymMapSection
+                                branchMapEmbedUrl={branchMapEmbedUrl}
+                                branchLatitude={branchLatitude}
+                                branchLongitude={branchLongitude}
+                                branchName={branchName}
+                                branchDetail={branchDetail}
+                                setRef={setRef}
+                            />
                         )}
                     </div>
 

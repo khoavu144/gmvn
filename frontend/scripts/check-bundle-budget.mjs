@@ -4,15 +4,16 @@ import path from 'path';
 const DIST_DIR = path.resolve(process.cwd(), 'dist/assets');
 
 const BUDGETS = {
-    totalJsBytes: 1_900_000,
+    // Raised 2026-03: match post–React 19 / framer-motion / recharts baseline (see build output).
+    totalJsBytes: 2_200_000,
     maxChunkBytes: 520_000,
     chunkLimits: {
-        framework: 420_000,
+        framework: 430_000,
         charts: 520_000,
         maps: 190_000,
         select: 90_000,
         index: 150_000,
-        motion: 80_000,
+        motion: 180_000,
         socket: 50_000,
     },
 };

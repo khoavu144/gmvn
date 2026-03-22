@@ -145,7 +145,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
             const originalName = selectedImageFile?.name || 'cover.jpg';
             const url = await uploadService.uploadImage(croppedBlob, 'covers', originalName);
             setProfileValue('cover_image_url', url, { shouldValidate: true, shouldDirty: true });
-        } catch (error) {
+        } catch {
             toast.error('Upload ảnh thất bại! Vui lòng thử lại.');
         } finally {
             setIsUploading(false);
@@ -411,7 +411,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                                 const val = watchProfile('certifications_json');
                                 if (val) certsArr = JSON.parse(val);
                                 if (!Array.isArray(certsArr)) certsArr = [];
-                            } catch (e) {
+                            } catch {
                                 certsArr = [];
                             }
                             return certsArr.map((cert, index) => (
@@ -452,12 +452,12 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                                             const val = watchProfile('certifications_json');
                                             if (val) currArr = JSON.parse(val);
                                             if (!Array.isArray(currArr)) currArr = [];
-                                        } catch (e) {
+                                        } catch {
                                             currArr = [];
                                         }
                                         currArr.push({ name: 'Chứng chỉ', issuer: 'Upload', year: new Date().getFullYear(), url });
                                         setProfileValue('certifications_json', JSON.stringify(currArr), { shouldDirty: true });
-                                    } catch (err) {
+                                    } catch {
                                         toast.error('Lỗi tải ảnh. Vui lòng thử lại');
                                     } finally {
                                         setIsUploading(false);

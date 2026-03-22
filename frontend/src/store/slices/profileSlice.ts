@@ -146,7 +146,7 @@ export const fetchPublicProfile = createAsyncThunk(
                                     testimonials: []
                                 };
                             }
-                        } catch (e) {
+                        } catch {
                             // User not found at all
                         }
                     }

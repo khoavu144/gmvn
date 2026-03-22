@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { CreditCard, Calendar, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
@@ -10,22 +10,22 @@ export default function SubscriptionsPage() {
     const [loading, setLoading] = useState(true);
     const { toast, ToastComponent } = useToast();
 
-    const fetchSubscriptions = async () => {
+    const fetchSubscriptions = useCallback(async () => {
         try {
             const res = await apiClient.get('/subscriptions/me');
             if (res.data.success) {
                 setSubscriptions(res.data.subscriptions);
             }
-        } catch (err) {
+        } catch {
             toast.error('Không thể tải dữ liệu gói tập');
         } finally {
             setLoading(false);
         }
-    };
+    }, [toast]);
 
     useEffect(() => {
-        fetchSubscriptions();
-    }, []);
+        void fetchSubscriptions();
+    }, [fetchSubscriptions]);
 
     const handleCancel = async (id: string) => {
         if (!window.confirm('Bạn có chắc chắn muốn hủy gói tập này không? Bạn vẫn có quyền truy cập cho đến hết chu kỳ hiện tại.')) return;

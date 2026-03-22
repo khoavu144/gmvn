@@ -33,7 +33,6 @@ const lazyWithChunkRetry = <TProps extends Record<string, unknown> = Record<stri
       const reloadKey = `lazy-chunk-reload:${chunkKey}`;
       const alreadyReloaded = sessionStorage.getItem(reloadKey) === '1';
 
-      // eslint-disable-next-line no-console
       console.warn('[lazy-chunk-retry] dynamic import failed', {
         chunkKey,
         message,
@@ -44,7 +43,6 @@ const lazyWithChunkRetry = <TProps extends Record<string, unknown> = Record<stri
 
       if (!alreadyReloaded) {
         sessionStorage.setItem(reloadKey, '1');
-        // eslint-disable-next-line no-console
         console.warn('[lazy-chunk-retry] forcing hard reload to recover chunk mismatch', {
           chunkKey,
           href: window.location.href,
@@ -53,7 +51,6 @@ const lazyWithChunkRetry = <TProps extends Record<string, unknown> = Record<stri
       }
     }
 
-    // eslint-disable-next-line no-console
     console.warn('[lazy-chunk-retry] rethrowing import error', { chunkKey, message });
     throw error;
   }
@@ -129,7 +126,6 @@ const RouteFallback = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
     console.warn('[route-fallback] suspense fallback visible', {
       pathname: location.pathname,
       search: location.search,
@@ -200,7 +196,6 @@ function RouteDiagnostics() {
   const navigationType = useNavigationType();
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
     console.warn('[route-diagnostics] navigation event', {
       pathname: location.pathname,
       search: location.search,

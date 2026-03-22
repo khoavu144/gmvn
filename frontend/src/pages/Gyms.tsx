@@ -189,7 +189,7 @@ const Gyms: React.FC = () => {
         staleTime: 5 * 60 * 1000,
     });
 
-    const gyms = (data?.gyms || []) as GymCenter[];
+    const gyms = useMemo(() => (data?.gyms || []) as GymCenter[], [data?.gyms]);
     const total = data?.pagination?.total || gyms.length;
     const errorMessage = error instanceof Error ? error.message : null;
 

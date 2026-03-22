@@ -12,11 +12,11 @@ interface GalleryLightboxProps {
 
 export default function GalleryLightbox({ items, currentIndex, onClose, onNavigate }: GalleryLightboxProps) {
     const item = items[currentIndex];
-    const [isImageLoaded, setIsImageLoaded] = useState(false);
+    const imageKey = `${currentIndex}-${item.image_url}`;
+    const [loadedKey, setLoadedKey] = useState<string | null>(null);
+    const isImageLoaded = loadedKey === imageKey;
 
     useEffect(() => {
-        setIsImageLoaded(false);
-        // Preload next image
         if (currentIndex < items.length - 1) {
             const img = new Image();
             img.src = items[currentIndex + 1].image_url;
@@ -88,10 +88,11 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
                         </div>
                     )}
                     <img 
+                        key={imageKey}
                         src={item.image_url} 
                         alt={item.caption || 'Community image'}
                         className={`max-w-full max-h-full object-contain rounded-lg shadow-2xl transition-opacity duration-500 ${isImageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                        onLoad={() => setIsImageLoaded(true)}
+                        onLoad={() => setLoadedKey(imageKey)}
                         onContextMenu={(e) => e.preventDefault()}
                     />
                 </div>

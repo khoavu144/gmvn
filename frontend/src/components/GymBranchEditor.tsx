@@ -69,7 +69,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             await gymService.updateBranch(branch.id, infoForm);
             toast.success('Đã cập nhật thông tin cơ bản');
             onUpdate();
-        } catch (error) {
+        } catch {
             toast.error('Lỗi cập nhật thông tin');
         } finally {
             setLoading(false);
@@ -84,7 +84,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             setNewImageUrl('');
             setNewImageCaption('');
             onUpdate();
-        } catch (error) {
+        } catch {
             toast.error('Lỗi thêm ảnh');
         } finally {
             setLoading(false);
@@ -103,7 +103,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                 try {
                     await gymService.deleteGalleryImage(branch.id, imageId);
                     onUpdate();
-                } catch (error) {
+                } catch {
                     toast.error('Lỗi xóa ảnh');
                 } finally {
                     setLoading(false);
@@ -118,7 +118,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             await gymService.updateAmenities(branch.id, updated);
             setAmenities(updated);
             onUpdate();
-        } catch (error) {
+        } catch {
             toast.error('Lỗi cập nhật tiện ích');
         } finally {
             setLoading(false);
@@ -131,7 +131,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             await gymService.updateEquipment(branch.id, updated);
             setEquipment(updated);
             onUpdate();
-        } catch (error) {
+        } catch {
             toast.error('Lỗi cập nhật thiết bị');
         } finally {
             setLoading(false);
@@ -144,7 +144,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             await gymService.updatePricing(branch.id, updated);
             setPricing(updated);
             onUpdate();
-        } catch (error) {
+        } catch {
             toast.error('Lỗi cập nhật bảng giá');
         } finally {
             setLoading(false);
@@ -164,7 +164,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                 event_type: 'class'
             });
             onUpdate();
-        } catch (error) {
+        } catch {
             toast.error('Lỗi tạo sự kiện');
         } finally {
             setLoading(false);
@@ -179,7 +179,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
             setSearchQuery('');
             setInviteRole('Huấn luyện viên');
             onUpdate();
-        } catch (error) {
+        } catch {
             toast.error('Lỗi mời Coach');
         } finally {
             setLoading(false);
@@ -198,7 +198,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                 try {
                     await gymService.removeTrainer(branch.id, linkId);
                     onUpdate();
-                } catch (error) {
+                } catch {
                     toast.error('Lỗi gỡ Coach');
                 } finally {
                     setLoading(false);
@@ -213,7 +213,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
         try {
             const results = await userService.searchCoaches(searchQuery);
             setSearchResults(results);
-        } catch (error) {
+        } catch {
             toast.error('Lỗi tìm kiếm Coach');
         } finally {
             setSearching(false);
@@ -232,7 +232,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                 try {
                     await gymService.deleteEvent(branch.id, eventId);
                     onUpdate();
-                } catch (error) {
+                } catch {
                     toast.error('Lỗi xóa sự kiện');
                 } finally {
                     setLoading(false);

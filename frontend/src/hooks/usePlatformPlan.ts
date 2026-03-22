@@ -49,7 +49,7 @@ export function usePlatformPlan(): PlatformPlanState {
         error: null,
     });
 
-    const fetch = useCallback(async () => {
+    const loadPlan = useCallback(async () => {
         try {
             const res = await apiClient.get('/platform/plan/me');
             setState({
@@ -65,7 +65,11 @@ export function usePlatformPlan(): PlatformPlanState {
         }
     }, []);
 
-    useEffect(() => { fetch(); }, [fetch]);
+    /* eslint-disable react-hooks/set-state-in-effect -- plan fetch kicks async loadPlan; state updates occur after await */
+    useEffect(() => {
+        void loadPlan();
+    }, [loadPlan]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     return state;
 }

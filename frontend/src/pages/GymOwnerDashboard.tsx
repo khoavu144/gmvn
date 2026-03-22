@@ -84,7 +84,7 @@ const GymOwnerDashboard: React.FC = () => {
                 setNewBranchForm({ branch_name: '', address: '', city: '', district: '', phone: '', description: '' });
                 fetchMyGym(); // reload fresh data
             }
-        } catch (error) {
+        } catch {
             toast.error('Lỗi tạo chi nhánh. Thử lại nhé!');
         } finally {
             setCreatingBranch(false);
@@ -100,7 +100,7 @@ const GymOwnerDashboard: React.FC = () => {
                 setGym((prev: GymCenter | null) => prev ? { ...prev, ...settingsForm } : prev);
                 toast.success('Đã cập nhật thông tin thành công!');
             }
-        } catch (error) {
+        } catch {
             toast.error('Lỗi cập nhật cài đặt');
         } finally {
             setSaving(false);

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect, useRef } from 'react';
+import { lazy, Suspense, useState, useEffect, useRef, useCallback } from 'react';
 import { logger } from '../lib/logger';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -104,21 +104,22 @@ export default function ProgramsPage() {
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        if (!user) { navigate('/login'); return; }
-        loadPrograms();
-    }, [user, navigate]);
-
-    const loadPrograms = async () => {
+    const loadPrograms = useCallback(async () => {
+        if (!user?.id) return;
         try {
             setError(null);
-            const res = await apiClient.get(`/programs/trainers/${user!.id}/programs`);
+            const res = await apiClient.get(`/programs/trainers/${user.id}/programs`);
             setPrograms(res.data.programs || []);
-        } catch (err: any) { 
-            logger.error(err); 
+        } catch (err: unknown) {
+            logger.error(err);
             setError('Không thể tải danh sách gói tập.');
         } finally { setLoading(false); }
-    };
+    }, [user?.id]);
+
+    useEffect(() => {
+        if (!user) { navigate('/login'); return; }
+        void loadPrograms();
+    }, [user, navigate, loadPrograms]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -135,7 +136,7 @@ export default function ProgramsPage() {
             const originalName = selectedImageFile?.name || 'program.jpg';
             const url = await uploadService.uploadImage(croppedBlob, 'programs', originalName);
             setForm(prev => ({ ...prev, cover_image_url: url }));
-        } catch (error) {
+        } catch {
             toast.error('Upload ảnh thất bại! Vui lòng thử lại.');
         } finally {
             setIsUploading(false);

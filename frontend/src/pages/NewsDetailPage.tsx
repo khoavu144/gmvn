@@ -25,6 +25,8 @@ interface NewsArticle {
     source_domain: string | null;
 }
 
+const SKELETON_LINE_WIDTHS = [88, 92, 78, 85, 90, 82, 87, 80] as const;
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function NewsDetailPage() {
@@ -35,6 +37,7 @@ export default function NewsDetailPage() {
 
     const canonicalBase = import.meta.env.VITE_CANONICAL_BASE_URL || 'https://gymerviet.com';
 
+    /* eslint-disable react-hooks/set-state-in-effect -- article fetch lifecycle */
     useEffect(() => {
         if (!slug) return;
         setLoading(true);
@@ -44,6 +47,7 @@ export default function NewsDetailPage() {
             .catch(() => setError('Bài viết không tồn tại hoặc đã bị gỡ.'))
             .finally(() => setLoading(false));
     }, [slug]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     if (loading) {
         return (
@@ -53,8 +57,8 @@ export default function NewsDetailPage() {
                     <div className="h-4 bg-[color:var(--mk-paper)] rounded-lg w-1/2" />
                     <div className="mt-6 aspect-[16/9] rounded-lg bg-[color:var(--mk-paper-strong)]" />
                     <div className="mt-6 space-y-3">
-                        {Array.from({ length: 8 }).map((_, i) => (
-                            <div key={i} className="h-4 bg-[color:var(--mk-paper)] rounded-lg" style={{ width: `${75 + Math.random() * 25}%` }} />
+                        {SKELETON_LINE_WIDTHS.map((pct, i) => (
+                            <div key={i} className="h-4 bg-[color:var(--mk-paper)] rounded-lg" style={{ width: `${pct}%` }} />
                         ))}
                     </div>
                 </div>

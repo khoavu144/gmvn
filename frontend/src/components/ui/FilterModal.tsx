@@ -37,9 +37,11 @@ export function FilterModal({
 }: FilterModalProps) {
     const [localSelected, setLocalSelected] = useState<Record<string, string[]>>(selected);
 
+    /* eslint-disable react-hooks/set-state-in-effect -- reset draft filters when parent selection or sheet open state changes */
     useEffect(() => {
         setLocalSelected(selected);
     }, [selected, isOpen]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const toggleOption = (groupId: string, optionId: string, multi: boolean = false) => {
         setLocalSelected((prev) => {

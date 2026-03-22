@@ -68,7 +68,7 @@ export function ProfileProgressTab() {
                 taken_at: form.taken_at || null,
                 weight_kg: form.weight_kg ? parseFloat(form.weight_kg) : null
             });
-        } catch (error) {
+        } catch {
             toast.error('Upload ảnh thất bại');
         } finally {
             setIsUploading(false);

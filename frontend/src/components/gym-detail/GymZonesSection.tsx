@@ -1,27 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import type { GymZone } from '../../types';
-
-function useInView(threshold = 0.08): [React.RefObject<HTMLDivElement>, boolean] {
-    const ref = React.useRef<HTMLDivElement>(null!);
-    const [inView, setInView] = React.useState(false);
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold });
-        obs.observe(el);
-        return () => obs.disconnect();
-    }, [threshold]);
-    return [ref, inView];
-}
-
-function FadeIn({ children }: { children: React.ReactNode }) {
-    const [ref, inView] = useInView();
-    return (
-        <div ref={ref} className={`transition-all duration-700 ${inView ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-            {children}
-        </div>
-    );
-}
 
 function SectionHeading({ kicker, title, description }: { kicker: string; title: string; description?: string }) {
     return (
@@ -42,7 +20,6 @@ const GymZonesSection = React.memo(function GymZonesSection({ branchZones, setRe
     if (branchZones.length === 0) return null;
 
     return (
-        <FadeIn>
             <section ref={setRef('zones')} id="zones" className="marketplace-panel p-6 sm:p-7">
                 <SectionHeading
                     kicker="Khu vực nổi bật"
@@ -54,18 +31,18 @@ const GymZonesSection = React.memo(function GymZonesSection({ branchZones, setRe
                     {branchZones.map((zone) => (
                         <article
                             key={zone.id}
-                            className={`rounded-lg border px-4 py-4 ${zone.is_signature_zone ? 'border-[color:var(--mk-accent)]/55 bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/75'}`}
+                            className={`rounded-lg border px-4 py-4 ${zone.is_signature_zone ? 'border-amber-500/50 bg-amber-50/70' : 'border-stone-200/90 bg-white/75'}`}
                         >
                             <div className="flex items-start justify-between gap-3">
                                 <div className="min-w-0">
-                                    <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">{zone.zone_type.replace(/_/g, ' ')}</div>
-                                    <h3 className="mt-1.5 text-base font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">{zone.name}</h3>
+                                    <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-stone-500">{zone.zone_type.replace(/_/g, ' ')}</div>
+                                    <h3 className="mt-1.5 text-base font-bold tracking-[-0.03em] text-stone-900">{zone.name}</h3>
                                 </div>
                                 {zone.is_signature_zone && <span className="marketplace-badge marketplace-badge--accent">Signature</span>}
                             </div>
 
                             {zone.description && (
-                                <p className="mt-2.5 text-sm leading-6 text-[color:var(--mk-text-soft)]">{zone.description}</p>
+                                <p className="mt-2.5 text-sm leading-6 text-stone-600">{zone.description}</p>
                             )}
 
                             <div className="mt-3 flex flex-wrap gap-1.5">
@@ -79,7 +56,6 @@ const GymZonesSection = React.memo(function GymZonesSection({ branchZones, setRe
                     ))}
                 </div>
             </section>
-        </FadeIn>
     );
 });
 

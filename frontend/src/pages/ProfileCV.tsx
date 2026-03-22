@@ -37,26 +37,10 @@ interface SimilarCoach {
 
 // ── Hooks ─────────────────────────────────────────────────────────────────────
 
-function useInView(threshold = 0.15): [React.RefObject<HTMLDivElement>, boolean] {
-    const ref = useRef<HTMLDivElement>(null!);
-    const [inView, setInView] = useState(false);
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const obs = new IntersectionObserver(
-            ([entry]) => { if (entry.isIntersecting) setInView(true); },
-            { threshold }
-        );
-        obs.observe(el);
-        return () => obs.disconnect();
-    }, [threshold]);
-    return [ref, inView];
-}
-
-function useCountUp(target: number, inView: boolean, duration = 1200): number {
+function useCountUp(target: number, run: boolean, duration = 1200): number {
     const [count, setCount] = useState(0);
     useEffect(() => {
-        if (!inView || target === 0) return;
+        if (!run || target === 0) return;
         let raf: number;
         let start: number | null = null;
         const step = (ts: number) => {
@@ -67,17 +51,16 @@ function useCountUp(target: number, inView: boolean, duration = 1200): number {
         };
         raf = requestAnimationFrame(step);
         return () => cancelAnimationFrame(raf);
-    }, [target, inView, duration]);
+    }, [target, run, duration]);
     return count;
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 function StatCounter({ value, label, dark }: { value: number; label: string; dark: boolean }) {
-    const [ref, inView] = useInView(0.3);
-    const count = useCountUp(value, inView);
+    const count = useCountUp(value, true);
     return (
-        <div ref={ref} className="flex flex-col items-center sm:items-start">
+        <div className="flex flex-col items-center sm:items-start">
             <span className={`text-3xl sm:text-4xl font-black tabular-nums transition-all duration-300 ${dark ? 'text-white' : 'text-black'}`}>
                 {count}+
             </span>
@@ -88,30 +71,17 @@ function StatCounter({ value, label, dark }: { value: number; label: string; dar
     );
 }
 
-function FadeSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-    const [ref, inView] = useInView(0.08);
-    return (
-        <div
-            ref={ref}
-            className={`transition-all duration-700 ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'} ${className}`}
-        >
-            {children}
-        </div>
-    );
-}
-
 function SkillBar({ name, level, dark }: { name: string; level: number; dark: boolean }) {
-    const [ref, inView] = useInView(0.2);
     return (
-        <div ref={ref} className="space-y-1.5">
+        <div className="space-y-1.5">
             <div className="flex justify-between items-baseline">
                 <span className={`text-sm font-medium ${dark ? 'text-gray-200' : 'text-[color:var(--mk-text)]'}`}>{name}</span>
                 <span className={`text-xs font-mono ${dark ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-muted)]'}`}>{level}%</span>
             </div>
             <div className={`h-[3px] w-full rounded-full ${dark ? 'bg-gray-700' : 'bg-[color:var(--mk-paper-strong)]'}`}>
                 <div
-                    className={`h-full rounded-full transition-all duration-1000 ease-out ${dark ? 'bg-white' : 'bg-black'}`}
-                    style={{ width: inView ? `${level}%` : '0%' }}
+                    className={`h-full rounded-full ${dark ? 'bg-white' : 'bg-black'}`}
+                    style={{ width: `${level}%` }}
                 />
             </div>
         </div>
@@ -438,19 +408,19 @@ export default function ProfileCV() {
 
                             {/* ABOUT */}
                             {(profile.bio_short || profile.bio_long) && (
-                                <FadeSection>
+                                <>
                                     <section ref={setRef('about')} id="about" className={`border ${card} p-5 sm:p-6`}>
                                         <h2 className={sectionHdr}>Giới thiệu</h2>
                                         <p className={`text-sm leading-7 whitespace-pre-line ${isDark ? 'text-gray-300' : 'text-[color:var(--mk-text-soft)]'}`}>
                                             {profile.bio_long || profile.bio_short}
                                         </p>
                                     </section>
-                                </FadeSection>
+                                </>
                             )}
 
                             {/* SKILLS */}
                             {skills.length > 0 && (
-                                <FadeSection>
+                                <>
                                     <section ref={setRef('skills')} id="skills" className={`border ${card} p-5 sm:p-6`}>
                                         <h2 className={sectionHdr}>Kỹ năng chuyên môn</h2>
                                         <div className="space-y-5">
@@ -459,12 +429,12 @@ export default function ProfileCV() {
                                             ))}
                                         </div>
                                     </section>
-                                </FadeSection>
+                                </>
                             )}
 
                             {/* EXPERIENCE TIMELINE */}
                             {experience.length > 0 && (
-                                <FadeSection>
+                                <>
                                     <section ref={setRef('experience')} id="experience" className={`border ${card} p-5 sm:p-6`}>
                                         <h2 className={sectionHdr}>Kinh nghiệm & Học vấn</h2>
                                         <div className={`relative pl-5 border-l ${border} space-y-7`}>
@@ -490,12 +460,12 @@ export default function ProfileCV() {
                                             ))}
                                         </div>
                                     </section>
-                                </FadeSection>
+                                </>
                             )}
 
                             {/* PRICING PACKAGES */}
                             {packages.length > 0 && (
-                                <FadeSection>
+                                <>
                                     <section ref={setRef('pricing')} id="pricing" className={`border ${card} p-5 sm:p-6`}>
                                         <h2 className={sectionHdr}>Gói tập luyện</h2>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -548,12 +518,12 @@ export default function ProfileCV() {
                                             ))}
                                         </div>
                                     </section>
-                                </FadeSection>
+                                </>
                             )}
 
                             {/* TESTIMONIALS */}
                             {testimonials.length > 0 && (
-                                <FadeSection>
+                                <>
                                     <section className={`border ${card} p-5 sm:p-6`}>
                                         <h2 className={sectionHdr}>Học viên nói gì</h2>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -588,12 +558,12 @@ export default function ProfileCV() {
                                             ))}
                                         </div>
                                     </section>
-                                </FadeSection>
+                                </>
                             )}
 
                             {/* GALLERY */}
                             {gallery.length > 0 && (
-                                <FadeSection>
+                                <>
                                     <section ref={setRef('gallery')} id="gallery" className={`border ${card} p-5 sm:p-6`}>
                                         <h2 className={sectionHdr}>Gallery</h2>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
@@ -613,12 +583,12 @@ export default function ProfileCV() {
                                             ))}
                                         </div>
                                     </section>
-                                </FadeSection>
+                                </>
                             )}
 
                             {/* FAQ */}
                             {faq.length > 0 && (
-                                <FadeSection>
+                                <>
                                     <section ref={setRef('faq')} id="faq" className={`border ${card} p-5 sm:p-6`}>
                                         <h2 className={sectionHdr}>Câu hỏi thường gặp</h2>
                                         <div className={`divide-y ${border}`}>
@@ -640,11 +610,11 @@ export default function ProfileCV() {
                                             ))}
                                         </div>
                                     </section>
-                                </FadeSection>
+                                </>
                             )}
 
                             {similarCoaches.length > 0 && (
-                                <FadeSection>
+                                <>
                                     <section className={`border ${card} p-5 sm:p-6`}>
                                         <h2 className={sectionHdr}>Huấn luyện viên tương tự</h2>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -687,7 +657,7 @@ export default function ProfileCV() {
                                             })}
                                         </div>
                                     </section>
-                                </FadeSection>
+                                </>
                             )}
 
                         </div>

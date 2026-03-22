@@ -1,27 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import type { GymPricing } from '../../types';
-
-function useInView(threshold = 0.08): [React.RefObject<HTMLDivElement>, boolean] {
-    const ref = React.useRef<HTMLDivElement>(null!);
-    const [inView, setInView] = React.useState(false);
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold });
-        obs.observe(el);
-        return () => obs.disconnect();
-    }, [threshold]);
-    return [ref, inView];
-}
-
-function FadeIn({ children }: { children: React.ReactNode }) {
-    const [ref, inView] = useInView();
-    return (
-        <div ref={ref} className={`transition-all duration-700 ${inView ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-            {children}
-        </div>
-    );
-}
 
 function SectionHeading({ kicker, title, description }: { kicker: string; title: string; description?: string }) {
     return (
@@ -66,7 +44,6 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
     if (branchPricing.length === 0) return null;
 
     return (
-        <FadeIn>
             <section ref={setRef('pricing')} id="pricing" className="marketplace-panel p-6 sm:p-7">
                 <SectionHeading
                     kicker="Bảng giá"
@@ -126,7 +103,6 @@ const GymPricingSection = React.memo(function GymPricingSection({ branchPricing,
                     ))}
                 </div>
             </section>
-        </FadeIn>
     );
 });
 

@@ -1,28 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import type { GymTrainerLink } from '../../types';
-
-function useInView(threshold = 0.08): [React.RefObject<HTMLDivElement>, boolean] {
-    const ref = React.useRef<HTMLDivElement>(null!);
-    const [inView, setInView] = React.useState(false);
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold });
-        obs.observe(el);
-        return () => obs.disconnect();
-    }, [threshold]);
-    return [ref, inView];
-}
-
-function FadeIn({ children }: { children: React.ReactNode }) {
-    const [ref, inView] = useInView();
-    return (
-        <div ref={ref} className={`transition-all duration-700 ${inView ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-            {children}
-        </div>
-    );
-}
 
 function SectionHeading({ kicker, title, description }: { kicker: string; title: string; description?: string }) {
     return (
@@ -54,7 +32,6 @@ const GymTrainersSection = React.memo(function GymTrainersSection({ branchTraine
     if (branchTrainerLinks.length === 0) return null;
 
     return (
-        <FadeIn>
             <section ref={setRef('trainers')} id="trainers" className="marketplace-panel p-6 sm:p-8">
                 <SectionHeading
                     kicker="Chuyên gia"
@@ -110,7 +87,6 @@ const GymTrainersSection = React.memo(function GymTrainersSection({ branchTraine
                     })}
                 </div>
             </section>
-        </FadeIn>
     );
 });
 

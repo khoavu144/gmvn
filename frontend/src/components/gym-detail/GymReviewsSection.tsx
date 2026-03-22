@@ -3,28 +3,6 @@ import GymReviewForm from '../GymReviewForm';
 import GymReviewList from '../GymReviewList';
 import { gymService } from '../../services/gymService';
 
-function useInView(threshold = 0.08): [React.RefObject<HTMLDivElement>, boolean] {
-    const ref = React.useRef<HTMLDivElement>(null!);
-    const [inView, setInView] = React.useState(false);
-    useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) setInView(true); }, { threshold });
-        obs.observe(el);
-        return () => obs.disconnect();
-    }, [threshold]);
-    return [ref, inView];
-}
-
-function FadeIn({ children }: { children: React.ReactNode }) {
-    const [ref, inView] = useInView();
-    return (
-        <div ref={ref} className={`transition-all duration-700 ${inView ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'}`}>
-            {children}
-        </div>
-    );
-}
-
 interface Props {
     gymId: string;
     branchId: string | null;
@@ -63,7 +41,6 @@ const GymReviewsSection = React.memo(function GymReviewsSection({ gymId, branchI
     };
 
     return (
-        <FadeIn>
             <section ref={setRef('reviews')} id="reviews" className="rounded-lg border border-black/10 bg-[linear-gradient(180deg,rgba(32,25,20,1),rgba(24,18,15,1))] p-6 text-white sm:p-8">
                 <div className="mb-6 space-y-2">
                     <div className="text-[0.72rem] font-bold uppercase tracking-[0.2em] text-white/60">Trust</div>
@@ -94,7 +71,6 @@ const GymReviewsSection = React.memo(function GymReviewsSection({ gymId, branchI
                     </div>
                 )}
             </section>
-        </FadeIn>
     );
 });
 

@@ -214,7 +214,7 @@ export default function Home() {
                                 </div>
                             ) : visibleProfiles.length > 0 ? (
                                 <div className="mt-5 space-y-3">
-                                    {visibleProfiles.map((coach) => (
+                                    {visibleProfiles.map((coach, index) => (
                                         <Link
                                             key={coach.id}
                                             to={coachLink(coach)}
@@ -227,7 +227,10 @@ export default function Home() {
                                                         src={coach.avatar_url}
                                                         alt={coach.full_name}
                                                         className="h-full w-full object-cover"
-                                                        loading="lazy"
+                                                        width={56}
+                                                        height={56}
+                                                        loading={index === 0 ? 'eager' : 'lazy'}
+                                                        fetchPriority={index === 0 ? 'high' : undefined}
                                                         decoding="async"
                                                     />
                                                 ) : (

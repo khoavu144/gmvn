@@ -124,6 +124,7 @@ export default function NewsPage() {
     const [activeCategory, setActiveCategory] = useState('all');
     const canonicalBase = import.meta.env.VITE_CANONICAL_BASE_URL || 'https://gymerviet.com';
 
+    /* eslint-disable react-hooks/set-state-in-effect -- list fetch: loading/error flags belong to request lifecycle */
     useEffect(() => {
         setLoading(true);
         setError(null);
@@ -139,6 +140,7 @@ export default function NewsPage() {
             .catch(() => setError('Không thể tải danh sách bài viết. Vui lòng thử lại.'))
             .finally(() => setLoading(false));
     }, [page, activeCategory]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     const handleCategoryChange = (category: string) => {
         setActiveCategory(category);

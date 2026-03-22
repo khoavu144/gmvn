@@ -28,10 +28,22 @@ export function GalleryLightbox({
     const [currentIndex, setCurrentIndex] = useState(initialIndex);
     const [isZoomed, setIsZoomed] = useState(false);
 
+    const goToPrevious = useCallback(() => {
+        setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+        setIsZoomed(false);
+    }, [images.length]);
+
+    const goToNext = useCallback(() => {
+        setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+        setIsZoomed(false);
+    }, [images.length]);
+
+    /* eslint-disable react-hooks/set-state-in-effect -- sync slide index when reopening lightbox */
     useEffect(() => {
         setCurrentIndex(initialIndex);
         setIsZoomed(false);
     }, [initialIndex, isOpen]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     // Keyboard navigation
     useEffect(() => {
@@ -58,17 +70,7 @@ export function GalleryLightbox({
             window.removeEventListener('keydown', handleKeyDown);
             document.body.style.overflow = '';
         };
-    }, [isOpen, currentIndex]);
-
-    const goToPrevious = useCallback(() => {
-        setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
-        setIsZoomed(false);
-    }, [images.length]);
-
-    const goToNext = useCallback(() => {
-        setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
-        setIsZoomed(false);
-    }, [images.length]);
+    }, [isOpen, goToNext, goToPrevious, onClose]);
 
     const toggleZoom = () => setIsZoomed(!isZoomed);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { logger } from '../lib/logger';
 import { gymService } from '../services/gymService';
 import type { GymReview } from '../types';
@@ -16,11 +16,7 @@ const GymReviewList: React.FC<GymReviewListProps> = ({ gymId, refreshTick = 0 })
     const user = useSelector((state: RootState) => state.auth.user);
     const canReply = user?.user_type === 'gym_owner' || user?.user_type === 'trainer';
 
-    useEffect(() => {
-        fetchReviews();
-    }, [gymId, refreshTick]);
-
-    const fetchReviews = async () => {
+    const fetchReviews = useCallback(async () => {
         setLoading(true);
         try {
             const res = await gymService.getGymReviews(gymId);
@@ -32,7 +28,11 @@ const GymReviewList: React.FC<GymReviewListProps> = ({ gymId, refreshTick = 0 })
         } finally {
             setLoading(false);
         }
-    };
+    }, [gymId]);
+
+    useEffect(() => {
+        void fetchReviews();
+    }, [gymId, refreshTick, fetchReviews]);
 
     if (loading) {
         return <div className="animate-pulse columns-1 md:columns-2 gap-4">

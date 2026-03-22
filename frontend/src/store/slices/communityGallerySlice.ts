@@ -44,7 +44,7 @@ export const fetchCommunityGalleryStats = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             return await communityGalleryApiService.getStats();
-        } catch (error: any) {
+        } catch {
             return rejectWithValue('Failed to fetch stats');
         }
     }
