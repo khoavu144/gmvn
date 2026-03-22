@@ -41,7 +41,7 @@ export const listNews = async (req: Request, res: Response): Promise<void> => {
         res.json({
             success: true,
             data: articles,
-            meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+            meta: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) },
         });
     } catch (err) {
         logger.error('[newsController.listNews]', err);
@@ -97,7 +97,7 @@ export const adminListNews = async (req: Request, res: Response): Promise<void> 
 
         const [articles, total] = await qb.getManyAndCount();
         res.json({ success: true, data: articles, meta: { page, limit, total } });
-    } catch (err) {
+    } catch {
         res.status(500).json({ success: false, message: 'Lỗi hệ thống' });
     }
 };
@@ -110,7 +110,7 @@ export const publishNews = async (req: Request, res: Response): Promise<void> =>
         if (!article) { res.status(404).json({ success: false, message: 'Không tìm thấy' }); return; }
         await repo.update(String(id), { status: 'published', published_at: new Date() });
         res.json({ success: true, message: 'Đã đăng bài viết' });
-    } catch (err) {
+    } catch {
         res.status(500).json({ success: false, message: 'Lỗi hệ thống' });
     }
 };
@@ -120,7 +120,7 @@ export const archiveNews = async (req: Request, res: Response): Promise<void> =>
         const { id } = req.params;
         await AppDataSource.getRepository(NewsArticle).update(String(id), { status: 'archived' });
         res.json({ success: true, message: 'Đã lưu trữ bài viết' });
-    } catch (err) {
+    } catch {
         res.status(500).json({ success: false, message: 'Lỗi hệ thống' });
     }
 };
@@ -130,7 +130,7 @@ export const deleteNews = async (req: Request, res: Response): Promise<void> => 
         const { id } = req.params;
         await AppDataSource.getRepository(NewsArticle).delete(String(id));
         res.json({ success: true, message: 'Đã xóa bài viết' });
-    } catch (err) {
+    } catch {
         res.status(500).json({ success: false, message: 'Lỗi hệ thống' });
     }
 };
@@ -144,7 +144,7 @@ export const triggerCrawl = async (req: Request, res: Response): Promise<void> =
         }).catch((err) => {
             logger.error('[newsController.triggerCrawl] Error', err);
         });
-    } catch (err) {
+    } catch {
         res.status(500).json({ success: false, message: 'Lỗi hệ thống' });
     }
 };

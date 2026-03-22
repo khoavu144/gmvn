@@ -109,18 +109,39 @@ class UserService {
             .getManyAndCount();
 
         const trainerIds = trainers.map((t) => t.id);
-        const profileRows: Array<{ trainer_id: string; slug: string | null; headline: string | null }> = trainerIds.length
+        const profileRows: Array<{
+            trainer_id: string;
+            slug: string | null;
+            headline: string | null;
+            is_accepting_clients: boolean | string | null;
+        }> = trainerIds.length
             ? await AppDataSource
                 .createQueryBuilder()
                 .select('profile.trainer_id', 'trainer_id')
                 .addSelect('profile.slug', 'slug')
                 .addSelect('profile.headline', 'headline')
+                .addSelect('profile.is_accepting_clients', 'is_accepting_clients')
                 .from('trainer_profiles', 'profile')
                 .where('profile.trainer_id IN (:...ids)', { ids: trainerIds })
                 .getRawMany()
             : [];
 
+        const testimonialRows: Array<{ trainer_id: string; review_count: string }> = trainerIds.length
+            ? await AppDataSource
+                .createQueryBuilder()
+                .select('testimonial.trainer_id', 'trainer_id')
+                .addSelect('COUNT(*)', 'review_count')
+                .from('testimonials', 'testimonial')
+                .where('testimonial.trainer_id IN (:...ids)', { ids: trainerIds })
+                .andWhere('testimonial.is_approved = true')
+                .groupBy('testimonial.trainer_id')
+                .getRawMany()
+            : [];
+
         const profileByTrainerId = new Map(profileRows.map((row) => [row.trainer_id, row]));
+        const testimonialCountByTrainerId = new Map(
+            testimonialRows.map((row) => [row.trainer_id, Number(row.review_count) || 0]),
+        );
 
         return {
             trainers: trainers.map((t) => {
@@ -138,6 +159,11 @@ class UserService {
                     is_verified: t.is_verified,
                     city: t.city ?? null,
                     avg_rating: t.avg_rating != null ? Number(t.avg_rating) : null,
+                    review_count: testimonialCountByTrainerId.get(t.id) ?? 0,
+                    is_accepting_clients:
+                        profileRow?.is_accepting_clients == null
+                            ? null
+                            : profileRow.is_accepting_clients === true || profileRow.is_accepting_clients === 'true',
                 };
             }),
             total,
