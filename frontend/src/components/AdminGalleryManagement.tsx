@@ -3,6 +3,7 @@ import { Camera, Plus, Trash2, Star, Filter, RefreshCw } from 'lucide-react';
 import { communityGalleryApiService } from '../services/communityGalleryService';
 import type { CommunityGalleryItem } from '../services/communityGalleryService';
 import { useToast } from './Toast';
+import { AdminLoadingBlock, adminEmptyStateClassName } from './admin/adminPanelPrimitives';
 
 export default function AdminGalleryManagement() {
     const { toast, ToastComponent } = useToast();
@@ -180,9 +181,14 @@ export default function AdminGalleryManagement() {
                 </div>
                 
                 {loading ? (
-                    <div className="p-8 text-center text-gray-500">Đang tải biểu dữ liệu...</div>
+                    <div className="p-8">
+                        <AdminLoadingBlock />
+                    </div>
                 ) : items.length === 0 ? (
-                    <div className="p-8 text-center text-gray-500">Chưa có hình ảnh nào trong thư viện.</div>
+                    <div className={`m-4 ${adminEmptyStateClassName}`}>
+                        <p className="font-medium text-gray-800">Chưa có ảnh trong thư viện</p>
+                        <p className="mt-1 text-xs text-gray-500">Thêm ảnh bằng form phía trên hoặc đợi ảnh từ huấn luyện viên.</p>
+                    </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">

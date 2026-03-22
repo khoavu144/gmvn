@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { AdminLoadingBlock, adminEmptyStateClassName } from './admin/adminPanelPrimitives';
 import { logger } from '../lib/logger';
 import { gymService } from '../services/gymService';
 import { useToast } from './Toast';
@@ -60,10 +61,15 @@ const AdminReviewManagement: React.FC = () => {
 
     const filteredReviews = reviews.filter(r => ratingFilter === 'all' || r.rating === ratingFilter);
 
-    if (loading) return <div className="animate-pulse space-y-4"><div className="h-24 bg-gray-50 rounded-lg"></div></div>;
+    if (loading) return <AdminLoadingBlock />;
 
     if (reviews.length === 0) {
-        return <div className="text-gray-500 italic py-12 text-center border-2 border-dashed border-gray-200 rounded-lg">Chưa có đánh giá nào.</div>;
+        return (
+            <div className={adminEmptyStateClassName}>
+                <p className="font-medium text-gray-800">Chưa có đánh giá nào</p>
+                <p className="mt-1 text-xs text-gray-500">Khi có review từ người dùng, bạn quản lý tại đây.</p>
+            </div>
+        );
     }
 
     return (
@@ -127,7 +133,10 @@ const AdminReviewManagement: React.FC = () => {
                     </div>
                 ))}
                 {filteredReviews.length === 0 && (
-                    <div className="text-gray-500 italic py-12 text-center border-2 border-dashed border-gray-200 rounded-lg">Không tìm thấy đánh giá nào phù hợp.</div>
+                    <div className={adminEmptyStateClassName}>
+                        <p className="font-medium text-gray-800">Không có đánh giá khớp bộ lọc</p>
+                        <p className="mt-1 text-xs text-gray-500">Thử chọn &quot;Tất cả số sao&quot; hoặc sao khác.</p>
+                    </div>
                 )}
             </div>
         </div>

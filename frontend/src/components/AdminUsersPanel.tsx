@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import apiClient from '../services/api';
+import { AdminLoadingBlock, adminEmptyStateClassName } from './admin/adminPanelPrimitives';
 
 type Row = {
     id: string;
@@ -87,12 +88,17 @@ export default function AdminUsersPanel() {
 
             {err && <div className="text-sm text-red-600">{err}</div>}
             {loading ? (
-                <p className="text-sm text-gray-500">Đang tải…</p>
+                <AdminLoadingBlock />
+            ) : err ? null : users.length === 0 ? (
+                <div className={adminEmptyStateClassName}>
+                    <p className="font-medium text-gray-800">Không có người dùng khớp bộ lọc</p>
+                    <p className="mt-1 text-xs text-gray-500">Thử bỏ tìm kiếm hoặc chọn vai trò khác.</p>
+                </div>
             ) : (
                 <>
-                    <div className="overflow-x-auto rounded-lg border border-gray-200">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+                    <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+                        <table className="w-full text-left text-sm">
+                            <thead className="border-b border-gray-200 bg-gray-50 text-xs font-bold uppercase tracking-wide text-gray-500">
                                 <tr>
                                     <th className="p-3">Tên</th>
                                     <th className="p-3">Email</th>

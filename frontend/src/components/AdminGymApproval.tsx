@@ -4,6 +4,7 @@ import { gymService } from '../services/gymService';
 import { useToast } from './Toast';
 import { ConfirmModal } from './ConfirmModal';
 import type { GymCenter } from '../types';
+import { AdminLoadingBlock, adminEmptyStateClassName } from './admin/adminPanelPrimitives';
 
 const AdminGymApproval: React.FC = () => {
     const { toast, ToastComponent } = useToast();
@@ -70,10 +71,15 @@ const AdminGymApproval: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="animate-pulse space-y-4"><div className="h-24 bg-gray-50 rounded-lg"></div></div>;
+    if (loading) return <AdminLoadingBlock />;
 
     if (pendingGyms.length === 0) {
-        return <div className="text-gray-500 italic py-12 text-center border-2 border-dashed border-gray-200 rounded-lg">Không có hồ sơ nào đang chờ duyệt.</div>;
+        return (
+            <div className={adminEmptyStateClassName}>
+                <p className="font-medium text-gray-800">Không có hồ sơ đang chờ duyệt</p>
+                <p className="mt-1 text-xs text-gray-500">Khi có gym owner gửi duyệt, danh sách sẽ hiện ở đây.</p>
+            </div>
+        );
     }
 
     return (

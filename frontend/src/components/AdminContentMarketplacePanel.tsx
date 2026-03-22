@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import apiClient from '../services/api';
+import { adminEmptyStateClassName } from './admin/adminPanelPrimitives';
 
 type NewsArticle = {
     id: string;
@@ -136,9 +137,15 @@ export default function AdminContentMarketplacePanel() {
                     </button>
                 </div>
                 <p className="text-xs text-gray-500 mb-3">Tổng: {newsMeta.total}</p>
-                <div className="overflow-x-auto rounded-lg border border-gray-200">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+                {news.length === 0 && !newsErr ? (
+                    <div className={adminEmptyStateClassName}>
+                        <p className="font-medium text-gray-800">Chưa có bài tin nào</p>
+                        <p className="mt-1 text-xs text-gray-500">Chạy crawl hoặc tạo bài để danh sách hiện ở đây.</p>
+                    </div>
+                ) : (
+                <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+                    <table className="w-full text-left text-sm">
+                        <thead className="border-b border-gray-200 bg-gray-50 text-xs font-bold uppercase tracking-wide text-gray-500">
                             <tr>
                                 <th className="p-3">Tiêu đề</th>
                                 <th className="p-3">Trạng thái</th>
@@ -175,6 +182,7 @@ export default function AdminContentMarketplacePanel() {
                         </tbody>
                     </table>
                 </div>
+                )}
                 <div className="flex justify-between mt-3 text-sm">
                     <button
                         type="button"
@@ -200,7 +208,10 @@ export default function AdminContentMarketplacePanel() {
                 </h3>
                 <p className="text-xs text-gray-500 mb-3">Tổng chờ: {modTotal}</p>
                 {products.length === 0 ? (
-                    <p className="text-sm text-gray-500">Không có sản phẩm pending_review.</p>
+                    <div className={adminEmptyStateClassName}>
+                        <p className="font-medium text-gray-800">Không có sản phẩm chờ duyệt</p>
+                        <p className="mt-1 text-xs text-gray-500">Khi người bán gửi bài, hàng chờ sẽ hiện ở đây.</p>
+                    </div>
                 ) : (
                     <div className="space-y-4">
                         {products.map((p) => (

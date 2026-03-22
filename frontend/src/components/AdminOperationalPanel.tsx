@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import apiClient from '../services/api';
+import { AdminLoadingBlock } from './admin/adminPanelPrimitives';
 
 type Health = {
     success: boolean;
@@ -108,7 +109,7 @@ export default function AdminOperationalPanel() {
     };
 
     if (loading && !health) {
-        return <p className="text-sm text-gray-500">Đang tải vận hành…</p>;
+        return <AdminLoadingBlock />;
     }
 
     return (

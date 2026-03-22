@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import apiClient from '../services/api';
+import { AdminLoadingBlock, adminEmptyStateClassName } from './admin/adminPanelPrimitives';
 
 interface Applicant {
     id: string;
@@ -73,15 +74,14 @@ export default function AdminCoachApplications() {
     };
 
     if (isLoading) {
-        return <p style={{ color: '#6b7280', fontSize: '0.88rem', padding: '16px 0' }}>Đang tải đơn đăng ký...</p>;
+        return <AdminLoadingBlock />;
     }
 
     if (applications.length === 0) {
         return (
-            <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                <p style={{ fontSize: '2rem', marginBottom: 8 }}>✅</p>
-                <p style={{ fontWeight: 700, color: '#111' }}>Không có đơn nào đang chờ duyệt</p>
-                <p style={{ fontSize: '0.82rem', color: '#6b7280' }}>Tổng đơn đã xử lý: {total}</p>
+            <div className={adminEmptyStateClassName}>
+                <p className="font-semibold text-gray-900">Không có đơn đang chờ duyệt</p>
+                <p className="mt-2 text-xs text-gray-500">Tổng đơn đã xử lý: {total}</p>
             </div>
         );
     }

@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { ClipboardList, Star, User, Calendar, Search, Eye, Store } from 'lucide-react';
+import { ClipboardList, Star, Calendar, Search, Eye, Store, Bell, MessageSquare } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import StatCard from '../../components/dashboard/StatCard';
 import QuickActionCard from '../../components/dashboard/QuickActionCard';
 import UpgradeToCoachBanner from '../../components/dashboard/UpgradeToCoachBanner';
+import DashboardPublicProfileBanner from '../../components/dashboard/DashboardPublicProfileBanner';
 
 export interface OverviewData {
     active_clients?: number;
@@ -22,80 +23,141 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
     const user = useSelector((state: RootState) => state.auth.user);
     const publicProfileUrl = user ? `/athletes/${user.id}` : '/coaches?type=athlete';
 
+    const weekSessions = Number(overview.week_sessions ?? 0);
+    const hasWeekSessions = weekSessions > 0;
+
+    const hero = useMemo(() => {
+        if (hasWeekSessions) {
+            return {
+                kicker: 'Lịch tuần này',
+                title: `${weekSessions} buổi tập trong tuần`,
+                body: 'Tiếp tục theo dõi lịch và tiến độ trên GYMERVIET.',
+                primary: { to: '/workouts', label: 'Mở lịch tập' },
+                secondary: { to: '/coaches', label: 'Tìm thêm coach' },
+            };
+        }
+        return {
+            kicker: 'Bắt đầu',
+            title: 'Chưa có buổi tập tuần này',
+            body: 'Xem coach trên GYMERVIET và chọn người phù hợp để lên lịch cùng bạn.',
+            primary: { to: '/coaches', label: 'Tìm coach' },
+            secondary: { to: '/workouts', label: 'Lịch tập của tôi' },
+        };
+    }, [hasWeekSessions, weekSessions]);
+
+    const unreadMsg = overview.unread_messages ?? 0;
+
     return (
         <div className="space-y-8">
-            {/* Next Workout Hero Card */}
-            <div className="bg-black text-white p-8 md:p-10 rounded-lg relative overflow-hidden group shadow-md">
-                <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent z-10"></div>
+            <div className="group relative overflow-hidden rounded-lg bg-zinc-900 p-8 text-white shadow-md md:p-10">
+                <div className="absolute inset-0 z-10 bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-zinc-900/40" />
                 <div className="relative z-20 max-w-2xl">
-                    <span className="inline-block px-3 py-1 bg-white text-black text-[10px] font-black uppercase tracking-widest mb-4">Buổi tập tiếp theo</span>
-                    <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-3">Chưa có lịch tập</h3>
-                    <p className="text-gray-500 mb-8 max-w-md">Xem Coach trên GYMERVIET và chọn người phù hợp để lên lịch tập cùng bạn.</p>
-                    <div className="flex gap-4">
-                        <Link to="/coaches" className="bg-white text-black px-6 py-3 font-bold uppercase tracking-widest text-sm hover:bg-gray-100 transition-colors inline-block rounded-sm">
-                            Tìm Coach ngay
+                    <span className="mb-4 inline-block rounded-sm bg-white px-3 py-1 text-[10px] font-bold tracking-wide text-zinc-900">
+                        {hero.kicker}
+                    </span>
+                    <h2 className="mb-3 text-3xl font-black tracking-tight md:text-4xl">{hero.title}</h2>
+                    <p className="mb-8 max-w-md text-sm leading-relaxed text-zinc-400">{hero.body}</p>
+                    <div className="flex flex-wrap gap-3">
+                        <Link
+                            to={hero.primary.to}
+                            className="inline-block rounded-sm bg-white px-6 py-3 text-sm font-bold text-zinc-900 hover:bg-zinc-100"
+                        >
+                            {hero.primary.label}
                         </Link>
-                        <Link to="/workouts" className="border border-gray-600 text-white px-6 py-3 font-bold uppercase tracking-widest text-sm hover:border-white transition-colors inline-block rounded-sm hidden md:inline-block">
-                            Lịch tập của tôi
+                        <Link
+                            to={hero.secondary.to}
+                            className="inline-block rounded-sm border border-zinc-600 px-6 py-3 text-sm font-bold text-white hover:border-white"
+                        >
+                            {hero.secondary.label}
                         </Link>
                     </div>
                 </div>
             </div>
 
-            {/* Stats Row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 {[
-                    { label: 'Số buổi tuần', value: String(overview.week_sessions ?? '0'), icon: <ClipboardList className="w-5 h-5" /> },
-                    { label: 'Đăng ký đang chạy', value: String(overview.active_subscriptions ?? '0'), icon: <Star className="w-5 h-5" /> },
-                    { label: 'Thông báo', value: String(overview.unread_notifications ?? '0'), icon: <User className="w-5 h-5" /> },
-                    { label: 'Gói tập active', value: String(overview.active_subscriptions ?? '0'), icon: <Calendar className="w-5 h-5" /> },
-                ].map(stat => (
+                    {
+                        label: 'Buổi trong tuần',
+                        value: String(weekSessions),
+                        icon: <ClipboardList className="h-5 w-5" />,
+                    },
+                    {
+                        label: 'Gói đang tham gia',
+                        value: String(overview.active_subscriptions ?? '0'),
+                        icon: <Star className="h-5 w-5" />,
+                    },
+                    {
+                        label: 'Thông báo',
+                        value: String(overview.unread_notifications ?? '0'),
+                        icon: <Bell className="h-5 w-5" />,
+                    },
+                    {
+                        label: 'Tin nhắn chưa đọc',
+                        value: String(unreadMsg),
+                        icon: <MessageSquare className="h-5 w-5" />,
+                    },
+                ].map((stat) => (
                     <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} />
                 ))}
             </div>
 
-            {/* Athlete public profile preview banner */}
-            <div className="flex items-center justify-between gap-4 bg-gray-900 text-white rounded-lg px-5 py-4">
-                <div>
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Hồ sơ Athlete public của bạn</p>
-                    <p className="text-sm font-bold truncate max-w-xs">{window.location.origin}{publicProfileUrl}</p>
-                </div>
-                <Link
-                    to={publicProfileUrl}
-                    target="_blank"
-                    className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider hover:bg-gray-50 transition-colors whitespace-nowrap shrink-0"
-                >
-                    <Eye className="w-3.5 h-3.5" />
-                    Xem ngay
-                </Link>
-            </div>
+            <DashboardPublicProfileBanner label="Hồ sơ Athlete công khai" path={publicProfileUrl} />
 
             <UpgradeToCoachBanner />
 
             <section className="page-header mb-0">
-                <p className="page-kicker">Không gian Luyện tập</p>
-                <h2 className="section-title">Theo dõi lịch tập và xây dựng hồ sơ thi đấu</h2>
+                <p className="page-kicker">Không gian luyện tập</p>
+                <h2 className="section-title">Lịch tập và hồ sơ vận động viên</h2>
                 <p className="page-description">
-                    Theo dõi lịch tập, hồ sơ vận động viên và liên hệ Coach — không cần màn hình quản trị phức tạp.
+                    Theo dõi lịch, hồ sơ và liên hệ coach — gọn gàng, không rối mắt.
                 </p>
             </section>
 
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                {[
-                    { to: '/workouts', icon: <Calendar className="w-5 h-5" />, title: 'LỊCH TẬP', desc: 'Theo dõi lịch tập và điểm số tiến độ' },
-                    { to: '/profile', icon: <Star className="w-5 h-5" />, title: 'CẬP NHẬT HỒ SƠ', desc: 'Cập nhật thành tích thi đấu' },
-                    { to: '/coaches', icon: <Search className="w-5 h-5" />, title: 'TÌM COACH', desc: 'Khám phá huấn luyện viên phù hợp' },
-                    { to: publicProfileUrl, icon: <Eye className="w-5 h-5" />, title: 'XEM PROFILE PUBLIC', desc: 'Kiểm tra giao diện người dùng nhìn thấy' },
-                    { to: '/dashboard/marketplace', icon: <Store className="w-5 h-5" />, title: 'MARKETPLACE', desc: 'Quản lý bài đăng bán hàng' },
-                ].map(card => (
-                    <QuickActionCard
-                        key={card.to}
-                        to={card.to}
-                        icon={card.icon}
-                        title={card.title}
-                        description={card.desc}
-                    />
-                ))}
+            <div>
+                <h3 className="text-h3 mb-4 border-b border-gray-200 pb-2">Lối tắt</h3>
+                <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+                    {[
+                        {
+                            to: '/workouts',
+                            icon: <Calendar className="h-5 w-5" />,
+                            title: 'Lịch tập',
+                            desc: 'Theo dõi lịch và tiến độ',
+                        },
+                        {
+                            to: '/profile',
+                            icon: <Star className="h-5 w-5" />,
+                            title: 'Cập nhật hồ sơ',
+                            desc: 'Thành tích và thông tin thi đấu',
+                        },
+                        {
+                            to: '/coaches',
+                            icon: <Search className="h-5 w-5" />,
+                            title: 'Tìm coach',
+                            desc: 'Huấn luyện viên phù hợp',
+                        },
+                        {
+                            to: publicProfileUrl,
+                            icon: <Eye className="h-5 w-5" />,
+                            title: 'Xem profile công khai',
+                            desc: 'Kiểm tra cách người khác nhìn thấy bạn',
+                        },
+                        {
+                            to: '/dashboard/marketplace',
+                            icon: <Store className="h-5 w-5" />,
+                            title: 'Marketplace',
+                            desc: 'Quản lý bài đăng bán hàng',
+                        },
+                    ].map((card) => (
+                        <QuickActionCard
+                            key={card.to}
+                            to={card.to}
+                            icon={card.icon}
+                            title={card.title}
+                            description={card.desc}
+                            uppercaseTitle={false}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );

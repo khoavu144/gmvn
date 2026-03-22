@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { Users, DollarSign, MessageSquare, ClipboardList, Eye, User, Store } from 'lucide-react';
+import { Users, DollarSign, MessageSquare, ClipboardList, Eye, User, Store, Bell } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import { gymService } from '../../services/gymService';
 import type { GymTrainerLink } from '../../types';
 import { useToast } from '../../components/Toast';
 import StatCard from '../../components/dashboard/StatCard';
 import QuickActionCard from '../../components/dashboard/QuickActionCard';
+import DashboardPublicProfileBanner from '../../components/dashboard/DashboardPublicProfileBanner';
 import type { OverviewData } from './AthleteDashboard';
 
 const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
@@ -16,12 +16,12 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
     const [invitations, setInvitations] = useState<GymTrainerLink[]>([]);
     const [loadingInvs, setLoadingInvs] = useState(true);
 
-    // Public profile URL: /coaches/:id or /profile/public/:id
     const publicProfileUrl = user ? `/coaches/${user.id}` : '/coaches';
 
     useEffect(() => {
-        gymService.getTrainerInvitations()
-            .then(res => {
+        gymService
+            .getTrainerInvitations()
+            .then((res) => {
                 if (res.success) setInvitations(res.invitations || []);
             })
             .finally(() => setLoadingInvs(false));
@@ -31,93 +31,136 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
         try {
             const res = await gymService.acceptInvitation(id);
             if (res.success) {
-                toast.success('Đã chấp nhận lời mời hợp tác!');
-                setInvitations(prev => prev.filter(i => i.id !== id));
+                toast.success('Đã chấp nhận lời mời hợp tác.');
+                setInvitations((prev) => prev.filter((i) => i.id !== id));
             }
-        } catch { toast.error('Lỗi khi thực hiện'); }
+        } catch {
+            toast.error('Không thực hiện được. Thử lại sau.');
+        }
     };
 
     const handleDecline = async (id: string) => {
         try {
             const res = await gymService.declineInvitation(id);
             if (res.success) {
-                toast.success('Đã từ chối lời mời');
-                setInvitations(prev => prev.filter(i => i.id !== id));
+                toast.success('Đã từ chối lời mời.');
+                setInvitations((prev) => prev.filter((i) => i.id !== id));
             }
-        } catch { toast.error('Lỗi khi thực hiện'); }
+        } catch {
+            toast.error('Không thực hiện được. Thử lại sau.');
+        }
     };
 
     return (
         <div className="space-y-8">
             {ToastComponent}
-            {/* Invitations Alert */}
+
             {!loadingInvs && invitations.length > 0 && (
-                <div className="bg-amber-50 border-2 border-amber-500 rounded-lg p-6">
-                    <h3 className="font-black uppercase tracking-tight text-amber-800 mb-4 flex items-center gap-2">
-                        <span>🔔</span> Bạn có {invitations.length} lời mời hợp tác mới
-                    </h3>
-                    <div className="grid gap-4">
-                        {invitations.map(inv => (
-                            <div key={inv.id} className="bg-white border border-amber-200 p-4 rounded-lg flex justify-between items-center shadow-sm">
+                <div className="rounded-lg border-2 border-amber-400/80 bg-amber-50 p-5 sm:p-6">
+                    <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-amber-950">
+                        <Bell className="h-5 w-5 shrink-0" aria-hidden />
+                        Bạn có {invitations.length} lời mời hợp tác từ phòng gym
+                    </h2>
+                    <ul className="grid gap-4">
+                        {invitations.map((inv) => (
+                            <li
+                                key={inv.id}
+                                className="flex flex-col gap-3 rounded-lg border border-amber-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+                            >
                                 <div>
-                                    <p className="font-bold text-sm">{inv.gym_center?.name}</p>
-                                    <p className="text-xs text-gray-500">Vị trí: {inv.role_at_gym || 'Coach'} • Chi nhánh: {inv.branch?.branch_name}</p>
+                                    <p className="font-bold text-gray-900">{inv.gym_center?.name}</p>
+                                    <p className="text-xs text-gray-600">
+                                        Vị trí: {inv.role_at_gym || 'Coach'} · Chi nhánh:{' '}
+                                        {inv.branch?.branch_name ?? '—'}
+                                    </p>
                                 </div>
-                                <div className="flex gap-2">
-                                    <button onClick={() => handleAccept(inv.id)} className="bg-black text-white px-3 py-1.5 rounded-xs text-[10px] font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors">Chấp nhận</button>
-                                    <button onClick={() => handleDecline(inv.id)} className="text-gray-500 px-3 py-1.5 rounded-xs text-[10px] font-bold uppercase tracking-widest hover:text-red-500 transition-colors">Từ chối</button>
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => void handleAccept(inv.id)}
+                                        className="min-h-[44px] min-w-[100px] rounded-sm bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-gray-800"
+                                    >
+                                        Chấp nhận
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => void handleDecline(inv.id)}
+                                        className="min-h-[44px] rounded-sm px-4 py-2 text-sm font-bold text-gray-700 hover:text-red-600"
+                                    >
+                                        Từ chối
+                                    </button>
                                 </div>
-                            </div>
+                            </li>
                         ))}
-                    </div>
+                    </ul>
                 </div>
             )}
 
-            {/* Stats row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 {[
-                    { label: 'Học viên', value: String(overview.active_clients ?? '—'), icon: <Users className="w-5 h-5" /> },
-                    { label: 'Doanh thu', value: overview.monthly_revenue ? `${Number(overview.monthly_revenue).toLocaleString('vi-VN')} đ` : '—', icon: <DollarSign className="w-5 h-5" /> },
-                    { label: 'Tin nhắn', value: String(overview.unread_messages ?? 0), icon: <MessageSquare className="w-5 h-5" /> },
-                    { label: 'Chương trình', value: `${overview.published_programs ?? 0}/${overview.total_programs ?? 0}`, icon: <ClipboardList className="w-5 h-5" /> },
-                ].map(stat => (
+                    { label: 'Học viên', value: String(overview.active_clients ?? '—'), icon: <Users className="h-5 w-5" /> },
+                    {
+                        label: 'Doanh thu tháng',
+                        value: overview.monthly_revenue
+                            ? `${Number(overview.monthly_revenue).toLocaleString('vi-VN')} đ`
+                            : '—',
+                        icon: <DollarSign className="h-5 w-5" />,
+                    },
+                    { label: 'Tin nhắn', value: String(overview.unread_messages ?? 0), icon: <MessageSquare className="h-5 w-5" /> },
+                    {
+                        label: 'Chương trình',
+                        value: `${overview.published_programs ?? 0}/${overview.total_programs ?? 0}`,
+                        icon: <ClipboardList className="h-5 w-5" />,
+                    },
+                ].map((stat) => (
                     <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} />
                 ))}
             </div>
 
-            {/* Coach public profile preview banner */}
-            <div className="flex items-center justify-between gap-4 bg-gray-900 text-white rounded-lg px-5 py-4">
-                <div>
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Hồ sơ public của bạn</p>
-                    <p className="text-sm font-bold truncate max-w-xs">{window.location.origin}{publicProfileUrl}</p>
-                </div>
-                <Link
-                    to={publicProfileUrl}
-                    target="_blank"
-                    className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider hover:bg-gray-50 transition-colors whitespace-nowrap shrink-0"
-                >
-                    <Eye className="w-3.5 h-3.5" />
-                    Xem ngay
-                </Link>
-            </div>
+            <DashboardPublicProfileBanner label="Hồ sơ Coach công khai" path={publicProfileUrl} />
 
-            {/* Quick actions */}
             <div>
-                <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Lối tắt</h3>
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <h3 className="text-h3 mb-4 border-b border-gray-200 pb-2">Lối tắt</h3>
+                <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                     {[
-                        { to: '/programs', icon: <ClipboardList className="w-5 h-5" />, title: 'QUẢN LÝ GÓI TẬP', desc: 'Tạo & publish chương trình' },
-                        { to: '/messages', icon: <MessageSquare className="w-5 h-5" />, title: 'TIN NHẮN', desc: 'Chat với học viên' },
-                        { to: '/profile', icon: <User className="w-5 h-5" />, title: 'CẬP NHẬT HỒ SƠ', desc: 'Chỉnh sửa thông tin chuyên môn' },
-                        { to: publicProfileUrl, icon: <Eye className="w-5 h-5" />, title: 'XEM PROFILE PUBLIC', desc: 'Kiểm tra giao diện học viên nhìn thấy' },
-                        { to: '/dashboard/marketplace', icon: <Store className="w-5 h-5" />, title: 'MARKETPLACE', desc: 'Quản lý bài đăng bán hàng' },
-                    ].map(card => (
+                        {
+                            to: '/programs',
+                            icon: <ClipboardList className="h-5 w-5" />,
+                            title: 'Quản lý gói tập',
+                            desc: 'Tạo và xuất bản chương trình',
+                        },
+                        {
+                            to: '/messages',
+                            icon: <MessageSquare className="h-5 w-5" />,
+                            title: 'Tin nhắn',
+                            desc: 'Trao đổi với học viên',
+                        },
+                        {
+                            to: '/profile',
+                            icon: <User className="h-5 w-5" />,
+                            title: 'Cập nhật hồ sơ',
+                            desc: 'Thông tin chuyên môn và CV',
+                        },
+                        {
+                            to: publicProfileUrl,
+                            icon: <Eye className="h-5 w-5" />,
+                            title: 'Xem profile công khai',
+                            desc: 'Giao diện học viên nhìn thấy',
+                        },
+                        {
+                            to: '/dashboard/marketplace',
+                            icon: <Store className="h-5 w-5" />,
+                            title: 'Marketplace',
+                            desc: 'Quản lý bài đăng bán hàng',
+                        },
+                    ].map((card) => (
                         <QuickActionCard
                             key={card.to}
                             to={card.to}
                             icon={card.icon}
                             title={card.title}
                             description={card.desc}
+                            uppercaseTitle={false}
                         />
                     ))}
                 </div>

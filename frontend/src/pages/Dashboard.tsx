@@ -65,7 +65,7 @@ export default function Dashboard() {
                                 Không gian làm việc {roleLabel[user.user_type] ?? 'của bạn'}
                             </p>
                             <h1 className="page-title">
-                                Xin chào, {user.full_name.split(' ').pop()} 👋
+                                Xin chào, {user.full_name.split(' ').pop()}
                             </h1>
                             <p className="page-description">
                                 Tổng hợp các thao tác quan trọng nhất cho tài khoản {roleLabel[user.user_type]?.toLowerCase() ?? 'người dùng'} của bạn.

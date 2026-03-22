@@ -1,5 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Users, User, Building2, ShieldAlert, Star, Activity, Newspaper, Award } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import {
+    Users,
+    User,
+    Building2,
+    Activity,
+    Newspaper,
+    Star,
+    Award,
+    Banknote,
+    Images,
+} from 'lucide-react';
 import apiClient from '../../services/api';
 import StatCard from '../../components/dashboard/StatCard';
 import QuickActionCard from '../../components/dashboard/QuickActionCard';
@@ -11,171 +22,225 @@ import BillingToggleSection from '../../components/dashboard/BillingToggleSectio
 import AdminOperationalPanel from '../../components/AdminOperationalPanel';
 import AdminUsersPanel from '../../components/AdminUsersPanel';
 import AdminContentMarketplacePanel from '../../components/AdminContentMarketplacePanel';
+import AdminDashboardShell from '../../components/admin/AdminDashboardShell';
+import {
+    ADMIN_TAB_QUERY_KEY,
+    parseAdminTabParam,
+    type AdminTab,
+} from './adminNavConfig';
 
-type AdminTab =
-    | 'overview'
-    | 'ops'
-    | 'users'
-    | 'content'
-    | 'gyms'
-    | 'reviews'
-    | 'gallery'
-    | 'coach-apps';
+type AdminStats = {
+    total_users: number;
+    total_trainers: number;
+    total_gyms: number;
+    monthly_revenue: number;
+};
 
 const AdminDashboard: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<AdminTab>('overview');
-    const [adminStats, setAdminStats] = useState<{
-        total_users: number; total_trainers: number; total_gyms: number; monthly_revenue: number;
-    } | null>(null);
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    useEffect(() => {
-        apiClient.get('/dashboard/admin/stats')
-            .then(r => setAdminStats(r.data.stats))
-            .catch(() => {/* silently ignore — shows — if failed */});
-    }, []);
-
-    const fmt = (n: number | undefined) => n !== undefined ? n.toLocaleString('vi') : '—';
-
-    const tabBtn = (id: AdminTab, label: string, tabId: string, panelId: string) => (
-        <button
-            role="tab"
-            id={tabId}
-            aria-selected={activeTab === id}
-            aria-controls={panelId}
-            onClick={() => setActiveTab(id)}
-            className={`pb-2 px-1 font-bold text-sm uppercase tracking-wider transition-colors border-b-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-black rounded-lg ${activeTab === id ? 'border-black text-black' : 'border-transparent text-gray-500'}`}
-        >
-            {label}
-        </button>
+    const activeTab = useMemo(
+        () => parseAdminTabParam(searchParams.get(ADMIN_TAB_QUERY_KEY)),
+        [searchParams]
     );
 
+    const setTab = useCallback(
+        (tab: AdminTab) => {
+            if (tab === 'overview') {
+                setSearchParams({}, { replace: true });
+            } else {
+                setSearchParams({ [ADMIN_TAB_QUERY_KEY]: tab }, { replace: true });
+            }
+        },
+        [setSearchParams]
+    );
+
+    const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
+    const [statsLoad, setStatsLoad] = useState<'loading' | 'ok' | 'err'>('loading');
+
+    const loadStats = useCallback(() => {
+        setStatsLoad('loading');
+        apiClient
+            .get('/dashboard/admin/stats')
+            .then((r) => {
+                setAdminStats(r.data.stats);
+                setStatsLoad('ok');
+            })
+            .catch(() => {
+                setAdminStats(null);
+                setStatsLoad('err');
+            });
+    }, []);
+
+    useEffect(() => {
+        loadStats();
+    }, [loadStats]);
+
+    const fmt = useCallback((n: number | undefined) => (n !== undefined ? n.toLocaleString('vi') : '—'), []);
+
+    const statValues = useMemo(() => {
+        if (statsLoad !== 'ok' || !adminStats) {
+            return [
+                { label: 'Người dùng', value: statsLoad === 'loading' ? '…' : '—', icon: <Users className="h-5 w-5 text-blue-600" /> },
+                { label: 'Huấn luyện viên', value: statsLoad === 'loading' ? '…' : '—', icon: <User className="h-5 w-5 text-amber-600" /> },
+                { label: 'Gym center', value: statsLoad === 'loading' ? '…' : '—', icon: <Building2 className="h-5 w-5 text-green-600" /> },
+                {
+                    label: 'Doanh thu tháng',
+                    value: statsLoad === 'loading' ? '…' : '—',
+                    icon: <Banknote className="h-5 w-5 text-emerald-700" />,
+                },
+            ];
+        }
+        return [
+            { label: 'Người dùng', value: fmt(adminStats.total_users), icon: <Users className="h-5 w-5 text-blue-600" /> },
+            { label: 'Huấn luyện viên', value: fmt(adminStats.total_trainers), icon: <User className="h-5 w-5 text-amber-600" /> },
+            { label: 'Gym center', value: fmt(adminStats.total_gyms), icon: <Building2 className="h-5 w-5 text-green-600" /> },
+            {
+                label: 'Doanh thu tháng',
+                value: `${fmt(adminStats.monthly_revenue)}đ`,
+                icon: <Banknote className="h-5 w-5 text-emerald-700" />,
+            },
+        ];
+    }, [adminStats, statsLoad, fmt]);
+
     return (
-        <div className="space-y-8">
-            <div className="flex flex-wrap gap-x-4 gap-y-2 border-b border-gray-200" role="tablist" aria-label="Admin Dashboard Tabs">
-                {tabBtn('overview', 'Tổng quan', 'tab-overview', 'panel-overview')}
-                {tabBtn('ops', 'Vận hành', 'tab-ops', 'panel-ops')}
-                {tabBtn('users', 'Người dùng', 'tab-users', 'panel-users')}
-                {tabBtn('content', 'Tin & TMĐT', 'tab-content', 'panel-content')}
-                {tabBtn('gyms', 'Phê duyệt Gym', 'tab-gyms', 'panel-gyms')}
-                {tabBtn('reviews', 'Đánh giá', 'tab-reviews', 'panel-reviews')}
-                {tabBtn('gallery', 'Gallery', 'tab-gallery', 'panel-gallery')}
-                {tabBtn('coach-apps', 'Đơn Coach', 'tab-coach-apps', 'panel-coach-apps')}
-            </div>
-
+        <AdminDashboardShell activeTab={activeTab} onTabChange={setTab}>
             {activeTab === 'overview' && (
-                <div id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" className="animate-fade-in focus:outline-none" tabIndex={0}>
-                    <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Tổng quan Hệ thống</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                        {[
-                            { label: 'Người dùng', value: fmt(adminStats?.total_users), icon: <Users className="w-5 h-5 text-blue-600" /> },
-                            { label: 'Huấn luyện viên', value: fmt(adminStats?.total_trainers), icon: <User className="w-5 h-5 text-amber-600" /> },
-                            { label: 'Gym Center', value: fmt(adminStats?.total_gyms), icon: <Building2 className="w-5 h-5 text-green-600" /> },
-                            { label: 'Doanh thu/tháng', value: adminStats ? `${fmt(adminStats.monthly_revenue)}đ` : '—', icon: <ShieldAlert className="w-5 h-5 text-red-600" /> },
-                        ].map(stat => (
-                            <StatCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} tone="subtle" />
-                        ))}
-                    </div>
+                <div id="panel-overview" className="animate-fade-in focus:outline-none" tabIndex={0}>
+                    <h2 className="text-h3 mb-4 border-b border-gray-200 pb-2">Tổng quan hệ thống</h2>
 
-                    <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Truy cập nhanh</h3>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                        {[
-                            { onClick: () => setActiveTab('ops'), icon: <Activity className="w-5 h-5" />, title: 'VẬN HÀNH', desc: 'Sức khỏe hệ thống, audit, giao dịch, gói platform' },
-                            { onClick: () => setActiveTab('users'), icon: <Users className="w-5 h-5" />, title: 'NGƯỜI DÙNG', desc: 'Danh sách & tìm kiếm tài khoản' },
-                            { onClick: () => setActiveTab('content'), icon: <Newspaper className="w-5 h-5" />, title: 'TIN & TMĐT', desc: 'Tin tức admin, kiểm duyệt sản phẩm' },
-                            { onClick: () => setActiveTab('gyms'), icon: <Building2 className="w-5 h-5" />, title: 'PHÊ DUYỆT GYM', desc: 'Duyệt hồ sơ Gym Owner mới' },
-                            { onClick: () => setActiveTab('reviews'), icon: <Star className="w-5 h-5" />, title: 'ĐÁNH GIÁ GYM', desc: 'Kiểm duyệt review vi phạm' },
-                            { onClick: () => setActiveTab('gallery'), icon: <Star className="w-5 h-5" />, title: 'GALLERY MẠNG LƯỚI', desc: 'Quản lý khoảnh khắc đẹp' },
-                            { onClick: () => setActiveTab('coach-apps'), icon: <Award className="w-5 h-5" />, title: 'ĐƠN COACH', desc: 'Đơn nâng cấp Athlete → Coach' },
-                        ].map(card => (
-                            <QuickActionCard
-                                key={card.title}
-                                to={undefined as any}
-                                onClick={card.onClick}
-                                icon={card.icon}
-                                title={card.title}
-                                description={card.desc}
+                    {statsLoad === 'err' && (
+                        <div
+                            className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950"
+                            role="alert"
+                        >
+                            <span>Không tải được số liệu. Kiểm tra mạng hoặc quyền admin, rồi thử lại.</span>
+                            <button
+                                type="button"
+                                onClick={() => loadStats()}
+                                className="shrink-0 rounded-md bg-gray-900 px-3 py-1.5 text-xs font-bold text-white hover:bg-gray-800"
+                            >
+                                Thử lại
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+                        {statValues.map((stat) => (
+                            <StatCard
+                                key={stat.label}
+                                label={stat.label}
+                                value={stat.value}
+                                icon={stat.icon}
+                                tone="subtle"
                             />
                         ))}
                     </div>
 
-                    <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Thu phí nền tảng</h3>
+                    <h3 className="text-h3 mb-4 border-b border-gray-200 pb-2">Truy cập nhanh</h3>
+                    <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                        {[
+                            {
+                                tab: 'ops' as const,
+                                icon: <Activity className="h-5 w-5" />,
+                                title: 'Vận hành',
+                                desc: 'Sức khỏe hệ thống, audit, giao dịch, gói platform',
+                            },
+                            {
+                                tab: 'users' as const,
+                                icon: <Users className="h-5 w-5" />,
+                                title: 'Người dùng',
+                                desc: 'Danh sách và tìm kiếm tài khoản',
+                            },
+                            {
+                                tab: 'content' as const,
+                                icon: <Newspaper className="h-5 w-5" />,
+                                title: 'Tin tức & sản phẩm',
+                                desc: 'Bài viết admin và kiểm duyệt sản phẩm marketplace',
+                            },
+                            {
+                                tab: 'gyms' as const,
+                                icon: <Building2 className="h-5 w-5" />,
+                                title: 'Duyệt gym',
+                                desc: 'Phê duyệt hồ sơ gym owner mới',
+                            },
+                            {
+                                tab: 'reviews' as const,
+                                icon: <Star className="h-5 w-5" />,
+                                title: 'Đánh giá gym',
+                                desc: 'Kiểm duyệt review vi phạm',
+                            },
+                            {
+                                tab: 'gallery' as const,
+                                icon: <Images className="h-5 w-5" />,
+                                title: 'Gallery cộng đồng',
+                                desc: 'Quản lý ảnh và nội dung gallery',
+                            },
+                            {
+                                tab: 'coach-apps' as const,
+                                icon: <Award className="h-5 w-5" />,
+                                title: 'Đơn làm coach',
+                                desc: 'Đơn nâng cấp Athlete → Coach',
+                            },
+                        ].map((card) => (
+                            <QuickActionCard
+                                key={card.tab}
+                                onClick={() => setTab(card.tab)}
+                                icon={card.icon}
+                                title={card.title}
+                                description={card.desc}
+                                uppercaseTitle={false}
+                            />
+                        ))}
+                    </div>
+
+                    <h3 className="text-h3 mb-4 border-b border-gray-200 pb-2">Thu phí nền tảng</h3>
                     <BillingToggleSection />
                 </div>
             )}
 
             {activeTab === 'ops' && (
-                <div id="panel-ops" role="tabpanel" aria-labelledby="tab-ops" className="focus:outline-none" tabIndex={0}>
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-black uppercase">Vận hành & giám sát</h3>
-                        <button type="button" onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black">Quay lại</button>
-                    </div>
+                <div id="panel-ops" role="tabpanel" className="focus:outline-none" tabIndex={0}>
                     <AdminOperationalPanel />
                 </div>
             )}
 
             {activeTab === 'users' && (
-                <div id="panel-users" role="tabpanel" aria-labelledby="tab-users" className="focus:outline-none" tabIndex={0}>
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-black uppercase">Người dùng</h3>
-                        <button type="button" onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black">Quay lại</button>
-                    </div>
+                <div id="panel-users" role="tabpanel" className="focus:outline-none" tabIndex={0}>
                     <AdminUsersPanel />
                 </div>
             )}
 
             {activeTab === 'content' && (
-                <div id="panel-content" role="tabpanel" aria-labelledby="tab-content" className="focus:outline-none" tabIndex={0}>
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-black uppercase">Tin tức & Marketplace</h3>
-                        <button type="button" onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black">Quay lại</button>
-                    </div>
+                <div id="panel-content" role="tabpanel" className="focus:outline-none" tabIndex={0}>
                     <AdminContentMarketplacePanel />
                 </div>
             )}
 
             {activeTab === 'gyms' && (
-                <div id="panel-gyms" role="tabpanel" aria-labelledby="tab-gyms" className="focus:outline-none" tabIndex={0}>
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-black uppercase">Hồ sơ chờ phê duyệt</h3>
-                        <button type="button" onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black">Quay lại</button>
-                    </div>
+                <div id="panel-gyms" role="tabpanel" className="focus:outline-none" tabIndex={0}>
                     <AdminGymApproval />
                 </div>
             )}
 
             {activeTab === 'reviews' && (
-                <div id="panel-reviews" role="tabpanel" aria-labelledby="tab-reviews" className="focus:outline-none" tabIndex={0}>
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-black uppercase">Quản lý Đánh giá</h3>
-                        <button type="button" onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black">Quay lại</button>
-                    </div>
+                <div id="panel-reviews" role="tabpanel" className="focus:outline-none" tabIndex={0}>
                     <AdminReviewManagement />
                 </div>
             )}
 
             {activeTab === 'gallery' && (
-                <div id="panel-gallery" role="tabpanel" aria-labelledby="tab-gallery" className="focus:outline-none" tabIndex={0}>
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-black uppercase">Quản lý Community Gallery</h3>
-                        <button type="button" onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black">Quay lại</button>
-                    </div>
+                <div id="panel-gallery" role="tabpanel" className="focus:outline-none" tabIndex={0}>
                     <AdminGalleryManagement />
                 </div>
             )}
 
             {activeTab === 'coach-apps' && (
-                <div id="panel-coach-apps" role="tabpanel" aria-labelledby="tab-coach-apps" className="focus:outline-none" tabIndex={0}>
-                    <div className="flex justify-between items-center mb-6">
-                        <div>
-                            <h3 className="text-xl font-black uppercase">Đơn đăng ký làm Coach</h3>
-                            <p className="text-xs text-gray-500 mt-1">Duyệt hoặc từ chối đơn của Athlete muốn nâng cấp thành Coach</p>
-                        </div>
-                        <button type="button" onClick={() => setActiveTab('overview')} className="text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-black">Quay lại</button>
-                    </div>
+                <div id="panel-coach-apps" role="tabpanel" className="focus:outline-none" tabIndex={0}>
                     <AdminCoachApplications />
                 </div>
             )}
-        </div>
+        </AdminDashboardShell>
     );
 };
 
