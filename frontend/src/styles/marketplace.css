@@ -1150,3 +1150,25 @@ a.marketplace-typo-slot:hover {
   padding: 0; margin: -1px; overflow: hidden;
   clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
+
+/* Coaches directory — align search / sort / city with marketplace surface tokens */
+.marketplace-shell .coaches-dir-control {
+  border-radius: 0.75rem;
+  border-color: var(--mk-line);
+  background-color: var(--mk-paper);
+  color: var(--mk-text);
+  box-shadow: 0 1px 2px rgba(28, 27, 27, 0.04);
+  min-height: 44px;
+}
+.marketplace-shell .coaches-dir-control::placeholder {
+  color: var(--mk-muted);
+  opacity: 0.88;
+}
+.marketplace-shell input.coaches-dir-control:focus-visible,
+.marketplace-shell select.coaches-dir-control:focus-visible {
+  outline: none;
+  border-color: color-mix(in oklab, var(--mk-text) 32%, var(--mk-line));
+  box-shadow:
+    0 0 0 2px var(--mk-paper),
+    0 0 0 4px color-mix(in oklab, var(--mk-text) 14%, transparent);
+}

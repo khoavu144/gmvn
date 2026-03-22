@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { trainerService, type TrainerFilters } from '../services/trainerService';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { ChevronDown } from 'lucide-react';
 import { SPECIALTY_CATEGORIES } from '../data/coachSpecialtyTaxonomy';
 import { CoachDirectoryCard, type CoachDirectoryTrainer } from '../components/coaches/CoachDirectoryCard';
 import '../styles/marketplace.css';
@@ -66,6 +67,9 @@ function FiltersBlock({
     setCity,
     resetFilters,
     hasActiveFilters,
+    sort,
+    setSort,
+    showSortInBlock,
 }: {
     currentType: 'trainer' | 'athlete';
     specialty: string;
@@ -76,9 +80,47 @@ function FiltersBlock({
     setCity: (c: string) => void;
     resetFilters: () => void;
     hasActiveFilters: boolean;
+    sort?: TrainerFilters['sort'];
+    setSort?: (s: TrainerFilters['sort']) => void;
+    showSortInBlock?: boolean;
 }) {
+    const preferredExpandedId = useMemo(() => {
+        if (!specialty) return 'strength';
+        const cat = SPECIALTY_CATEGORIES.find((c) => c.items.includes(specialty));
+        return cat?.id ?? 'strength';
+    }, [specialty]);
+
+    const [expandedCatId, setExpandedCatId] = useState(preferredExpandedId);
+    useEffect(() => {
+        setExpandedCatId(preferredExpandedId);
+    }, [preferredExpandedId]);
+
+    const toggleCategory = (catId: string) => {
+        setExpandedCatId((prev) => (prev === catId ? '' : catId));
+    };
+
     return (
         <div className="space-y-6">
+            {showSortInBlock && sort !== undefined && setSort && (
+                <div>
+                    <label htmlFor="coaches-sort-mobile" className="marketplace-section-kicker mb-2 block">
+                        Sắp xếp
+                    </label>
+                    <select
+                        id="coaches-sort-mobile"
+                        className="form-input coaches-dir-control w-full py-2.5 text-sm font-semibold"
+                        value={sort}
+                        onChange={(e) => setSort(e.target.value as TrainerFilters['sort'])}
+                    >
+                        {SORT_OPTIONS.map((o) => (
+                            <option key={o.value} value={o.value}>
+                                {o.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
+
             <div>
                 <p className="marketplace-section-kicker mb-2">Chuyên môn</p>
                 <div className="space-y-2">
@@ -94,48 +136,72 @@ function FiltersBlock({
                         Tất cả chuyên môn
                     </button>
                     {SPECIALTY_CATEGORIES.map((cat) => {
-                        const isOpenDefault = specialty ? cat.items.includes(specialty) : cat.id === 'strength';
+                        const isOpen = expandedCatId === cat.id;
                         return (
-                            <details
+                            <div
                                 key={cat.id}
-                                className="group rounded-lg border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)]"
-                                open={isOpenDefault}
+                                className="rounded-lg border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)]"
                             >
-                                <summary className="cursor-pointer list-none px-3 py-2.5 text-sm font-bold text-[color:var(--mk-text)] [&::-webkit-details-marker]:hidden">
+                                <button
+                                    type="button"
+                                    id={`coaches-filter-${cat.id}`}
+                                    aria-expanded={isOpen}
+                                    aria-controls={`coaches-filter-panel-${cat.id}`}
+                                    className="flex w-full flex-col rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[color:var(--mk-paper-strong)]/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mk-text)]/15 focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--mk-paper)]"
+                                    onClick={() => toggleCategory(cat.id)}
+                                >
                                     <span className="flex items-center justify-between gap-2">
-                                        {cat.label}
-                                        <span className="text-[color:var(--mk-muted)] text-xs font-normal group-open:rotate-180">▼</span>
+                                        <span className="text-sm font-bold text-[color:var(--mk-text)]">{cat.label}</span>
+                                        <ChevronDown
+                                            className={`h-4 w-4 shrink-0 text-[color:var(--mk-muted)] transition-transform duration-200 ${
+                                                isOpen ? 'rotate-180' : ''
+                                            }`}
+                                            aria-hidden
+                                        />
                                     </span>
                                     <span className="mt-0.5 block text-xs font-normal font-body text-[color:var(--mk-muted)]">
                                         {cat.description}
                                     </span>
-                                </summary>
-                                <div className="flex flex-wrap gap-1.5 border-t border-[color:var(--mk-line)] px-3 py-3">
-                                    {cat.items.map((item) => (
-                                        <button
-                                            key={item}
-                                            type="button"
-                                            className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
-                                                specialty === item
-                                                    ? 'border-[color:var(--mk-text)] bg-[color:var(--mk-text)] text-white'
-                                                    : 'border-[color:var(--mk-line)] bg-white text-[color:var(--mk-text-soft)] hover:border-[color:var(--mk-text)]/25'
-                                            }`}
-                                            onClick={() => setSpecialty(specialty === item ? '' : item)}
-                                        >
-                                            {item}
-                                        </button>
-                                    ))}
+                                </button>
+                                <div
+                                    id={`coaches-filter-panel-${cat.id}`}
+                                    role="region"
+                                    aria-labelledby={`coaches-filter-${cat.id}`}
+                                    hidden={!isOpen}
+                                    className={isOpen ? 'border-t border-[color:var(--mk-line)]' : undefined}
+                                >
+                                    {isOpen ? (
+                                        <div className="flex flex-wrap gap-1.5 px-3 py-3">
+                                            {cat.items.map((item) => (
+                                                <button
+                                                    key={item}
+                                                    type="button"
+                                                    className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-colors ${
+                                                        specialty === item
+                                                            ? 'border-[color:var(--mk-text)] bg-[color:var(--mk-text)] text-white'
+                                                            : 'border-[color:var(--mk-line)] bg-white text-[color:var(--mk-text-soft)] hover:border-[color:var(--mk-text)]/25'
+                                                    }`}
+                                                    onClick={() => setSpecialty(specialty === item ? '' : item)}
+                                                >
+                                                    {item}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    ) : null}
                                 </div>
-                            </details>
+                            </div>
                         );
                     })}
                 </div>
             </div>
 
             <div>
-                <label className="marketplace-section-kicker mb-2 block">Khu vực</label>
+                <label htmlFor="coaches-filter-city" className="marketplace-section-kicker mb-2 block">
+                    Khu vực
+                </label>
                 <select
-                    className="form-input w-full py-2.5 text-sm"
+                    id="coaches-filter-city"
+                    className="form-input coaches-dir-control w-full py-2.5 text-sm"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                 >
@@ -196,6 +262,7 @@ export default function Coaches() {
     const debouncedQ = useDebouncedValue(qInput, 380);
 
     const [showMobileFilters, setShowMobileFilters] = useState(false);
+    const filtersSidebarRef = useRef<HTMLElement>(null);
     const PAGE_SIZE = 12;
 
     const priceRange = PRICE_RANGES[priceIdx];
@@ -384,11 +451,11 @@ export default function Coaches() {
                                 : 'Lọc theo nhóm chuyên môn, khu vực và ngân sách — rồi mở hồ sơ để xem phong cách đồng hành có hợp bạn không.'}
                         </p>
 
-                        <div className="mt-5 flex flex-wrap gap-2">
+                        <div className="mt-5 flex flex-wrap items-center gap-2">
                             <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[color:var(--mk-muted)]">
                                 Gợi ý nhanh:
                             </span>
-                            {SPECIALTY_CATEGORIES.slice(0, 5).map((cat) => (
+                            {SPECIALTY_CATEGORIES.map((cat) => (
                                 <button
                                     key={cat.id}
                                     type="button"
@@ -398,6 +465,24 @@ export default function Coaches() {
                                     {cat.label}
                                 </button>
                             ))}
+                            <button
+                                type="button"
+                                className="rounded-full border border-dashed border-[color:var(--mk-muted)]/50 bg-[color:var(--mk-paper)] px-3 py-1 text-xs font-semibold text-[color:var(--mk-text-soft)] transition hover:border-[color:var(--mk-text)]/30 hover:text-[color:var(--mk-text)]"
+                                onClick={() => {
+                                    if (typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches) {
+                                        filtersSidebarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    } else {
+                                        setShowMobileFilters(true);
+                                        requestAnimationFrame(() => {
+                                            document
+                                                .getElementById('coaches-mobile-filters-panel')
+                                                ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                        });
+                                    }
+                                }}
+                            >
+                                Tất cả nhóm
+                            </button>
                         </div>
                     </div>
 
@@ -426,7 +511,7 @@ export default function Coaches() {
                     </aside>
                 </section>
 
-                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-stretch">
                     <div className="relative min-w-0 flex-1 sm:max-w-xl">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                             <svg className="h-4 w-4 text-[color:var(--mk-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -435,7 +520,7 @@ export default function Coaches() {
                         </div>
                         <input
                             type="search"
-                            className="form-input w-full pl-10"
+                            className="form-input coaches-dir-control w-full pl-10"
                             placeholder="Tìm theo tên, chuyên môn hoặc từ khóa..."
                             aria-label="Tìm kiếm Coach và VĐV"
                             value={qInput}
@@ -445,10 +530,10 @@ export default function Coaches() {
 
                     <button
                         type="button"
-                        className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-bold transition-colors lg:hidden ${
+                        className={`flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border px-4 text-sm font-bold transition-colors sm:w-auto lg:hidden ${
                             showMobileFilters || hasActiveFilters
                                 ? 'border-[color:var(--mk-text)] bg-[color:var(--mk-text)] text-white'
-                                : 'border-[color:var(--mk-line)] text-[color:var(--mk-text)]'
+                                : 'border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] text-[color:var(--mk-text)] shadow-sm'
                         }`}
                         onClick={() => setShowMobileFilters((v) => !v)}
                     >
@@ -456,8 +541,12 @@ export default function Coaches() {
                         {hasActiveFilters && <span className="rounded-full bg-white/20 px-1.5 text-xs">•</span>}
                     </button>
 
+                    <label htmlFor="coaches-sort-desktop" className="sr-only">
+                        Sắp xếp kết quả
+                    </label>
                     <select
-                        className="form-input min-w-[10rem] py-2.5 text-sm font-semibold"
+                        id="coaches-sort-desktop"
+                        className="form-input coaches-dir-control hidden min-w-[10rem] py-2.5 text-sm font-semibold lg:block lg:w-auto"
                         value={sort}
                         onChange={(e) => setSort(e.target.value as TrainerFilters['sort'])}
                     >
@@ -470,7 +559,10 @@ export default function Coaches() {
                 </div>
 
                 {showMobileFilters && (
-                    <div className="mb-6 rounded-xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] p-4 lg:hidden">
+                    <div
+                        id="coaches-mobile-filters-panel"
+                        className="mb-6 rounded-xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] p-4 lg:hidden"
+                    >
                         <FiltersBlock
                             currentType={currentType}
                             specialty={specialty}
@@ -481,12 +573,15 @@ export default function Coaches() {
                             setCity={setCity}
                             resetFilters={resetFilters}
                             hasActiveFilters={hasActiveFilters}
+                            sort={sort}
+                            setSort={setSort}
+                            showSortInBlock
                         />
                     </div>
                 )}
 
                 <div className="grid gap-8 lg:grid-cols-[minmax(240px,280px)_minmax(0,1fr)] lg:items-start">
-                    <aside className="hidden lg:block">
+                    <aside ref={filtersSidebarRef} id="coaches-filters-sidebar" className="hidden lg:block">
                         <div className="sticky top-[calc(var(--header-height,56px)+1rem)] rounded-xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] p-5 shadow-sm">
                             <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-[color:var(--mk-muted)]">
                                 Lọc chi tiết
@@ -543,13 +638,48 @@ export default function Coaches() {
                                 </button>
                             </div>
                         ) : data?.trainers.length === 0 ? (
-                            <div className="marketplace-panel marketplace-empty text-center">
-                                <p className="text-sm font-medium text-[color:var(--mk-text)]">Chưa có hồ sơ phù hợp.</p>
-                                {hasActiveFilters && (
-                                    <button type="button" className="mt-3 font-bold underline" onClick={resetFilters}>
-                                        Xoá bộ lọc
-                                    </button>
-                                )}
+                            <div className="marketplace-panel marketplace-empty mx-auto max-w-lg text-center">
+                                <p className="text-base font-semibold text-[color:var(--mk-text)]">Chưa có hồ sơ phù hợp.</p>
+                                <p className="mt-2 text-sm leading-relaxed text-[color:var(--mk-muted)]">
+                                    {hasActiveFilters
+                                        ? 'Thử nới lỏng bộ lọc hoặc quay lại danh sách mặc định — đôi khi chỉ cần bỏ một điều kiện là đủ lựa chọn mới xuất hiện.'
+                                        : 'Danh sách đang trống hoặc chưa có hồ sơ công khai trong mục này. Bạn có thể tạo hồ sơ của riêng mình hoặc quay lại sau.'}
+                                </p>
+                                <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+                                    {hasActiveFilters ? (
+                                        <>
+                                            <button
+                                                type="button"
+                                                className="btn-primary px-5 py-2.5 text-sm font-bold"
+                                                onClick={resetFilters}
+                                            >
+                                                Xoá bộ lọc
+                                            </button>
+                                            <Link
+                                                to={currentType === 'athlete' ? '/coaches?type=athlete' : '/coaches'}
+                                                className="btn-secondary px-5 py-2.5 text-center text-sm font-bold"
+                                            >
+                                                {currentType === 'athlete'
+                                                    ? 'Về danh sách VĐV (mặc định)'
+                                                    : 'Về danh sách Coach (mặc định)'}
+                                            </Link>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Link
+                                                to={currentType === 'athlete' ? '/coaches?type=athlete' : '/coaches'}
+                                                className="btn-secondary px-5 py-2.5 text-center text-sm font-bold"
+                                            >
+                                                {currentType === 'athlete'
+                                                    ? 'Về danh sách VĐV (mặc định)'
+                                                    : 'Về danh sách Coach (mặc định)'}
+                                            </Link>
+                                            <Link to="/register" className="btn-primary px-5 py-2.5 text-center text-sm font-bold">
+                                                Tạo hồ sơ
+                                            </Link>
+                                        </>
+                                    )}
+                                </div>
                             </div>
                         ) : (
                             <>
