@@ -12,6 +12,8 @@
     "migrate:run": "ts-node src/scripts/runMigrations.ts",
     "bundle:supabase-sql": "node scripts/bundle-sql-migrations.mjs",
     "seed": "ts-node src/seeds/fullSeed.ts",
+    "seed:check": "ts-node src/scripts/checkSeedDataset.ts",
+    "seed:images": "ts-node src/scripts/validateSeedImages.ts",
     "patch:balm": "ts-node src/scripts/patchBalmImage.ts",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
