@@ -1,15 +1,30 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
 import type { RootState } from '../store/store';
 import apiClient from '../services/api';
-
-import CoachDashboard from './dashboard/CoachDashboard';
-import AthleteDashboard from './dashboard/AthleteDashboard';
 import type { OverviewData } from './dashboard/AthleteDashboard';
-import UserDashboard from './dashboard/UserDashboard';
-import AdminDashboard from './dashboard/AdminDashboard';
+
+const CoachDashboard = lazy(() => import('./dashboard/CoachDashboard'));
+const AthleteDashboard = lazy(() => import('./dashboard/AthleteDashboard'));
+const UserDashboard = lazy(() => import('./dashboard/UserDashboard'));
+const AdminDashboard = lazy(() => import('./dashboard/AdminDashboard'));
+
+function DashboardRoleFallback() {
+    return (
+        <div
+            className="flex min-h-[220px] items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50/80"
+            aria-busy="true"
+            aria-live="polite"
+        >
+            <div
+                className="h-9 w-9 animate-spin rounded-full border-2 border-gray-200 border-t-gray-900"
+                aria-hidden
+            />
+        </div>
+    );
+}
 
 export default function Dashboard() {
     const user = useSelector((state: RootState) => state.auth.user);
@@ -42,7 +57,7 @@ export default function Dashboard() {
                 <meta name="description" content="Quản lý hồ sơ, tin nhắn, và các tính năng nâng cao trên GYMERVIET." />
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
-            <div className="bg-white border-b border-[color:var(--mk-line)]">
+            <div className="bg-white border-b border-gray-200">
                 <div className="page-container py-6">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div>
@@ -67,10 +82,12 @@ export default function Dashboard() {
             </div>
 
             <div className="page-container py-8">
-                {user.user_type === 'trainer' && <CoachDashboard overview={overview} />}
-                {user.user_type === 'athlete' && <AthleteDashboard overview={overview} />}
-                {user.user_type === 'user' && <UserDashboard />}
-                {user.user_type === 'admin' && <AdminDashboard />}
+                <Suspense fallback={<DashboardRoleFallback />}>
+                    {user.user_type === 'trainer' && <CoachDashboard overview={overview} />}
+                    {user.user_type === 'athlete' && <AthleteDashboard overview={overview} />}
+                    {user.user_type === 'user' && <UserDashboard />}
+                    {user.user_type === 'admin' && <AdminDashboard />}
+                </Suspense>
                 {user.user_type === 'gym_owner' && <Navigate to="/gym-owner" replace />}
             </div>
         </div>

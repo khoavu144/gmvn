@@ -84,6 +84,10 @@ const CommunityGallery = lazyWithChunkRetry(() => import('./pages/CommunityGalle
 const PricingPage = lazyWithChunkRetry(() => import('./pages/PricingPage'), 'pricing');
 const MarketplacePage = lazyWithChunkRetry(() => import('./pages/MarketplacePage'), 'marketplace');
 const ProductDetailPage = lazyWithChunkRetry(() => import('./pages/ProductDetailPage'), 'product-detail');
+const SellerMarketplaceListPage = lazyWithChunkRetry(() => import('./pages/seller/SellerMarketplaceListPage'), 'seller-marketplace');
+const SellerProductNewPage = lazyWithChunkRetry(() => import('./pages/seller/SellerProductNewPage'), 'seller-product-new');
+const SellerTrainingPackageNewPage = lazyWithChunkRetry(() => import('./pages/seller/SellerTrainingPackageNewPage'), 'seller-training-new');
+const SellerProductEditPage = lazyWithChunkRetry(() => import('./pages/seller/SellerProductEditPage'), 'seller-product-edit');
 const NewsPage = lazyWithChunkRetry(() => import('./pages/NewsPage'), 'news');
 const NewsDetailPage = lazyWithChunkRetry(() => import('./pages/NewsDetailPage'), 'news-detail');
 
@@ -228,6 +232,10 @@ const router = createBrowserRouter([
       { path: '/reset-password', element: lazyRoute(<ResetPassword />) },
       { path: '/dashboard', element: lazyRoute(<ProtectedRoute><Dashboard /></ProtectedRoute>) },
       { path: '/dashboard/subscriptions', element: lazyRoute(<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>) },
+      { path: '/dashboard/marketplace', element: lazyRoute(<ProtectedRoute><SellerMarketplaceListPage /></ProtectedRoute>) },
+      { path: '/dashboard/marketplace/new', element: lazyRoute(<ProtectedRoute><SellerProductNewPage /></ProtectedRoute>) },
+      { path: '/dashboard/marketplace/new/training', element: lazyRoute(<ProtectedRoute><SellerTrainingPackageNewPage /></ProtectedRoute>) },
+      { path: '/dashboard/marketplace/edit/:productId', element: lazyRoute(<ProtectedRoute><SellerProductEditPage /></ProtectedRoute>) },
       { path: '/coaches', element: lazyRoute(<Coaches />) },
       { path: '/coaches/:trainerId', element: lazyRoute(<CoachDetail />) },
       // SEO permalink route: fallback to coach detail by slug when public CV profile is not available

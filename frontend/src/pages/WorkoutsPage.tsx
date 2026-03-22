@@ -74,10 +74,10 @@ export default function WorkoutsPage() {
                 </section>
 
                 {subs.length === 0 ? (
-                    <div className="empty-state border-dashed border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] mt-4 rounded-lg max-w-2xl mx-auto">
+                    <div className="empty-state border-dashed border-gray-200 bg-gray-50 mt-4 rounded-lg max-w-2xl mx-auto">
                         <div className="text-4xl mb-4">🎯</div>
-                        <h3 className="text-lg font-bold text-[color:var(--mk-text)] mb-2">Chưa có lộ trình tập luyện</h3>
-                        <p className="text-sm text-[color:var(--mk-muted)] mb-6 max-w-sm mx-auto">
+                        <h3 className="text-lg font-bold text-gray-900 mb-2">Chưa có lộ trình tập luyện</h3>
+                        <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
                             Khi bạn đăng ký học với Coach, các bài tập chi tiết theo từng ngày sẽ xuất hiện tại đây để bạn dễ dàng theo dõi.
                         </p>
                         <button onClick={() => navigate('/coaches')} className="btn-primary px-6 text-sm">
@@ -115,23 +115,23 @@ export default function WorkoutsPage() {
                             <div className="space-y-6 animate-pulse">
                                 {[1, 2, 3].map(i => (
                                     <div key={i} className="page-section">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-[color:var(--mk-line)] pb-4">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-gray-200 pb-4">
                                             <div className="space-y-2 w-full sm:w-1/2">
-                                                <div className="h-4 bg-[color:var(--mk-paper-strong)] w-24 rounded-sm"></div>
-                                                <div className="h-6 bg-[color:var(--mk-paper-strong)] w-3/4 rounded-sm"></div>
+                                                <div className="h-4 bg-gray-100 w-24 rounded-sm"></div>
+                                                <div className="h-6 bg-gray-100 w-3/4 rounded-sm"></div>
                                             </div>
                                             <div className="hidden sm:flex items-center gap-2">
-                                                <div className="h-10 w-48 bg-[color:var(--mk-paper)] rounded-sm"></div>
-                                                <div className="h-10 w-28 bg-[color:var(--mk-paper-strong)] rounded-sm"></div>
+                                                <div className="h-10 w-48 bg-gray-50 rounded-sm"></div>
+                                                <div className="h-10 w-28 bg-gray-100 rounded-sm"></div>
                                             </div>
                                         </div>
                                         <div className="space-y-4">
                                             {[1, 2].map(j => (
                                                 <div key={j} className="flex items-start gap-3">
-                                                    <div className="w-5 h-5 rounded-full bg-[color:var(--mk-paper-strong)] shrink-0 mt-0.5"></div>
+                                                    <div className="w-5 h-5 rounded-full bg-gray-100 shrink-0 mt-0.5"></div>
                                                     <div className="space-y-2 w-full">
-                                                        <div className="h-4 bg-[color:var(--mk-paper-strong)] w-1/3 rounded-sm"></div>
-                                                        <div className="h-3 bg-[color:var(--mk-paper-strong)] w-1/4 rounded-sm"></div>
+                                                        <div className="h-4 bg-gray-100 w-1/3 rounded-sm"></div>
+                                                        <div className="h-3 bg-gray-100 w-1/4 rounded-sm"></div>
                                                     </div>
                                                 </div>
                                             ))}
@@ -140,25 +140,25 @@ export default function WorkoutsPage() {
                                 ))}
                             </div>
                         ) : workouts.length === 0 ? (
-                            <div className="empty-state border-dashed text-sm text-[color:var(--mk-muted)]">
+                            <div className="empty-state border-dashed text-sm text-gray-500">
                                 <div className="empty-state-number">{selectedWeek}</div>
-                                <p className="text-sm font-medium text-[color:var(--mk-text-soft)]">Tuần {selectedWeek} chưa có lịch tập.</p>
+                                <p className="text-sm font-medium text-gray-600">Tuần {selectedWeek} chưa có lịch tập.</p>
                             </div>
                         ) : (
                             <div className="space-y-6">
                                 {workouts.map(w => {
                                     const isDone = loggedIds.has(w.id);
                                     return (
-                                        <div key={w.id} className={`page-section ${isDone ? 'bg-[color:var(--mk-paper)]' : ''}`}>
-                                            <div className="mb-4 flex flex-col justify-between gap-4 border-b border-[color:var(--mk-line)] pb-4 sm:flex-row sm:items-center">
+                                        <div key={w.id} className={`page-section ${isDone ? 'bg-gray-50' : ''}`}>
+                                            <div className="mb-4 flex flex-col justify-between gap-4 border-b border-gray-200 pb-4 sm:flex-row sm:items-center">
                                                 <div>
                                                     <div className="mb-1 flex items-center gap-2">
                                                         <span className="page-pill">
                                                             {w.day_number ? dayNames[w.day_number] : 'Chưa xếp ngày'}
                                                         </span>
-                                                        {w.duration_minutes && <span className="text-xs font-medium text-[color:var(--mk-muted)]">{w.duration_minutes} phút</span>}
+                                                        {w.duration_minutes && <span className="text-xs font-medium text-gray-500">{w.duration_minutes} phút</span>}
                                                     </div>
-                                                    <h3 className={`text-lg font-bold tracking-tight ${isDone ? 'text-[color:var(--mk-muted)] line-through' : 'text-black'}`}>
+                                                    <h3 className={`text-lg font-bold tracking-tight ${isDone ? 'text-gray-500 line-through' : 'text-black'}`}>
                                                         {w.name || `Buổi tập ngày ${w.day_number}`}
                                                     </h3>
                                                 </div>
@@ -172,7 +172,7 @@ export default function WorkoutsPage() {
                                                         />
                                                     )}
                                                     <button onClick={() => handleLog(w.id)} disabled={isDone}
-                                                        className={`shrink-0 ${isDone ? 'btn-secondary border-transparent bg-[color:var(--mk-paper)] text-[color:var(--mk-muted)] shadow-none' : 'btn-primary'}`}>
+                                                        className={`shrink-0 ${isDone ? 'btn-secondary border-transparent bg-gray-50 text-gray-500 shadow-none' : 'btn-primary'}`}>
                                                         {isDone ? 'Đã hoàn thành' : 'Đánh dấu xong'}
                                                     </button>
                                                 </div>
@@ -182,10 +182,10 @@ export default function WorkoutsPage() {
                                                 <div className="space-y-3">
                                                     {w.exercises.map((ex, i) => (
                                                         <div key={ex.id} className={`flex items-start gap-3 text-sm ${isDone ? 'opacity-60' : ''}`}>
-                                                            <span className="w-5 h-5 rounded-full bg-[color:var(--mk-paper)] flex items-center justify-center text-[10px] font-bold text-[color:var(--mk-muted)] flex-shrink-0 mt-0.5">{i + 1}</span>
+                                                            <span className="w-5 h-5 rounded-full bg-gray-50 flex items-center justify-center text-[10px] font-bold text-gray-500 flex-shrink-0 mt-0.5">{i + 1}</span>
                                                             <div className="flex-1">
-                                                                <div className="font-semibold text-[color:var(--mk-text)]">{ex.exercise_name}</div>
-                                                                <div className="text-xs font-medium text-[color:var(--mk-muted)] mt-0.5 flex flex-wrap gap-x-3 gap-y-1">
+                                                                <div className="font-semibold text-gray-900">{ex.exercise_name}</div>
+                                                                <div className="text-xs font-medium text-gray-500 mt-0.5 flex flex-wrap gap-x-3 gap-y-1">
                                                                     {ex.sets && <span>{ex.sets} set</span>}
                                                                     {ex.reps_min && <span>{ex.reps_min}{ex.reps_max && ex.reps_max !== ex.reps_min ? `-${ex.reps_max}` : ''} reps</span>}
                                                                     {ex.rest_seconds && <span>{ex.rest_seconds}s nghỉ</span>}
@@ -195,7 +195,7 @@ export default function WorkoutsPage() {
                                                     ))}
                                                 </div>
                                             ) : (
-                                                <div className="text-sm text-[color:var(--mk-muted)] italic">Chưa có bài tập nào.</div>
+                                                <div className="text-sm text-gray-500 italic">Chưa có bài tập nào.</div>
                                             )}
                                         </div>
                                     )

@@ -26,6 +26,8 @@ import shareRoutes from './routes/share';
 import platformSubscriptionRoutes from './routes/platformSubscription';
 import marketplaceRoutes from './routes/marketplace';
 import newsRoutes from './routes/news';
+import googleFormIngestRoutes from './routes/googleFormIngest';
+import userProfileCatalogRoutes from './routes/userProfileCatalog';
 import { generateSitemap } from './controllers/sitemapController';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
@@ -48,11 +50,12 @@ app.set('trust proxy', 1);
 app.get('/sitemap.xml', generateSitemap);
 
 // Middleware
+// Share HTML at /share/* uses inline <style> only; no inline scripts (meta refresh + link).
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'"],
+            scriptSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             imgSrc: ["'self'", "data:", "https:"],
@@ -115,6 +118,7 @@ app.use('/api/v1/dashboard', dashboardRoutes);
 // Workout progress routes mount at root (they mix /subscriptions and /users paths)
 app.use('/api/v1', workoutProgressRoutes);
 app.use('/api/v1/profiles', profileRoutes);
+app.use('/api/v1/user-profile', userProfileCatalogRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/admin', adminRoutes);
 // Gym Center Module
@@ -135,6 +139,7 @@ app.use('/share', shareRoutes);
 app.use('/api/v1/marketplace', marketplaceRoutes);
 // News / Tin Tức
 app.use('/api/v1/news', newsRoutes);
+app.use('/api/v1/integrations/google-form', googleFormIngestRoutes);
 
 // Health check (Public standard mode - P0-4 Security Fix)
 app.get('/api/v1/health', (_req, res) => {

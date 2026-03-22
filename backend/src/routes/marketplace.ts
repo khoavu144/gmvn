@@ -37,14 +37,23 @@ router.post('/products/:productId/reviews', authenticate, ctrl.createReview);
 // POST /api/marketplace/seller/register
 router.post('/seller/register', authenticate, ctrl.registerSeller);
 
+// GET /api/marketplace/seller/profile — current user's seller shop profile (or null)
+router.get('/seller/profile', authenticate, ctrl.getMySellerProfile);
+
 // GET /api/marketplace/seller/products
 router.get('/seller/products', authenticate, ctrl.sellerListProducts);
+
+// GET /api/marketplace/seller/products/:id — one product (seller), with training_package
+router.get('/seller/products/:id', authenticate, ctrl.sellerGetProductById);
 
 // POST /api/marketplace/seller/products — create any product
 router.post('/seller/products', authenticate, ctrl.sellerCreateProduct);
 
 // POST /api/marketplace/seller/products/training-package — create training pkg
 router.post('/seller/products/training-package', authenticate, ctrl.sellerCreateTrainingPackage);
+
+// PUT /api/marketplace/seller/products/:id/training-package — update training package (seller)
+router.put('/seller/products/:id/training-package', authenticate, ctrl.sellerUpdateTrainingPackage);
 
 // PUT /api/marketplace/seller/products/:id
 router.put('/seller/products/:id', authenticate, ctrl.sellerUpdateProduct);

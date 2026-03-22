@@ -14,6 +14,8 @@ export interface User {
     is_verified?: boolean;
     onboarding_completed?: boolean;
     gym_owner_status?: 'pending_review' | 'approved' | 'rejected' | null;
+    /** Allows more than one marketplace listing (second+ product). */
+    marketplace_membership_active?: boolean;
     created_at: string;
     updated_at?: string;
     profile_slug?: string | null; // for /coach/:slug URL

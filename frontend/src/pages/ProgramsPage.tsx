@@ -84,7 +84,7 @@ const prereqOptions = [
     { value: 'Cần tạ đơn cơ bản', label: 'Thiết bị cơ bản (Dumbbell/Band)' },
 ];
 
-const InputFallback = () => <div className="h-10 w-full animate-pulse rounded-xs bg-[color:var(--mk-paper)]" />;
+const InputFallback = () => <div className="h-10 w-full animate-pulse rounded-xs bg-gray-50" />;
 
 export default function ProgramsPage() {
     const { toast, ToastComponent } = useToast();
@@ -235,16 +235,16 @@ export default function ProgramsPage() {
                 {/* Create/Edit Form */}
                 {showForm && (
                     <div className="card mb-8 border-black shadow-sm overflow-visible">
-                        <div className="flex items-center justify-between border-b border-[color:var(--mk-line)] pb-4 mb-6">
+                        <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
                             <h2 className="text-xl font-bold text-black m-0">{editingId ? 'Chỉnh sửa gói tập' : 'Tạo gói tập mới'}</h2>
-                            <button onClick={() => setShowForm(false)} className="text-[color:var(--mk-muted)] hover:text-black text-sm font-medium">Đóng</button>
+                            <button onClick={() => setShowForm(false)} className="text-gray-500 hover:text-black text-sm font-medium">Đóng</button>
                         </div>
 
                         <div className="space-y-8">
 
                             {/* Core Info */}
                             <section>
-                                <h3 className="text-sm font-bold uppercase tracking-wider text-[color:var(--mk-muted)] mb-4">1. Thông tin cơ bản</h3>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">1. Thông tin cơ bản</h3>
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                                         <div className="sm:col-span-2">
@@ -263,14 +263,14 @@ export default function ProgramsPage() {
                                         <label className="form-label">Ảnh bìa minh hoạ (Tỷ lệ dẹt)</label>
                                         <div className="flex flex-col sm:flex-row items-center gap-4">
                                             {form.cover_image_url ? (
-                                                <div className="relative w-full sm:w-64 aspect-[16/9] bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] rounded overflow-hidden flex-shrink-0">
+                                                <div className="relative w-full sm:w-64 aspect-[16/9] bg-gray-50 border border-gray-200 rounded overflow-hidden flex-shrink-0">
                                                     <img src={form.cover_image_url} alt="Cover" className="w-full h-full object-cover" />
                                                     <button type="button" onClick={() => setForm(f => ({ ...f, cover_image_url: '' }))} className="absolute top-2 right-2 bg-white/90 text-black px-2 py-1 rounded text-xs font-medium hover:bg-white transition shadow">
                                                         Xóa
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <div className="w-full sm:w-64 aspect-[16/9] bg-[color:var(--mk-paper)] border-2 border-dashed border-[color:var(--mk-line)] rounded flex flex-col items-center justify-center text-[color:var(--mk-muted)] flex-shrink-0">
+                                                <div className="w-full sm:w-64 aspect-[16/9] bg-gray-50 border-2 border-dashed border-gray-200 rounded flex flex-col items-center justify-center text-gray-500 flex-shrink-0">
                                                     <i className="fi fi-rr-picture text-2xl mb-1"></i>
                                                     <span className="text-xs font-medium">Chưa có ảnh</span>
                                                 </div>
@@ -280,7 +280,7 @@ export default function ProgramsPage() {
                                                 <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="btn-secondary text-sm">
                                                     {isUploading ? 'Đang tải lên...' : 'Tải lên từ thiết bị'}
                                                 </button>
-                                                <p className="text-xs text-[color:var(--mk-muted)] mt-2">Nên dùng ảnh chụp Form khách hàng thực tế hoặc không gian phòng tập.</p>
+                                                <p className="text-xs text-gray-500 mt-2">Nên dùng ảnh chụp Form khách hàng thực tế hoặc không gian phòng tập.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -294,7 +294,7 @@ export default function ProgramsPage() {
 
                             {/* Details */}
                             <section>
-                                <h3 className="text-sm font-bold uppercase tracking-wider text-[color:var(--mk-muted)] mb-4">2. Đối tượng & Chi tiết</h3>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">2. Đối tượng & Chi tiết</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div>
                                         <label className="form-label">Mục tiêu hình thể</label>
@@ -375,9 +375,9 @@ export default function ProgramsPage() {
 
                             {/* Pricing */}
                             <section>
-                                <h3 className="text-sm font-bold uppercase tracking-wider text-[color:var(--mk-muted)] mb-4">3. Cấu trúc giá</h3>
-                                <div className="bg-[color:var(--mk-paper)] p-4 border border-[color:var(--mk-line)] rounded-md">
-                                    <div className="flex gap-4 mb-4 border-b border-[color:var(--mk-line)] pb-4">
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">3. Cấu trúc giá</h3>
+                                <div className="bg-gray-50 p-4 border border-gray-200 rounded-md">
+                                    <div className="flex gap-4 mb-4 border-b border-gray-200 pb-4">
                                         {pricingTypeOptions.map(opt => (
                                             <label key={opt.id} className="flex items-center gap-2 cursor-pointer font-medium text-sm">
                                                 <input
@@ -386,7 +386,7 @@ export default function ProgramsPage() {
                                                     value={opt.id}
                                                     checked={form.pricing_type === opt.id}
                                                     onChange={() => setForm(f => ({ ...f, pricing_type: opt.id as any }))}
-                                                    className="text-black border-[color:var(--mk-line)] focus:ring-black"
+                                                    className="text-black border-gray-200 focus:ring-black"
                                                 />
                                                 {opt.title}
                                             </label>
@@ -409,13 +409,13 @@ export default function ProgramsPage() {
                                         <div>
                                             <label className="form-label">Mức phí mỗi buổi tập (VNĐ)</label>
                                             <input type="number" value={form.price_per_session} onChange={e => setForm(f => ({ ...f, price_per_session: e.target.value }))} className="form-input md:w-1/2" placeholder="VD: 300000" />
-                                            <p className="text-xs text-[color:var(--mk-muted)] mt-1">Dành cho các gói yêu cầu mua theo số lượng buổi trực tiếp.</p>
+                                            <p className="text-xs text-gray-500 mt-1">Dành cho các gói yêu cầu mua theo số lượng buổi trực tiếp.</p>
                                         </div>
                                     )}
                                 </div>
                             </section>
 
-                            <div className="flex justify-end gap-3 pt-6 border-t border-[color:var(--mk-line)]">
+                            <div className="flex justify-end gap-3 pt-6 border-t border-gray-200">
                                 <button onClick={() => { setShowForm(false); setEditingId(null); }} className="btn-secondary px-6 py-2.5">Thoát</button>
                                 <button onClick={handleSubmit} disabled={saving || !form.name.trim()}
                                     className="btn-primary px-8 py-2.5 text-sm">
@@ -432,20 +432,20 @@ export default function ProgramsPage() {
                         {loading ? (
                             <div className="grid grid-cols-1 gap-6 animate-pulse">
                                 {[1, 2, 3].map(i => (
-                                    <div key={i} className="card !p-0 flex flex-col sm:flex-row shadow-sm border border-[color:var(--mk-line)]">
-                                        <div className="sm:w-48 aspect-[16/9] sm:aspect-auto bg-[color:var(--mk-paper-strong)]"></div>
+                                    <div key={i} className="card !p-0 flex flex-col sm:flex-row shadow-sm border border-gray-200">
+                                        <div className="sm:w-48 aspect-[16/9] sm:aspect-auto bg-gray-100"></div>
                                         <div className="p-5 flex-1 flex flex-col justify-center">
                                             <div className="flex justify-between items-start mb-3">
-                                                <div className="h-6 bg-[color:var(--mk-paper-strong)] w-1/2 rounded-full"></div>
-                                                <div className="h-6 bg-[color:var(--mk-paper-strong)] w-16 rounded-full"></div>
+                                                <div className="h-6 bg-gray-100 w-1/2 rounded-full"></div>
+                                                <div className="h-6 bg-gray-100 w-16 rounded-full"></div>
                                             </div>
                                             <div className="space-y-2 mb-4">
-                                                <div className="h-3 bg-[color:var(--mk-paper-strong)] w-full rounded-sm"></div>
-                                                <div className="h-3 bg-[color:var(--mk-paper-strong)] w-5/6 rounded-sm"></div>
+                                                <div className="h-3 bg-gray-100 w-full rounded-sm"></div>
+                                                <div className="h-3 bg-gray-100 w-5/6 rounded-sm"></div>
                                             </div>
                                             <div className="flex gap-2">
-                                                <div className="h-5 bg-[color:var(--mk-paper-strong)] w-12 rounded-sm"></div>
-                                                <div className="h-5 bg-[color:var(--mk-paper-strong)] w-16 rounded-sm"></div>
+                                                <div className="h-5 bg-gray-100 w-12 rounded-sm"></div>
+                                                <div className="h-5 bg-gray-100 w-16 rounded-sm"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -458,7 +458,7 @@ export default function ProgramsPage() {
                             </div>
                         ) : programs.length === 0 ? (
                             <div className="card text-center py-16 border-dashed">
-                                <p className="text-[color:var(--mk-muted)] text-sm">Bạn chưa thiết lập gói huấn luyện nào.</p>
+                                <p className="text-gray-500 text-sm">Bạn chưa thiết lập gói huấn luyện nào.</p>
                                 <button onClick={() => { setShowForm(true); setEditingId(null); setForm(defaultForm); }} className="mt-4 text-black font-semibold underline text-sm">Tạo gói đầu tiên ngay</button>
                             </div>
                         ) : (
@@ -471,11 +471,11 @@ export default function ProgramsPage() {
                                     return (
                                         <div key={prog.id} className="card overflow-hidden !p-0 flex flex-col sm:flex-row">
                                             {/* Thumbnail area */}
-                                            <div className="sm:w-48 bg-[color:var(--mk-paper)] aspect-[16/9] sm:aspect-auto flex-shrink-0 relative">
+                                            <div className="sm:w-48 bg-gray-50 aspect-[16/9] sm:aspect-auto flex-shrink-0 relative">
                                                 {prog.cover_image_url ? (
                                                     <img src={prog.cover_image_url} alt="" className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-[color:var(--mk-muted)] bg-[color:var(--mk-paper)]">
+                                                    <div className="w-full h-full flex items-center justify-center text-gray-500 bg-gray-50">
                                                         <i className="fi fi-rr-dumbbell text-2xl"></i>
                                                     </div>
                                                 )}
@@ -496,23 +496,23 @@ export default function ProgramsPage() {
                                                     <h3 className="font-bold text-lg text-black m-0 leading-tight">{prog.name}</h3>
                                                     <span className="text-black font-bold whitespace-nowrap">{priceText}</span>
                                                 </div>
-                                                <p className="text-sm text-[color:var(--mk-text-soft)] line-clamp-2 mb-4">{prog.description}</p>
+                                                <p className="text-sm text-gray-600 line-clamp-2 mb-4">{prog.description}</p>
 
                                                 <div className="flex flex-wrap gap-1.5 mt-auto">
-                                                    {prog.duration_weeks && <span className="text-[10px] bg-[color:var(--mk-paper)] text-[color:var(--mk-text-soft)] px-2 py-1 rounded-xs font-medium">{prog.duration_weeks} tuần</span>}
+                                                    {prog.duration_weeks && <span className="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-xs font-medium">{prog.duration_weeks} tuần</span>}
                                                     {prog.training_goals?.slice(0, 2).map(g => (
-                                                        <span key={g} className="text-[10px] bg-[color:var(--mk-paper)] text-[color:var(--mk-text-soft)] px-2 py-1 rounded-xs font-medium">{g}</span>
+                                                        <span key={g} className="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-xs font-medium">{g}</span>
                                                     ))}
                                                     {prog.included_features?.length ? (
-                                                        <span className="text-[10px] bg-[color:var(--mk-paper)] text-[color:var(--mk-text-soft)] px-2 py-1 rounded-xs font-medium">+{prog.included_features.length} quyền lợi</span>
+                                                        <span className="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-xs font-medium">+{prog.included_features.length} quyền lợi</span>
                                                     ) : null}
                                                     <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-1 rounded-xs font-medium ml-auto">
                                                         {prog.current_clients}/{prog.max_clients} slots
                                                     </span>
                                                 </div>
 
-                                                <div className="flex gap-2 justify-end mt-4 pt-4 border-t border-[color:var(--mk-line)]">
-                                                    <button onClick={() => handleEdit(prog)} className="text-sm font-medium text-[color:var(--mk-text-soft)] hover:text-black px-3 py-1.5 hover:bg-[color:var(--mk-paper)] transition rounded-xs">Sửa gói</button>
+                                                <div className="flex gap-2 justify-end mt-4 pt-4 border-t border-gray-200">
+                                                    <button onClick={() => handleEdit(prog)} className="text-sm font-medium text-gray-600 hover:text-black px-3 py-1.5 hover:bg-gray-50 transition rounded-xs">Sửa gói</button>
                                                     {!prog.is_published && (
                                                         <button onClick={() => handlePublish(prog.id)} className="text-sm font-bold text-white bg-black hover:bg-gray-800 px-4 py-1.5 transition rounded-xs shadow-sm">Phát hành</button>
                                                     )}

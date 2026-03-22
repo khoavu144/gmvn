@@ -26,12 +26,12 @@ export function StatCard({
     return (
         <div className={cn('card p-4', className)}>
             <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-[color:var(--mk-muted)] dark:text-[color:var(--mk-muted)] uppercase tracking-wide">
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-500 uppercase tracking-wide">
                     {label}
                 </span>
                 {Icon && (
-                    <div className="p-1.5 rounded bg-[color:var(--mk-paper)] dark:bg-gray-800">
-                        <Icon className="w-4 h-4 text-[color:var(--mk-text-soft)] dark:text-[color:var(--mk-muted)]" />
+                    <div className="p-1.5 rounded bg-gray-50 dark:bg-gray-800">
+                        <Icon className="w-4 h-4 text-gray-600 dark:text-gray-500" />
                     </div>
                 )}
             </div>
@@ -48,7 +48,7 @@ export function StatCard({
                                 'text-xs font-medium',
                                 trend === 'up' && 'text-green-600 dark:text-green-400',
                                 trend === 'down' && 'text-red-600 dark:text-red-400',
-                                trend === 'neutral' && 'text-[color:var(--mk-muted)]'
+                                trend === 'neutral' && 'text-gray-500'
                             )}
                         >
                             {trend === 'up' && '↑'}
@@ -73,15 +73,15 @@ export function StatCardCompact({
     className,
 }: Omit<StatCardProps, 'subtext' | 'trend' | 'trendValue'>) {
     return (
-        <div className={cn('flex items-center gap-3 p-3 rounded-lg bg-[color:var(--mk-paper)] dark:bg-gray-800/50', className)}>
+        <div className={cn('flex items-center gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50', className)}>
             {Icon && (
                 <div className="p-2 rounded bg-white dark:bg-gray-800 shadow-sm">
-                    <Icon className="w-4 h-4 text-[color:var(--mk-text-soft)] dark:text-[color:var(--mk-muted)]" />
+                    <Icon className="w-4 h-4 text-gray-600 dark:text-gray-500" />
                 </div>
             )}
             <div>
                 <div className="stat-value text-lg" data-stat>{value}</div>
-                <div className="text-xs text-[color:var(--mk-muted)] dark:text-[color:var(--mk-muted)]">{label}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-500">{label}</div>
             </div>
         </div>
     );

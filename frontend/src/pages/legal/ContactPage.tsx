@@ -43,10 +43,10 @@ export default function ContactPage() {
                         { icon: '🔒', label: 'Bảo mật', value: 'security@gymerviet.com' },
                         { icon: '⏰', label: 'Giờ làm việc', value: 'T2–T6, 8:00–17:30' },
                     ].map((item) => (
-                        <div key={item.label} className="flex items-start gap-3 p-3 border border-[color:var(--mk-line)] rounded-xs bg-white">
+                        <div key={item.label} className="flex items-start gap-3 p-3 border border-gray-200 rounded-xs bg-white">
                             <span className="text-lg mt-0.5">{item.icon}</span>
                             <div>
-                                <div className="text-xs font-semibold text-[color:var(--mk-muted)] uppercase tracking-wider">{item.label}</div>
+                                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{item.label}</div>
                                 <div className="text-sm text-black mt-0.5 font-medium">{item.value}</div>
                             </div>
                         </div>
@@ -59,7 +59,7 @@ export default function ContactPage() {
                         <div className="card text-center py-12">
                             <div className="text-3xl mb-4">✓</div>
                             <h3 className="font-bold text-black text-lg mb-2">Đã nhận được tin nhắn!</h3>
-                            <p className="text-sm text-[color:var(--mk-text-soft)]">
+                            <p className="text-sm text-gray-600">
                                 Chúng tôi sẽ phản hồi đến <strong>{form.email}</strong> trong vòng 24 giờ.
                             </p>
                             <button
@@ -126,7 +126,7 @@ export default function ContactPage() {
                                 <p className="form-helper">{form.message.length}/500 ký tự</p>
                             </div>
 
-                            <div className="pt-2 border-t border-[color:var(--mk-line)] flex justify-end">
+                            <div className="pt-2 border-t border-gray-200 flex justify-end">
                                 <button type="submit" disabled={loading} className="btn-primary min-w-[140px]">
                                     {loading ? 'Đang gửi...' : 'Gửi tin nhắn'}
                                 </button>

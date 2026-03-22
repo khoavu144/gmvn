@@ -14,6 +14,7 @@ import { AppDataSource } from '../config/database';
 import { NewsArticle } from '../entities/NewsArticle';
 import { newsCrawlerService } from '../services/newsCrawlerService';
 import { logger } from '../utils/logger';
+import { sanitizeNewsHtml } from '../utils/sanitizeNewsHtml';
 
 // ─── Public Endpoints ────────────────────────────────────────────────────────
 
@@ -65,7 +66,10 @@ export const getNewsBySlug = async (req: Request, res: Response): Promise<void> 
         // Increment view count (fire-and-forget)
         repo.increment({ id: article.id }, 'view_count', 1).catch(() => {});
 
-        res.json({ success: true, data: article });
+        res.json({
+            success: true,
+            data: { ...article, content: sanitizeNewsHtml(article.content) },
+        });
     } catch (err) {
         logger.error('[newsController.getNewsBySlug]', err);
         res.status(500).json({ success: false, message: 'Lỗi hệ thống' });

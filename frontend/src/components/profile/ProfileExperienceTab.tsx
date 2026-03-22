@@ -89,13 +89,13 @@ export function ProfileExperienceTab() {
                         exit={{ opacity: 0, y: -20 }}
                         className="bg-white rounded-lg p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5"
                     >
-                        <h3 className="text-xl font-bold tracking-tight text-[color:var(--mk-text)] mb-6">
+                        <h3 className="text-xl font-bold tracking-tight text-gray-900 mb-6">
                             {editingId ? 'Chỉnh sửa kinh nghiệm' : 'Thêm kinh nghiệm'}
                         </h3>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-[color:var(--mk-text-soft)] mb-2">Chức danh / Tên khoá học</label>
+                                    <label className="block text-sm font-medium text-gray-600 mb-2">Chức danh / Tên khoá học</label>
                                     <input 
                                         value={form.title} 
                                         onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
@@ -104,7 +104,7 @@ export function ProfileExperienceTab() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[color:var(--mk-text-soft)] mb-2">Tổ chức / Trường</label>
+                                    <label className="block text-sm font-medium text-gray-600 mb-2">Tổ chức / Trường</label>
                                     <input 
                                         value={form.organization} 
                                         onChange={e => setForm(f => ({ ...f, organization: e.target.value }))}
@@ -116,7 +116,7 @@ export function ProfileExperienceTab() {
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
-                                    <label className="block text-sm font-medium text-[color:var(--mk-text-soft)] mb-2">Loại</label>
+                                    <label className="block text-sm font-medium text-gray-600 mb-2">Loại</label>
                                     <select 
                                         value={form.experience_type} 
                                         onChange={e => setForm(f => ({ ...f, experience_type: e.target.value as any }))}
@@ -129,7 +129,7 @@ export function ProfileExperienceTab() {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[color:var(--mk-text-soft)] mb-2">Từ ngày</label>
+                                    <label className="block text-sm font-medium text-gray-600 mb-2">Từ ngày</label>
                                     <input 
                                         type="date" 
                                         value={form.start_date} 
@@ -139,46 +139,46 @@ export function ProfileExperienceTab() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-[color:var(--mk-text-soft)] mb-2">Đến ngày</label>
+                                    <label className="block text-sm font-medium text-gray-600 mb-2">Đến ngày</label>
                                     <input 
                                         type="date" 
                                         value={form.end_date} 
                                         disabled={form.is_current}
                                         onChange={e => setForm(f => ({ ...f, end_date: e.target.value }))}
-                                        className="w-full form-input rounded-lg transition-all disabled:bg-[color:var(--mk-paper)] disabled:text-[color:var(--mk-muted)]" 
+                                        className="w-full form-input rounded-lg transition-all disabled:bg-gray-50 disabled:text-gray-500" 
                                     />
                                 </div>
                             </div>
 
-                            <label className="flex items-center gap-3 text-sm font-medium text-[color:var(--mk-text-soft)] cursor-pointer w-fit p-3 bg-[color:var(--mk-paper)] rounded-lg hover:bg-[color:var(--mk-paper)] transition-colors">
+                            <label className="flex items-center gap-3 text-sm font-medium text-gray-600 cursor-pointer w-fit p-3 bg-gray-50 rounded-lg hover:bg-gray-50 transition-colors">
                                 <input 
                                     type="checkbox" 
                                     checked={form.is_current}
                                     onChange={e => setForm(f => ({ ...f, is_current: e.target.checked, end_date: '' }))}
-                                    className="w-5 h-5 rounded-md border-[color:var(--mk-line)] text-black focus:ring-black transition-all" 
+                                    className="w-5 h-5 rounded-md border-gray-200 text-black focus:ring-black transition-all" 
                                 />
                                 Vẫn đang làm việc / học học tại đây
                             </label>
 
                             <div>
-                                <label className="block text-sm font-medium text-[color:var(--mk-text-soft)] mb-2">Mô tả chi tiết</label>
+                                <label className="block text-sm font-medium text-gray-600 mb-2">Mô tả chi tiết</label>
                                 <textarea 
                                     rows={4} 
                                     value={form.description} 
                                     onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                                    className="w-full form-input rounded-lg resize-none transition-all placeholder:text-[color:var(--mk-muted)]" 
+                                    className="w-full form-input rounded-lg resize-none transition-all placeholder:text-gray-500" 
                                     placeholder="Mô tả công việc, thành tích, hoặc những gì bạn học được..."
                                 />
                             </div>
 
-                            <div className="flex items-center gap-3 pt-4 border-t border-[color:var(--mk-line)]">
+                            <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
                                 <button type="submit" className="btn-primary rounded-lg px-8 py-3 bg-black text-white hover:bg-gray-900 transition-colors">
                                     {editingId ? 'Lưu thay đổi' : 'Thêm kinh nghiệm'}
                                 </button>
                                 <button 
                                     type="button" 
                                     onClick={resetForm}
-                                    className="btn-secondary rounded-lg px-8 py-3 border border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)] hover:bg-[color:var(--mk-paper)] transition-colors"
+                                    className="btn-secondary rounded-lg px-8 py-3 border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
                                 >
                                     Hủy
                                 </button>
@@ -194,12 +194,12 @@ export function ProfileExperienceTab() {
                     >
                         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 items-start sm:items-center justify-between mb-8">
                             <div>
-                                <h3 className="text-xl font-bold tracking-tight text-[color:var(--mk-text)]">Kinh nghiệm & Học vấn</h3>
-                                <p className="text-sm text-[color:var(--mk-muted)] mt-1">Hồ sơ chuyên môn của bạn ({experience.length})</p>
+                                <h3 className="text-xl font-bold tracking-tight text-gray-900">Kinh nghiệm & Học vấn</h3>
+                                <p className="text-sm text-gray-500 mt-1">Hồ sơ chuyên môn của bạn ({experience.length})</p>
                             </div>
                             <button 
                                 onClick={() => setIsAdding(true)}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-[color:var(--mk-paper)] hover:bg-black hover:text-white text-[color:var(--mk-text-soft)] rounded-lg transition-all duration-300 border border-[color:var(--mk-line)] hover:border-black font-medium text-sm"
+                                className="flex items-center gap-2 px-5 py-2.5 bg-gray-50 hover:bg-black hover:text-white text-gray-600 rounded-lg transition-all duration-300 border border-gray-200 hover:border-black font-medium text-sm"
                             >
                                 <Plus className="w-4 h-4" strokeWidth={2} aria-hidden /> 
                                 Thêm mới
@@ -207,12 +207,12 @@ export function ProfileExperienceTab() {
                         </div>
 
                         {experience.length === 0 ? (
-                            <div className="text-center py-12 px-4 rounded-lg bg-[color:var(--mk-paper)] border border-dashed border-[color:var(--mk-line)]">
+                            <div className="text-center py-12 px-4 rounded-lg bg-gray-50 border border-dashed border-gray-200">
                                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm ring-1 ring-black/5">
-                                    <Briefcase className="w-8 h-8 text-[color:var(--mk-muted)]" strokeWidth={2} aria-hidden />
+                                    <Briefcase className="w-8 h-8 text-gray-500" strokeWidth={2} aria-hidden />
                                 </div>
-                                <h4 className="text-[color:var(--mk-text)] font-semibold mb-2">Chưa có kinh nghiệm nào</h4>
-                                <p className="text-sm text-[color:var(--mk-muted)] max-w-sm mx-auto mb-6">
+                                <h4 className="text-gray-900 font-semibold mb-2">Chưa có kinh nghiệm nào</h4>
+                                <p className="text-sm text-gray-500 max-w-sm mx-auto mb-6">
                                     Thêm kinh nghiệm làm việc, học vấn hoặc các chứng chỉ để làm nổi bật hồ sơ của bạn.
                                 </p>
                                 <button 
@@ -223,7 +223,7 @@ export function ProfileExperienceTab() {
                                 </button>
                             </div>
                         ) : (
-                            <div className="relative border-l-2 border-[color:var(--mk-line)] ml-3 md:ml-4 space-y-10 py-2">
+                            <div className="relative border-l-2 border-gray-200 ml-3 md:ml-4 space-y-10 py-2">
                                 <AnimatePresence>
                                     {experience.map((exp, idx) => (
                                         <motion.div 
@@ -234,33 +234,33 @@ export function ProfileExperienceTab() {
                                             transition={{ delay: idx * 0.05 }}
                                             className="relative pl-8 md:pl-10 group"
                                         >
-                                            <div className="absolute -left-[17px] top-1 bg-white p-1 rounded-full border-2 border-[color:var(--mk-line)] group-hover:border-black transition-colors duration-300">
-                                                <div className="bg-[color:var(--mk-paper)] text-[color:var(--mk-muted)] group-hover:bg-black group-hover:text-white p-2 rounded-full transition-all duration-300">
+                                            <div className="absolute -left-[17px] top-1 bg-white p-1 rounded-full border-2 border-gray-200 group-hover:border-black transition-colors duration-300">
+                                                <div className="bg-gray-50 text-gray-500 group-hover:bg-black group-hover:text-white p-2 rounded-full transition-all duration-300">
                                                     {typeIcons[exp.experience_type] || <Briefcase className="w-4 h-4" strokeWidth={2} aria-hidden />}
                                                 </div>
                                             </div>
                                             
-                                            <div className="bg-white rounded-lg p-6 border border-[color:var(--mk-line)] hover:shadow-lg transition-all duration-300 group-hover:border-[color:var(--mk-line)]">
+                                            <div className="bg-white rounded-lg p-6 border border-gray-200 hover:shadow-lg transition-all duration-300 group-hover:border-gray-200">
                                                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-3">
                                                     <div>
-                                                        <h4 className="text-lg font-bold text-[color:var(--mk-text)]">{exp.title}</h4>
-                                                        <p className="text-[color:var(--mk-text-soft)] font-medium">{exp.organization}</p>
+                                                        <h4 className="text-lg font-bold text-gray-900">{exp.title}</h4>
+                                                        <p className="text-gray-600 font-medium">{exp.organization}</p>
                                                     </div>
                                                     <div className="flex items-center gap-3">
-                                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide bg-[color:var(--mk-paper)] text-[color:var(--mk-text-soft)] border border-[color:var(--mk-line)] uppercase">
+                                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold tracking-wide bg-gray-50 text-gray-600 border border-gray-200 uppercase">
                                                             {typeLabels[exp.experience_type]}
                                                         </span>
                                                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                             <button 
                                                                 onClick={() => startEdit(exp)} 
-                                                                className="p-2 text-[color:var(--mk-muted)] hover:text-black hover:bg-[color:var(--mk-paper)] rounded-lg transition-colors"
+                                                                className="p-2 text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition-colors"
                                                                 title="Chỉnh sửa"
                                                             >
                                                                 <Pencil className="w-4 h-4" strokeWidth={2} aria-hidden />
                                                             </button>
                                                             <button 
                                                                 onClick={() => dispatch(deleteExperienceThunk(exp.id))} 
-                                                                className="p-2 text-[color:var(--mk-muted)] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                                 title="Xóa"
                                                             >
                                                                 <Trash2 className="w-4 h-4" strokeWidth={2} aria-hidden />
@@ -269,7 +269,7 @@ export function ProfileExperienceTab() {
                                                     </div>
                                                 </div>
                                                 
-                                                <div className="flex items-center gap-2 text-sm text-[color:var(--mk-muted)] mb-4 font-medium">
+                                                <div className="flex items-center gap-2 text-sm text-gray-500 mb-4 font-medium">
                                                     <span>
                                                         {exp.start_date ? format(parseISO(exp.start_date), 'MM/yyyy', { locale: vi }) : ''} 
                                                         {' '}—{' '} 
@@ -278,7 +278,7 @@ export function ProfileExperienceTab() {
                                                 </div>
 
                                                 {exp.description && (
-                                                    <p className="text-[color:var(--mk-text-soft)] text-sm leading-relaxed whitespace-pre-wrap bg-[color:var(--mk-paper)]/50 p-4 rounded-lg">
+                                                    <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap bg-gray-50/50 p-4 rounded-lg">
                                                         {exp.description}
                                                     </p>
                                                 )}

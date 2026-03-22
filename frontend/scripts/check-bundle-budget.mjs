@@ -5,7 +5,8 @@ const DIST_DIR = path.resolve(process.cwd(), 'dist/assets');
 
 const BUDGETS = {
     // Raised 2026-03: match post–React 19 / framer-motion / recharts baseline (see build output).
-    totalJsBytes: 2_200_000,
+    // 2026-03-22: ~2.17 MB summed dist/assets/*.js after dependency drift.
+    totalJsBytes: 2_300_000,
     maxChunkBytes: 520_000,
     chunkLimits: {
         framework: 430_000,

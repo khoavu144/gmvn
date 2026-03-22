@@ -50,10 +50,10 @@ export const CoachDirectoryCard = memo(({ trainer }: { trainer: CoachDirectoryTr
     return (
         <Link
             to={href}
-            className="group flex min-h-0 flex-col overflow-hidden rounded-xl border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[color:var(--mk-text)]/25 hover:shadow-[var(--mk-shadow-soft)]"
+            className="group flex min-h-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-gray-900/25 hover:shadow-md"
             onPointerEnter={handlePrefetch}
         >
-            <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-[color:var(--mk-paper-strong)]">
+            <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-gray-100">
                 {trainer.avatar_url ? (
                     <img
                         src={trainer.avatar_url}
@@ -63,11 +63,11 @@ export const CoachDirectoryCard = memo(({ trainer }: { trainer: CoachDirectoryTr
                         decoding="async"
                     />
                 ) : (
-                    <div className="flex h-full w-full items-center justify-center text-4xl font-black tracking-tight text-[color:var(--mk-muted)]/35">
+                    <div className="flex h-full w-full items-center justify-center text-4xl font-black tracking-tight text-gray-500/35">
                         {trainer.full_name.charAt(0).toUpperCase()}
                     </div>
                 )}
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[color:var(--mk-text)]/55 via-transparent to-transparent" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-gray-900/55 via-transparent to-transparent" />
                 {trainer.is_verified && (
                     <span className="absolute left-3 top-3 inline-flex items-center rounded border border-white/30 bg-black/55 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white backdrop-blur-sm">
                         Đã xác minh
@@ -92,18 +92,18 @@ export const CoachDirectoryCard = memo(({ trainer }: { trainer: CoachDirectoryTr
 
             <div className="flex min-h-0 flex-1 flex-col gap-3 p-4 sm:p-5">
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-                    <span className="font-semibold text-[color:var(--mk-text)]">{priceLabel}</span>
+                    <span className="font-semibold text-gray-900">{priceLabel}</span>
                     {trainer.city && (
                         <>
-                            <span className="text-[color:var(--mk-line)]" aria-hidden>
+                            <span className="text-gray-300" aria-hidden>
                                 ·
                             </span>
-                            <span className="text-[color:var(--mk-muted)]">{trainer.city}</span>
+                            <span className="text-gray-500">{trainer.city}</span>
                         </>
                     )}
                 </div>
 
-                <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-[color:var(--mk-text-soft)]">
+                <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-gray-600">
                     {trainer.bio || 'Chưa có thông tin giới thiệu.'}
                 </p>
 
@@ -112,20 +112,20 @@ export const CoachDirectoryCard = memo(({ trainer }: { trainer: CoachDirectoryTr
                         {specs.slice(0, 3).map((spec) => (
                             <span
                                 key={spec}
-                                className="inline-flex rounded border border-[color:var(--mk-line)] bg-[color:var(--mk-bg)] px-2 py-0.5 text-[11px] font-medium text-[color:var(--mk-text-soft)]"
+                                className="inline-flex rounded border border-gray-200 bg-gray-50 px-2 py-0.5 text-[11px] font-medium text-gray-600"
                             >
                                 {spec}
                             </span>
                         ))}
                         {specs.length > 3 && (
-                            <span className="inline-flex rounded border border-dashed border-[color:var(--mk-line)] px-2 py-0.5 text-[11px] text-[color:var(--mk-muted)]">
+                            <span className="inline-flex rounded border border-dashed border-gray-200 px-2 py-0.5 text-[11px] text-gray-500">
                                 +{specs.length - 3}
                             </span>
                         )}
                     </div>
                 )}
 
-                <div className="mt-auto flex items-center justify-between border-t border-[color:var(--mk-line)] pt-3 text-sm font-semibold text-[color:var(--mk-text)]">
+                <div className="mt-auto flex items-center justify-between border-t border-gray-200 pt-3 text-sm font-semibold text-gray-900">
                     Xem hồ sơ
                     <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
                 </div>

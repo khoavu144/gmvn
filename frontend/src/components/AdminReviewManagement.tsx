@@ -60,10 +60,10 @@ const AdminReviewManagement: React.FC = () => {
 
     const filteredReviews = reviews.filter(r => ratingFilter === 'all' || r.rating === ratingFilter);
 
-    if (loading) return <div className="animate-pulse space-y-4"><div className="h-24 bg-[color:var(--mk-paper)] rounded-lg"></div></div>;
+    if (loading) return <div className="animate-pulse space-y-4"><div className="h-24 bg-gray-50 rounded-lg"></div></div>;
 
     if (reviews.length === 0) {
-        return <div className="text-[color:var(--mk-muted)] italic py-12 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-lg">Chưa có đánh giá nào.</div>;
+        return <div className="text-gray-500 italic py-12 text-center border-2 border-dashed border-gray-200 rounded-lg">Chưa có đánh giá nào.</div>;
     }
 
     return (
@@ -71,8 +71,8 @@ const AdminReviewManagement: React.FC = () => {
             {ToastComponent}
             
             {/* Toolbar */}
-            <div className="flex flex-wrap items-center gap-4 bg-[color:var(--mk-paper)] p-4 rounded-lg border border-[color:var(--mk-line)]">
-                <div className="flex items-center gap-2 text-sm font-bold text-[color:var(--mk-muted)] uppercase tracking-widest">
+            <div className="flex flex-wrap items-center gap-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-2 text-sm font-bold text-gray-500 uppercase tracking-widest">
                     <Filter className="w-4 h-4" /> Lọc theo:
                 </div>
                 <select 
@@ -87,18 +87,18 @@ const AdminReviewManagement: React.FC = () => {
                     <option value="2">2 Sao</option>
                     <option value="1">1 Sao</option>
                 </select>
-                <div className="flex-1 text-right text-sm text-[color:var(--mk-muted)] font-bold uppercase tracking-widest">
+                <div className="flex-1 text-right text-sm text-gray-500 font-bold uppercase tracking-widest">
                     {filteredReviews.length} kết quả
                 </div>
             </div>
 
             <div className="space-y-4">
                 {filteredReviews.map(review => (
-                    <div key={review.id} className={`bg-white border p-5 rounded-lg flex justify-between items-start transition-colors ${review.is_visible ? 'border-[color:var(--mk-line)] hover:border-black' : 'border-dashed border-[color:var(--mk-line)] opacity-60'}`}>
+                    <div key={review.id} className={`bg-white border p-5 rounded-lg flex justify-between items-start transition-colors ${review.is_visible ? 'border-gray-200 hover:border-black' : 'border-dashed border-gray-200 opacity-60'}`}>
                         <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
                                 <span className="font-black text-sm uppercase tracking-tight">Hội viên {review.user_id.substring(0, 8)}...</span>
-                                <span className="text-[10px] text-[color:var(--mk-muted)] font-bold uppercase tracking-widest bg-[color:var(--mk-paper)] px-2 py-1 rounded-sm">
+                                <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest bg-gray-50 px-2 py-1 rounded-sm">
                                     {new Date(review.created_at).toLocaleDateString('vi-VN')}
                                 </span>
                                 {!review.is_visible && <span className="text-[10px] text-red-600 font-bold uppercase tracking-widest bg-red-50 px-2 py-1 rounded-sm">Đã bị ẩn</span>}
@@ -108,12 +108,12 @@ const AdminReviewManagement: React.FC = () => {
                                     <span key={star} className={`text-sm ${review.rating >= star ? 'text-black' : 'text-gray-200'}`}>★</span>
                                 ))}
                             </div>
-                            <p className="text-sm text-[color:var(--mk-text-soft)] leading-relaxed">"{review.comment}"</p>
+                            <p className="text-sm text-gray-600 leading-relaxed">"{review.comment}"</p>
                         </div>
                         <div className="ml-6 flex flex-col gap-2">
                             <button
                                 onClick={() => handleToggle(review.id)}
-                                className="flex items-center justify-center gap-2 px-4 py-2 border border-[color:var(--mk-line)] rounded-lg text-xs font-bold uppercase tracking-widest hover:border-black hover:bg-black hover:text-white transition-colors h-10 w-32"
+                                className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-xs font-bold uppercase tracking-widest hover:border-black hover:bg-black hover:text-white transition-colors h-10 w-32"
                             >
                                 {review.is_visible ? <><EyeOff className="w-4 h-4" /> Ẩn</> : <><Eye className="w-4 h-4" /> Hiện</>}
                             </button>
@@ -127,7 +127,7 @@ const AdminReviewManagement: React.FC = () => {
                     </div>
                 ))}
                 {filteredReviews.length === 0 && (
-                    <div className="text-[color:var(--mk-muted)] italic py-12 text-center border-2 border-dashed border-[color:var(--mk-line)] rounded-lg">Không tìm thấy đánh giá nào phù hợp.</div>
+                    <div className="text-gray-500 italic py-12 text-center border-2 border-dashed border-gray-200 rounded-lg">Không tìm thấy đánh giá nào phù hợp.</div>
                 )}
             </div>
         </div>

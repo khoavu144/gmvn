@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import apiClient from '../services/api';
+import { Button } from '../components/ui/Button';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -10,11 +13,11 @@ export default function ForgotPassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    
+
     setLoading(true);
     setError('');
     setSuccess('');
-    
+
     try {
       await apiClient.post('/auth/forgot-password', { email });
       setSuccess('Nếu email có trong hệ thống, chúng tôi đã gửi mã khôi phục cho bạn. Vui lòng kiểm tra hộp thư (và thư mục rác).');
@@ -26,20 +29,24 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center bg-[color:var(--mk-paper)] px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-sm border border-[color:var(--mk-line)]">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-[color:var(--mk-text)]">
-            Quên mật khẩu
-          </h2>
-          <p className="mt-2 text-center text-sm text-[color:var(--mk-text-soft)]">
+    <div className="page-shell">
+      <Helmet>
+        <title>Quên mật khẩu — GYMERVIET</title>
+      </Helmet>
+      <div className="page-container max-w-md py-16 sm:py-20">
+        <div className="text-center page-header">
+          <h1 className="page-title text-center">Quên mật khẩu</h1>
+          <p className="page-description mx-auto text-center">
             Nhập email của bạn để nhận mã khôi phục mật khẩu.
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4 rounded-md shadow-sm">
+
+        <div className="card">
+          <form className="space-y-4" onSubmit={handleSubmit} aria-label="Biểu mẫu quên mật khẩu">
             <div>
-              <label htmlFor="email" className="sr-only">Địa chỉ email</label>
+              <label htmlFor="email" className="form-label">
+                Địa chỉ email
+              </label>
               <input
                 id="email"
                 name="email"
@@ -47,31 +54,40 @@ export default function ForgotPassword() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="relative block w-full rounded-md border-0 py-3 px-4 text-[color:var(--mk-text)] ring-1 ring-inset ring-gray-300 placeholder:text-[color:var(--mk-muted)] focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6"
-                placeholder="Địa chỉ email"
+                className="form-input"
+                placeholder="your@email.com"
+                autoComplete="email"
               />
             </div>
-          </div>
 
-          {error && <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-md">{error}</div>}
-          {success && <div className="text-green-600 text-sm text-center bg-green-50 p-2 rounded-md">{success}</div>}
+            {error && (
+              <div role="alert" className="bg-red-50 border border-red-200 text-gray-900 px-4 py-3 rounded-xs text-sm">
+                {error}
+              </div>
+            )}
+            {success && (
+              <div role="status" className="text-green-800 text-sm bg-green-50 border border-green-200 px-4 py-3 rounded-xs">
+                {success}
+              </div>
+            )}
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative flex w-full justify-center rounded-md bg-black px-3 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:bg-gray-400"
-            >
+            <Button type="submit" variant="primary" size="full" loading={loading}>
               {loading ? 'Đang gửi...' : 'Gửi mã khôi phục'}
-            </button>
-          </div>
-          
-          <div className="text-center text-sm">
-            <a href="/reset-password" className="font-semibold text-indigo-600 hover:text-indigo-500">
-              Bạn đã có mã khôi phục? Đặt lại mật khẩu
-            </a>
-          </div>
-        </form>
+            </Button>
+
+            <div className="text-center text-sm pt-2">
+              <Link to="/reset-password" className="font-semibold text-black hover:underline">
+                Bạn đã có mã khôi phục? Đặt lại mật khẩu
+              </Link>
+            </div>
+          </form>
+        </div>
+
+        <div className="mt-8 text-center">
+          <Link to="/login" className="back-link justify-center">
+            ← Quay lại đăng nhập
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -55,11 +55,11 @@ export default function ReportPage() {
                 <div className="card text-center py-16 max-w-sm mx-auto">
                     <div className="text-4xl mb-4 text-black font-bold">✓</div>
                     <h3 className="font-bold text-black text-lg mb-2">Đã nhận báo cáo</h3>
-                    <p className="text-sm text-[color:var(--mk-text-soft)] leading-relaxed">
+                    <p className="text-sm text-gray-600 leading-relaxed">
                         Chúng tôi sẽ điều tra và xử lý trong vòng <strong>3–5 ngày làm việc</strong>.
                         {!form.anonymous && ` Kết quả sẽ được gửi đến ${form.reporter_email}.`}
                     </p>
-                    <p className="text-xs text-[color:var(--mk-muted)] mt-4">
+                    <p className="text-xs text-gray-500 mt-4">
                         Mã báo cáo: {reportId}
                     </p>
                 </div>
@@ -82,14 +82,14 @@ export default function ReportPage() {
             <div className="flex items-center gap-2 my-8">
                 {[1, 2, 3].map((s) => (
                     <div key={s} className="flex items-center gap-2">
-                        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${step >= s ? 'bg-black text-white' : 'bg-[color:var(--mk-paper)] text-[color:var(--mk-muted)]'
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${step >= s ? 'bg-black text-white' : 'bg-gray-50 text-gray-500'
                             }`}>
                             {step > s ? '✓' : s}
                         </div>
-                        <span className={`text-xs ${step >= s ? 'text-black font-medium' : 'text-[color:var(--mk-muted)]'}`}>
+                        <span className={`text-xs ${step >= s ? 'text-black font-medium' : 'text-gray-500'}`}>
                             {['Loại vi phạm', 'Chi tiết', 'Xác nhận'][s - 1]}
                         </span>
-                        {s < 3 && <div className={`flex-1 h-px w-8 ${step > s ? 'bg-black' : 'bg-[color:var(--mk-paper-strong)]'}`} />}
+                        {s < 3 && <div className={`flex-1 h-px w-8 ${step > s ? 'bg-black' : 'bg-gray-100'}`} />}
                     </div>
                 ))}
             </div>
@@ -103,8 +103,8 @@ export default function ReportPage() {
                             <label
                                 key={type.value}
                                 className={`flex items-start gap-4 p-4 border rounded-xs cursor-pointer transition-colors ${form.violation_type === type.value
-                                    ? 'border-black bg-[color:var(--mk-paper)]'
-                                    : 'border-[color:var(--mk-line)] hover:border-[color:var(--mk-line)] bg-white'
+                                    ? 'border-black bg-gray-50'
+                                    : 'border-gray-200 hover:border-gray-200 bg-white'
                                     }`}
                             >
                                 <input
@@ -113,11 +113,11 @@ export default function ReportPage() {
                                     value={type.value}
                                     checked={form.violation_type === type.value}
                                     onChange={() => setForm(f => ({ ...f, violation_type: type.value }))}
-                                    className="mt-0.5 text-black border-[color:var(--mk-line)]"
+                                    className="mt-0.5 text-black border-gray-200"
                                 />
                                 <div>
                                     <div className="font-semibold text-sm text-black">{type.label}</div>
-                                    <div className="text-xs text-[color:var(--mk-text-soft)] mt-0.5">{type.desc}</div>
+                                    <div className="text-xs text-gray-600 mt-0.5">{type.desc}</div>
                                 </div>
                             </label>
                         ))}
@@ -137,9 +137,9 @@ export default function ReportPage() {
                 {/* Step 2 */}
                 {step === 2 && (
                     <div className="space-y-4">
-                        <div className="p-3 bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] rounded-xs text-sm">
+                        <div className="p-3 bg-gray-50 border border-gray-200 rounded-xs text-sm">
                             <span className="font-semibold text-black">Loại vi phạm:</span>{' '}
-                            <span className="text-[color:var(--mk-text-soft)]">{selectedType?.label}</span>
+                            <span className="text-gray-600">{selectedType?.label}</span>
                         </div>
 
                         <div>
@@ -178,7 +178,7 @@ export default function ReportPage() {
                             />
                         </div>
 
-                        <div className="flex gap-3 pt-4 border-t border-[color:var(--mk-line)]">
+                        <div className="flex gap-3 pt-4 border-t border-gray-200">
                             <button type="button" onClick={() => setStep(1)} className="btn-secondary">← Quay lại</button>
                             <button
                                 type="button"
@@ -212,18 +212,18 @@ export default function ReportPage() {
                                 type="checkbox"
                                 checked={form.anonymous}
                                 onChange={e => setForm(f => ({ ...f, anonymous: e.target.checked, reporter_email: '' }))}
-                                className="rounded-xs text-black border-[color:var(--mk-line)]"
+                                className="rounded-xs text-black border-gray-200"
                             />
-                            <span className="text-sm text-[color:var(--mk-text-soft)]">Báo cáo ẩn danh (không nhận phản hồi)</span>
+                            <span className="text-sm text-gray-600">Báo cáo ẩn danh (không nhận phản hồi)</span>
                         </label>
 
-                        <div className="p-4 border border-[color:var(--mk-line)] rounded-xs bg-[color:var(--mk-paper)] text-sm space-y-1.5 text-[color:var(--mk-text-soft)]">
+                        <div className="p-4 border border-gray-200 rounded-xs bg-gray-50 text-sm space-y-1.5 text-gray-600">
                             <p><span className="font-semibold text-black">Loại vi phạm:</span> {selectedType?.label}</p>
                             {form.reported_user_id && <p><span className="font-semibold text-black">Đối tượng:</span> {form.reported_user_id}</p>}
                             <p><span className="font-semibold text-black">Mô tả:</span> {form.description.slice(0, 100)}{form.description.length > 100 ? '...' : ''}</p>
                         </div>
 
-                        <div className="flex gap-3 pt-4 border-t border-[color:var(--mk-line)]">
+                        <div className="flex gap-3 pt-4 border-t border-gray-200">
                             <button type="button" onClick={() => setStep(2)} className="btn-secondary">← Quay lại</button>
                             <button
                                 type="submit"

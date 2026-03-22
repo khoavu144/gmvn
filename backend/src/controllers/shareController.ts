@@ -479,7 +479,6 @@ function renderShareHtml(data: ShareProfileData): string {
         .share-shell a { color: #f8fafc; font-weight: 700; }
         .share-shell p { color: rgba(248,250,252,0.72); }
     </style>
-    <script>window.location.replace(${JSON.stringify(data.canonicalUrl)});</script>
 </head>
 <body>
     <main class="share-shell">

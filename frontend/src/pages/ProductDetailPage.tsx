@@ -2,6 +2,30 @@ import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
+import {
+    Activity,
+    AlertCircle,
+    Apple,
+    Calendar,
+    CalendarClock,
+    CheckCircle2,
+    ChevronRight,
+    ClipboardList,
+    Download,
+    Handshake,
+    Heart,
+    Infinity as InfinityIcon,
+    Lock,
+    MessageCircle,
+    Package,
+    PackageSearch,
+    Palette,
+    ShoppingCart,
+    Star,
+    Target,
+    Truck,
+    Unlock,
+} from 'lucide-react';
 import '../styles/marketplace.css';
 import type { Product, ProductReview } from '../types';
 import { ProductCard } from './MarketplacePage';
@@ -24,10 +48,16 @@ function truncateMetaDescription(text: string, maxLen: number): string {
 }
 
 function StarRating({ rating }: { rating: number }) {
+    const r = Math.round(rating);
     return (
-        <div className="mpd-stars" aria-label={`Đánh giá ${rating}/5`}>
-            {[1, 2, 3, 4, 5].map(i => (
-                <span key={i} className={i <= Math.round(rating) ? 'mpd-star mpd-star--filled' : 'mpd-star'}>★</span>
+        <div className="mpd-stars" role="img" aria-label={`Đánh giá ${rating}/5`}>
+            {[1, 2, 3, 4, 5].map((i) => (
+                <Star
+                    key={i}
+                    className={`h-4 w-4 shrink-0 ${i <= r ? 'fill-amber-400 text-amber-500' : 'text-[color:var(--cur-outline-var)]'}`}
+                    strokeWidth={1.5}
+                    aria-hidden
+                />
             ))}
         </div>
     );
@@ -83,12 +113,16 @@ function ProductSalesAreaPanel({ product, id }: { product: Product; id?: string 
     return (
         <aside className="mpd-sales-map-panel" aria-labelledby={titleId}>
             <h3 className="mpd-sales-map-panel-title" id={titleId}>
-                Khu vực bán hàng
+                Phạm vi &amp; bản đồ tham chiếu
             </h3>
             <p className="mpd-sales-map-panel-desc">{desc}</p>
+            <p className="mpd-sales-map-panel-note">
+                Bản đồ dưới đây là khung Việt Nam để tham chiếu địa lý, không phải vị trí cửa hàng hay kho cụ thể của
+                người bán.
+            </p>
             <div className="mpd-sales-map-frame-wrap">
                 <iframe
-                    title="Bản đồ phạm vi tham chiếu Việt Nam"
+                    title="Bản đồ tham chiếu khu vực Việt Nam"
                     src={VN_OSM_EMBED}
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
@@ -106,6 +140,28 @@ function ProductSalesAreaPanel({ product, id }: { product: Product; id?: string 
     );
 }
 
+function ProductDetailSkeleton() {
+    return (
+        <div className="mpd-skeleton-page" aria-busy="true" aria-label="Đang tải trang sản phẩm">
+            <div className="mpd-skeleton-breadcrumb">
+                <div className="mpd-skeleton-bar" />
+                <div className="mpd-skeleton-bar" />
+                <div className="mpd-skeleton-bar" />
+            </div>
+            <div className="mpd-skeleton-layout">
+                <div className="mpd-skeleton-gallery-main" />
+                <div className="mpd-skeleton-info">
+                    <div className="mpd-skeleton-bar" />
+                    <div className="mpd-skeleton-bar" />
+                    <div className="mpd-skeleton-bar" />
+                    <div className="mpd-skeleton-bar" />
+                    <div className="mpd-skeleton-bar" />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function ProductDetailPage() {
     const { slug } = useParams<{ slug: string }>();
     const [product, setProduct] = useState<Product | null>(null);
@@ -113,6 +169,8 @@ export default function ProductDetailPage() {
     const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [notFound, setNotFound] = useState(false);
+    const [loadError, setLoadError] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
     const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
     const [activeImage, setActiveImage] = useState<string | null>(null);
 
@@ -120,60 +178,139 @@ export default function ProductDetailPage() {
     useEffect(() => {
         if (!slug) return;
         setLoading(true);
-        axios.get(`${API}/marketplace/products/${slug}`)
-            .then(r => {
+        setNotFound(false);
+        setLoadError(false);
+        setProduct(null);
+        axios
+            .get(`${API}/marketplace/products/${slug}`)
+            .then((r) => {
                 setProduct(r.data.product);
                 setActiveImage(r.data.product.thumbnail_url ?? null);
             })
-            .catch(err => {
-                if (err.response?.status === 404) setNotFound(true);
+            .catch((err) => {
+                if (err.response?.status === 404) {
+                    setNotFound(true);
+                } else {
+                    setLoadError(true);
+                }
             })
             .finally(() => setLoading(false));
-    }, [slug]);
+    }, [slug, reloadKey]);
     /* eslint-enable react-hooks/set-state-in-effect */
 
     useEffect(() => {
         if (!product) return;
-        axios.get(`${API}/marketplace/products/${product.id}/reviews`)
-            .then(r => setReviews(r.data.reviews ?? []))
+        axios
+            .get(`${API}/marketplace/products/${product.id}/reviews`)
+            .then((r) => setReviews(r.data.reviews ?? []))
             .catch(() => {});
-            
+
         if (product.category) {
-            axios.get(`${API}/marketplace/products`, {
-                params: { category: product.category.slug, limit: '12' },
-            }).then((r) => {
-                setRelatedProducts(
-                    (r.data.products ?? []).filter((p: Product) => p.id !== product.id).slice(0, 10)
-                );
-            }).catch(() => {});
+            axios
+                .get(`${API}/marketplace/products`, {
+                    params: { category: product.category.slug, limit: '12' },
+                })
+                .then((r) => {
+                    setRelatedProducts(
+                        (r.data.products ?? []).filter((p: Product) => p.id !== product.id).slice(0, 10)
+                    );
+                })
+                .catch(() => {});
         }
     }, [product]);
 
-    if (loading) return (
-        <div className="mpd-loading">
-            <div className="marketplace-loading-spinner" />
-            <p>Đang tải...</p>
-        </div>
-    );
+    if (!slug) {
+        return (
+            <>
+                <Helmet>
+                    <title>Không tìm thấy | GYMERVIET Marketplace</title>
+                </Helmet>
+                <div className="mpd-page mpd-not-found">
+                    <div className="mpd-not-found-icon">
+                        <PackageSearch className="h-8 w-8" strokeWidth={1.75} aria-hidden />
+                    </div>
+                    <h2>Liên kết không hợp lệ</h2>
+                    <p>Không có mã sản phẩm trong đường dẫn.</p>
+                    <div className="mpd-not-found-actions">
+                        <Link to="/marketplace" className="marketplace-btn-ghost">
+                            Về cửa hàng
+                        </Link>
+                    </div>
+                </div>
+            </>
+        );
+    }
 
-    if (notFound || !product) return (
-        <div className="mpd-not-found">
-            <p>😞</p>
-            <h2>Sản phẩm không tồn tại</h2>
-            <Link to="/marketplace" className="marketplace-btn-ghost">← Về cửa hàng</Link>
-        </div>
-    );
+    if (loading) {
+        return (
+            <>
+                <Helmet>
+                    <title>Đang tải… | GYMERVIET Marketplace</title>
+                </Helmet>
+                <ProductDetailSkeleton />
+            </>
+        );
+    }
 
-    const selectedVariant = product.variants?.find(v => v.id === selectedVariantId);
+    if (loadError && !notFound) {
+        return (
+            <>
+                <Helmet>
+                    <title>Không tải được sản phẩm | GYMERVIET Marketplace</title>
+                </Helmet>
+                <div className="mpd-page mpd-fetch-error">
+                    <div className="mpd-fetch-error-icon">
+                        <AlertCircle className="h-8 w-8" strokeWidth={1.75} aria-hidden />
+                    </div>
+                    <h2>Không tải được thông tin sản phẩm</h2>
+                    <p>Kiểm tra kết nối mạng hoặc thử lại sau. Nếu lỗi kéo dài, máy chủ có thể đang bận.</p>
+                    <div className="mpd-fetch-error-actions">
+                        <button type="button" className="marketplace-btn-ghost" onClick={() => setReloadKey((k) => k + 1)}>
+                            Thử lại
+                        </button>
+                        <Link to="/marketplace" className="marketplace-btn-ghost">
+                            Về cửa hàng
+                        </Link>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    if (notFound || !product) {
+        return (
+            <>
+                <Helmet>
+                    <title>Không tìm thấy sản phẩm | GYMERVIET Marketplace</title>
+                </Helmet>
+                <div className="mpd-page mpd-not-found">
+                    <div className="mpd-not-found-icon">
+                        <PackageSearch className="h-8 w-8" strokeWidth={1.75} aria-hidden />
+                    </div>
+                    <h2>Sản phẩm không tồn tại</h2>
+                    <p>Có thể sản phẩm đã gỡ hoặc đường dẫn không đúng. Quay lại cửa hàng hoặc chọn một danh mục.</p>
+                    <div className="mpd-not-found-actions">
+                        <Link to="/marketplace" className="marketplace-btn-ghost">
+                            Về cửa hàng
+                        </Link>
+                        <Link to="/marketplace?sort=newest" className="marketplace-btn-ghost">
+                            Xem hàng mới
+                        </Link>
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    const selectedVariant = product.variants?.find((v) => v.id === selectedVariantId);
     const displayPrice = selectedVariant?.price ?? product.price;
     const comparePrice = selectedVariant?.compare_at_price ?? product.compare_at_price;
     const hasDiscount = comparePrice && comparePrice > displayPrice;
     const discountPct = hasDiscount ? Math.round(((comparePrice! - displayPrice) / comparePrice!) * 100) : 0;
 
-    const allImages = [
-        ...(product.thumbnail_url ? [product.thumbnail_url] : []),
-        ...(product.gallery ?? []),
-    ].filter((url, idx, arr) => arr.indexOf(url) === idx);
+    const allImages = [...(product.thumbnail_url ? [product.thumbnail_url] : []), ...(product.gallery ?? [])].filter(
+        (url, idx, arr) => arr.indexOf(url) === idx
+    );
 
     const tp = product.training_package;
     const hasSpecs = Boolean(product.attributes && Object.keys(product.attributes).length > 0);
@@ -193,23 +330,27 @@ export default function ProductDetailPage() {
             </Helmet>
 
             <div className="mpd-page">
-                {/* Breadcrumb */}
-                <nav className="mpd-breadcrumb" aria-label="Đường dẫn">
-                    <Link to="/marketplace">Cửa hàng</Link>
-                    {product.category && (
-                        <>
-                            <span>/</span>
-                            <Link to={`/marketplace?category=${product.category.slug}`}>
-                                {product.category.icon_emoji} {product.category.label}
-                            </Link>
-                        </>
-                    )}
-                    <span>/</span>
-                    <span className="mpd-breadcrumb-current">{product.title}</span>
+                <nav aria-label="Đường dẫn">
+                    <ol className="mpd-breadcrumb">
+                        <li>
+                            <Link to="/marketplace">Cửa hàng</Link>
+                        </li>
+                        {product.category && (
+                            <li>
+                                <ChevronRight className="mpd-breadcrumb-sep" aria-hidden />
+                                <Link to={`/marketplace?category=${product.category.slug}`}>
+                                    {product.category.icon_emoji} {product.category.label}
+                                </Link>
+                            </li>
+                        )}
+                        <li>
+                            <ChevronRight className="mpd-breadcrumb-sep" aria-hidden />
+                            <span className="mpd-breadcrumb-current">{product.title}</span>
+                        </li>
+                    </ol>
                 </nav>
 
                 <div className="mpd-layout">
-                    {/* Left: Gallery */}
                     <div className="mpd-gallery">
                         <div className="mpd-gallery-main">
                             {activeImage ? (
@@ -237,7 +378,6 @@ export default function ProductDetailPage() {
                         )}
                     </div>
 
-                    {/* Right: Product info + sticky buy rail */}
                     <div className="mpd-info">
                         <div className="mpd-info-head">
                             <span className="mpd-category-label">
@@ -250,7 +390,6 @@ export default function ProductDetailPage() {
 
                         <h1 className="mpd-title">{product.title}</h1>
 
-                        {/* Seller Proof */}
                         {product.seller && (
                             <div className="mpd-seller-proof">
                                 <div className="mpd-seller-proof-avatar">
@@ -264,24 +403,33 @@ export default function ProductDetailPage() {
                                     <strong>{product.seller.full_name}</strong>
                                     <div className="mpd-seller-proof-stats">
                                         {product.sale_count > 0 && <span>{product.sale_count} đã bán</span>}
-                                        {product.review_count === 0 && product.avg_rating != null && Number(product.avg_rating) > 0 && (
-                                            <span>⭐ {Number(product.avg_rating).toFixed(1)}</span>
-                                        )}
+                                        {product.review_count === 0 &&
+                                            product.avg_rating != null &&
+                                            Number(product.avg_rating) > 0 && (
+                                                <span className="inline-flex items-center gap-1">
+                                                    <Star
+                                                        className="h-3.5 w-3.5 fill-amber-400 text-amber-500"
+                                                        strokeWidth={1.5}
+                                                        aria-hidden
+                                                    />
+                                                    {Number(product.avg_rating).toFixed(1)}
+                                                </span>
+                                            )}
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Rating summary */}
                         {product.review_count > 0 && (
                             <div className="mpd-rating-summary">
                                 <StarRating rating={product.avg_rating ?? 0} />
-                                <span className="mpd-rating-value">{product.avg_rating != null ? Number(product.avg_rating).toFixed(1) : '0.0'}</span>
+                                <span className="mpd-rating-value">
+                                    {product.avg_rating != null ? Number(product.avg_rating).toFixed(1) : '0.0'}
+                                </span>
                                 <span className="mpd-rating-count">({product.review_count} đánh giá)</span>
                             </div>
                         )}
 
-                        {/* Price */}
                         <div className="mpd-price-row">
                             <span className="mpd-price-main">{formatPrice(displayPrice, product.currency)}</span>
                             {hasDiscount && (
@@ -292,49 +440,90 @@ export default function ProductDetailPage() {
                             )}
                         </div>
 
-                        {/* Metrics strip */}
                         {tp ? (
                             <div className="mpd-metrics-strip">
-                                <span className="mpd-metric">🎯 {tp.goal.replace(/_/g, ' ')}</span>
-                                <span className="mpd-metric">📅 {tp.duration_weeks} tuần</span>
-                                <span className="mpd-metric">💪 {tp.level === 'all' ? 'Mọi level' : tp.level}</span>
-                                {tp.includes_nutrition && <span className="mpd-metric">🥗 Kèm dinh dưỡng</span>}
+                                <span className="mpd-metric">
+                                    <Target className="mpd-metric-icon" aria-hidden />
+                                    {tp.goal.replace(/_/g, ' ')}
+                                </span>
+                                <span className="mpd-metric">
+                                    <Calendar className="mpd-metric-icon" aria-hidden />
+                                    {tp.duration_weeks} tuần
+                                </span>
+                                <span className="mpd-metric">
+                                    <Activity className="mpd-metric-icon" aria-hidden />
+                                    {tp.level === 'all' ? 'Mọi level' : tp.level}
+                                </span>
+                                {tp.includes_nutrition && (
+                                    <span className="mpd-metric">
+                                        <Apple className="mpd-metric-icon" aria-hidden />
+                                        Kèm dinh dưỡng
+                                    </span>
+                                )}
                             </div>
                         ) : product.product_type === 'physical' ? (
                             <div className="mpd-metrics-strip">
                                 {product.stock_quantity != null && (
-                                    <span className="mpd-metric">📦 Còn {product.stock_quantity} sp</span>
+                                    <span className="mpd-metric">
+                                        <Package className="mpd-metric-icon" aria-hidden />
+                                        Còn {product.stock_quantity} sp
+                                    </span>
                                 )}
                                 {product.variants && product.variants.length > 0 && (
-                                    <span className="mpd-metric">🎨 {product.variants.length} lựa chọn</span>
+                                    <span className="mpd-metric">
+                                        <Palette className="mpd-metric-icon" aria-hidden />
+                                        {product.variants.length} lựa chọn
+                                    </span>
                                 )}
-                                <span className="mpd-metric">🚚 Giao hàng toàn quốc</span>
+                                <span className="mpd-metric">
+                                    <Truck className="mpd-metric-icon" aria-hidden />
+                                    Giao hàng toàn quốc
+                                </span>
                             </div>
                         ) : product.product_type === 'service' ? (
                             <div className="mpd-metrics-strip">
                                 {!!product.attributes?.['Format'] && (
-                                    <span className="mpd-metric">🤝 {String(product.attributes['Format'])}</span>
+                                    <span className="mpd-metric">
+                                        <Handshake className="mpd-metric-icon" aria-hidden />
+                                        {String(product.attributes['Format'])}
+                                    </span>
                                 )}
                                 {!!product.attributes?.['Phù hợp'] && (
-                                    <span className="mpd-metric">🎯 {String(product.attributes['Phù hợp'])}</span>
+                                    <span className="mpd-metric">
+                                        <Target className="mpd-metric-icon" aria-hidden />
+                                        {String(product.attributes['Phù hợp'])}
+                                    </span>
                                 )}
                                 {product.variants && product.variants.length > 0 && (
-                                    <span className="mpd-metric">📋 {product.variants.length} gói</span>
+                                    <span className="mpd-metric">
+                                        <ClipboardList className="mpd-metric-icon" aria-hidden />
+                                        {product.variants.length} gói
+                                    </span>
                                 )}
-                                <span className="mpd-metric">📅 Đặt lịch trước</span>
+                                <span className="mpd-metric">
+                                    <CalendarClock className="mpd-metric-icon" aria-hidden />
+                                    Đặt lịch trước
+                                </span>
                             </div>
                         ) : product.product_type === 'digital' ? (
                             <div className="mpd-metrics-strip">
-                                <span className="mpd-metric">📥 Tải ngay sau thanh toán</span>
-                                <span className="mpd-metric">♾️ Truy cập vĩnh viễn</span>
+                                <span className="mpd-metric">
+                                    <Download className="mpd-metric-icon" aria-hidden />
+                                    Tải ngay sau thanh toán
+                                </span>
+                                <span className="mpd-metric">
+                                    <InfinityIcon className="mpd-metric-icon" aria-hidden />
+                                    Truy cập vĩnh viễn
+                                </span>
                             </div>
                         ) : null}
 
-                        {/* Variants */}
                         {product.variants && product.variants.length > 0 && (
                             <div className="mpd-variants">
-                                <label className="mpd-variants-label">Lựa chọn:</label>
-                                <div className="mpd-variants-grid">
+                                <span className="mpd-variants-label" id="mpd-variants-label">
+                                    Lựa chọn:
+                                </span>
+                                <div className="mpd-variants-grid" role="group" aria-labelledby="mpd-variants-label">
                                     <button
                                         className={`mpd-variant-btn ${selectedVariantId === null ? 'mpd-variant-btn--active' : ''}`}
                                         onClick={() => setSelectedVariantId(null)}
@@ -342,46 +531,81 @@ export default function ProductDetailPage() {
                                     >
                                         Mặc định
                                     </button>
-                                    {product.variants.filter(v => v.is_active).map(v => (
-                                        <button
-                                            key={v.id}
-                                            className={`mpd-variant-btn ${selectedVariantId === v.id ? 'mpd-variant-btn--active' : ''}`}
-                                            onClick={() => setSelectedVariantId(v.id)}
-                                            type="button"
-                                        >
-                                            {v.variant_label}
-                                            {v.stock_quantity === 0 && <span className="mpd-variant-sold"> (Hết)</span>}
-                                        </button>
-                                    ))}
+                                    {product.variants
+                                        .filter((v) => v.is_active)
+                                        .map((v) => (
+                                            <button
+                                                key={v.id}
+                                                className={`mpd-variant-btn ${selectedVariantId === v.id ? 'mpd-variant-btn--active' : ''}`}
+                                                onClick={() => setSelectedVariantId(v.id)}
+                                                type="button"
+                                            >
+                                                {v.variant_label}
+                                                {v.stock_quantity === 0 && (
+                                                    <span className="mpd-variant-sold"> (Hết)</span>
+                                                )}
+                                            </button>
+                                        ))}
                                 </div>
                             </div>
                         )}
 
-                        {/* CTA */}
+                        <p className="sr-only">Thanh toán và giỏ hàng đang được hoàn thiện.</p>
                         <div className="mpd-cta-row">
-                            <button className="mpd-btn-primary" type="button">
-                                {product.product_type === 'digital' ? '🔓 Mua ngay' : '🛒 Thêm vào giỏ'}
+                            <button
+                                className="mpd-btn-primary"
+                                type="button"
+                                disabled
+                                title="Tính năng thanh toán đang hoàn thiện"
+                            >
+                                {product.product_type === 'digital' ? (
+                                    <>
+                                        <Unlock className="h-5 w-5 shrink-0" aria-hidden />
+                                        Mua ngay
+                                    </>
+                                ) : (
+                                    <>
+                                        <ShoppingCart className="h-5 w-5 shrink-0" aria-hidden />
+                                        Thêm vào giỏ
+                                    </>
+                                )}
                             </button>
-                            <button className="mpd-btn-secondary" type="button">
-                                ♡ Lưu
+                            <button
+                                className="mpd-btn-secondary"
+                                type="button"
+                                disabled
+                                title="Danh sách yêu thích đang hoàn thiện"
+                                aria-label="Lưu sản phẩm (sắp ra mắt)"
+                            >
+                                <Heart className="h-5 w-5" strokeWidth={2} aria-hidden />
                             </button>
                         </div>
 
-                        {/* Trust signals */}
                         <ul className="mpd-trust">
                             {product.product_type === 'digital' && (
-                                <li>📥 Tải ngay sau khi thanh toán</li>
+                                <li>
+                                    <Download className="mpd-trust-icon" aria-hidden />
+                                    Tải ngay sau khi thanh toán
+                                </li>
                             )}
                             {product.product_type === 'physical' && (
-                                <li>🚚 Giao hàng toàn quốc</li>
+                                <li>
+                                    <Truck className="mpd-trust-icon" aria-hidden />
+                                    Giao hàng toàn quốc
+                                </li>
                             )}
-                            <li>🔒 Thanh toán an toàn</li>
-                            <li>💬 Hỗ trợ 24/7</li>
+                            <li>
+                                <Lock className="mpd-trust-icon" aria-hidden />
+                                Thanh toán an toàn
+                            </li>
+                            <li>
+                                <MessageCircle className="mpd-trust-icon" aria-hidden />
+                                Hỗ trợ 24/7
+                            </li>
                         </ul>
                     </div>
                 </div>
 
-                {/* ── Stacked Content Sections ── */}
                 <div className="mpd-stacked-sections">
                     <section className="mpd-section" id="description">
                         <h2 className="mpd-section-title">Mô tả sản phẩm</h2>
@@ -396,36 +620,52 @@ export default function ProductDetailPage() {
 
                                     {tp?.program_structure && tp.preview_weeks > 0 && (
                                         <div className="mpd-program-preview">
-                                            <h3>📋 Xem trước lịch tập (Tuần 1)</h3>
-                                            {Object.entries(tp.program_structure).slice(0, tp.preview_weeks).map(([week, days]) => (
-                                                <div key={week} className="mpd-program-week">
-                                                    <h4>{week.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}</h4>
-                                                    {Object.entries(days).map(([day, plan]) => (
-                                                        <div key={day} className="mpd-program-day">
-                                                            <strong>{plan.title}</strong>
-                                                            {plan.exercises.length > 0 && (
-                                                                <div className="mpd-table-scroll">
-                                                                    <table className="mpd-exercise-table">
-                                                                        <thead>
-                                                                            <tr><th>Bài tập</th><th>Sets</th><th>Reps</th><th>Nghỉ</th></tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            {plan.exercises.map((ex, i) => (
-                                                                                <tr key={i}>
-                                                                                    <td>{ex.name}</td>
-                                                                                    <td>{ex.sets}</td>
-                                                                                    <td>{ex.reps}</td>
-                                                                                    <td>{ex.rest_seconds ? `${ex.rest_seconds}s` : '—'}</td>
+                                            <h3 className="mpd-program-preview-title">
+                                                <ClipboardList className="mpd-metric-icon h-5 w-5" aria-hidden />
+                                                Xem trước lịch tập (Tuần 1)
+                                            </h3>
+                                            {Object.entries(tp.program_structure)
+                                                .slice(0, tp.preview_weeks)
+                                                .map(([week, days]) => (
+                                                    <div key={week} className="mpd-program-week">
+                                                        <h4>
+                                                            {week.replace('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+                                                        </h4>
+                                                        {Object.entries(days).map(([day, plan]) => (
+                                                            <div key={day} className="mpd-program-day">
+                                                                <strong>{plan.title}</strong>
+                                                                {plan.exercises.length > 0 && (
+                                                                    <div className="mpd-table-scroll">
+                                                                        <table className="mpd-exercise-table">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>Bài tập</th>
+                                                                                    <th>Sets</th>
+                                                                                    <th>Reps</th>
+                                                                                    <th>Nghỉ</th>
                                                                                 </tr>
-                                                                            ))}
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ))}
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {plan.exercises.map((ex, i) => (
+                                                                                    <tr key={i}>
+                                                                                        <td>{ex.name}</td>
+                                                                                        <td>{ex.sets}</td>
+                                                                                        <td>{ex.reps}</td>
+                                                                                        <td>
+                                                                                            {ex.rest_seconds
+                                                                                                ? `${ex.rest_seconds}s`
+                                                                                                : '—'}
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                ))}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ))}
                                         </div>
                                     )}
                                 </div>
@@ -474,24 +714,29 @@ export default function ProductDetailPage() {
                     )}
 
                     <section className="mpd-section" id="reviews">
-                        <h2 className="mpd-section-title">Đánh giá từ khách hàng {product.review_count > 0 && `(${product.review_count})`}</h2>
+                        <h2 className="mpd-section-title">
+                            Đánh giá từ khách hàng {product.review_count > 0 && `(${product.review_count})`}
+                        </h2>
                         <div className="mpd-reviews">
                             {reviews.length === 0 ? (
                                 <p className="mpd-empty-text">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
                             ) : (
-                                reviews.map(r => (
+                                reviews.map((r) => (
                                     <div key={r.id} className="mpd-review">
                                         <div className="mpd-review-head">
                                             <strong>{r.user?.full_name ?? 'Người dùng'}</strong>
                                             <StarRating rating={r.rating} />
                                             {r.is_verified_purchase && (
-                                                <span className="mpd-verified-badge">✓ Đã mua</span>
+                                                <span className="mpd-verified-badge inline-flex items-center gap-1">
+                                                    <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+                                                    Đã mua
+                                                </span>
                                             )}
                                             <span className="mpd-review-date">
                                                 {new Date(r.created_at).toLocaleDateString('vi-VN')}
                                             </span>
                                         </div>
-                                        {r.comment && <p className="mpd-review-comment">"{r.comment}"</p>}
+                                        {r.comment && <p className="mpd-review-comment">&quot;{r.comment}&quot;</p>}
                                         {r.reply_text && (
                                             <div className="mpd-review-reply">
                                                 <strong>Phản hồi từ người bán:</strong>
@@ -503,7 +748,6 @@ export default function ProductDetailPage() {
                             )}
                         </div>
                     </section>
-
                 </div>
             </div>
         </>

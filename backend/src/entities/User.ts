@@ -70,6 +70,10 @@ export class User {
     @Column({ type: 'boolean', default: false })
     is_verified!: boolean;
 
+    /** When true, seller may list more than one marketplace product (see marketplace listing quota). */
+    @Column({ type: 'boolean', default: false })
+    marketplace_membership_active!: boolean;
+
     @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
     slug!: string | null; // SEO-friendly URL slug for trainers (e.g., "nguyen-dieu-nhi")
 

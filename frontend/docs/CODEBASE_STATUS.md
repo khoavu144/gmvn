@@ -3,7 +3,7 @@
 **Cập nhật:** 2026-03-22  
 **Mục đích:** Một trang duy nhất mô tả **trạng thái thực tế** của repo (stack, UI, refactor, kiểm thử, nợ kỹ thuật). Khi merge PR lớn (UI, auth, gym, marketplace), nên chỉnh lại mục tương ứng và đổi ngày ở đầu file.
 
-**Tài liệu liên quan:** [UI_UX_AUDIT_BACKLOG.md](./UI_UX_AUDIT_BACKLOG.md) · [UI_UX_PROGRESS_LOG.md](./UI_UX_PROGRESS_LOG.md) · [UI_PAGE_REVIEW_CHECKLIST.md](./UI_PAGE_REVIEW_CHECKLIST.md) · [MANUAL_UX_CHECKLIST.md](./MANUAL_UX_CHECKLIST.md) · **Backend:** [../../backend/docs/CODEBASE_STATUS.md](../../backend/docs/CODEBASE_STATUS.md)
+**Tài liệu liên quan:** [UI_UX_AUDIT_BACKLOG.md](./UI_UX_AUDIT_BACKLOG.md) · [UI_UX_PROGRESS_LOG.md](./UI_UX_PROGRESS_LOG.md) · [UI_PAGE_REVIEW_CHECKLIST.md](./UI_PAGE_REVIEW_CHECKLIST.md) · [MANUAL_UX_CHECKLIST.md](./MANUAL_UX_CHECKLIST.md) · [MOBILE_TESTING.md](./MOBILE_TESTING.md) · **Backend:** [../../backend/docs/CODEBASE_STATUS.md](../../backend/docs/CODEBASE_STATUS.md)
 
 ---
 
@@ -32,7 +32,7 @@ Không có package manager ở root; mỗi app có `package.json` riêng.
 
 **Font (HTML + Tailwind):** Inter (body/sans), Manrope (display — qua `tailwind.config.js` `fontFamily.display` và biến `--font-display` trong `index.css`). Google Fonts trong `index.html`.
 
-**Scripts chất lượng:** `npm run lint`, `npm run build`, `npm run build:ci` (build + bundle budget), `npm run test:e2e` / `test:e2e:prod`, `screenshots:prod`, `lh:a11y`.
+**Scripts chất lượng:** `npm run lint`, `npm run build`, `npm run build:ci` (build + bundle budget), `npm run test:e2e` (desktop + mobile Playwright), `test:e2e:desktop`, `test:e2e:mobile`, `test:e2e:prod`, `screenshots:prod`, `lh:a11y`.
 
 ---
 
@@ -44,7 +44,7 @@ Quy ước ghi ở đầu [`src/index.css`](../src/index.css):
 - **Marketplace / editorial:** biến `--mk-*` (warm neutral), dùng qua `bg-[color:var(--mk-…)]` hoặc class `.marketplace-*`.
 - **Curator / PDP:** `--cur-*` trong [`src/styles/marketplace.css`](../src/styles/marketplace.css).
 
-**Đồng bộ neutral:** Đã chuyển `stone-*` / `zinc-*` → `gray-*` trên phần lớn `src`, **ngoại trừ** (cố ý) [`CoachDetailPage.tsx`](../src/pages/CoachDetailPage.tsx) và [`AthleteDetailPage.tsx`](../src/pages/AthleteDetailPage.tsx) — vẫn còn lớp `stone-*` cục bộ.
+**Đồng bộ neutral:** `stone-*` / `zinc-*` → `gray-*` trên phần lớn `src`, gồm cả [`CoachDetailPage.tsx`](../src/pages/CoachDetailPage.tsx) và [`AthleteDetailPage.tsx`](../src/pages/AthleteDetailPage.tsx) (modal/subnav/error shell dùng `gray-*`). Họ màu editorial **`--mk-*`** chủ yếu còn trong marketplace, gym-detail sections, và `coach-flagship/*`.
 
 **Layout chung:** `--header-height` (globals), `page-container`, `card`, `section-heading` trong `globals.css`.
 
@@ -70,7 +70,7 @@ Quy ước ghi ở đầu [`src/index.css`](../src/index.css):
 | **Gym detail** [`GymDetailPage.tsx`](../src/pages/GymDetailPage.tsx) | Long-scroll: các section mount cùng lúc; điều hướng phụ + `scrollIntoView` + `IntersectionObserver` (highlight); class `gym-detail-section` + `scroll-margin-top` cho offset header/subnav; copy/sticky rail theo kế hoạch overhaul. |
 | **Gyms list** [`Gyms.tsx`](../src/pages/Gyms.tsx) | Chuẩn hóa nhịp dọc, wrapper `.gyms-marketplace`, `CategoryStrip` grid header, `GymCard` flex + footer ghim trong lưới (theo plan layout). |
 | **Marketplace PDP** | [`ProductDetailPage.tsx`](../src/pages/ProductDetailPage.tsx) + `marketplace.css` (shell 1280px, gallery sticky, section spacing). |
-| **Coach / Athlete public** | Hai trang detail flagship: **không** nằm trong wave đồng bộ `gray` toàn cục (vẫn `stone` cục bộ). |
+| **Coach / Athlete public** | Trang detail ([`CoachDetailPage`](../src/pages/CoachDetailPage.tsx), [`AthleteDetailPage`](../src/pages/AthleteDetailPage.tsx)) dùng `gray-*` cho shell/modal/subnav; block editorial trong `components/coach-flagship/*` giữ `--mk-*`. |
 | **Dashboard** | Role-based: User / Athlete / Coach / Admin / Gym owner. |
 | **Legal** | `pages/legal/*` + `LegalPageLayout`. |
 
@@ -115,8 +115,8 @@ CI: xem [`.github/workflows`](../../.github/workflows) (frontend E2E, env secret
 
 ## 9. Nợ kỹ thuật / việc tùy chọn tiếp theo
 
-- Đồng bộ `stone` → `gray` trên **Coach detail** và **Athlete detail** nếu muốn một họ màu duy nhất toàn site.
-- Tiếp tục rút `var(--mk-*)` sang utility/token gọn hơn theo từng route group (không bắt buộc một lần).
+- **`ProfileCV.tsx`:** vẫn nhiều `var(--mk-*)` (CV preview/editor); wave tiếp theo có thể chuyển sang `gray-*` hoặc class chung.
+- Tiếp tục rút `var(--mk-*)` khỏi shell nếu xuất hiện thêm (giữ `mk` cho gym-detail, coach-flagship, marketplace).
 - Bundle / LCP: theo dõi số Lighthouse trong [UI_UX_AUDIT_BACKLOG.md](./UI_UX_AUDIT_BACKLOG.md).
 - Cập nhật `frontend/README.md` từ template Vite mặc định sang hướng dẫn chạy project GYMERVIET (tùy ưu tiên).
 

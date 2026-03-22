@@ -63,8 +63,8 @@ export default function PaymentPolicyPage() {
                         'Đội ngũ xem xét trong 3–5 ngày làm việc.',
                         'Tiền được hoàn về tài khoản ngân hàng gốc trong 5–10 ngày làm việc sau khi duyệt.',
                     ].map((step, i) => (
-                        <div key={i} className="flex items-start gap-3 text-sm text-[color:var(--mk-text-soft)]">
-                            <span className="flex-shrink-0 w-5 h-5 rounded-full border border-[color:var(--mk-line)] flex items-center justify-center text-xs font-bold text-[color:var(--mk-muted)]">{i + 1}</span>
+                        <div key={i} className="flex items-start gap-3 text-sm text-gray-600">
+                            <span className="flex-shrink-0 w-5 h-5 rounded-full border border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">{i + 1}</span>
                             <span>{step}</span>
                         </div>
                     ))}

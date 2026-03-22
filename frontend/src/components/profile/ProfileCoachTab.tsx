@@ -196,12 +196,12 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
             {ToastComponent}
             <form onSubmit={handleProfile(onSubmitProfile)} className="space-y-6">
                 {successMsg && (
-                    <div className="bg-[color:var(--mk-paper)] border border-black text-black px-4 py-3 rounded-xs text-sm">
+                    <div className="bg-gray-50 border border-black text-black px-4 py-3 rounded-xs text-sm">
                         {successMsg}
                     </div>
                 )}
                 {profileError && (
-                    <div className="bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] text-[color:var(--mk-text)] px-4 py-3 rounded-xs text-sm">
+                    <div className="bg-gray-50 border border-gray-200 text-gray-900 px-4 py-3 rounded-xs text-sm">
                         Lỗi: {profileError}
                     </div>
                 )}
@@ -211,8 +211,8 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <label className="form-label">Đường dẫn hồ sơ</label>
-                            <div className="flex border border-[color:var(--mk-line)] rounded-xs bg-[color:var(--mk-paper)] focus-within:border-black focus-within:ring-1 focus-within:ring-black transition overflow-hidden">
-                                <span className="px-3 py-2.5 text-[color:var(--mk-muted)] text-sm border-r border-[color:var(--mk-line)] select-none">{profilePathLabel}</span>
+                            <div className="flex border border-gray-200 rounded-xs bg-gray-50 focus-within:border-black focus-within:ring-1 focus-within:ring-black transition overflow-hidden">
+                                <span className="px-3 py-2.5 text-gray-500 text-sm border-r border-gray-200 select-none">{profilePathLabel}</span>
                                 <input type="text" {...regProfile('slug')} placeholder="ten-user"
                                     className="flex-1 bg-white outline-none px-3 text-sm text-black w-full" />
                             </div>
@@ -222,14 +222,14 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                             <label className="form-label">Ảnh bìa hồ sơ</label>
                             <div className="flex flex-col gap-3">
                                 {watchProfile('cover_image_url') ? (
-                                    <div className="relative w-full aspect-[21/9] bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] rounded overflow-hidden">
+                                    <div className="relative w-full aspect-[21/9] bg-gray-50 border border-gray-200 rounded overflow-hidden">
                                         <img src={watchProfile('cover_image_url') || ''} alt="Xem trước ảnh bìa" className="w-full h-full object-cover" />
                                         <button type="button" onClick={() => setProfileValue('cover_image_url', '')} className="absolute top-2 right-2 bg-white/90 text-black px-2 py-1 rounded text-xs font-medium hover:bg-white transition shadow">
                                             Xóa ảnh
                                         </button>
                                     </div>
                                 ) : (
-                                    <div className="w-full aspect-[21/9] bg-[color:var(--mk-paper)] border-2 border-dashed border-[color:var(--mk-line)] rounded flex flex-col items-center justify-center text-[color:var(--mk-muted)]">
+                                    <div className="w-full aspect-[21/9] bg-gray-50 border-2 border-dashed border-gray-200 rounded flex flex-col items-center justify-center text-gray-500">
                                         <span className="text-sm">Chưa có ảnh bìa</span>
                                     </div>
                                 )}
@@ -241,19 +241,19 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                             </div>
                         </div>
                     </div>
-                    <div className="flex flex-col sm:flex-row gap-6 pt-4 border-t border-[color:var(--mk-line)]">
+                    <div className="flex flex-col sm:flex-row gap-6 pt-4 border-t border-gray-200">
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" {...regProfile('is_profile_public')} className="rounded-xs text-black border-[color:var(--mk-line)] focus:ring-black" />
+                            <input type="checkbox" {...regProfile('is_profile_public')} className="rounded-xs text-black border-gray-200 focus:ring-black" />
                             <span className="text-sm font-medium text-black">Hiển thị hồ sơ công khai</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" {...regProfile('is_accepting_clients')} className="rounded-xs text-black border-[color:var(--mk-line)] focus:ring-black" />
+                            <input type="checkbox" {...regProfile('is_accepting_clients')} className="rounded-xs text-black border-gray-200 focus:ring-black" />
                             <span className="text-sm font-medium text-black">Đang nhận học viên mới</span>
                         </label>
                     </div>
 
                     {/* Template & Theme Settings */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-[color:var(--mk-line)] mt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-gray-200 mt-4">
                         <div>
                             <label className="form-label">Bố cục hồ sơ công khai</label>
                             <div className="grid grid-cols-2 gap-2 mt-1">
@@ -263,9 +263,9 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                                 ].map(opt => (
                                     <label key={opt.value} className="cursor-pointer">
                                         <input type="radio" value={opt.value} {...regProfile('profile_template')} className="sr-only" />
-                                        <div className={`p-3 border text-left transition-colors ${watchProfile('profile_template') === opt.value ? 'border-black bg-black text-white' : 'border-[color:var(--mk-line)] hover:border-[color:var(--mk-line)]'}`}>
+                                        <div className={`p-3 border text-left transition-colors ${watchProfile('profile_template') === opt.value ? 'border-black bg-black text-white' : 'border-gray-200 hover:border-gray-200'}`}>
                                             <p className="text-xs font-bold">{opt.label}</p>
-                                            <p className={`text-[10px] mt-0.5 ${watchProfile('profile_template') === opt.value ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-muted)]'}`}>{opt.desc}</p>
+                                            <p className={`text-[10px] mt-0.5 ${watchProfile('profile_template') === opt.value ? 'text-gray-500' : 'text-gray-500'}`}>{opt.desc}</p>
                                         </div>
                                     </label>
                                 ))}
@@ -280,9 +280,9 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                                 ].map(opt => (
                                     <label key={opt.value} className="cursor-pointer">
                                         <input type="radio" value={opt.value} {...regProfile('theme_color')} className="sr-only" />
-                                        <div className={`p-3 border text-left transition-colors ${watchProfile('theme_color') === opt.value ? 'border-black bg-black text-white' : 'border-[color:var(--mk-line)] hover:border-[color:var(--mk-line)]'}`}>
+                                        <div className={`p-3 border text-left transition-colors ${watchProfile('theme_color') === opt.value ? 'border-black bg-black text-white' : 'border-gray-200 hover:border-gray-200'}`}>
                                             <p className="text-xs font-bold">{opt.label}</p>
-                                            <p className={`text-[10px] mt-0.5 ${watchProfile('theme_color') === opt.value ? 'text-[color:var(--mk-muted)]' : 'text-[color:var(--mk-muted)]'}`}>{opt.desc}</p>
+                                            <p className={`text-[10px] mt-0.5 ${watchProfile('theme_color') === opt.value ? 'text-gray-500' : 'text-gray-500'}`}>{opt.desc}</p>
                                         </div>
                                     </label>
                                 ))}
@@ -292,13 +292,13 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
 
                     {/* Preview Link */}
                     {watchProfile('slug') && (
-                        <div className="pt-4 border-t border-[color:var(--mk-line)] mt-4 flex items-center gap-3">
-                            <span className="text-xs text-[color:var(--mk-muted)]">Liên kết hồ sơ của bạn:</span>
+                        <div className="pt-4 border-t border-gray-200 mt-4 flex items-center gap-3">
+                            <span className="text-xs text-gray-500">Liên kết hồ sơ của bạn:</span>
                             <a
                                 href={`${publicBasePath}/${watchProfile('slug')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-xs font-medium text-black underline underline-offset-2 hover:text-[color:var(--mk-text-soft)] transition-colors"
+                                className="text-xs font-medium text-black underline underline-offset-2 hover:text-gray-600 transition-colors"
                             >
                                 {publicBasePath}/{watchProfile('slug')} ↗
                             </a>
@@ -368,7 +368,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                             <input type="number" min={0} {...regProfile('success_stories', { valueAsNumber: true })} className="form-input" />
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-[color:var(--mk-line)]">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-200">
                         <div>
                             <label className="form-label">Địa điểm hoạt động (Tỉnh/Thành)</label>
                             <select {...regProfile('location')} className="form-input">
@@ -399,7 +399,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
 
                 <div className="card">
                     <h2 className="card-header border-none pb-0 mb-2">Chứng chỉ & Bằng cấp</h2>
-                    <p className="text-xs text-[color:var(--mk-muted)] mb-4">
+                    <p className="text-xs text-gray-500 mb-4">
                         Tải lên hình ảnh chứng chỉ của bạn. Những ảnh này sẽ được lưu và hiển thị trên hồ sơ công khai.
                     </p>
                     <input type="hidden" {...regProfile('certifications_json')} />
@@ -415,7 +415,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                                 certsArr = [];
                             }
                             return certsArr.map((cert, index) => (
-                                <div key={index} className="relative group border border-[color:var(--mk-line)] rounded-sm overflow-hidden aspect-video bg-[color:var(--mk-paper)]">
+                                <div key={index} className="relative group border border-gray-200 rounded-sm overflow-hidden aspect-video bg-gray-50">
                                     <img src={cert.url} alt={cert.name || 'Chứng chỉ'} className="w-full h-full object-cover" />
                                     <button
                                         type="button"
@@ -431,7 +431,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                             ));
                         })()}
 
-                        <label className={`border-2 border-dashed border-[color:var(--mk-line)] rounded-sm aspect-video flex flex-col items-center justify-center text-[color:var(--mk-muted)] hover:border-black hover:text-black transition ${isUploading ? 'cursor-wait opacity-50' : 'cursor-pointer'}`}>
+                        <label className={`border-2 border-dashed border-gray-200 rounded-sm aspect-video flex flex-col items-center justify-center text-gray-500 hover:border-black hover:text-black transition ${isUploading ? 'cursor-wait opacity-50' : 'cursor-pointer'}`}>
                             <span className="text-2xl mb-1">+</span>
                             <span className="text-xs font-medium text-center px-2">
                                 {isUploading ? 'Đang tải...' : 'Tải lên ảnh mới'}

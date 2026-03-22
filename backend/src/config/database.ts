@@ -72,6 +72,10 @@ import { ProhibitedKeyword } from '../entities/ProhibitedKeyword';
 
 // News Module
 import { NewsArticle } from '../entities/NewsArticle';
+import { UserProfileSection } from '../entities/UserProfileSection';
+import { UserProfileTerm } from '../entities/UserProfileTerm';
+import { UserProfileTermSelection } from '../entities/UserProfileTermSelection';
+import { GoogleFormImportLog } from '../entities/GoogleFormImportLog';
 
 const env = getEnv();
 
@@ -150,6 +154,10 @@ export const AppDataSource = new DataSource({
         ProhibitedKeyword,
         // News / Tin Tức
         NewsArticle,
+        UserProfileSection,
+        UserProfileTerm,
+        UserProfileTermSelection,
+        GoogleFormImportLog,
     ],
     subscribers: [],
     migrations: [__dirname + '/../migrations/*.{js,ts}'],

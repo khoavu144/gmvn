@@ -101,40 +101,40 @@ export default function AdminGalleryManagement() {
         <div className="space-y-6">
             {ToastComponent}
             {/* Header & Add form */}
-            <div className="bg-white p-6 rounded-lg border border-[color:var(--mk-line)] shadow-sm">
+            <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
                 <h3 className="text-lg font-black uppercase tracking-tight mb-4 flex items-center gap-2">
                     <Camera className="w-5 h-5" /> Thêm hình ảnh mới
                 </h3>
                 <form onSubmit={handleCreate} className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-xs font-bold text-[color:var(--mk-text-soft)] uppercase mb-1">Image URL *</label>
+                            <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Image URL *</label>
                             <input 
                                 type="url" 
                                 value={formItem.image_url}
                                 onChange={e => setFormItem({...formItem, image_url: e.target.value})}
                                 placeholder="https://..."
-                                className="w-full border border-[color:var(--mk-line)] rounded px-3 py-2 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-colors"
+                                className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-colors"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-[color:var(--mk-text-soft)] uppercase mb-1">Caption / Trích dẫn</label>
+                            <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Caption / Trích dẫn</label>
                             <input 
                                 type="text" 
                                 value={formItem.caption}
                                 onChange={e => setFormItem({...formItem, caption: e.target.value})}
                                 placeholder="Một khoảnh khắc đẹp..."
-                                className="w-full border border-[color:var(--mk-line)] rounded px-3 py-2 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-colors"
+                                className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-colors"
                             />
                         </div>
                     </div>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-xs font-bold text-[color:var(--mk-text-soft)] uppercase mb-1">Danh mục</label>
+                            <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Danh mục</label>
                             <select 
                                 value={formItem.category}
                                 onChange={e => setFormItem({...formItem, category: e.target.value as any})}
-                                className="w-full border border-[color:var(--mk-line)] rounded px-3 py-2 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-colors"
+                                className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-colors"
                             >
                                 <option value="workout">Tập Luyện</option>
                                 <option value="transformation">Chuyển hóa</option>
@@ -150,7 +150,7 @@ export default function AdminGalleryManagement() {
                                     type="checkbox" 
                                     checked={formItem.is_featured}
                                     onChange={e => setFormItem({...formItem, is_featured: e.target.checked})}
-                                    className="w-4 h-4 rounded border-[color:var(--mk-line)] text-black focus:ring-black"
+                                    className="w-4 h-4 rounded border-gray-200 text-black focus:ring-black"
                                 />
                                 <span className="text-sm font-semibold group-hover:text-black">Nổi bật (Featured)</span>
                             </label>
@@ -169,24 +169,24 @@ export default function AdminGalleryManagement() {
             </div>
 
             {/* List */}
-            <div className="bg-white rounded-lg border border-[color:var(--mk-line)] overflow-hidden shadow-sm">
-                <div className="p-4 border-b border-[color:var(--mk-line)] flex justify-between items-center bg-[color:var(--mk-paper)]">
-                    <h3 className="font-bold text-sm uppercase tracking-wider text-[color:var(--mk-text-soft)] flex items-center gap-2">
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                    <h3 className="font-bold text-sm uppercase tracking-wider text-gray-600 flex items-center gap-2">
                         <Filter className="w-4 h-4" /> Danh sách ảnh ({items.length})
                     </h3>
-                    <button onClick={() => loadGallery(page)} className="text-[color:var(--mk-muted)] hover:text-black p-1">
+                    <button onClick={() => loadGallery(page)} className="text-gray-500 hover:text-black p-1">
                         <RefreshCw className="w-4 h-4" />
                     </button>
                 </div>
                 
                 {loading ? (
-                    <div className="p-8 text-center text-[color:var(--mk-muted)]">Đang tải biểu dữ liệu...</div>
+                    <div className="p-8 text-center text-gray-500">Đang tải biểu dữ liệu...</div>
                 ) : items.length === 0 ? (
-                    <div className="p-8 text-center text-[color:var(--mk-muted)]">Chưa có hình ảnh nào trong thư viện.</div>
+                    <div className="p-8 text-center text-gray-500">Chưa có hình ảnh nào trong thư viện.</div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
-                            <thead className="bg-[color:var(--mk-paper)] border-b border-[color:var(--mk-line)] text-xs font-bold uppercase text-[color:var(--mk-muted)]">
+                            <thead className="bg-gray-50 border-b border-gray-200 text-xs font-bold uppercase text-gray-500">
                                 <tr>
                                     <th className="px-4 py-3">Hình ảnh</th>
                                     <th className="px-4 py-3">Chi tiết</th>
@@ -196,25 +196,25 @@ export default function AdminGalleryManagement() {
                             </thead>
                             <tbody>
                                 {items.map(item => (
-                                    <tr key={item.id} className="border-b border-[color:var(--mk-line)] hover:bg-[color:var(--mk-paper)] transition-colors">
+                                    <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                                         <td className="px-4 py-3">
-                                            <div className="w-24 h-24 rounded-lg overflow-hidden border border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] flex items-center justify-center relative group">
+                                            <div className="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center relative group">
                                                 <img src={item.image_url} alt="Gallery item" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                                                 {item.is_featured && <div className="absolute top-1 left-1 bg-yellow-500 text-white p-0.5 rounded-full"><Star size={10} className="fill-current"/></div>}
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <p className="font-semibold text-[color:var(--mk-text)] line-clamp-2">{item.caption || <span className="text-[color:var(--mk-muted)] italic">Không có trích dẫn</span>}</p>
-                                            <p className="text-xs text-[color:var(--mk-muted)] uppercase mt-1">Danh mục: {item.category}</p>
-                                            <p className="text-xs text-[color:var(--mk-muted)] mt-1">{new Date(item.created_at).toLocaleDateString('vi-VN')}</p>
+                                            <p className="font-semibold text-gray-900 line-clamp-2">{item.caption || <span className="text-gray-500 italic">Không có trích dẫn</span>}</p>
+                                            <p className="text-xs text-gray-500 uppercase mt-1">Danh mục: {item.category}</p>
+                                            <p className="text-xs text-gray-500 mt-1">{new Date(item.created_at).toLocaleDateString('vi-VN')}</p>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-[color:var(--mk-paper)] text-[color:var(--mk-text-soft)]">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-50 text-gray-600">
                                                 {item.source === 'admin_upload' ? 'Upload Trực Tiếp' : 'Từ Trainer'}
                                             </span>
                                             {item.linked_user && (
                                                 <div className="flex items-center gap-2 mt-2">
-                                                    <div className="w-5 h-5 rounded-full bg-[color:var(--mk-paper-strong)] overflow-hidden">
+                                                    <div className="w-5 h-5 rounded-full bg-gray-100 overflow-hidden">
                                                         {item.linked_user.avatar_url && <img src={item.linked_user.avatar_url} alt="" className="w-full h-full object-cover" />}
                                                     </div>
                                                     <span className="text-xs font-semibold">{item.linked_user.full_name}</span>
@@ -225,14 +225,14 @@ export default function AdminGalleryManagement() {
                                             <div className="flex items-center gap-2">
                                                 <button 
                                                     onClick={() => toggleFeatured(item)}
-                                                    className={`p-1.5 rounded-md border transition-colors ${item.is_featured ? 'border-yellow-200 bg-yellow-50 text-yellow-600' : 'border-[color:var(--mk-line)] text-[color:var(--mk-muted)] hover:text-black hover:border-black'}`}
+                                                    className={`p-1.5 rounded-md border transition-colors ${item.is_featured ? 'border-yellow-200 bg-yellow-50 text-yellow-600' : 'border-gray-200 text-gray-500 hover:text-black hover:border-black'}`}
                                                     title={item.is_featured ? "Gỡ nổi bật" : "Đánh dấu nổi bật"}
                                                 >
                                                     <Star className="w-4 h-4" />
                                                 </button>
                                                 <button 
                                                     onClick={() => handleDelete(item.id)}
-                                                    className="p-1.5 rounded-md border border-[color:var(--mk-line)] text-[color:var(--mk-muted)] hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
+                                                    className="p-1.5 rounded-md border border-gray-200 text-gray-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
                                                     title="Xoá"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -248,19 +248,19 @@ export default function AdminGalleryManagement() {
                 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                    <div className="p-4 border-t border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] flex justify-center gap-2">
+                    <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-center gap-2">
                         <button 
                             disabled={page === 1}
                             onClick={() => loadGallery(page - 1)}
-                            className="px-3 py-1 bg-white border border-[color:var(--mk-line)] rounded text-xs font-bold uppercase disabled:opacity-50"
+                            className="px-3 py-1 bg-white border border-gray-200 rounded text-xs font-bold uppercase disabled:opacity-50"
                         >
                             Trang trước
                         </button>
-                        <span className="px-3 py-1 text-sm font-medium text-[color:var(--mk-text-soft)]">Trang {page} / {totalPages}</span>
+                        <span className="px-3 py-1 text-sm font-medium text-gray-600">Trang {page} / {totalPages}</span>
                         <button 
                             disabled={page === totalPages}
                             onClick={() => loadGallery(page + 1)}
-                            className="px-3 py-1 bg-white border border-[color:var(--mk-line)] rounded text-xs font-bold uppercase disabled:opacity-50"
+                            className="px-3 py-1 bg-white border border-gray-200 rounded text-xs font-bold uppercase disabled:opacity-50"
                         >
                             Trang sau
                         </button>

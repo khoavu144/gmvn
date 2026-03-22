@@ -34,14 +34,14 @@ export default class ErrorBoundary extends Component<Props, State> {
 
         return (
             <div className="min-h-screen bg-white text-black flex items-center justify-center px-6 py-12">
-                <div className="w-full max-w-lg rounded-lg border border-[color:var(--mk-line)] bg-white p-8 shadow-sm text-center">
-                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">
+                <div className="w-full max-w-lg rounded-lg border border-gray-200 bg-white p-8 shadow-sm text-center">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">
                         GYMERVIET
                     </p>
                     <h1 className="mt-4 text-3xl font-black tracking-tight">
                         Đã xảy ra lỗi ở {this.props.scope || 'ứng dụng'}
                     </h1>
-                    <p className="mt-3 text-sm leading-6 text-[color:var(--mk-text-soft)]">
+                    <p className="mt-3 text-sm leading-6 text-gray-600">
                         Phiên hiển thị hiện tại đã bị gián đoạn. Bạn có thể tải lại trang hoặc quay về trang chủ.
                     </p>
                     <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -54,7 +54,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                         </button>
                         <a
                             href="/"
-                            className="inline-flex items-center justify-center rounded-lg border border-[color:var(--mk-line)] px-5 py-3 text-sm font-semibold text-[color:var(--mk-text-soft)] transition hover:border-black hover:text-black"
+                            className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-600 transition hover:border-black hover:text-black"
                         >
                             Về trang chủ
                         </a>

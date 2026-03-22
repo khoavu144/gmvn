@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { ClipboardList, Star, User, Calendar, Search, Eye } from 'lucide-react';
+import { ClipboardList, Star, User, Calendar, Search, Eye, Store } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import StatCard from '../../components/dashboard/StatCard';
 import QuickActionCard from '../../components/dashboard/QuickActionCard';
@@ -30,9 +30,9 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
                 <div className="relative z-20 max-w-2xl">
                     <span className="inline-block px-3 py-1 bg-white text-black text-[10px] font-black uppercase tracking-widest mb-4">Buổi tập tiếp theo</span>
                     <h3 className="text-3xl md:text-4xl font-black uppercase tracking-tight mb-3">Chưa có lịch tập</h3>
-                    <p className="text-[color:var(--mk-muted)] mb-8 max-w-md">Xem Coach trên GYMERVIET và chọn người phù hợp để lên lịch tập cùng bạn.</p>
+                    <p className="text-gray-500 mb-8 max-w-md">Xem Coach trên GYMERVIET và chọn người phù hợp để lên lịch tập cùng bạn.</p>
                     <div className="flex gap-4">
-                        <Link to="/coaches" className="bg-white text-black px-6 py-3 font-bold uppercase tracking-widest text-sm hover:bg-[color:var(--mk-paper-strong)] transition-colors inline-block rounded-sm">
+                        <Link to="/coaches" className="bg-white text-black px-6 py-3 font-bold uppercase tracking-widest text-sm hover:bg-gray-100 transition-colors inline-block rounded-sm">
                             Tìm Coach ngay
                         </Link>
                         <Link to="/workouts" className="border border-gray-600 text-white px-6 py-3 font-bold uppercase tracking-widest text-sm hover:border-white transition-colors inline-block rounded-sm hidden md:inline-block">
@@ -57,13 +57,13 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
             {/* Athlete public profile preview banner */}
             <div className="flex items-center justify-between gap-4 bg-gray-900 text-white rounded-lg px-5 py-4">
                 <div>
-                    <p className="text-[10px] uppercase tracking-widest text-[color:var(--mk-muted)] mb-1">Hồ sơ Athlete public của bạn</p>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Hồ sơ Athlete public của bạn</p>
                     <p className="text-sm font-bold truncate max-w-xs">{window.location.origin}{publicProfileUrl}</p>
                 </div>
                 <Link
                     to={publicProfileUrl}
                     target="_blank"
-                    className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider hover:bg-[color:var(--mk-paper)] transition-colors whitespace-nowrap shrink-0"
+                    className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider hover:bg-gray-50 transition-colors whitespace-nowrap shrink-0"
                 >
                     <Eye className="w-3.5 h-3.5" />
                     Xem ngay
@@ -80,12 +80,13 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
                 </p>
             </section>
 
-            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                 {[
                     { to: '/workouts', icon: <Calendar className="w-5 h-5" />, title: 'LỊCH TẬP', desc: 'Theo dõi lịch tập và điểm số tiến độ' },
                     { to: '/profile', icon: <Star className="w-5 h-5" />, title: 'CẬP NHẬT HỒ SƠ', desc: 'Cập nhật thành tích thi đấu' },
                     { to: '/coaches', icon: <Search className="w-5 h-5" />, title: 'TÌM COACH', desc: 'Khám phá huấn luyện viên phù hợp' },
                     { to: publicProfileUrl, icon: <Eye className="w-5 h-5" />, title: 'XEM PROFILE PUBLIC', desc: 'Kiểm tra giao diện người dùng nhìn thấy' },
+                    { to: '/dashboard/marketplace', icon: <Store className="w-5 h-5" />, title: 'MARKETPLACE', desc: 'Quản lý bài đăng bán hàng' },
                 ].map(card => (
                     <QuickActionCard
                         key={card.to}

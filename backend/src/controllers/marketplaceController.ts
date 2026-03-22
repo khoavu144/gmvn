@@ -8,6 +8,24 @@ import * as svc from '../services/marketplaceService';
 /** Express route params are typed string|string[] — use this to safely get a single value */
 const p = (v: string | string[] | undefined): string => (Array.isArray(v) ? v[0] : v) ?? '';
 
+function jsonSellerRuleError(res: Response, err: svc.MarketplaceSellerRuleError): void {
+    const body: Record<string, unknown> = {
+        success: false,
+        error: err.message,
+        error_code: err.code,
+    };
+    if (err.code === 'NEEDS_MEMBERSHIP') {
+        body.needs_membership = true;
+    }
+    if (err.code === 'FORBIDDEN_PRODUCT_TYPE') {
+        body.forbidden_product_type = true;
+    }
+    if (err.code === 'FORBIDDEN_TRAINING_PACKAGE') {
+        body.forbidden_training_package = true;
+    }
+    res.status(403).json(body);
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // CATEGORIES
 // ─────────────────────────────────────────────────────────────────────
@@ -82,6 +100,12 @@ export async function registerSeller(req: Request, res: Response): Promise<void>
         const userId = (req as any).user?.user_id as string | undefined;
         if (!userId) { res.status(401).json({ success: false, error: 'Unauthorized' }); return; }
 
+        const userType = (req as any).user?.user_type as string | undefined;
+        if (userType === 'admin') {
+            res.status(403).json({ success: false, error: 'Tài khoản admin không đăng ký bán trên marketplace.' });
+            return;
+        }
+
         const { shop_name, business_type } = req.body as {
             shop_name: string;
             business_type: 'individual' | 'brand' | 'gym' | 'coach';
@@ -96,6 +120,18 @@ export async function registerSeller(req: Request, res: Response): Promise<void>
             shop_name,
             business_type: business_type || 'individual',
         });
+        res.json({ success: true, profile });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Server error' });
+    }
+}
+
+export async function getMySellerProfile(req: Request, res: Response): Promise<void> {
+    try {
+        const userId = (req as any).user?.user_id as string | undefined;
+        if (!userId) { res.status(401).json({ success: false }); return; }
+
+        const profile = await svc.getSellerProfileByUserId(userId);
         res.json({ success: true, profile });
     } catch (err) {
         res.status(500).json({ success: false, error: 'Server error' });
@@ -141,6 +177,10 @@ export async function sellerCreateProduct(req: Request, res: Response): Promise<
         const product = await svc.createProduct(userId, req.body as svc.CreateProductInput);
         res.status(201).json({ success: true, product });
     } catch (err) {
+        if (err instanceof svc.MarketplaceSellerRuleError) {
+            jsonSellerRuleError(res, err);
+            return;
+        }
         console.error('[marketplace] createProduct error', err);
         res.status(500).json({ success: false, error: 'Server error' });
     }
@@ -154,7 +194,45 @@ export async function sellerCreateTrainingPackage(req: Request, res: Response): 
         const result = await svc.createTrainingPackage(userId, req.body as svc.CreateTrainingPackageInput);
         res.status(201).json({ success: true, ...result });
     } catch (err) {
+        if (err instanceof svc.MarketplaceSellerRuleError) {
+            jsonSellerRuleError(res, err);
+            return;
+        }
         console.error('[marketplace] createTrainingPackage error', err);
+        res.status(500).json({ success: false, error: 'Server error' });
+    }
+}
+
+export async function sellerGetProductById(req: Request, res: Response): Promise<void> {
+    try {
+        const userId = (req as any).user?.user_id as string | undefined;
+        if (!userId) { res.status(401).json({ success: false }); return; }
+
+        const id = p(req.params['id']);
+        const product = await svc.getSellerProductById(id, userId);
+        if (!product) {
+            res.status(404).json({ success: false, error: 'Sản phẩm không tồn tại' });
+            return;
+        }
+        res.json({ success: true, product });
+    } catch (err) {
+        res.status(500).json({ success: false, error: 'Server error' });
+    }
+}
+
+export async function sellerUpdateTrainingPackage(req: Request, res: Response): Promise<void> {
+    try {
+        const userId = (req as any).user?.user_id as string | undefined;
+        if (!userId) { res.status(401).json({ success: false }); return; }
+
+        const id = p(req.params['id']);
+        const trainingPackage = await svc.updateSellerTrainingPackage(id, userId, req.body);
+        if (!trainingPackage) {
+            res.status(404).json({ success: false, error: 'Không tìm thấy gói tập cho sản phẩm này' });
+            return;
+        }
+        res.json({ success: true, training_package: trainingPackage });
+    } catch (err) {
         res.status(500).json({ success: false, error: 'Server error' });
     }
 }
@@ -165,13 +243,17 @@ export async function sellerUpdateProduct(req: Request, res: Response): Promise<
         if (!userId) { res.status(401).json({ success: false }); return; }
 
         const id = p(req.params['id']);
-        const product = await svc.updateProduct(id, userId, req.body);
+        const product = await svc.updateProduct(id, userId, req.body as svc.SellerUpdateProductInput);
         if (!product) {
             res.status(404).json({ success: false, error: 'Sản phẩm không tồn tại' });
             return;
         }
         res.json({ success: true, product });
     } catch (err) {
+        if (err instanceof svc.MarketplaceSellerRuleError) {
+            jsonSellerRuleError(res, err);
+            return;
+        }
         res.status(500).json({ success: false, error: 'Server error' });
     }
 }

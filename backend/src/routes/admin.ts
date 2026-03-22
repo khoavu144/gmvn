@@ -7,7 +7,9 @@ import {
     rejectAction,
     getReports,
     getFinancialTransactions,
-    getSystemHealth
+    getSystemHealth,
+    getGoogleFormImportLogs,
+    getUserProfileCatalogExport,
 } from '../controllers/adminDashboardController';
 
 const router = Router();
@@ -23,5 +25,7 @@ router.post('/approvals/:logId/reject', rejectAction);
 router.get('/reports', getReports);
 router.get('/transactions', getFinancialTransactions);
 router.get('/health', getSystemHealth);
+router.get('/form-imports', getGoogleFormImportLogs);
+router.get('/catalog-export', getUserProfileCatalogExport);
 
 export default router;

@@ -62,7 +62,7 @@ export default function SubscriptionsPage() {
                     <div className="empty-state py-12">
                         <CreditCard className="mx-auto mb-4 h-12 w-12 text-gray-300" />
                         <h3 className="mb-2 text-xl font-bold tracking-tight text-black">Bạn chưa đăng ký gói tập nào</h3>
-                        <p className="mx-auto mb-6 max-w-md text-sm text-[color:var(--mk-muted)]">Khám phá các Coach chuyên nghiệp và tham gia chuyên đề để bắt đầu lộ trình.</p>
+                        <p className="mx-auto mb-6 max-w-md text-sm text-gray-500">Khám phá các Coach chuyên nghiệp và tham gia chuyên đề để bắt đầu lộ trình.</p>
                         <Link to="/coaches" className="btn-primary inline-flex text-xs uppercase tracking-[0.14em]">Tìm Coach ngay</Link>
                     </div>
                 ) : (
@@ -87,15 +87,15 @@ export default function SubscriptionsPage() {
                                         )}
                                     </div>
 
-                                    <p className="text-sm text-[color:var(--mk-text-soft)]">Huấn luyện viên: <span className="font-semibold text-black">{sub.trainer?.full_name}</span></p>
+                                    <p className="text-sm text-gray-600">Huấn luyện viên: <span className="font-semibold text-black">{sub.trainer?.full_name}</span></p>
 
-                                    <div className="flex flex-wrap gap-4 text-xs font-medium text-[color:var(--mk-muted)]">
+                                    <div className="flex flex-wrap gap-4 text-xs font-medium text-gray-500">
                                         <span className="inline-flex items-center gap-1.5"><Calendar className="h-3.5 w-3.5" /> Chu kỳ: {sub.subscription_type === 'monthly' ? 'Hàng tháng' : 'Mua đứt (Vĩnh viễn)'}</span>
                                         <span className="inline-flex items-center gap-1.5"><CreditCard className="h-3.5 w-3.5" /> {Number(sub.price_paid || 0).toLocaleString('vi-VN')} đ</span>
                                     </div>
 
                                     {sub.next_billing_date && sub.status === 'active' && (
-                                        <p className="page-pill bg-[color:var(--mk-paper)] text-[color:var(--mk-muted)]">Gia hạn tiếp theo: {new Date(sub.next_billing_date).toLocaleDateString('vi-VN')}</p>
+                                        <p className="page-pill bg-gray-50 text-gray-500">Gia hạn tiếp theo: {new Date(sub.next_billing_date).toLocaleDateString('vi-VN')}</p>
                                     )}
                                 </div>
 

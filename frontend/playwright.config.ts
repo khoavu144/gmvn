@@ -17,7 +17,12 @@ export default defineConfig({
     trace: 'on-first-retry',
     ignoreHTTPSErrors: true,
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    // Mobile viewports + touch / device scale (bắt layout khác desktop; không thay thế máy thật)
+    { name: 'mobile-chrome', use: { ...devices['Pixel 7'] } },
+    { name: 'mobile-safari', use: { ...devices['iPhone 13'] } },
+  ],
   webServer: isRemote
     ? undefined
     : {

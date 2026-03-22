@@ -79,7 +79,7 @@ export default function CoachMobileNav({
               ))}
             </nav>
             {primaryCta ? (
-              <button type="button" onClick={primaryCta.action} className="coach-mobile-nav-message-btn" style={{ background: 'var(--mk-text)', color: 'white' }}>
+              <button type="button" onClick={primaryCta.action} className="coach-mobile-nav-message-btn !bg-gray-900 !text-white hover:!bg-gray-800">
                 {primaryCta.text}
               </button>
             ) : (

@@ -130,7 +130,7 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
                                         </h3>
                                         {item.linked_user.user_type === 'trainer' && <CheckCircle2 size={16} className="text-blue-400" />}
                                     </div>
-                                    <p className="text-sm text-[color:var(--mk-muted)]">
+                                    <p className="text-sm text-gray-500">
                                         Xem hồ sơ cá nhân
                                     </p>
                                 </div>
@@ -138,7 +138,7 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
 
                             <Link 
                                 to={`/coach/${item.linked_user.slug}`}
-                                className="mt-4 w-full py-3 bg-white text-black hover:bg-[color:var(--mk-paper-strong)] font-bold rounded-lg text-center transition-colors flex items-center justify-center gap-2"
+                                className="mt-4 w-full py-3 bg-white text-black hover:bg-gray-100 font-bold rounded-lg text-center transition-colors flex items-center justify-center gap-2"
                             >
                                 Truy cập Profile
                             </Link>
@@ -152,7 +152,7 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
                                 </div>
                                 <div>
                                     <h3 className="text-base font-bold">GYMERVIET Team</h3>
-                                    <p className="text-sm text-[color:var(--mk-muted)]">Official Staff</p>
+                                    <p className="text-sm text-gray-500">Official Staff</p>
                                 </div>
                             </div>
                         </div>

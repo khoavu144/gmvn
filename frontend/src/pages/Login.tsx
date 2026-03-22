@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials, setLoading } from '../store/slices/authSlice';
 import { authApi } from '../services/auth';
 import type { RootState } from '../store/store';
+import { Button } from '../components/ui/Button';
 
 export default function Login() {
     const navigate = useNavigate();
@@ -119,14 +120,16 @@ export default function Login() {
                             </Link>
                         </div>
 
-                        <button
+                        <Button
                             type="submit"
-                            disabled={loading}
+                            variant="primary"
+                            size="full"
+                            loading={loading}
                             aria-busy={loading}
-                            className="btn-primary w-full mt-2"
+                            className="mt-2"
                         >
                             {loading ? 'Đang xác thực...' : 'Đăng nhập'}
-                        </button>
+                        </Button>
                     </form>
 
                     <div className="mt-6 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">

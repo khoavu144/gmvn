@@ -23,9 +23,9 @@ export default function FAQPage() {
                 ))}
             </div>
 
-            <div className="mt-10 p-6 border border-[color:var(--mk-line)] rounded-xs bg-white text-center">
+            <div className="mt-10 p-6 border border-gray-200 rounded-xs bg-white text-center">
                 <h3 className="font-bold text-black mb-2">Không tìm thấy câu trả lời?</h3>
-                <p className="text-sm text-[color:var(--mk-text-soft)] mb-4">Đội ngũ hỗ trợ của chúng tôi sẵn sàng giúp bạn.</p>
+                <p className="text-sm text-gray-600 mb-4">Đội ngũ hỗ trợ của chúng tôi sẵn sàng giúp bạn.</p>
                 <Link to="/contact" className="btn-primary inline-flex">
                     Liên hệ hỗ trợ
                 </Link>

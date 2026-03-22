@@ -30,10 +30,10 @@ export default function LegalPageLayout({
 
     return (
         <div className="page-shell">
-            <div className="border-b border-[color:var(--mk-line)] bg-white">
+            <div className="border-b border-gray-200 bg-white">
                 <div className={`page-container ${widthClass} py-10 sm:py-14`}>
                     {breadcrumbs && breadcrumbs.length > 0 && (
-                        <nav className="mb-6 flex items-center gap-2 text-xs text-[color:var(--mk-muted)]" aria-label="Breadcrumb">
+                        <nav className="mb-6 flex items-center gap-2 text-xs text-gray-500" aria-label="Breadcrumb">
                             <Link to="/" className="font-medium transition-colors hover:text-black">Trang chủ</Link>
                             {breadcrumbs.map((crumb, i) => (
                                 <span key={i} className="flex items-center gap-2">
@@ -43,7 +43,7 @@ export default function LegalPageLayout({
                                             {crumb.label}
                                         </Link>
                                     ) : (
-                                        <span className="font-semibold text-[color:var(--mk-text-soft)]">{crumb.label}</span>
+                                        <span className="font-semibold text-gray-600">{crumb.label}</span>
                                     )}
                                 </span>
                             ))}
@@ -57,7 +57,7 @@ export default function LegalPageLayout({
                             <p className="page-description max-w-2xl">{subtitle}</p>
                         )}
                         {lastUpdated && (
-                            <p className="mt-4 text-xs font-bold uppercase tracking-[0.14em] text-[color:var(--mk-muted)]">
+                            <p className="mt-4 text-xs font-bold uppercase tracking-[0.14em] text-gray-500">
                                 Cập nhật lần cuối: {lastUpdated}
                             </p>
                         )}
@@ -76,9 +76,9 @@ export default function LegalPageLayout({
 
 export function LegalSection({ title, children }: { title: string; children: React.ReactNode }) {
     return (
-        <section className="mb-6 rounded-lg border border-[color:var(--mk-line)] bg-white p-5 shadow-sm sm:p-6">
-            <h2 className="mb-4 border-b border-[color:var(--mk-line)] pb-3 text-lg font-bold tracking-tight text-black">{title}</h2>
-            <div className="space-y-3 text-sm leading-7 text-[color:var(--mk-text-soft)]">
+        <section className="mb-6 rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+            <h2 className="mb-4 border-b border-gray-200 pb-3 text-lg font-bold tracking-tight text-black">{title}</h2>
+            <div className="space-y-3 text-sm leading-7 text-gray-600">
                 {children}
             </div>
         </section>
@@ -106,7 +106,7 @@ export function LegalCallout({
     children: React.ReactNode;
 }) {
     const styles = {
-        info: 'border-[color:var(--mk-line)] bg-[color:var(--mk-paper)] text-[color:var(--mk-text-soft)]',
+        info: 'border-gray-200 bg-gray-50 text-gray-600',
         warning: 'border-amber-200 bg-amber-50 text-amber-800',
         danger: 'border-black bg-black text-white',
     }[type];

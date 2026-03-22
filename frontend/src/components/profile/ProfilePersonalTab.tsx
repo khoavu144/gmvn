@@ -57,6 +57,12 @@ export function ProfilePersonalTab({ user, onUpdate }: Props) {
     });
 
     const onSubmitPersonal = (data: PersonalFormValues) => {
+        if (user.user_type === 'trainer') {
+            const { specialties: _s, ...rest } = data;
+            void _s;
+            mutationPersonal.mutate(rest);
+            return;
+        }
         const specialtiesArray = data.specialties
             ? data.specialties.split(',').map((s) => s.trim()).filter(Boolean)
             : null;
@@ -68,12 +74,12 @@ export function ProfilePersonalTab({ user, onUpdate }: Props) {
             <h2 className="card-header">Thông tin chung</h2>
 
             {successMsgPersonal && (
-                <div className="mb-6 bg-[color:var(--mk-paper)] border border-black text-black px-4 py-3 rounded-xs text-sm">
+                <div className="mb-6 bg-gray-50 border border-black text-black px-4 py-3 rounded-xs text-sm">
                     {successMsgPersonal}
                 </div>
             )}
             {mutationPersonal.isError && (
-                <div className="mb-6 bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] text-black px-4 py-3 rounded-xs text-sm">
+                <div className="mb-6 bg-gray-50 border border-gray-200 text-black px-4 py-3 rounded-xs text-sm">
                     Lỗi khi lưu thông tin.
                 </div>
             )}
@@ -92,7 +98,7 @@ export function ProfilePersonalTab({ user, onUpdate }: Props) {
                 </div>
 
                 {user.user_type === 'athlete' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2 border-t border-[color:var(--mk-line)] mt-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2 border-t border-gray-200 mt-6">
                         <div>
                             <label className="form-label">Chiều cao (cm)</label>
                             <input type="number" {...regPersonal('height_cm', { valueAsNumber: true })} className="form-input" />
@@ -112,18 +118,19 @@ export function ProfilePersonalTab({ user, onUpdate }: Props) {
                     </div>
                 )}
                 {user.user_type === 'trainer' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-[color:var(--mk-line)]">
+                    <div className="grid grid-cols-1 gap-6 pt-6 border-t border-gray-200">
                         <div>
                             <label className="form-label">Giá dịch vụ tham khảo (₫/tháng)</label>
                             <input type="number" {...regPersonal('base_price_monthly', { valueAsNumber: true })} className="form-input" />
                         </div>
-                        <div>
-                            <label className="form-label">Chuyên môn (cách nhau bởi dấu phẩy)</label>
-                            <input type="text" {...regPersonal('specialties')} placeholder="Yoga, Giảm cân, Tăng cơ..." className="form-input" />
-                        </div>
+                        <p className="text-sm text-gray-500">
+                            Chuyên môn huấn luyện: chọn từ danh sách có sẵn trong tab{' '}
+                            <span className="font-semibold text-black">Mục tiêu &amp; chuyên môn</span> — không cần gõ
+                            tay.
+                        </p>
                     </div>
                 )}
-                <div className="pt-6 border-t border-[color:var(--mk-line)] flex justify-end">
+                <div className="pt-6 border-t border-gray-200 flex justify-end">
                     <button type="submit" disabled={mutationPersonal.isPending} className="btn-primary min-w-[120px]">
                         {mutationPersonal.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
                     </button>

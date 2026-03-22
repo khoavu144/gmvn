@@ -1,6 +1,13 @@
 import { Router } from 'express';
 import { authenticate, trainerOnly, athleteOnly, requireAdmin } from '../middleware/auth';
-import { getOverview, getClients, getPayments, getAthleteOverview, getAdminStats } from '../controllers/dashboardController';
+import {
+    getOverview,
+    getClients,
+    getPayments,
+    getAthleteOverview,
+    getAdminStats,
+    getAdminUsers,
+} from '../controllers/dashboardController';
 
 const router = Router();
 
@@ -10,5 +17,6 @@ router.get('/payments', authenticate, trainerOnly, getPayments);
 
 router.get('/athlete/overview', authenticate, athleteOnly, getAthleteOverview);
 router.get('/admin/stats', authenticate, requireAdmin, getAdminStats);
+router.get('/admin/users', authenticate, requireAdmin, getAdminUsers);
 
 export default router;

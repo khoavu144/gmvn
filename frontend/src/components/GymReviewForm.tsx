@@ -37,17 +37,17 @@ const GymReviewForm: React.FC<GymReviewFormProps> = ({ gymId, branchId, onSucces
     return (
         <form onSubmit={handleSubmit} className="bg-white/5 border border-white/10 rounded-lg p-6 sm:p-8">
             <h3 className="text-xl font-black mb-1 text-white tracking-tight">Trải nghiệm của bạn</h3>
-            <p className="text-[color:var(--mk-muted)] text-sm mb-6">Chia sẻ chân thực để giúp cộng đồng đưa ra quyết định tốt hơn.</p>
+            <p className="text-gray-500 text-sm mb-6">Chia sẻ chân thực để giúp cộng đồng đưa ra quyết định tốt hơn.</p>
             
             <div className="mb-5">
-                <label className="block text-[10px] font-bold text-[color:var(--mk-muted)] mb-2.5 uppercase tracking-widest">Đánh giá chung</label>
+                <label className="block text-[10px] font-bold text-gray-500 mb-2.5 uppercase tracking-widest">Đánh giá chung</label>
                 <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map(star => (
                         <button
                             key={star}
                             type="button"
                             onClick={() => setRating(star)}
-                            className={`w-11 h-11 rounded-lg font-bold transition-all ${rating >= star ? 'bg-yellow-400 text-black scale-105 shadow-lg shadow-yellow-400/20 border border-yellow-400' : 'bg-white/5 border border-white/10 text-[color:var(--mk-muted)] hover:border-white/30 hover:text-white'}`}
+                            className={`w-11 h-11 rounded-lg font-bold transition-all ${rating >= star ? 'bg-yellow-400 text-black scale-105 shadow-lg shadow-yellow-400/20 border border-yellow-400' : 'bg-white/5 border border-white/10 text-gray-500 hover:border-white/30 hover:text-white'}`}
                         >
                             ★
                         </button>
@@ -55,7 +55,7 @@ const GymReviewForm: React.FC<GymReviewFormProps> = ({ gymId, branchId, onSucces
                 </div>
             </div>
             <div className="mb-6">
-                <label className="block text-[10px] font-bold text-[color:var(--mk-muted)] mb-2.5 uppercase tracking-widest">Chi tiết trải nghiệm</label>
+                <label className="block text-[10px] font-bold text-gray-500 mb-2.5 uppercase tracking-widest">Chi tiết trải nghiệm</label>
                 <textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
@@ -64,7 +64,7 @@ const GymReviewForm: React.FC<GymReviewFormProps> = ({ gymId, branchId, onSucces
                     className="w-full h-28 resize-none bg-black/50 text-white border border-white/20 rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-white focus:border-white placeholder-gray-600 transition-all font-medium text-sm shadow-inner"
                 ></textarea>
             </div>
-            <button type="submit" disabled={submitting} className="w-full sm:w-auto px-8 py-3.5 bg-white text-black font-black uppercase tracking-wider text-xs rounded-lg hover:bg-[color:var(--mk-paper-strong)] disabled:opacity-50 transition-colors">
+            <button type="submit" disabled={submitting} className="w-full sm:w-auto px-8 py-3.5 bg-white text-black font-black uppercase tracking-wider text-xs rounded-lg hover:bg-gray-100 disabled:opacity-50 transition-colors">
                 {submitting ? 'Đang gửi...' : 'Gửi Đánh Giá'}
             </button>
         </form>

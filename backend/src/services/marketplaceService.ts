@@ -3,6 +3,7 @@
  * Business logic for GYMERVIET Product Marketplace
  */
 import { AppDataSource } from '../config/database';
+import { User } from '../entities/User';
 import { Product, ProductStatus } from '../entities/Product';
 import { ProductCategory } from '../entities/ProductCategory';
 import { ProductVariant } from '../entities/ProductVariant';
@@ -46,6 +47,21 @@ export interface CreateProductInput {
     gallery?: string[];
     attributes?: Record<string, unknown>;
     tags?: string[];
+}
+
+/** Thrown when seller listing rules block create (membership, role, admin). */
+export class MarketplaceSellerRuleError extends Error {
+    constructor(
+        public readonly code:
+            | 'NEEDS_MEMBERSHIP'
+            | 'FORBIDDEN_PRODUCT_TYPE'
+            | 'FORBIDDEN_TRAINING_PACKAGE'
+            | 'ADMIN_NO_SELLER',
+        message: string,
+    ) {
+        super(message);
+        this.name = 'MarketplaceSellerRuleError';
+    }
 }
 
 export interface CreateTrainingPackageInput extends CreateProductInput {
@@ -113,6 +129,55 @@ async function determineProductStatus(
     }
 
     return 'active';
+}
+
+async function countSellerListings(userId: string): Promise<number> {
+    const repo = AppDataSource.getRepository(Product);
+    return repo.count({ where: { seller_id: userId, deleted_at: IsNull() } });
+}
+
+export async function getUserForMarketplace(userId: string): Promise<User | null> {
+    return AppDataSource.getRepository(User).findOneBy({ id: userId });
+}
+
+export async function getSellerProfileByUserId(userId: string): Promise<SellerProfile | null> {
+    return AppDataSource.getRepository(SellerProfile).findOne({ where: { user_id: userId } });
+}
+
+function assertNotAdminSeller(user: User): void {
+    if (user.user_type === 'admin') {
+        throw new MarketplaceSellerRuleError('ADMIN_NO_SELLER', 'Tài khoản admin không bán trên marketplace.');
+    }
+}
+
+export async function assertSellerListingMembershipQuota(user: User): Promise<void> {
+    const n = await countSellerListings(user.id);
+    if (n >= 1 && !user.marketplace_membership_active) {
+        throw new MarketplaceSellerRuleError(
+            'NEEDS_MEMBERSHIP',
+            'Bạn đã dùng 1 listing miễn phí. Nâng cấp membership để đăng thêm sản phẩm.',
+        );
+    }
+}
+
+export function assertSellerStandardProductType(user: User, input: CreateProductInput): void {
+    if (user.user_type === 'user' || user.user_type === 'gym_owner') {
+        if (input.product_type !== 'physical') {
+            throw new MarketplaceSellerRuleError(
+                'FORBIDDEN_PRODUCT_TYPE',
+                'Tài khoản của bạn chỉ được đăng sản phẩm vật lý trên marketplace.',
+            );
+        }
+    }
+}
+
+export function assertSellerTrainingPackageRole(user: User): void {
+    if (user.user_type !== 'athlete' && user.user_type !== 'trainer') {
+        throw new MarketplaceSellerRuleError(
+            'FORBIDDEN_TRAINING_PACKAGE',
+            'Chỉ Athlete hoặc Coach mới được đăng gói tập / giáo án.',
+        );
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -282,7 +347,12 @@ export async function getNewArrivals(limit = 8): Promise<Product[]> {
 // PRODUCTS — SELLER
 // ─────────────────────────────────────────────────────────────────────
 
-export async function createProduct(
+export type SellerUpdateProductInput = Partial<CreateProductInput> & {
+    category_id?: string;
+    status?: 'draft' | 'archived';
+};
+
+async function createProductInternal(
     sellerId: string,
     input: CreateProductInput,
 ): Promise<Product> {
@@ -315,12 +385,33 @@ export async function createProduct(
     return repo.save(product);
 }
 
+export async function createProduct(
+    sellerId: string,
+    input: CreateProductInput,
+): Promise<Product> {
+    const user = await getUserForMarketplace(sellerId);
+    if (!user) {
+        throw new Error('User not found');
+    }
+    assertNotAdminSeller(user);
+    assertSellerStandardProductType(user, input);
+    await assertSellerListingMembershipQuota(user);
+    return createProductInternal(sellerId, input);
+}
+
 export async function createTrainingPackage(
     sellerId: string,
     input: CreateTrainingPackageInput,
 ): Promise<{ product: Product; trainingPackage: TrainingPackage }> {
-    // Create base product
-    const product = await createProduct(sellerId, {
+    const user = await getUserForMarketplace(sellerId);
+    if (!user) {
+        throw new Error('User not found');
+    }
+    assertNotAdminSeller(user);
+    assertSellerTrainingPackageRole(user);
+    await assertSellerListingMembershipQuota(user);
+
+    const product = await createProductInternal(sellerId, {
         ...input,
         product_type: 'digital',
     });
@@ -350,7 +441,7 @@ export async function createTrainingPackage(
 export async function updateProduct(
     productId: string,
     sellerId: string,
-    input: Partial<CreateProductInput>,
+    input: SellerUpdateProductInput,
 ): Promise<Product | null> {
     const repo = AppDataSource.getRepository(Product);
     const product = await repo.findOne({
@@ -364,6 +455,28 @@ export async function updateProduct(
         product.title = input.title;
     }
 
+    if (input.category_id !== undefined && input.category_id !== product.category_id) {
+        product.category_id = input.category_id;
+        const synthetic: CreateProductInput = {
+            title: product.title,
+            description: product.description ?? undefined,
+            category_id: product.category_id,
+            product_type: product.product_type,
+            price: Number(product.price),
+            compare_at_price: product.compare_at_price != null ? Number(product.compare_at_price) : undefined,
+            stock_quantity: product.stock_quantity ?? undefined,
+            track_inventory: product.track_inventory,
+            sku: product.sku ?? undefined,
+            digital_file_url: product.digital_file_url ?? undefined,
+            preview_content: product.preview_content ?? undefined,
+            thumbnail_url: product.thumbnail_url ?? undefined,
+            gallery: product.gallery ?? undefined,
+            attributes: product.attributes ?? undefined,
+            tags: product.tags ?? undefined,
+        };
+        product.status = await determineProductStatus(synthetic, product.category_id, sellerId);
+    }
+
     Object.assign(product, {
         ...(input.description !== undefined && { description: input.description }),
         ...(input.price !== undefined && { price: input.price }),
@@ -375,9 +488,87 @@ export async function updateProduct(
         ...(input.tags !== undefined && { tags: input.tags }),
         ...(input.digital_file_url !== undefined && { digital_file_url: input.digital_file_url }),
         ...(input.preview_content !== undefined && { preview_content: input.preview_content }),
+        ...(input.product_type !== undefined && { product_type: input.product_type }),
     });
 
+    if (input.status !== undefined && (input.status === 'draft' || input.status === 'archived')) {
+        product.status = input.status;
+    }
+
+    const owner = await getUserForMarketplace(sellerId);
+    if (owner && (owner.user_type === 'user' || owner.user_type === 'gym_owner')) {
+        if (product.product_type !== 'physical') {
+            throw new MarketplaceSellerRuleError(
+                'FORBIDDEN_PRODUCT_TYPE',
+                'Tài khoản của bạn chỉ được đăng sản phẩm vật lý trên marketplace.',
+            );
+        }
+    }
+
     return repo.save(product);
+}
+
+export async function getSellerProductById(
+    productId: string,
+    sellerId: string,
+): Promise<Product | null> {
+    const repo = AppDataSource.getRepository(Product);
+    return repo.findOne({
+        where: { id: productId, seller_id: sellerId, deleted_at: IsNull() },
+        relations: ['category', 'training_package'],
+    });
+}
+
+export type UpdateTrainingPackageSellerInput = Partial<
+    Pick<
+        CreateTrainingPackageInput,
+        | 'goal'
+        | 'level'
+        | 'duration_weeks'
+        | 'sessions_per_week'
+        | 'equipment_required'
+        | 'includes_nutrition'
+        | 'includes_video'
+        | 'program_structure'
+        | 'preview_weeks'
+        | 'nutrition_guide'
+    >
+>;
+
+export async function updateSellerTrainingPackage(
+    productId: string,
+    sellerId: string,
+    input: UpdateTrainingPackageSellerInput,
+): Promise<TrainingPackage | null> {
+    const product = await AppDataSource.getRepository(Product).findOne({
+        where: { id: productId, seller_id: sellerId, deleted_at: IsNull() },
+        relations: ['training_package'],
+    });
+    if (!product?.training_package) {
+        return null;
+    }
+
+    const tpRepo = AppDataSource.getRepository(TrainingPackage);
+    const tp = product.training_package;
+
+    Object.assign(tp, {
+        ...(input.goal !== undefined && { goal: input.goal as TrainingPackage['goal'] }),
+        ...(input.level !== undefined && { level: input.level as TrainingPackage['level'] }),
+        ...(input.duration_weeks !== undefined && { duration_weeks: input.duration_weeks }),
+        ...(input.sessions_per_week !== undefined && { sessions_per_week: input.sessions_per_week }),
+        ...(input.equipment_required !== undefined && { equipment_required: input.equipment_required }),
+        ...(input.includes_nutrition !== undefined && { includes_nutrition: input.includes_nutrition }),
+        ...(input.includes_video !== undefined && { includes_video: input.includes_video }),
+        ...(input.program_structure !== undefined && {
+            program_structure: input.program_structure as unknown as TrainingPackage['program_structure'],
+        }),
+        ...(input.preview_weeks !== undefined && { preview_weeks: input.preview_weeks }),
+        ...(input.nutrition_guide !== undefined && {
+            nutrition_guide: input.nutrition_guide as TrainingPackage['nutrition_guide'],
+        }),
+    });
+
+    return tpRepo.save(tp);
 }
 
 export async function listSellerProducts(

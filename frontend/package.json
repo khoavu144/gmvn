@@ -11,10 +11,13 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:e2e": "playwright test",
+    "test:e2e:desktop": "playwright test --project=chromium",
+    "test:e2e:mobile": "playwright test --project=mobile-chrome --project=mobile-safari",
     "test:e2e:prod": "PLAYWRIGHT_BASE_URL=https://gymerviet.com playwright test",
     "screenshots:prod": "node scripts/capture-prod-screens.mjs",
     "test:e2e:ui": "playwright test --ui",
-    "lh:a11y": "lighthouse http://127.0.0.1:4173/ --only-categories=accessibility --chrome-flags=\"--headless --no-sandbox\""
+    "lh:a11y": "lighthouse http://127.0.0.1:4173/ --only-categories=accessibility --chrome-flags=\"--headless --no-sandbox\"",
+    "lh:a11y:routes": "node ./scripts/lighthouse-a11y-routes.mjs"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
@@ -24,9 +27,9 @@
     "@types/leaflet": "^1.9.21",
     "axios": "^1.13.6",
     "browser-image-compression": "^2.0.2",
-    "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "dompurify": "^3.3.3",
     "framer-motion": "^12.35.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.577.0",
@@ -47,6 +50,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@playwright/test": "^1.58.2",
+    "@types/dompurify": "^3.0.5",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -54,6 +58,7 @@
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.27",
     "eslint": "^9.39.1",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",

@@ -42,7 +42,7 @@ const GymReviewList: React.FC<GymReviewListProps> = ({ gymId, refreshTick = 0 })
     }
 
     if (reviews.length === 0) {
-        return <div className="text-[color:var(--mk-muted)] italic text-sm py-8 text-center border border-dashed border-white/20 rounded-lg bg-white/5">Chưa có đánh giá nào cho phòng tập này. Hãy là người đầu tiên!</div>;
+        return <div className="text-gray-500 italic text-sm py-8 text-center border border-dashed border-white/20 rounded-lg bg-white/5">Chưa có đánh giá nào cho phòng tập này. Hãy là người đầu tiên!</div>;
     }
 
     return (
@@ -105,11 +105,11 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, gymId, canReply, onRepl
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-0.5">
                         <span className="font-bold text-sm text-gray-100 truncate pr-2">{review.user?.full_name || `Hội viên ${review.user_id.substring(0, 4)}...`}</span>
-                        <span className="text-[10px] font-medium tracking-wider text-[color:var(--mk-muted)] uppercase whitespace-nowrap">{new Date(review.created_at).toLocaleDateString('vi-VN')}</span>
+                        <span className="text-[10px] font-medium tracking-wider text-gray-500 uppercase whitespace-nowrap">{new Date(review.created_at).toLocaleDateString('vi-VN')}</span>
                     </div>
                     <div className="flex items-center mb-3">
                         {[1, 2, 3, 4, 5].map(star => (
-                            <span key={star} className={`text-sm ${review.rating >= star ? 'text-yellow-400' : 'text-[color:var(--mk-text-soft)]'}`}>
+                            <span key={star} className={`text-sm ${review.rating >= star ? 'text-yellow-400' : 'text-gray-600'}`}>
                                 ★
                             </span>
                         ))}
@@ -123,9 +123,9 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, gymId, canReply, onRepl
                 <div className="mt-5 bg-black/50 border border-white/10 rounded-lg p-4 relative">
                     <div className="absolute -top-2 left-6 w-4 h-4 bg-black/50 border-t border-l border-white/10 rotate-45"></div>
                     <div className="flex items-center gap-2 mb-2 relative z-10">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--mk-muted)]">Phản hồi từ thiết chế</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Phản hồi từ thiết chế</span>
                         {review.replied_at && (
-                            <span className="text-[10px] text-[color:var(--mk-text-soft)]">
+                            <span className="text-[10px] text-gray-600">
                                 • {new Date(review.replied_at).toLocaleDateString('vi-VN')}
                             </span>
                         )}
@@ -140,7 +140,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, gymId, canReply, onRepl
                     {!showReplyForm ? (
                         <button
                             onClick={() => setShowReplyForm(true)}
-                            className="text-[10px] font-bold uppercase tracking-widest text-[color:var(--mk-muted)] hover:text-white transition-colors border border-white/20 px-3 py-1.5 rounded-lg hover:border-white"
+                            className="text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:text-white transition-colors border border-white/20 px-3 py-1.5 rounded-lg hover:border-white"
                         >
                             ↩ Trả lời đánh giá này
                         </button>
@@ -162,14 +162,14 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, gymId, canReply, onRepl
                                 <button
                                     type="submit"
                                     disabled={submitting || !replyText.trim()}
-                                    className="text-xs font-bold uppercase tracking-wider bg-white text-black px-4 py-2 rounded-lg hover:bg-[color:var(--mk-paper-strong)] disabled:opacity-50 transition-colors"
+                                    className="text-xs font-bold uppercase tracking-wider bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 transition-colors"
                                 >
                                     {submitting ? 'Đang gửi...' : 'Gửi phản hồi'}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => { setShowReplyForm(false); setReplyText(''); setReplyError(null); }}
-                                    className="text-xs font-bold uppercase tracking-wider text-[color:var(--mk-muted)] hover:text-white transition-colors px-3"
+                                    className="text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-white transition-colors px-3"
                                 >
                                     Hủy
                                 </button>

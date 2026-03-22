@@ -16,6 +16,7 @@ interface User {
     is_verified?: boolean;
     onboarding_completed?: boolean;
     gym_owner_status?: 'pending_review' | 'approved' | 'rejected' | null;
+    marketplace_membership_active?: boolean;
     created_at: string;
     updated_at?: string;
 }

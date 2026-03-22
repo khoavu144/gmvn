@@ -10,12 +10,12 @@ export default function GuidelinesPage() {
             maxWidth="xl"
         >
             {/* Tab-like navigation */}
-            <div className="flex gap-2 mb-10 border-b border-[color:var(--mk-line)] pb-0 overflow-x-auto">
+            <div className="flex gap-2 mb-10 border-b border-gray-200 pb-0 overflow-x-auto">
                 {['Tổng quan', 'Dành cho học viên', 'Dành cho Coach'].map((tab, i) => (
                     <a
                         key={tab}
                         href={`#section-${i}`}
-                        className="px-4 py-2.5 text-sm font-medium text-[color:var(--mk-text-soft)] hover:text-black border-b-2 border-transparent hover:border-[color:var(--mk-line)] whitespace-nowrap transition-colors"
+                        className="px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-black border-b-2 border-transparent hover:border-gray-200 whitespace-nowrap transition-colors"
                     >
                         {tab}
                     </a>
@@ -28,13 +28,13 @@ export default function GuidelinesPage() {
                     <p>GYMERVIET kết nối 3 nhóm người dùng chính:</p>
                     <div className="grid sm:grid-cols-3 gap-4 mt-3">
                         {[
-                            { role: 'Người tập (User)', desc: 'Tìm kiếm và đăng ký gói tập với Coach. Theo dõi lịch tập, nhắn tin với Coach.', color: 'border-[color:var(--mk-line)]' },
-                            { role: 'Vận động viên (Athlete)', desc: 'Như người tập nhưng có thêm portfolio chuyên nghiệp và có thể tạo gói tập của mình.', color: 'border-[color:var(--mk-line)]' },
+                            { role: 'Người tập (User)', desc: 'Tìm kiếm và đăng ký gói tập với Coach. Theo dõi lịch tập, nhắn tin với Coach.', color: 'border-gray-200' },
+                            { role: 'Vận động viên (Athlete)', desc: 'Như người tập nhưng có thêm portfolio chuyên nghiệp và có thể tạo gói tập của mình.', color: 'border-gray-200' },
                             { role: 'Coach chuyên nghiệp', desc: 'Tạo và bán gói tập, quản lý học viên, xây dựng hồ sơ public chuyên nghiệp.', color: 'border-black' },
                         ].map((r) => (
                             <div key={r.role} className={`card border ${r.color}`}>
                                 <h4 className="font-bold text-sm text-black mb-2">{r.role}</h4>
-                                <p className="text-sm text-[color:var(--mk-text-soft)]">{r.desc}</p>
+                                <p className="text-sm text-gray-600">{r.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -106,7 +106,7 @@ export default function GuidelinesPage() {
                 </LegalSection>
             </div>
 
-            <div className="mt-8 p-4 bg-[color:var(--mk-paper)] border border-[color:var(--mk-line)] rounded-xs text-sm text-[color:var(--mk-text-soft)]">
+            <div className="mt-8 p-4 bg-gray-50 border border-gray-200 rounded-xs text-sm text-gray-600">
                 Cần hỗ trợ thêm?{' '}
                 <Link to="/faq" className="font-medium text-black underline underline-offset-2">Xem FAQ</Link>
                 {' '}hoặc{' '}

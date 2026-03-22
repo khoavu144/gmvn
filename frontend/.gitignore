@@ -28,3 +28,6 @@ dist-ssr
 /test-results/
 /playwright-report/
 /blob-report/
+
+# Lighthouse (npm run lh:a11y:routes)
+lighthouse-a11y-*.json

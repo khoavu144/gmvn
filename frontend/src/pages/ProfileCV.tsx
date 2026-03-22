@@ -596,7 +596,7 @@ export default function ProfileCV() {
                                                 <div key={item.id}>
                                                     <button
                                                         onClick={() => setOpenFaqId(openFaqId === item.id ? null : item.id)}
-                                                        className={`w-full flex justify-between items-center py-4 text-left transition-colors ${isDark ? 'hover:text-white' : 'hover:text-black'} focus:outline-none`}
+                                                        className={`w-full flex justify-between items-center py-4 text-left transition-colors ${isDark ? 'hover:text-white' : 'hover:text-black'} focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mk-text)]/25 focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--mk-paper)] rounded-sm`}
                                                     >
                                                         <span className={`text-sm font-medium pr-4 ${text}`}>{item.question}</span>
                                                         <span className={`font-mono text-xs shrink-0 transition-transform duration-200 ${openFaqId === item.id ? 'rotate-45' : ''} ${muted}`}>+</span>

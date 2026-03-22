@@ -15,6 +15,14 @@ import {
 } from '../utils/jwt';
 import { hashPassword, verifyPassword } from '../utils/password';
 import { refreshTokenStore } from './refreshTokenStore';
+import {
+    setUserSelections,
+    validateSelections,
+    resolveCoachSpecialtyTermIdsFromLabels,
+    UserProfileCatalogError,
+} from './userProfileCatalogService';
+import type { AppUserType as ProfileRulesUserType } from '../config/userProfileRules';
+import { AppError } from '../utils/AppError';
 
 const getUserRepo = () => AppDataSource.getRepository(User);
 
@@ -39,6 +47,7 @@ class AuthService {
             gym_owner_status: user.gym_owner_status,
             is_verified: user.is_verified,
             onboarding_completed: user.onboarding_completed,
+            marketplace_membership_active: user.marketplace_membership_active,
             created_at: user.created_at,
             updated_at: user.updated_at,
         };
@@ -179,17 +188,52 @@ class AuthService {
         const user = await getUserRepo().findOneBy({ id: userId });
         if (!user) throw new Error('User not found');
 
+        const userType = user.user_type as ProfileRulesUserType;
+
         if (data.height_cm) user.height_cm = Number(data.height_cm);
         if (data.current_weight_kg) user.current_weight_kg = Number(data.current_weight_kg);
         if (data.experience_level) user.experience_level = String(data.experience_level);
         if (data.bio) user.bio = String(data.bio);
-        if (data.specialties && Array.isArray(data.specialties)) user.specialties = data.specialties;
+
+        const rawIds = data.term_ids;
+        let termIds: string[] = [];
+        let shouldPersistSelections = false;
+
+        if (Array.isArray(rawIds)) {
+            termIds = [...new Set(rawIds.map((x: unknown) => String(x)))];
+            shouldPersistSelections = true;
+        } else if (
+            userType === 'trainer' &&
+            Array.isArray(data.specialties) &&
+            data.specialties.length > 0
+        ) {
+            termIds = await resolveCoachSpecialtyTermIdsFromLabels(
+                data.specialties.map((x: unknown) => String(x)),
+            );
+            shouldPersistSelections = true;
+        }
+
+        if (!shouldPersistSelections && data.specialties && Array.isArray(data.specialties)) {
+            user.specialties = data.specialties;
+        }
+
+        try {
+            await validateSelections(userType, 'post_signup_wizard', termIds);
+            if (shouldPersistSelections) {
+                await setUserSelections(userId, userType, 'post_signup_wizard', termIds);
+            }
+        } catch (e) {
+            if (e instanceof UserProfileCatalogError && e.code === 'VALIDATION') {
+                throw new AppError(e.message, 400);
+            }
+            throw e;
+        }
 
         user.onboarding_completed = true;
-
         await getUserRepo().save(user);
 
-        return this.buildAuthUser(user);
+        const refreshed = await getUserRepo().findOneBy({ id: userId });
+        return this.buildAuthUser(refreshed!);
     }
 
     async resetPassword(input: ResetPasswordInput) {
@@ -227,6 +271,7 @@ class AuthService {
             is_verified: user.is_verified,
             onboarding_completed: user.onboarding_completed,
             gym_owner_status: user.gym_owner_status,
+            marketplace_membership_active: user.marketplace_membership_active,
             created_at: user.created_at,
             updated_at: user.updated_at,
         };

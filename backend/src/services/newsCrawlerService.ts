@@ -9,6 +9,7 @@ import { NewsArticle } from '../entities/NewsArticle';
 import { logger } from '../utils/logger';
 import { newsAiWriterService } from './newsAiWriterService';
 import { newsImageService } from './newsImageService';
+import { sanitizeNewsHtml } from '../utils/sanitizeNewsHtml';
 
 // ─── Crawl Source Configuration ──────────────────────────────────────────────
 
@@ -234,6 +235,8 @@ class NewsCrawlerService {
         for (const [oldUrl, newUrl] of Object.entries(imageMap)) {
             finalContent = finalContent.split(oldUrl).join(newUrl);
         }
+
+        finalContent = sanitizeNewsHtml(finalContent);
 
         // 4. Save article to DB with status 'draft' (requires admin publish)
         const article = repo.create({

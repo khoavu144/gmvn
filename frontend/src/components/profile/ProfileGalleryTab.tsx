@@ -32,7 +32,7 @@ export function ProfileGalleryTab() {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-black uppercase tracking-tight">Thư viện Ảnh</h2>
-                    <p className="text-[color:var(--mk-muted)] mt-1">Thêm ảnh tập, thành tích hoặc chứng chỉ để hồ sơ rõ ràng hơn.</p>
+                    <p className="text-gray-500 mt-1">Thêm ảnh tập, thành tích hoặc chứng chỉ để hồ sơ rõ ràng hơn.</p>
                 </div>
                 {!isAdding && (
                     <button onClick={() => setIsAdding(true)} className="btn-primary flex items-center gap-2">
@@ -66,7 +66,7 @@ export function ProfileGalleryTab() {
                         <div className="card border-black">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="card-header mb-0 border-0 pb-0">Thêm ảnh mới</h3>
-                                <button onClick={() => setIsAdding(false)} className="p-2 text-[color:var(--mk-muted)] hover:text-black hover:bg-[color:var(--mk-paper)] rounded-full transition-colors">
+                                <button onClick={() => setIsAdding(false)} className="p-2 text-gray-500 hover:text-black hover:bg-gray-50 rounded-full transition-colors">
                                     <X className="w-5 h-5" strokeWidth={2} aria-hidden />
                                 </button>
                             </div>
@@ -114,7 +114,7 @@ export function ProfileGalleryTab() {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
                             transition={{ duration: 0.2, delay: idx * 0.05 }}
-                            className="group relative aspect-[4/5] bg-[color:var(--mk-paper)] rounded-none overflow-hidden cursor-pointer"
+                            className="group relative aspect-[4/5] bg-gray-50 rounded-none overflow-hidden cursor-pointer"
                             onClick={() => setLightboxImage(img)}
                         >
                             <img src={img.image_url} alt={img.caption || 'gallery'} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
@@ -154,12 +154,12 @@ export function ProfileGalleryTab() {
             </div>
 
             {gallery.length === 0 && !isAdding && (
-                <div className="text-center py-16 px-4 bg-[color:var(--mk-paper)] border border-dashed border-[color:var(--mk-line)] rounded-none">
-                    <div className="w-16 h-16 bg-[color:var(--mk-paper-strong)] rounded-full flex items-center justify-center mx-auto mb-4">
-                        <ImageIconLucide className="w-8 h-8 text-[color:var(--mk-muted)]" strokeWidth={2} aria-hidden />
+                <div className="text-center py-16 px-4 bg-gray-50 border border-dashed border-gray-200 rounded-none">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <ImageIconLucide className="w-8 h-8 text-gray-500" strokeWidth={2} aria-hidden />
                     </div>
                     <h3 className="text-lg font-bold text-black mb-1">Chưa có hình ảnh nào</h3>
-                    <p className="text-[color:var(--mk-muted)] mb-6 max-w-sm mx-auto">Ảnh tập, phòng gym hoặc feedback học viên giúp người mới tin tưởng hơn.</p>
+                    <p className="text-gray-500 mb-6 max-w-sm mx-auto">Ảnh tập, phòng gym hoặc feedback học viên giúp người mới tin tưởng hơn.</p>
                     <button onClick={() => setIsAdding(true)} className="btn-primary">
                         Thêm bức ảnh đầu tiên
                     </button>

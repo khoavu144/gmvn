@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import apiClient from '../services/api';
+import { sanitizeNewsArticleHtml } from '../utils/sanitizeNewsContent';
 import { Clock, ArrowLeft, Tag, Eye } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -199,7 +200,7 @@ export default function NewsDetailPage() {
                             prose-a:text-amber-700 prose-a:no-underline hover:prose-a:underline
                             prose-img:rounded-lg prose-img:shadow-md
                             prose-ul:list-disc prose-ol:list-decimal"
-                        dangerouslySetInnerHTML={{ __html: article.content }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeNewsArticleHtml(article.content) }}
                     />
 
                     {/* Tags */}

@@ -4,8 +4,10 @@ import { AppDataSource } from '../config/database';
 import { ProgramReport } from '../entities/ProgramReport';
 import { FinancialTransaction } from '../entities/FinancialTransaction';
 import { User } from '../entities/User';
+import { UserProfileSection } from '../entities/UserProfileSection';
 import { GymCenter } from '../entities/GymCenter';
 import { refreshTokenStore } from '../services/refreshTokenStore';
+import { listGoogleFormImportLogs } from '../services/googleFormIngestService';
 
 export const getAuditLogs = async (req: Request, res: Response) => {
     try {
@@ -93,5 +95,39 @@ export const getSystemHealth = async (_req: Request, res: Response) => {
         });
     } catch (error: any) {
         res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+export const getGoogleFormImportLogs = async (req: Request, res: Response) => {
+    try {
+        const limit = Math.min(200, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10) || 50));
+        const logs = await listGoogleFormImportLogs(limit);
+        res.json({ success: true, logs });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+/** JSON để đồng bộ checkbox Google Form với slug nội bộ (admin only). */
+export const getUserProfileCatalogExport = async (_req: Request, res: Response) => {
+    try {
+        const repo = AppDataSource.getRepository(UserProfileSection);
+        const sections = await repo.find({
+            where: { is_active: true },
+            relations: ['terms'],
+            order: { sort_order: 'ASC' },
+        });
+        const data = sections.map((s) => ({
+            slug: s.slug,
+            title_vi: s.title_vi,
+            applies_to: s.applies_to,
+            terms: (s.terms || [])
+                .filter((t) => t.is_active)
+                .sort((a, b) => a.sort_order - b.sort_order)
+                .map((t) => ({ slug: t.slug, label_vi: t.label_vi })),
+        }));
+        res.json({ success: true, schemaVersion: 1, sections: data });
+    } catch (err: any) {
+        res.status(500).json({ error: err.message });
     }
 };

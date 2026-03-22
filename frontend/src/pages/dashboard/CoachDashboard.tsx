@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Users, DollarSign, MessageSquare, ClipboardList, Eye, User } from 'lucide-react';
+import { Users, DollarSign, MessageSquare, ClipboardList, Eye, User, Store } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import { gymService } from '../../services/gymService';
 import type { GymTrainerLink } from '../../types';
@@ -61,11 +61,11 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                             <div key={inv.id} className="bg-white border border-amber-200 p-4 rounded-lg flex justify-between items-center shadow-sm">
                                 <div>
                                     <p className="font-bold text-sm">{inv.gym_center?.name}</p>
-                                    <p className="text-xs text-[color:var(--mk-muted)]">Vị trí: {inv.role_at_gym || 'Coach'} • Chi nhánh: {inv.branch?.branch_name}</p>
+                                    <p className="text-xs text-gray-500">Vị trí: {inv.role_at_gym || 'Coach'} • Chi nhánh: {inv.branch?.branch_name}</p>
                                 </div>
                                 <div className="flex gap-2">
                                     <button onClick={() => handleAccept(inv.id)} className="bg-black text-white px-3 py-1.5 rounded-xs text-[10px] font-bold uppercase tracking-widest hover:bg-gray-800 transition-colors">Chấp nhận</button>
-                                    <button onClick={() => handleDecline(inv.id)} className="text-[color:var(--mk-muted)] px-3 py-1.5 rounded-xs text-[10px] font-bold uppercase tracking-widest hover:text-red-500 transition-colors">Từ chối</button>
+                                    <button onClick={() => handleDecline(inv.id)} className="text-gray-500 px-3 py-1.5 rounded-xs text-[10px] font-bold uppercase tracking-widest hover:text-red-500 transition-colors">Từ chối</button>
                                 </div>
                             </div>
                         ))}
@@ -88,13 +88,13 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
             {/* Coach public profile preview banner */}
             <div className="flex items-center justify-between gap-4 bg-gray-900 text-white rounded-lg px-5 py-4">
                 <div>
-                    <p className="text-[10px] uppercase tracking-widest text-[color:var(--mk-muted)] mb-1">Hồ sơ public của bạn</p>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Hồ sơ public của bạn</p>
                     <p className="text-sm font-bold truncate max-w-xs">{window.location.origin}{publicProfileUrl}</p>
                 </div>
                 <Link
                     to={publicProfileUrl}
                     target="_blank"
-                    className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider hover:bg-[color:var(--mk-paper)] transition-colors whitespace-nowrap shrink-0"
+                    className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-sm text-xs font-bold uppercase tracking-wider hover:bg-gray-50 transition-colors whitespace-nowrap shrink-0"
                 >
                     <Eye className="w-3.5 h-3.5" />
                     Xem ngay
@@ -103,13 +103,14 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
 
             {/* Quick actions */}
             <div>
-                <h3 className="text-h3 border-b border-[color:var(--mk-line)] pb-2 mb-4">Lối tắt</h3>
-                <div className="grid md:grid-cols-3 gap-4">
+                <h3 className="text-h3 border-b border-gray-200 pb-2 mb-4">Lối tắt</h3>
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     {[
                         { to: '/programs', icon: <ClipboardList className="w-5 h-5" />, title: 'QUẢN LÝ GÓI TẬP', desc: 'Tạo & publish chương trình' },
                         { to: '/messages', icon: <MessageSquare className="w-5 h-5" />, title: 'TIN NHẮN', desc: 'Chat với học viên' },
                         { to: '/profile', icon: <User className="w-5 h-5" />, title: 'CẬP NHẬT HỒ SƠ', desc: 'Chỉnh sửa thông tin chuyên môn' },
                         { to: publicProfileUrl, icon: <Eye className="w-5 h-5" />, title: 'XEM PROFILE PUBLIC', desc: 'Kiểm tra giao diện học viên nhìn thấy' },
+                        { to: '/dashboard/marketplace', icon: <Store className="w-5 h-5" />, title: 'MARKETPLACE', desc: 'Quản lý bài đăng bán hàng' },
                     ].map(card => (
                         <QuickActionCard
                             key={card.to}

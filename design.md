@@ -9,11 +9,11 @@
 
 | Layer | Technology |
 |---|---|
-| **Frontend** | React 18 + TypeScript, Vite, Redux Toolkit |
-| **Styling** | Tailwind CSS + Vanilla CSS modules (`coachProfile.css`, `index.css`) |
-| **Font** | [Lexend](https://fonts.google.com/specimen/Lexend) (primary), system-ui fallback |
-| **Routing** | React Router DOM v6 (`createBrowserRouter`) |
-| **State** | Redux Toolkit (`authSlice`, `profileSlice`, `communityGallerySlice`) |
+| **Frontend** | React 19 + TypeScript, Vite, Redux Toolkit, TanStack Query (where used) |
+| **Styling** | Tailwind CSS + [`frontend/src/index.css`](frontend/src/index.css), [`frontend/src/styles/globals.css`](frontend/src/styles/globals.css), [`frontend/src/styles/marketplace.css`](frontend/src/styles/marketplace.css) |
+| **Font** | **Inter** (body), **Manrope** (display) — see `frontend/index.html` and Tailwind `fontFamily` |
+| **Routing** | React Router DOM v7 |
+| **State** | Redux Toolkit (`authSlice`, `profileSlice`, …) |
 | **API Client** | Axios (`apiClient` singleton with JWT interceptor) |
 | **SEO** | `react-helmet-async` |
 | **Backend** | Node.js + Express + TypeScript |
@@ -27,44 +27,35 @@
 | **Email** | Nodemailer (SMTP) |
 | **Deployment** | Frontend → Vercel, Backend → Render |
 
+**Canonical design reference (implementation):** [`frontend/docs/CODEBASE_STATUS.md`](frontend/docs/CODEBASE_STATUS.md) §3 and the token map at the top of [`frontend/src/index.css`](frontend/src/index.css). This document tracks product intent; tokens in code win when they differ.
+
 ---
 
-## 2. Design System
+## 2. Design System (canonical in code)
 
-### Color Palette (Global CSS)
+### Layers
 
-```css
-/* Primary Dark */
---color-dark:    #1a1a2e   /* main backgrounds, sidebar */
---color-dark-2:  #16213e   /* gradient mid */
---color-accent:  #0f3460   /* gradient end, links */
-
-/* Indigo (action) */
---color-indigo:  #4338ca
---color-indigo-light: #6366f1
-
-/* Neutral */
---color-text:    #111111
---color-text-2:  #374151
---color-muted:   #6b7280
---color-border:  #e5e7eb
---color-bg:      #f9fafb
-```
+1. **App shell / dashboard / forms:** Tailwind **`gray-*`** + semantic success | warning | error | info (see `globals.css`).
+2. **Marketplace / warm editorial:** CSS variables **`--mk-*`** (OKLCH neutrals + accent) in `index.css`; used heavily in `marketplace.css` and marketplace routes.
+3. **Curator / product detail accents:** **`--cur-*`** in `marketplace.css` (browns, surfaces).
 
 ### Typography
 
-- **Font:** `Lexend`, weight 400–800
-- **Headings:** 700–800, color `#111`
-- **Body:** 400–500, 0.88–0.95rem, color `#374151`
-- **Muted:** `#6b7280`, 0.72–0.80rem
+- **Body:** Inter (`:root` and Tailwind `font-sans`).
+- **Display / headlines:** Manrope via `--font-display` and Tailwind `font-display`.
+- Type scale helpers: `--type-display-lg`, `--type-headline-sm`, etc. in `index.css`.
 
-### Component Tokens
+### Neutrals
 
-```
-border-radius: 8–16px (cards), 999px (pills/badges)
-box-shadow: 0 4px 12px rgba(0,0,0,0.06–0.12)
-transition: 0.15s ease (hover effects)
-```
+- Prefer **`gray-*`** for shell and auth flows so one neutral family spans list pages, dashboard, and legal.
+- **Coach/Athlete flagship** components under `components/coach-flagship/` may use **`--mk-*`** for editorial continuity with marketplace tone.
+
+### Component patterns
+
+- Shared UI: [`frontend/src/components/ui/`](frontend/src/components/ui/) (`Button`, `Badge`, …).
+- Layout: `page-shell`, `page-container`, `card`, `section-heading` in `globals.css`.
+- **Border radius:** ~8px cards, full pills where specified in components.
+- **Motion:** `transition` ~150ms; respect `prefers-reduced-motion` in `index.css`.
 
 ---
 

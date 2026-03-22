@@ -373,10 +373,10 @@ export default function CoachDetailPage() {
 
     if (!trainer) {
         return (
-            <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center gap-4 px-4 text-center">
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4 px-4 text-center">
                 <div className="text-5xl font-extrabold text-gray-100 mb-2">404</div>
-                <div className="text-stone-900 font-bold text-lg">Không tìm thấy Hồ sơ</div>
-                <p className="text-sm text-stone-500 max-w-sm">Người dùng này có thể đã thay đổi URL hoặc không còn hoạt động trên GYMERVIET.</p>
+                <div className="text-gray-900 font-bold text-lg">Không tìm thấy Hồ sơ</div>
+                <p className="text-sm text-gray-500 max-w-sm">Người dùng này có thể đã thay đổi URL hoặc không còn hoạt động trên GYMERVIET.</p>
                 {/* FIX: use Link not <a href> for SPA-smooth navigation */}
                 <Link to="/coaches" className="btn-primary mt-4 px-6">← Về trang khám phá</Link>
             </div>
@@ -561,30 +561,30 @@ export default function CoachDetailPage() {
                     aria-labelledby="payment-dialog-title"
                 >
                     <div className="bg-white rounded-lg p-6 sm:p-8 max-w-sm w-full space-y-6 shadow-md">
-                        <div className="flex justify-between items-center border-b border-stone-200 pb-4">
+                        <div className="flex justify-between items-center border-b border-gray-200 pb-4">
                             <h3 id="payment-dialog-title" className="text-xl font-extrabold">Thanh Toán</h3>
                             <button
                                 ref={paymentCloseRef}
                                 type="button"
                                 onClick={() => setPendingPayment(null)}
-                                className="rounded-md p-1 text-stone-500 hover:text-black text-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-900 focus-visible:ring-offset-2"
+                                className="rounded-md p-1 text-gray-500 hover:text-black text-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
                                 aria-label="Đóng hộp thoại thanh toán"
                             >✕</button>
                         </div>
                         <div className="text-center space-y-4">
-                            <p className="text-sm text-stone-600">Chuyển khoản với nội dung chính xác bên dưới.</p>
+                            <p className="text-sm text-gray-600">Chuyển khoản với nội dung chính xác bên dưới.</p>
                             <img
                                 src={`https://img.vietqr.io/image/970436-${import.meta.env.VITE_PLATFORM_BANK_ACCOUNT || '0987654321'}-compact2.png?amount=${pendingPayment.amount}&addInfo=${encodeURIComponent(pendingPayment.transfer_content)}&accountName=GYMERVIET`}
                                 alt="Mã QR VietQR chuyển khoản thanh toán gói tập"
-                                className="mx-auto border border-stone-200 rounded-lg w-48 h-48 object-contain"
+                                className="mx-auto border border-gray-200 rounded-lg w-48 h-48 object-contain"
                             />
-                            <div className="bg-stone-50 p-4 rounded-lg text-left text-sm space-y-2 font-mono">
+                            <div className="bg-gray-50 p-4 rounded-lg text-left text-sm space-y-2 font-mono">
                                 <div className="flex justify-between">
-                                    <span className="text-stone-500">Số tiền:</span>
+                                    <span className="text-gray-500">Số tiền:</span>
                                     <span className="font-bold text-black">{pendingPayment.amount.toLocaleString('vi-VN')} VND</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-stone-500">Nội dung:</span>
+                                    <span className="text-gray-500">Nội dung:</span>
                                     <span className="font-bold text-black border-b border-black">{pendingPayment.transfer_content}</span>
                                 </div>
                             </div>

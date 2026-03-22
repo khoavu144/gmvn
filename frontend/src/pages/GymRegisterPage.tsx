@@ -69,13 +69,13 @@ const GymRegisterPage: React.FC = () => {
     if (submitted || user?.gym_owner_status === 'pending_review') {
         return (
             <div className="min-h-[80vh] flex items-center justify-center p-4">
-                <div className="bg-white p-8 rounded-lg shadow-sm border border-[color:var(--mk-line)] border-t-4 border-t-black text-center max-w-lg w-full">
+                <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 border-t-4 border-t-black text-center max-w-lg w-full">
                     <div className="w-16 h-16 border-4 border-black rounded-full mx-auto mb-6 flex items-center justify-center">
                         <div className="w-1 h-8 bg-black rounded-full animate-bounce mx-0.5"></div>
                         <div className="w-1 h-8 bg-black rounded-full animate-bounce [animation-delay:0.2s] mx-0.5"></div>
                     </div>
                     <h2 className="text-2xl font-black mb-2 uppercase">Hồ sơ đang chờ duyệt</h2>
-                    <p className="text-[color:var(--mk-text-soft)] mb-6">
+                    <p className="text-gray-600 mb-6">
                         GYMERVIET đang xác minh thông tin phòng tập của bạn. Quá trình này thường mất từ 1-2 ngày làm việc. Chúng tôi sẽ liên hệ qua email nếu cần thêm thông tin.
                     </p>
                     <button 
@@ -100,10 +100,10 @@ const GymRegisterPage: React.FC = () => {
     if (user?.gym_owner_status === 'rejected') {
         return (
             <div className="min-h-[80vh] flex items-center justify-center p-4">
-                <div className="bg-white p-8 rounded-lg shadow-sm border border-[color:var(--mk-line)] border-t-4 border-t-red-600 text-center max-w-lg w-full">
+                <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 border-t-4 border-t-red-600 text-center max-w-lg w-full">
                     <div className="text-sm font-black uppercase tracking-widest text-red-600 mb-2">Hồ sơ bị từ chối</div>
                     <h2 className="text-2xl font-black mb-2 uppercase text-red-600">Xác minh thất bại</h2>
-                    <p className="text-[color:var(--mk-text-soft)]">
+                    <p className="text-gray-600">
                         Rất tiếc, thông tin đăng ký phòng tập của bạn không đáp ứng tiêu chuẩn của GYMERVIET. Vui lòng liên hệ bộ phận hỗ trợ để biết thêm chi tiết.
                     </p>
                 </div>
@@ -114,11 +114,11 @@ const GymRegisterPage: React.FC = () => {
     return (
         <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6">
             <div className="mb-8">
-                <h1 className="text-3xl font-black text-[color:var(--mk-text)] uppercase tracking-tight">Đăng ký Đối tác Gym Center</h1>
-                <p className="text-[color:var(--mk-text-soft)] mt-2">Vui lòng cung cấp chính xác thông tin phòng tập để được kiểm duyệt nhanh nhất.</p>
+                <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tight">Đăng ký Đối tác Gym Center</h1>
+                <p className="text-gray-600 mt-2">Vui lòng cung cấp chính xác thông tin phòng tập để được kiểm duyệt nhanh nhất.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-lg border border-[color:var(--mk-line)] space-y-8">
+            <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-lg border border-gray-200 space-y-8">
                 {error && (
                     <div className="p-4 bg-red-50 text-red-700 rounded-lg text-sm font-medium border border-red-100">
                         {error}
@@ -126,7 +126,7 @@ const GymRegisterPage: React.FC = () => {
                 )}
 
                 <div className="space-y-6">
-                    <h3 className="text-lg font-bold border-b border-[color:var(--mk-line)] pb-2">Thông tin chung (Thương hiệu)</h3>
+                    <h3 className="text-lg font-bold border-b border-gray-200 pb-2">Thông tin chung (Thương hiệu)</h3>
                     <div>
                         <label className="form-label block mb-1">Tên Gym Center / Chuỗi hệ thống</label>
                         <input required type="text" name="name" value={form.name} onChange={handleChange} className="form-input w-full" placeholder="VD: California Fitness, CityGym..." />
@@ -142,7 +142,7 @@ const GymRegisterPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-6">
-                    <h3 className="text-lg font-bold border-b border-[color:var(--mk-line)] pb-2">Tạo cơ sở đầu tiên</h3>
+                    <h3 className="text-lg font-bold border-b border-gray-200 pb-2">Tạo cơ sở đầu tiên</h3>
                     <div>
                         <label className="form-label block mb-1">Tên cơ sở</label>
                         <input required type="text" name="branchName" value={form.branchName} onChange={handleChange} className="form-input w-full" placeholder="VD: Cơ sở chính, Chi nhánh Cầu Giấy..." />
@@ -167,11 +167,11 @@ const GymRegisterPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="pt-4 border-t border-[color:var(--mk-line)]">
+                <div className="pt-4 border-t border-gray-200">
                     <button type="submit" disabled={loading} className="btn-primary w-full py-4 text-sm tracking-widest uppercase">
                         {loading ? 'Đang gửi hồ sơ...' : 'Gửi hồ sơ đăng ký'}
                     </button>
-                    <p className="text-xs text-center text-[color:var(--mk-muted)] mt-4">
+                    <p className="text-xs text-center text-gray-500 mt-4">
                         Bằng việc đăng ký, bạn đồng ý với Điều khoản Đối tác của GYMERVIET.
                     </p>
                 </div>

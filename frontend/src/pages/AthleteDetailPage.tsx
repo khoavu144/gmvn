@@ -281,10 +281,10 @@ export default function AthleteDetailPage() {
 
   if (error || !profile || !athlete) {
     return (
-      <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center gap-4 px-4 text-center">
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4 px-4 text-center">
         <div className="text-5xl font-extrabold text-gray-100 mb-2">404</div>
-        <div className="text-stone-900 font-bold text-lg">Không tìm thấy hồ sơ</div>
-        <p className="text-sm text-stone-500 max-w-sm">Vận động viên này có thể đã đổi URL hoặc không còn công khai trên GYMERVIET.</p>
+        <div className="text-gray-900 font-bold text-lg">Không tìm thấy hồ sơ</div>
+        <p className="text-sm text-gray-500 max-w-sm">Vận động viên này có thể đã đổi URL hoặc không còn công khai trên GYMERVIET.</p>
         <Link to="/coaches?type=athlete" className="btn-primary mt-4 px-6">
           ← Về danh sách vận động viên
         </Link>
@@ -355,11 +355,11 @@ export default function AthleteDetailPage() {
         profileVariant="athlete"
       />
 
-      <div className="bg-white border-b border-stone-200">
+      <div className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-12 flex items-center justify-between">
           <Link
             to="/coaches?type=athlete"
-            className="text-[13px] font-semibold text-stone-500 hover:text-stone-900 transition-colors"
+            className="text-[13px] font-semibold text-gray-500 hover:text-gray-900 transition-colors"
           >
             ← Vận động viên
           </Link>
@@ -367,7 +367,7 @@ export default function AthleteDetailPage() {
             {isOwnProfile && (
               <Link
                 to="/profile"
-                className="inline-flex items-center gap-1.5 h-8 px-3 border border-stone-300 rounded-lg text-[12px] font-semibold text-stone-700 hover:border-stone-900 hover:text-stone-900 transition-colors"
+                className="inline-flex items-center gap-1.5 h-8 px-3 border border-gray-300 rounded-lg text-[12px] font-semibold text-gray-700 hover:border-gray-900 hover:text-gray-900 transition-colors"
               >
                 <Pencil className="w-3 h-3" />
                 Chỉnh sửa hồ sơ
@@ -479,7 +479,7 @@ export default function AthleteDetailPage() {
                         href={item.image_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="aspect-square overflow-hidden rounded-lg bg-stone-100 border border-stone-200 hover:opacity-90 transition-opacity"
+                        className="aspect-square overflow-hidden rounded-lg bg-gray-100 border border-gray-200 hover:opacity-90 transition-opacity"
                       >
                         <img
                           src={getOptimizedUrl(item.image_url, 400)}

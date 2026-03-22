@@ -34,11 +34,11 @@ export default function TrainerGuidePage() {
                             { step: '04', title: 'Đội ngũ xem xét', desc: 'Chúng tôi xem xét trong 3–5 ngày làm việc. Kết quả gửi qua email.' },
                             { step: '05', title: 'Nhận badge Verified', desc: 'Sau khi xác minh, profile sẽ hiển thị badge "Verified" — tăng đáng kể độ tin tưởng từ học viên.' },
                         ].map((item) => (
-                            <div key={item.step} className="flex gap-4 p-4 border border-[color:var(--mk-line)] rounded-xs bg-white">
-                                <span className="text-xs font-bold font-mono text-[color:var(--mk-muted)] pt-0.5 w-6 flex-shrink-0">{item.step}</span>
+                            <div key={item.step} className="flex gap-4 p-4 border border-gray-200 rounded-xs bg-white">
+                                <span className="text-xs font-bold font-mono text-gray-500 pt-0.5 w-6 flex-shrink-0">{item.step}</span>
                                 <div>
                                     <h4 className="font-semibold text-black text-sm">{item.title}</h4>
-                                    <p className="text-sm text-[color:var(--mk-text-soft)] mt-1">{item.desc}</p>
+                                    <p className="text-sm text-gray-600 mt-1">{item.desc}</p>
                                 </div>
                             </div>
                         ))}
@@ -60,7 +60,7 @@ export default function TrainerGuidePage() {
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm border-collapse">
                             <thead>
-                                <tr className="border-b-2 border-[color:var(--mk-line)]">
+                                <tr className="border-b-2 border-gray-200">
                                     <th className="text-left py-3 px-4 font-bold text-black">Giá học viên trả</th>
                                     <th className="text-right py-3 px-4 font-bold text-black">Phí nền tảng (5%)</th>
                                     <th className="text-right py-3 px-4 font-bold text-black">Coach nhận (95%)</th>
@@ -73,9 +73,9 @@ export default function TrainerGuidePage() {
                                     [2000000, 100000, 1900000],
                                     [5000000, 250000, 4750000],
                                 ].map((row, i) => (
-                                    <tr key={i} className="border-b border-[color:var(--mk-line)] hover:bg-[color:var(--mk-paper)]">
+                                    <tr key={i} className="border-b border-gray-200 hover:bg-gray-50">
                                         <td className="py-3 px-4">{row[0].toLocaleString('vi-VN')}đ</td>
-                                        <td className="py-3 px-4 text-right text-[color:var(--mk-text-soft)]">{row[1].toLocaleString('vi-VN')}đ</td>
+                                        <td className="py-3 px-4 text-right text-gray-600">{row[1].toLocaleString('vi-VN')}đ</td>
                                         <td className="py-3 px-4 text-right font-semibold text-black">{row[2].toLocaleString('vi-VN')}đ</td>
                                     </tr>
                                 ))}
