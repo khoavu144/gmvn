@@ -15,6 +15,8 @@ export interface CoachDirectoryTrainer {
     is_verified?: boolean;
     city?: string | null;
     avg_rating?: number | null;
+    review_count?: number | null;
+    is_accepting_clients?: boolean | null;
 }
 
 function coachHref(t: CoachDirectoryTrainer): string {
@@ -29,10 +31,12 @@ export const CoachDirectoryCard = memo(
         trainer,
         index = 0,
         reducedEffects = false,
+        onClick,
     }: {
         trainer: CoachDirectoryTrainer;
         index?: number;
         reducedEffects?: boolean;
+        onClick?: () => void;
     }) => {
     const { prefetchCoach, prefetchAthlete } = usePrefetchProfile();
     const href = coachHref(trainer);
@@ -49,17 +53,24 @@ export const CoachDirectoryCard = memo(
         else prefetchCoach(identifier);
     };
 
+    const hasRealReviews = Number(trainer.review_count ?? 0) > 0;
     const rating =
-        trainer.avg_rating != null && Number(trainer.avg_rating) > 0
+        hasRealReviews && trainer.avg_rating != null && Number(trainer.avg_rating) > 0
             ? Number(trainer.avg_rating).toFixed(1)
             : null;
 
     const priceLabel =
         trainer.base_price_monthly != null
             ? `${Number(trainer.base_price_monthly).toLocaleString('vi-VN')} ₫/tháng`
-            : 'Liên hệ báo giá';
+            : 'Chưa công khai giá';
 
     const specs = trainer.specialties?.filter(Boolean) ?? [];
+    const intro = trainer.bio?.trim() || trainer.headline?.trim() || 'Đang cập nhật hồ sơ.';
+    const availabilityLabel = trainer.is_accepting_clients === false ? 'Tạm đóng nhận học viên' : 'Đang nhận học viên';
+    const availabilityClassName =
+        trainer.is_accepting_clients === false
+            ? 'border-amber-200 bg-amber-50 text-amber-800'
+            : 'border-emerald-200 bg-emerald-50 text-emerald-700';
 
     const cardClassName = reducedEffects
         ? 'group flex min-h-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm'
@@ -78,7 +89,7 @@ export const CoachDirectoryCard = memo(
         : 'shrink-0 rounded-md border border-white/25 bg-black/35 px-2 py-1 text-xs font-bold tabular-nums text-white backdrop-blur-sm';
 
     return (
-        <Link to={href} className={cardClassName} onPointerEnter={handlePrefetch}>
+        <Link to={href} className={cardClassName} onPointerEnter={handlePrefetch} onClick={onClick}>
             <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-gray-100">
                 {trainer.avatar_url ? (
                     <img
@@ -118,6 +129,17 @@ export const CoachDirectoryCard = memo(
             </div>
 
             <div className="flex min-h-0 flex-1 flex-col gap-3 p-4 sm:p-5">
+                <div className="flex flex-wrap gap-1.5">
+                    {trainer.is_verified ? (
+                        <span className="inline-flex rounded-full border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-900">
+                            Hồ sơ xác minh
+                        </span>
+                    ) : null}
+                    <span className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em] ${availabilityClassName}`}>
+                        {availabilityLabel}
+                    </span>
+                </div>
+
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
                     <span className="font-semibold text-gray-900">{priceLabel}</span>
                     {trainer.city && (
@@ -131,7 +153,7 @@ export const CoachDirectoryCard = memo(
                 </div>
 
                 <p className="line-clamp-3 flex-1 text-sm leading-relaxed text-gray-600">
-                    {trainer.bio || 'Chưa có thông tin giới thiệu.'}
+                    {intro}
                 </p>
 
                 {specs.length > 0 && (
@@ -152,16 +174,24 @@ export const CoachDirectoryCard = memo(
                     </div>
                 )}
 
-                <div className="mt-auto flex items-center justify-between border-t border-gray-200 pt-3 text-sm font-semibold text-gray-900">
-                    Xem hồ sơ
-                    <span
-                        className={
-                            reducedEffects
-                                ? ''
-                                : 'transition-transform duration-200 group-hover:translate-x-1'
-                        }
-                    >
-                        →
+                <div className="mt-auto flex items-center justify-between gap-3 border-t border-gray-200 pt-3 text-sm font-semibold text-gray-900">
+                    <div className="min-w-0">
+                        {rating ? (
+                            <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-900">
+                                <span aria-hidden>★</span>
+                                {rating}
+                                <span className="text-xs font-medium text-gray-500">
+                                    ({Number(trainer.review_count ?? 0).toLocaleString('vi-VN')} đánh giá)
+                                </span>
+                            </span>
+                        ) : (
+                            <span className="text-xs font-medium uppercase tracking-[0.12em] text-gray-500">
+                                Chưa có đánh giá
+                            </span>
+                        )}
+                    </div>
+                    <span className={reducedEffects ? '' : 'transition-transform duration-200 group-hover:translate-x-1'}>
+                        Xem hồ sơ →
                     </span>
                 </div>
             </div>

@@ -7,6 +7,7 @@ import { Camera, Image as ImageIcon, Users, Activity, Star } from 'lucide-react'
 import GalleryCard from '../components/gallery/GalleryCard';
 import GalleryLightbox from '../components/gallery/GalleryLightbox';
 import type { CommunityGalleryItem } from '../services/communityGalleryService';
+import { trackEvent } from '../lib/analytics';
 
 const CATEGORIES = [
     { id: 'all', label: 'Tất cả', icon: ImageIcon },
@@ -42,52 +43,54 @@ export default function CommunityGallery() {
 
     const handleCategorySelect = (categoryId: string) => {
         if (categoryId === currentCategory) return;
+        trackEvent('browse_filter_use', {
+            route: 'gallery',
+            action: 'category',
+            value: categoryId,
+        });
         dispatch(setCategory(categoryId));
         // Ensure scroll to top
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     return (
-        <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black">
+        <div className="page-shell bg-[linear-gradient(180deg,#fafaf9_0%,#f5f5f4_100%)] text-gray-900 selection:bg-black selection:text-white">
             <Helmet>
                 <title>The Wall — GYMERVIET Community</title>
                 <meta name="description" content="Chiêm ngưỡng hành trình, kết quả và những khoảnh khắc đẹp nhất của cộng đồng thể hình GYMERVIET." />
             </Helmet>
 
             {/* Hero Section */}
-            <div className="relative pt-24 pb-16 lg:pt-32 lg:pb-24 overflow-hidden border-b border-white/10">
-                <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 mix-blend-overlay"></div>
-                <div className="max-w-7xl mx-auto px-4 relative z-10 text-center">
-                    <div className="inline-block px-3 py-1 mb-6 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm text-xs font-bold tracking-widest text-white/70 uppercase">
+            <div className="relative overflow-hidden border-b border-gray-200 bg-[radial-gradient(circle_at_top_right,_rgba(24,24,27,0.06),_transparent_42%),linear-gradient(180deg,#fafaf9_0%,#f1efe9_100%)] pt-16 pb-12 lg:pt-24 lg:pb-16">
+                <div className="page-container relative z-10 text-left">
+                    <div className="inline-flex rounded-full border border-gray-200 bg-white px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-gray-500 shadow-sm">
                         Gymerviet Community
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight leading-none group">
-                        <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500">
-                            THE WALL
-                        </span>
+                    <h1 className="mt-6 max-w-4xl text-4xl font-black tracking-[-0.05em] text-gray-900 sm:text-5xl lg:text-6xl">
+                        Những khoảnh khắc cộng đồng đang tập luyện, chuyển hóa và sống kỷ luật mỗi ngày.
                     </h1>
-                    <p className="max-w-xl mx-auto text-lg md:text-xl text-gray-500 font-medium mb-12">
-                        Kỷ luật. Mồ hôi. Và những phiên bản tốt nhất. Không gian tôn vinh nỗ lực của cộng đồng The Gymerviet.
+                    <p className="mt-5 max-w-2xl text-base leading-8 text-gray-600 sm:text-lg">
+                        Một lớp bằng chứng cộng đồng giúp người mới tin hơn vào hệ sinh thái GYMERVIET.
                     </p>
 
                     {/* Stats */}
                     {stats && (
-                        <div className="flex flex-wrap justify-center gap-6 md:gap-12 mb-12 text-sm md:text-base">
-                            <div className="flex flex-col items-center">
+                        <div className="mt-10 flex flex-wrap gap-6 text-sm md:gap-10 md:text-base">
+                            <div className="flex flex-col">
                                 <span className="text-2xl md:text-3xl font-bold font-mono">{stats.total_images}+</span>
-                                <span className="text-gray-500 uppercase tracking-wider text-xs font-bold mt-1">Khoảnh khắc</span>
+                                <span className="mt-1 text-xs font-bold uppercase tracking-wider text-gray-500">Khoảnh khắc</span>
                             </div>
-                            <div className="w-px h-12 bg-white/10 hidden md:block"></div>
-                            <div className="flex flex-col items-center">
+                            <div className="hidden h-12 w-px bg-gray-200 md:block"></div>
+                            <div className="flex flex-col">
                                 <span className="text-2xl md:text-3xl font-bold font-mono">{stats.total_contributors}</span>
-                                <span className="text-gray-500 uppercase tracking-wider text-xs font-bold mt-1">Vận động viên</span>
+                                <span className="mt-1 text-xs font-bold uppercase tracking-wider text-gray-500">Người đóng góp</span>
                             </div>
                         </div>
                     )}
 
                     {/* Filters */}
-                    <div className="flex justify-center gap-2 overflow-x-auto pb-4 no-scrollbar">
-                        <div className="flex p-1 bg-white/5 backdrop-blur-md rounded-lg border border-white/10">
+                    <div className="mt-8 flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+                        <div className="flex rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
                             {CATEGORIES.map(cat => {
                                 const Icon = cat.icon;
                                 const isActive = currentCategory === cat.id;
@@ -95,9 +98,9 @@ export default function CommunityGallery() {
                                     <button
                                         key={cat.id}
                                         onClick={() => handleCategorySelect(cat.id)}
-                                        className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${isActive
-                                                ? 'bg-white text-black shadow-md shadow-white/10'
-                                                : 'text-gray-500 hover:text-white hover:bg-white/10'
+                                        className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${isActive
+                                                ? 'bg-gray-900 text-white shadow-sm'
+                                                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                                             }`}
                                     >
                                         <Icon size={16} strokeWidth={isActive ? 2.5 : 2} />
@@ -111,14 +114,14 @@ export default function CommunityGallery() {
             </div>
 
             {/* Masonry Grid */}
-            <div className="max-w-[1600px] mx-auto px-4 py-12 md:py-16">
+            <div className="mx-auto max-w-[1600px] px-4 py-10 md:py-14">
                 {items.length === 0 && !loading ? (
-                    <div className="text-center py-24 border border-dashed border-white/20 rounded-lg bg-white/5">
-                        <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <Camera className="w-8 h-8 text-gray-500" />
+                    <div className="rounded-2xl border border-dashed border-gray-300 bg-white py-24 text-center shadow-sm">
+                        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+                            <Camera className="h-8 w-8 text-gray-500" />
                         </div>
-                        <h3 className="text-2xl font-bold text-white mb-2">Chưa có bức ảnh nào</h3>
-                        <p className="text-gray-500">Hãy là người đầu tiên đóng góp vào thư mục này.</p>
+                        <h3 className="mb-2 text-2xl font-bold text-gray-900">Chưa có bức ảnh nào</h3>
+                        <p className="text-gray-500">Gallery sẽ sáng lên khi cộng đồng đóng góp thêm hình ảnh thật.</p>
                     </div>
                 ) : (
                     <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 sm:gap-6 space-y-4 sm:space-y-6">
@@ -139,7 +142,7 @@ export default function CommunityGallery() {
 
                 {loading && (
                     <div className="flex justify-center py-12">
-                        <div className="w-8 h-8 rounded-full border-t-2 border-l-2 border-white animate-spin"></div>
+                        <div className="h-8 w-8 animate-spin rounded-full border-l-2 border-t-2 border-gray-900"></div>
                     </div>
                 )}
             </div>

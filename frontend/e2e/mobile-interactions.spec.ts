@@ -34,6 +34,11 @@ async function bodyOverflow(page: Page) {
 }
 
 test.describe('mobile interaction stability', () => {
+  test.beforeEach(async ({ page }, testInfo) => {
+    void page;
+    test.skip(!/mobile/i.test(testInfo.project.name), 'Mobile interaction suite only applies to mobile projects');
+  });
+
   test('mobile menu toggles body scroll lock cleanly', async ({ page }) => {
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 

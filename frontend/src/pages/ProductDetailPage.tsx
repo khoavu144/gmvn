@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 import {
     AlertCircle,
     CheckCircle2,
@@ -13,6 +14,8 @@ import {
 import '../styles/marketplace.css';
 import type { Product, ProductReview } from '../types';
 import { ProductCard } from './MarketplacePage';
+import type { RootState } from '../store/store';
+import { trackEvent } from '../lib/analytics';
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001/api/v1';
 
@@ -302,6 +305,7 @@ function ProductDetailSkeleton() {
 
 export default function ProductDetailPage() {
     const { slug } = useParams<{ slug: string }>();
+    const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
     const [product, setProduct] = useState<Product | null>(null);
     const [reviews, setReviews] = useState<ProductReview[]>([]);
     const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
@@ -469,6 +473,11 @@ export default function ProductDetailPage() {
     ];
     const showSectionNav = sectionItems.length >= 3;
     const buyLead = buildBuyLead(product);
+    const sellerChatTarget = product.seller?.id
+        ? isAuthenticated
+            ? `/messages?to=${product.seller.id}`
+            : '/login'
+        : '/marketplace';
 
     return (
         <>
@@ -666,16 +675,19 @@ export default function ProductDetailPage() {
                                 </div>
                             )}
 
-                            <p className="sr-only">Thanh toán và giỏ hàng đang được hoàn thiện.</p>
                             <div className="mpd-cta-row">
-                                <button
+                                <Link
+                                    to={sellerChatTarget}
                                     className="mpd-btn-primary"
-                                    type="button"
-                                    disabled
-                                    title="Tính năng thanh toán đang hoàn thiện"
+                                    onClick={() => trackEvent('detail_cta_click', {
+                                        page_id: 'product_detail',
+                                        product_id: product.id,
+                                        target: sellerChatTarget,
+                                        cta_id: product.seller?.id ? 'contact_seller' : 'back_to_marketplace',
+                                    })}
                                 >
-                                    {product.product_type === 'digital' ? 'Mua ngay' : 'Thêm vào giỏ'}
-                                </button>
+                                    {product.seller?.id ? 'Trao đổi với người bán' : 'Quay lại cửa hàng'}
+                                </Link>
                                 <button
                                     className="mpd-btn-secondary"
                                     type="button"
@@ -686,6 +698,11 @@ export default function ProductDetailPage() {
                                     <Heart className="h-5 w-5" strokeWidth={2} aria-hidden />
                                 </button>
                             </div>
+                            <p className="text-xs leading-6 text-gray-500">
+                                {product.seller?.id
+                                    ? 'Checkout đang được hoàn thiện. Trong lúc này, bạn vẫn có thể mở hội thoại trực tiếp để hỏi biến thể, giao nhận hoặc lịch triển khai.'
+                                    : 'Checkout đang được hoàn thiện, vì vậy luồng an toàn nhất hiện tại là quay lại danh sách sản phẩm.'}
+                            </p>
 
                             <ul className="mpd-trust">
                                 {product.training_package && <li>Xem trước cấu trúc tuần tập ngay trên trang</li>}
@@ -701,7 +718,17 @@ export default function ProductDetailPage() {
                 {showSectionNav && (
                     <nav className="mpd-section-nav" aria-label="Điều hướng nội dung sản phẩm">
                         {sectionItems.map((item) => (
-                            <a key={item.id} href={`#${item.id}`} className="mpd-section-nav-link">
+                            <a
+                                key={item.id}
+                                href={`#${item.id}`}
+                                className="mpd-section-nav-link"
+                                onClick={() => trackEvent('detail_cta_click', {
+                                    page_id: 'product_detail',
+                                    product_id: product.id,
+                                    cta_id: `section_${item.id}`,
+                                    target: `#${item.id}`,
+                                })}
+                            >
                                 {item.label}
                             </a>
                         ))}

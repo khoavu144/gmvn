@@ -10,6 +10,8 @@ import apiClient from './services/api';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import MainLayout from './components/MainLayout';
+import { trackPageView } from './lib/analytics';
+import { resolveRoutePresentation } from './lib/routePresentation';
 
 type LazyModule<TProps = Record<string, unknown>> = {
   default: React.ComponentType<TProps>;
@@ -204,6 +206,7 @@ const RouteErrorFallback = () => {
 function RouteDiagnostics() {
   const location = useLocation();
   const navigationType = useNavigationType();
+  const routePresentation = resolveRoutePresentation(location.pathname);
 
   useEffect(() => {
     warnDev('[route-diagnostics] navigation event', {
@@ -211,10 +214,28 @@ function RouteDiagnostics() {
       search: location.search,
       hash: location.hash,
       navigationType,
+      analyticsPageId: routePresentation.analyticsPageId,
+      funnel: routePresentation.funnel,
+      businessObjective: routePresentation.businessObjective,
       href: window.location.href,
       ts: new Date().toISOString(),
     });
-  }, [location.pathname, location.search, location.hash, navigationType]);
+
+    trackPageView({
+      page_id: routePresentation.analyticsPageId,
+      funnel: routePresentation.funnel,
+      objective: routePresentation.businessObjective,
+      path: `${location.pathname}${location.search}`,
+    });
+  }, [
+    location.pathname,
+    location.search,
+    location.hash,
+    navigationType,
+    routePresentation.analyticsPageId,
+    routePresentation.businessObjective,
+    routePresentation.funnel,
+  ]);
 
   return null;
 }
@@ -229,50 +250,137 @@ const router = createBrowserRouter([
     ),
     errorElement: <RouteErrorFallback />,
     children: [
-      { path: '/', element: lazyRoute(<Home />) },
-      { path: '/login', element: lazyRoute(<Login />) },
-      { path: '/register', element: lazyRoute(<Register />) },
-      { path: '/onboarding', element: lazyRoute(<ProtectedRoute><OnboardingPage /></ProtectedRoute>) },
-      { path: '/verify-email', element: lazyRoute(<ProtectedRoute><VerifyEmail /></ProtectedRoute>) },
-      { path: '/forgot-password', element: lazyRoute(<ForgotPassword />) },
-      { path: '/reset-password', element: lazyRoute(<ResetPassword />) },
-      { path: '/dashboard', element: lazyRoute(<ProtectedRoute><Dashboard /></ProtectedRoute>) },
-      { path: '/dashboard/subscriptions', element: lazyRoute(<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>) },
-      { path: '/dashboard/marketplace', element: lazyRoute(<ProtectedRoute><SellerMarketplaceListPage /></ProtectedRoute>) },
-      { path: '/dashboard/marketplace/new', element: lazyRoute(<ProtectedRoute><SellerProductNewPage /></ProtectedRoute>) },
-      { path: '/dashboard/marketplace/new/training', element: lazyRoute(<ProtectedRoute><SellerTrainingPackageNewPage /></ProtectedRoute>) },
-      { path: '/dashboard/marketplace/edit/:productId', element: lazyRoute(<ProtectedRoute><SellerProductEditPage /></ProtectedRoute>) },
-      { path: '/coaches', element: lazyRoute(<Coaches />) },
-      { path: '/coaches/:trainerId', element: lazyRoute(<CoachDetail />) },
+      {
+        path: '/',
+        element: lazyRoute(<Home />),
+      },
+      {
+        path: '/login',
+        element: lazyRoute(<Login />),
+      },
+      {
+        path: '/register',
+        element: lazyRoute(<Register />),
+      },
+      {
+        path: '/onboarding',
+        element: lazyRoute(<ProtectedRoute><OnboardingPage /></ProtectedRoute>),
+      },
+      {
+        path: '/verify-email',
+        element: lazyRoute(<ProtectedRoute><VerifyEmail /></ProtectedRoute>),
+      },
+      {
+        path: '/forgot-password',
+        element: lazyRoute(<ForgotPassword />),
+      },
+      {
+        path: '/reset-password',
+        element: lazyRoute(<ResetPassword />),
+      },
+      {
+        path: '/dashboard',
+        element: lazyRoute(<ProtectedRoute><Dashboard /></ProtectedRoute>),
+      },
+      {
+        path: '/dashboard/subscriptions',
+        element: lazyRoute(<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>),
+      },
+      {
+        path: '/dashboard/marketplace',
+        element: lazyRoute(<ProtectedRoute><SellerMarketplaceListPage /></ProtectedRoute>),
+      },
+      {
+        path: '/dashboard/marketplace/new',
+        element: lazyRoute(<ProtectedRoute><SellerProductNewPage /></ProtectedRoute>),
+      },
+      {
+        path: '/dashboard/marketplace/new/training',
+        element: lazyRoute(<ProtectedRoute><SellerTrainingPackageNewPage /></ProtectedRoute>),
+      },
+      {
+        path: '/dashboard/marketplace/edit/:productId',
+        element: lazyRoute(<ProtectedRoute><SellerProductEditPage /></ProtectedRoute>),
+      },
+      {
+        path: '/coaches',
+        element: lazyRoute(<Coaches />),
+      },
+      {
+        path: '/coaches/:trainerId',
+        element: lazyRoute(<CoachDetail />),
+      },
       // SEO permalink route: fallback to coach detail by slug when public CV profile is not available
-      { path: '/coach/:slug', element: lazyRoute(<CoachDetail />) },
+      {
+        path: '/coach/:slug',
+        element: lazyRoute(<CoachDetail />),
+      },
       // Athlete SEO permalink route (parity with /coach/:slug)
-      { path: '/athlete/:slug', element: lazyRoute(<AthleteDetailPage />) },
+      {
+        path: '/athlete/:slug',
+        element: lazyRoute(<AthleteDetailPage />),
+      },
       // Redirect /athletes/:identifier → /athlete/:identifier for SEO
       { path: '/athletes/:identifier', element: <AthletesRedirect /> },
-      { path: '/profile', element: lazyRoute(<ProtectedRoute><Profile /></ProtectedRoute>) },
-      { path: '/programs', element: lazyRoute(<ProtectedRoute requiredRole={['trainer', 'athlete']}><ProgramsPage /></ProtectedRoute>) },
-      { path: '/messages', element: lazyRoute(<ProtectedRoute><MessagesPage /></ProtectedRoute>) },
-      { path: '/workouts', element: lazyRoute(<ProtectedRoute requiredRole="athlete"><WorkoutsPage /></ProtectedRoute>) },
+      {
+        path: '/profile',
+        element: lazyRoute(<ProtectedRoute><Profile /></ProtectedRoute>),
+      },
+      {
+        path: '/programs',
+        element: lazyRoute(<ProtectedRoute requiredRole={['trainer', 'athlete']}><ProgramsPage /></ProtectedRoute>),
+      },
+      {
+        path: '/messages',
+        element: lazyRoute(<ProtectedRoute><MessagesPage /></ProtectedRoute>),
+      },
+      {
+        path: '/workouts',
+        element: lazyRoute(<ProtectedRoute requiredRole="athlete"><WorkoutsPage /></ProtectedRoute>),
+      },
       // Sprint 2: /trainer/:trainerId redirects to canonical /coaches/:trainerId (merge duplicate routes)
       { path: '/trainer/:trainerId', element: lazyRoute(<TrainerRedirect />) },
-      { path: '/gallery', element: lazyRoute(<CommunityGallery />) },
-      { path: '/pricing', element: lazyRoute(<PricingPage />) },
+      {
+        path: '/gallery',
+        element: lazyRoute(<CommunityGallery />),
+      },
+      {
+        path: '/pricing',
+        element: lazyRoute(<PricingPage />),
+      },
 
       // Gym Module Routes
-      { path: '/gyms', element: lazyRoute(<Gyms />) },
+      {
+        path: '/gyms',
+        element: lazyRoute(<Gyms />),
+      },
       // BUG FIX: /gyms/:idOrSlug — backend detects UUID vs slug transparently
-      { path: '/gyms/:id', element: lazyRoute(<GymDetailPage />) },
+      {
+        path: '/gyms/:id',
+        element: lazyRoute(<GymDetailPage />),
+      },
       { path: '/gym-owner/register', element: lazyRoute(<ProtectedRoute requiredRole="gym_owner"><GymRegisterPage /></ProtectedRoute>) },
       { path: '/gym-owner', element: lazyRoute(<ProtectedRoute requiredRole="gym_owner"><GymOwnerDashboard /></ProtectedRoute>) },
 
       // Marketplace Routes
-      { path: '/marketplace', element: lazyRoute(<MarketplacePage />) },
-      { path: '/marketplace/product/:slug', element: lazyRoute(<ProductDetailPage />) },
+      {
+        path: '/marketplace',
+        element: lazyRoute(<MarketplacePage />),
+      },
+      {
+        path: '/marketplace/product/:slug',
+        element: lazyRoute(<ProductDetailPage />),
+      },
 
       // News Routes
-      { path: '/news', element: lazyRoute(<NewsPage />) },
-      { path: '/news/:slug', element: lazyRoute(<NewsDetailPage />) },
+      {
+        path: '/news',
+        element: lazyRoute(<NewsPage />),
+      },
+      {
+        path: '/news/:slug',
+        element: lazyRoute(<NewsDetailPage />),
+      },
 
       // Legal & Community Routes
       { path: '/about', element: lazyRoute(<AboutPage />) },

@@ -59,7 +59,7 @@ export default function Login() {
     };
 
     return (
-        <div className="page-shell">
+        <div className="auth-shell">
             <Helmet>
                 <title>Đăng nhập — GYMERVIET</title>
                 <meta name="description" content="Đăng nhập tài khoản GYMERVIET để quản lý hồ sơ, kết nối Coach và theo dõi tiến trình tập luyện." />

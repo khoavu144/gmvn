@@ -347,10 +347,44 @@ body {
     padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--gv-space-6));
   }
 
+  .auth-shell {
+    @apply min-h-screen bg-[linear-gradient(180deg,#fafaf9_0%,#f5f5f4_100%)] text-gray-900;
+  }
+
+  .auth-shell__grid {
+    @apply mx-auto max-w-page px-4 sm:px-6 grid gap-8 py-10 md:py-14 lg:grid-cols-[minmax(0,0.95fr)_minmax(22rem,0.85fr)] lg:gap-10 lg:py-20;
+  }
+
+  .auth-shell__intro {
+    @apply flex flex-col gap-6 lg:justify-center;
+  }
+
+  .auth-shell__panel {
+    @apply rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8;
+  }
+
+  .auth-shell__summary {
+    @apply rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6;
+  }
+
+  .auth-shell__points {
+    @apply mt-5 space-y-3 text-sm leading-7 text-gray-600;
+  }
+
+  .auth-shell__points li {
+    @apply relative pl-5;
+  }
+
+  .auth-shell__points li::before {
+    content: '';
+    @apply absolute left-0 top-[0.85rem] h-1.5 w-1.5 rounded-full bg-gray-900;
+  }
+
   @media (min-width: 1024px) {
     .page-shell,
     .page-shell-muted,
-    .marketplace-shell {
+    .marketplace-shell,
+    .auth-shell {
       padding-bottom: 0;
     }
   }

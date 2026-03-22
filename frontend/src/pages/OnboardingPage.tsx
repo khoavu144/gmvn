@@ -1,16 +1,18 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useQuery } from '@tanstack/react-query';
-import { setCredentials } from '../store/slices/authSlice';
+import axios from 'axios';
+import { Check } from 'lucide-react';
+
 import apiClient from '../services/api';
+import { setCredentials } from '../store/slices/authSlice';
+import type { RootState } from '../store/store';
 import { fetchUserProfileCatalog } from '../services/userProfileCatalogApi';
 import type { CatalogSection } from '../services/userProfileCatalogApi';
 import { ProfileCatalogSections, toggleTermInSection } from '../components/profile/ProfileCatalogSections';
-import type { RootState } from '../store/store';
-import { Check, ChevronRight } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
-import axios from 'axios';
+import { trackEvent } from '../lib/analytics';
 import {
     SKIP_FOR_NOW,
     ONBOARDING_GOALS_TITLE,
@@ -19,17 +21,38 @@ import {
     ONBOARDING_COACH_SPECIALTIES_SUB,
 } from '../content/userProfileGlossary';
 
+type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced';
+
+const EXPERIENCE_OPTIONS: Array<{ id: ExperienceLevel; title: string; desc: string }> = [
+    {
+        id: 'beginner',
+        title: 'Người mới bắt đầu',
+        desc: 'Chưa từng tập nghiêm túc hoặc mới quay lại gần đây.',
+    },
+    {
+        id: 'intermediate',
+        title: 'Đã có kinh nghiệm',
+        desc: 'Tập đều đặn và đã hiểu các nguyên tắc cơ bản.',
+    },
+    {
+        id: 'advanced',
+        title: 'Nâng cao',
+        desc: 'Đã có cấu trúc tập rõ ràng và theo đuổi mục tiêu dài hạn.',
+    },
+];
+
 export default function OnboardingPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { user, accessToken, refreshToken } = useSelector((state: RootState) => state.auth);
 
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const [step, setStep] = useState(1);
 
     const [height, setHeight] = useState(170);
     const [weight, setWeight] = useState(65);
-    const [experience, setExperience] = useState('beginner');
+    const [experience, setExperience] = useState<ExperienceLevel>('beginner');
     const [bio, setBio] = useState('');
     const [selectedTerms, setSelectedTerms] = useState<Set<string>>(new Set());
 
@@ -44,12 +67,39 @@ export default function OnboardingPage() {
 
     const catalogSections: CatalogSection[] = catalogQ.data?.sections ?? [];
 
+    const panelTitle = useMemo(() => {
+        if (isCoach) {
+            return step === 1 ? ONBOARDING_COACH_SPECIALTIES_TITLE : 'Giới thiệu bản thân';
+        }
+        if (step === 1) return 'Chỉ số cơ bản';
+        if (step === 2) return ONBOARDING_GOALS_TITLE;
+        return 'Mức kinh nghiệm';
+    }, [isCoach, step]);
+
+    const panelDescription = useMemo(() => {
+        if (isCoach) {
+            return step === 1
+                ? ONBOARDING_COACH_SPECIALTIES_SUB
+                : 'Một đoạn ngắn là đủ để người học hiểu bạn phù hợp với ai.';
+        }
+        if (step === 1) return 'Một vài dữ kiện nền để gợi ý trải nghiệm phù hợp hơn.';
+        if (step === 2) return ONBOARDING_GOALS_SUB;
+        return 'Chọn mức gần đúng nhất. Bạn có thể cập nhật lại sau.';
+    }, [isCoach, step]);
+
     const onToggleTerm = useCallback((section: CatalogSection, termId: string) => {
         setSelectedTerms((prev) => toggleTermInSection(section, termId, prev));
     }, []);
 
+    const goToStep = (nextStep: number) => {
+        setError('');
+        setStep(nextStep);
+    };
+
     const handleSubmit = async () => {
         setLoading(true);
+        setError('');
+
         try {
             const data: Record<string, unknown> = {};
             if (isCoach) {
@@ -62,29 +112,40 @@ export default function OnboardingPage() {
                 data.term_ids = [...selectedTerms];
             }
 
-            const res = await apiClient.post('/auth/complete-onboarding', data);
+            const response = await apiClient.post('/auth/complete-onboarding', data);
 
-            if (res.data.success) {
-                if (accessToken) {
-                    dispatch(
-                        setCredentials({
-                            user: res.data.data.user,
-                            access_token: accessToken,
-                            refresh_token: refreshToken as string,
-                        }),
-                    );
-                }
-                navigate('/dashboard');
+            if (response.data.success && accessToken) {
+                dispatch(
+                    setCredentials({
+                        user: response.data.data.user,
+                        access_token: accessToken,
+                        refresh_token: refreshToken as string,
+                    }),
+                );
             }
+
+            trackEvent('onboarding_complete', {
+                user_type: user?.user_type || 'unknown',
+                step_count: totalSteps,
+                selected_terms: selectedTerms.size,
+            });
+            navigate('/dashboard');
         } catch (err) {
-            console.error('Lỗi khi lưu thông tin:', err);
-            const msg = axios.isAxiosError(err)
-                ? err.response?.data?.error?.message
+            const message = axios.isAxiosError(err)
+                ? err.response?.data?.error?.message || err.response?.data?.error
                 : null;
-            alert(msg || 'Có lỗi xảy ra, vui lòng thử lại.');
+            setError(message || 'Không thể lưu onboarding lúc này. Vui lòng thử lại.');
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleSkipGoals = () => {
+        trackEvent('onboarding_skip', {
+            step_id: 'goals',
+            user_type: user?.user_type || 'unknown',
+        });
+        goToStep(3);
     };
 
     if (!user) return null;
@@ -93,263 +154,227 @@ export default function OnboardingPage() {
         return null;
     }
 
-    const catalogLoading = catalogQ.isLoading && (step > 1 || isCoach);
-
     return (
-        <div className="flex min-h-screen bg-white">
+        <div className="auth-shell">
             <Helmet>
-                <title>Thiết lập hồ sơ — GymViet</title>
+                <title>Thiết lập hồ sơ — GYMERVIET</title>
+                <meta name="description" content="Hoàn thiện onboarding để bắt đầu dùng GYMERVIET với trải nghiệm phù hợp hơn." />
             </Helmet>
 
-            <div className="hidden lg:flex lg:w-1/2 bg-black flex-col justify-between p-12 text-white relative overflow-hidden">
-                <div className="relative z-10">
-                    <p className="font-bold tracking-[0.2em] text-xs mb-8">GYMERVIET</p>
-                    <h1 className="text-4xl font-black uppercase tracking-tight leading-none mb-6">
-                        {isCoach
-                            ? 'Trở thành Huấn luyện viên hàng đầu'
-                            : 'Bắt đầu hành trình biến đổi cơ thể'}
+            <div className="auth-shell__grid">
+                <section className="auth-shell__intro">
+                    <p className="page-kicker">Kích hoạt trải nghiệm</p>
+                    <h1 className="page-title max-w-xl">
+                        {isCoach ? 'Hoàn thiện vài tín hiệu để hồ sơ Coach bắt đầu có giá trị ngay.' : 'Thiết lập vài dữ kiện nền để app gợi ý lộ trình hợp lý hơn.'}
                     </h1>
-                    <p className="text-gray-500 max-w-md text-lg">
-                        {isCoach
-                            ? 'Hoàn tất hồ sơ để nhận học viên và quản lý lịch trên GYMERVIET.'
-                            : 'Cho chúng tôi vài thông tin cơ bản để gợi ý lộ trình tập phù hợp với bạn.'}
+                    <p className="page-description max-w-xl">
+                        Mục tiêu là đưa bạn vào dashboard nhanh hơn, với trải nghiệm bớt nhiễu hơn.
                     </p>
-                </div>
-                <div className="relative z-10 opacity-50">
-                    <p className="text-sm font-mono tracking-widest uppercase">
-                        Bước {step} của {totalSteps}
-                    </p>
-                </div>
-                <div className="absolute -bottom-[20%] -right-[10%] w-[80%] h-[80%] rounded-full border-[40px] border-gray-900 opacity-50"></div>
-                <div className="absolute bottom-[10%] right-[10%] w-[40%] h-[40%] rounded-full border-[20px] border-gray-800 opacity-50"></div>
-            </div>
 
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
-                <div className="w-full max-w-md space-y-8">
-                    {!isCoach && step === 1 && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                    <div className="auth-shell__summary surface-panel">
+                        <div className="flex items-center justify-between gap-4">
                             <div>
-                                <h2 className="text-3xl font-black uppercase tracking-tight text-black mb-2">
-                                    Chỉ số cơ thể
-                                </h2>
-                                <p className="text-gray-500 text-sm">
-                                    Dùng để ước lượng năng lượng (TDEE) và BMI.
-                                </p>
+                                <span className="page-kicker">Tiến độ</span>
+                                <h2 className="section-title mt-1">Bước {step} / {totalSteps}</h2>
                             </div>
-                            <div className="mt-8 space-y-6">
-                                <div>
-                                    <label className="flex justify-between font-bold text-sm mb-4">
-                                        <span>Chiều cao</span>
-                                        <span className="text-black">{height} cm</span>
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="140"
-                                        max="220"
-                                        value={height}
-                                        onChange={(e) => setHeight(Number(e.target.value))}
-                                        className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-black"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="flex justify-between font-bold text-sm mb-4">
-                                        <span>Cân nặng</span>
-                                        <span className="text-black">{weight} kg</span>
-                                    </label>
-                                    <input
-                                        type="range"
-                                        min="30"
-                                        max="150"
-                                        value={weight}
-                                        onChange={(e) => setWeight(Number(e.target.value))}
-                                        className="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-black"
-                                    />
-                                </div>
-                                <button
-                                    onClick={() => setStep(2)}
-                                    className="btn-primary w-full group flex justify-between items-center mt-8"
-                                >
-                                    Tiếp tục <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                            <span className="page-pill">{isCoach ? 'Coach flow' : 'Member flow'}</span>
+                        </div>
+
+                        <div
+                            className="mt-5 h-2 w-full overflow-hidden rounded-full bg-gray-100"
+                            role="progressbar"
+                            aria-valuemin={1}
+                            aria-valuemax={totalSteps}
+                            aria-valuenow={step}
+                            aria-label="Tiến độ onboarding"
+                        >
+                            <div className="h-full bg-gray-900 transition-all duration-500" style={{ width: `${(step / totalSteps) * 100}%` }} />
+                        </div>
+
+                        <ul className="auth-shell__points">
+                            <li>Có thể bổ sung sâu hơn trong hồ sơ sau.</li>
+                            <li>Chỉ hỏi phần ảnh hưởng trực tiếp tới gợi ý và trust.</li>
+                            <li>Thiết kế để hoàn thành nhanh trên mobile.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section className="auth-shell__panel surface-panel">
+                    <div className="page-header">
+                        <p className="page-kicker">Onboarding</p>
+                        <h2 className="page-title text-2xl sm:text-3xl">{panelTitle}</h2>
+                        <p className="page-description">{panelDescription}</p>
+                    </div>
+
+                    {error ? (
+                        <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                            {error}
+                        </div>
+                    ) : null}
+
+                    {!isCoach && step === 1 ? (
+                        <div className="space-y-8">
+                            <div>
+                                <label className="mb-3 flex items-center justify-between text-sm font-semibold text-gray-900">
+                                    <span>Chiều cao</span>
+                                    <span>{height} cm</span>
+                                </label>
+                                <input
+                                    type="range"
+                                    min="140"
+                                    max="220"
+                                    value={height}
+                                    onChange={(event) => setHeight(Number(event.target.value))}
+                                    className="w-full accent-black"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-3 flex items-center justify-between text-sm font-semibold text-gray-900">
+                                    <span>Cân nặng</span>
+                                    <span>{weight} kg</span>
+                                </label>
+                                <input
+                                    type="range"
+                                    min="30"
+                                    max="150"
+                                    value={weight}
+                                    onChange={(event) => setWeight(Number(event.target.value))}
+                                    className="w-full accent-black"
+                                />
+                            </div>
+                            <button type="button" onClick={() => goToStep(2)} className="btn-primary w-full">
+                                Tiếp tục
+                            </button>
+                        </div>
+                    ) : null}
+
+                    {!isCoach && step === 2 ? (
+                        <div className="space-y-6">
+                            {catalogQ.isLoading ? (
+                                <p className="text-sm text-gray-500">Đang tải danh sách mục tiêu…</p>
+                            ) : catalogQ.isError ? (
+                                <p className="text-sm text-red-600">Không tải được gợi ý. Bạn có thể bỏ qua bước này để tiếp tục.</p>
+                            ) : (
+                                <ProfileCatalogSections
+                                    sections={catalogSections}
+                                    selected={selectedTerms}
+                                    onToggleTerm={onToggleTerm}
+                                />
+                            )}
+
+                            <div className="flex flex-col gap-3 sm:flex-row">
+                                <button type="button" onClick={() => goToStep(1)} className="btn-secondary sm:flex-1">
+                                    Quay lại
+                                </button>
+                                <button type="button" onClick={handleSkipGoals} className="btn-secondary sm:flex-1">
+                                    {SKIP_FOR_NOW}
+                                </button>
+                                <button type="button" onClick={() => goToStep(3)} className="btn-primary sm:flex-[1.2]">
+                                    Tiếp tục
                                 </button>
                             </div>
                         </div>
-                    )}
+                    ) : null}
 
-                    {!isCoach && step === 2 && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                            <div>
-                                <h2 className="text-3xl font-black uppercase tracking-tight text-black mb-2">
-                                    {ONBOARDING_GOALS_TITLE}
-                                </h2>
-                                <p className="text-gray-500 text-sm">{ONBOARDING_GOALS_SUB}</p>
+                    {!isCoach && step === 3 ? (
+                        <div className="space-y-4">
+                            {EXPERIENCE_OPTIONS.map((level) => (
+                                <button
+                                    key={level.id}
+                                    type="button"
+                                    onClick={() => setExperience(level.id)}
+                                    className={`w-full rounded-xl border p-4 text-left transition-colors ${experience === level.id ? 'border-gray-900 bg-gray-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                                >
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div>
+                                            <h3 className="font-bold text-gray-900">{level.title}</h3>
+                                            <p className="mt-1 text-sm leading-6 text-gray-600">{level.desc}</p>
+                                        </div>
+                                        <span className={`flex h-6 w-6 items-center justify-center rounded-full border ${experience === level.id ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-300 text-transparent'}`}>
+                                            <Check className="h-4 w-4" />
+                                        </span>
+                                    </div>
+                                </button>
+                            ))}
+
+                            <div className="flex flex-col gap-3 pt-3 sm:flex-row">
+                                <button type="button" onClick={() => goToStep(2)} className="btn-secondary sm:flex-1">
+                                    Quay lại
+                                </button>
+                                <button type="button" onClick={handleSubmit} disabled={loading} className="btn-primary sm:flex-[1.2]">
+                                    {loading ? 'Đang hoàn tất…' : 'Hoàn tất onboarding'}
+                                </button>
                             </div>
-                            <div className="mt-8">
-                                {catalogLoading ? (
-                                    <p className="text-sm text-gray-500">Đang tải danh sách…</p>
-                                ) : catalogQ.isError ? (
-                                    <p className="text-sm text-red-600">Không tải được gợi ý. Thử tải lại trang.</p>
-                                ) : (
-                                    <ProfileCatalogSections
-                                        sections={catalogSections}
-                                        selected={selectedTerms}
-                                        onToggleTerm={onToggleTerm}
-                                    />
-                                )}
-                            </div>
-                            <div className="flex flex-col gap-3 mt-8">
+                        </div>
+                    ) : null}
+
+                    {isCoach && step === 1 ? (
+                        <div className="space-y-6">
+                            {catalogQ.isLoading ? (
+                                <p className="text-sm text-gray-500">Đang tải nhóm chuyên môn…</p>
+                            ) : catalogQ.isError ? (
+                                <p className="text-sm text-red-600">Không tải được danh sách. Vui lòng thử lại hoặc quay lại sau.</p>
+                            ) : (
+                                <ProfileCatalogSections
+                                    sections={catalogSections}
+                                    selected={selectedTerms}
+                                    onToggleTerm={onToggleTerm}
+                                />
+                            )}
+
+                            <div className="flex flex-col gap-3 sm:flex-row">
                                 <button
                                     type="button"
-                                    onClick={() => setStep(3)}
-                                    className="btn-secondary w-full"
+                                    onClick={() => goToStep(2)}
+                                    disabled={selectedTerms.size === 0}
+                                    className="btn-primary sm:flex-1 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    Tiếp tục
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        trackEvent('onboarding_skip', {
+                                            step_id: 'coach_specialties',
+                                            user_type: user.user_type,
+                                        });
+                                        goToStep(2);
+                                    }}
+                                    className="btn-secondary sm:flex-1"
                                 >
                                     {SKIP_FOR_NOW}
                                 </button>
-                                <div className="flex gap-4">
-                                    <button onClick={() => setStep(1)} className="btn-secondary w-1/3">
-                                        Quay lại
-                                    </button>
-                                    <button onClick={() => setStep(3)} className="btn-primary w-2/3">
-                                        Tiếp tục
-                                    </button>
-                                </div>
                             </div>
                         </div>
-                    )}
+                    ) : null}
 
-                    {!isCoach && step === 3 && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                    {isCoach && step === 2 ? (
+                        <div className="space-y-6">
                             <div>
-                                <h2 className="text-3xl font-black uppercase tracking-tight text-black mb-2">
-                                    Kinh nghiệm
-                                </h2>
-                                <p className="text-gray-500 text-sm">
-                                    Bạn đã từng tập luyện nghiêm túc bao giờ chưa?
-                                </p>
+                                <label htmlFor="coach-bio" className="form-label">
+                                    Giới thiệu ngắn
+                                </label>
+                                <textarea
+                                    id="coach-bio"
+                                    rows={6}
+                                    value={bio}
+                                    onChange={(event) => setBio(event.target.value)}
+                                    placeholder="Ví dụ: Tôi đồng hành với người cần giảm mỡ bền vững và lấy lại kỷ luật tập luyện."
+                                    className="form-input resize-none"
+                                />
                             </div>
-                            <div className="mt-8 space-y-4">
-                                {[
-                                    {
-                                        id: 'beginner',
-                                        title: 'Người mới bắt đầu',
-                                        desc: 'Chưa từng tập hoặc vừa mới bắt đầu',
-                                    },
-                                    {
-                                        id: 'intermediate',
-                                        title: 'Đã có kinh nghiệm',
-                                        desc: 'Tập luyện đều đặn từ 6 tháng đến 2 năm',
-                                    },
-                                    {
-                                        id: 'advanced',
-                                        title: 'Nâng cao',
-                                        desc: 'Tập luyện chuyên nghiệp trên 2 năm',
-                                    },
-                                ].map((lvl) => (
-                                    <div
-                                        key={lvl.id}
-                                        onClick={() => setExperience(lvl.id)}
-                                        className={`border-2 p-5 rounded-lg cursor-pointer transition-all ${experience === lvl.id ? 'border-black bg-gray-50' : 'border-gray-200 hover:border-gray-200'}`}
-                                    >
-                                        <div className="flex justify-between items-center">
-                                            <div>
-                                                <h3 className="font-bold text-black">{lvl.title}</h3>
-                                                <p className="text-xs text-gray-500 mt-1">
-                                                    {lvl.desc}
-                                                </p>
-                                            </div>
-                                            <div
-                                                className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${experience === lvl.id ? 'border-black bg-black text-white' : 'border-gray-200'}`}
-                                            >
-                                                {experience === lvl.id && <Check className="w-4 h-4" />}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                                <div className="flex gap-4 pt-4">
-                                    <button onClick={() => setStep(2)} className="btn-secondary w-1/3">
-                                        Quay lại
-                                    </button>
-                                    <button
-                                        onClick={handleSubmit}
-                                        disabled={loading}
-                                        className="btn-primary w-2/3"
-                                    >
-                                        {loading ? 'Đang xử lý...' : 'Hoàn tất'}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
-                    {isCoach && step === 1 && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                            <div>
-                                <h2 className="text-3xl font-black uppercase tracking-tight text-black mb-2">
-                                    {ONBOARDING_COACH_SPECIALTIES_TITLE}
-                                </h2>
-                                <p className="text-gray-500 text-sm">
-                                    {ONBOARDING_COACH_SPECIALTIES_SUB}
-                                </p>
-                            </div>
-                            <div className="mt-8">
-                                {catalogQ.isLoading ? (
-                                    <p className="text-sm text-gray-500">Đang tải danh sách…</p>
-                                ) : catalogQ.isError ? (
-                                    <p className="text-sm text-red-600">Không tải được gợi ý. Thử tải lại trang.</p>
-                                ) : (
-                                    <ProfileCatalogSections
-                                        sections={catalogSections}
-                                        selected={selectedTerms}
-                                        onToggleTerm={onToggleTerm}
-                                    />
-                                )}
-                            </div>
-                            <button
-                                onClick={() => setStep(2)}
-                                disabled={catalogSections.length === 0 || selectedTerms.size === 0}
-                                className="btn-primary w-full mt-8 flex justify-between items-center disabled:opacity-50 disabled:cursor-not-allowed group"
-                            >
-                                Tiếp tục{' '}
-                                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </button>
-                        </div>
-                    )}
-
-                    {isCoach && step === 2 && (
-                        <div className="animate-in fade-in slide-in-from-right-4 duration-500">
-                            <div>
-                                <h2 className="text-3xl font-black uppercase tracking-tight text-black mb-2">
-                                    Giới thiệu bản thân
-                                </h2>
-                                <p className="text-gray-500 text-sm">
-                                    Có thể bổ sung sau trong mục Hồ sơ — không bắt buộc để hoàn tất bước này.
-                                </p>
-                            </div>
-                            <div className="mt-8 space-y-6">
-                                <div>
-                                    <textarea
-                                        rows={5}
-                                        value={bio}
-                                        onChange={(e) => setBio(e.target.value)}
-                                        placeholder="Ví dụ: Tôi là HLV chuyên về giảm mỡ và phục hồi thể lực…"
-                                        className="form-input resize-none"
-                                    />
-                                </div>
-                                <div className="flex gap-4">
-                                    <button onClick={() => setStep(1)} className="btn-secondary w-1/3">
-                                        Quay lại
-                                    </button>
-                                    <button
-                                        onClick={handleSubmit}
-                                        disabled={loading}
-                                        className="btn-primary w-2/3"
-                                    >
-                                        {loading ? 'Đang xử lý...' : 'Hoàn tất'}
-                                    </button>
-                                </div>
+                            <div className="flex flex-col gap-3 sm:flex-row">
+                                <button type="button" onClick={() => goToStep(1)} className="btn-secondary sm:flex-1">
+                                    Quay lại
+                                </button>
+                                <button type="button" onClick={handleSubmit} disabled={loading} className="btn-primary sm:flex-[1.2]">
+                                    {loading ? 'Đang hoàn tất…' : 'Hoàn tất onboarding'}
+                                </button>
                             </div>
                         </div>
-                    )}
-                </div>
+                    ) : null}
+                </section>
             </div>
         </div>
     );

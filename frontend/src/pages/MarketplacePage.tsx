@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet-async';
 import axios from 'axios';
 import '../styles/marketplace.css';
 import { useMobileReducedEffects } from '../hooks/useMobileReducedEffects';
+import { trackEvent } from '../lib/analytics';
 import type {
     Product,
     ProductCategory,
@@ -51,6 +52,12 @@ export const ProductCard = React.memo(function ProductCard({
     return (
         <Link
             to={`/marketplace/product/${product.slug}`}
+            onClick={() => trackEvent('card_click', {
+                route: 'marketplace',
+                entity_id: product.id,
+                target: `/marketplace/product/${product.slug}`,
+                card_variant: variant,
+            })}
             className={`marketplace-product-card marketplace-card--${variant}`}
             aria-label={product.title}
         >
@@ -307,6 +314,13 @@ export default function MarketplacePage() {
     }, [loadProducts]);
 
     function setFilter(key: string, value: string) {
+        if (key !== 'page') {
+            trackEvent(key === 'q' ? 'browse_search_use' : 'browse_filter_use', {
+                route: 'marketplace',
+                action: key,
+                value: value || 'all',
+            });
+        }
         const next = new URLSearchParams(searchParams);
         if (value) {
             next.set(key, value);

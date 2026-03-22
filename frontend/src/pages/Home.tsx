@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { logger } from '../lib/logger';
+import { trackEvent } from '../lib/analytics';
 import apiClient from '../services/api';
 import type { Trainer } from '../types';
 import { usePrefetchProfile } from '../hooks/usePrefetchProfile';
@@ -106,6 +107,13 @@ export default function Home() {
         prefetchCoach(identifier);
     };
 
+    const trackHomeCta = (ctaId: string, target: string) => {
+        trackEvent('homepage_cta_click', {
+            cta_id: ctaId,
+            target,
+        });
+    };
+
     return (
         <main className="marketplace-shell min-h-screen">
             <Helmet>
@@ -183,18 +191,21 @@ export default function Home() {
                             >
                                 <a
                                     href="#ba-vai-tro"
+                                    onClick={() => trackHomeCta('hero_roles', '#ba-vai-tro')}
                                     className="btn-primary shrink-0 whitespace-nowrap px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.14em] sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.16em]"
                                 >
                                     Khám phá 3 vai trò
                                 </a>
                                 <Link
                                     to="/gyms"
+                                    onClick={() => trackHomeCta('hero_gyms', '/gyms')}
                                     className="btn-secondary shrink-0 whitespace-nowrap px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.14em] sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.16em]"
                                 >
                                     Tìm phòng tập
                                 </Link>
                                 <Link
                                     to="/register"
+                                    onClick={() => trackHomeCta('hero_register', '/register')}
                                     className="btn-secondary shrink-0 whitespace-nowrap px-3 py-2.5 text-[11px] font-bold uppercase tracking-[0.14em] sm:px-6 sm:py-3 sm:text-sm sm:tracking-[0.16em]"
                                 >
                                     Tạo tài khoản
@@ -235,6 +246,7 @@ export default function Home() {
                                             key={coach.id}
                                             to={coachLink(coach)}
                                             onMouseEnter={() => handlePrefetch(coach)}
+                                            onClick={() => trackHomeCta('hero_profile_spotlight', coachLink(coach))}
                                             className="group flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-4 transition duration-300 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)]"
                                         >
                                             <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-gray-100">
@@ -307,6 +319,7 @@ export default function Home() {
                         <Link
                             key={item.title}
                             to={item.href}
+                            onClick={() => trackHomeCta(`audience_${item.kicker.toLowerCase()}`, item.href)}
                             className="marketplace-panel gv-panel-pad group flex h-full flex-col gap-5 shadow-sm ring-1 ring-gray-900/[0.05] transition duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.12)]"
                         >
                             <div className="space-y-3">
@@ -371,18 +384,21 @@ export default function Home() {
                         <div className="flex flex-wrap gap-3 lg:flex-nowrap lg:justify-end lg:self-center">
                             <Link
                                 to="/coaches"
+                                onClick={() => trackHomeCta('bottom_coaches', '/coaches')}
                                 className="btn-secondary min-w-[7.5rem] px-5 text-sm font-bold uppercase tracking-[0.16em] lg:text-center"
                             >
                                 Coach
                             </Link>
                             <Link
                                 to="/gyms"
+                                onClick={() => trackHomeCta('bottom_gyms', '/gyms')}
                                 className="btn-secondary min-w-[7.5rem] px-5 text-sm font-bold uppercase tracking-[0.16em] lg:text-center"
                             >
                                 Phòng tập
                             </Link>
                             <Link
                                 to="/register"
+                                onClick={() => trackHomeCta('bottom_register', '/register')}
                                 className="btn-primary px-6 text-sm font-bold uppercase tracking-[0.16em] lg:shrink-0"
                             >
                                 Tạo tài khoản
@@ -406,6 +422,7 @@ export default function Home() {
                             <div className="mt-6 border-t border-gray-200 pt-5">
                                 <Link
                                     to="/faq"
+                                    onClick={() => trackHomeCta('faq_more', '/faq')}
                                     className="text-sm font-bold uppercase tracking-[0.14em] text-gray-900 hover:underline underline-offset-4"
                                 >
                                     Xem thêm câu hỏi thường gặp →

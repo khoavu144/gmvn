@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import type { RootState } from '../store/store';
 import apiClient from '../services/api';
+import { trackEvent } from '../lib/analytics';
 
 type PlanKey = 'free' | 'coach_pro' | 'coach_elite' | 'athlete_premium' | 'gym_business';
 
@@ -22,11 +23,11 @@ const PLAN_LABELS: Record<PlanKey, string> = {
 };
 
 const PLAN_SUMMARIES: Record<PlanKey, string> = {
-    free: 'Khởi động với những tính năng nền tảng để làm quen với hệ sinh thái trước khi nâng cấp.',
-    coach_pro: 'Phù hợp cho coach đang mở rộng số học viên, muốn có hiện diện rõ ràng hơn trong hệ thống.',
-    coach_elite: 'Dành cho coach xem GYMERVIET là một kênh tăng trưởng chính và cần ưu tiên hiển thị mạnh hơn.',
-    athlete_premium: 'Dành cho người tập muốn lưu giữ tiến độ dài hạn, theo dõi sâu hơn và so sánh nhiều lựa chọn.',
-    gym_business: 'Phù hợp cho gym center cần trình bày nhiều chi nhánh, nhiều coach và tối ưu khả năng được khám phá.',
+    free: 'Bắt đầu với bộ tính năng nền tảng.',
+    coach_pro: 'Cho coach đang mở rộng tệp học viên.',
+    coach_elite: 'Cho coach xem GYMERVIET là kênh tăng trưởng chính.',
+    athlete_premium: 'Cho người tập muốn theo dõi tiến độ sâu hơn.',
+    gym_business: 'Cho gym cần tăng khám phá và quản lý nhiều chi nhánh.',
 };
 
 const DESCRIPTIONS: Record<PlanKey, string[]> = {
@@ -45,39 +46,42 @@ const PRICES: Record<PlanKey, number> = {
     gym_business: 999999,
 };
 
-const FAQ_ITEMS = [
+const HERO_POINTS = [
     {
-        question: 'Gói Coach Pro có những gì?',
-        answer: 'Không giới hạn chương trình, 50 học viên cùng lúc, Badge Pro trên hồ sơ, ưu tiên tìm kiếm và share card tuỳ chỉnh. Giá 499.999đ/năm.',
+        title: 'Giá rõ ràng',
+        body: 'Mọi gói đều theo năm để so sánh nhanh.',
     },
     {
-        question: 'Gói Coach Elite có những gì?',
-        answer: 'Không giới hạn chương trình và học viên, top tìm kiếm, Badge Elite nổi bật, share card tuỳ chỉnh và hỗ trợ ưu tiên. Giá 999.999đ/năm.',
-    },
-    {
-        question: 'Có thể huỷ bất kỳ lúc nào không?',
-        answer: 'Có. Bạn có thể huỷ bất kỳ lúc nào và gói sẽ hết hiệu lực sau khi chu kỳ hiện tại kết thúc.',
-    },
-    {
-        question: 'GYMERVIET hỗ trợ phương thức thanh toán nào?',
-        answer: 'Hiện tại hỗ trợ chuyển khoản ngân hàng qua SePay. Gói được kích hoạt tự động ngay sau khi xác nhận giao dịch.',
+        title: 'Kích hoạt nhanh',
+        body: 'Thanh toán đúng nội dung, hệ thống sẽ tự xử lý.',
     },
 ] as const;
 
-const HERO_POINTS = [
-    {
-        title: 'Thanh toán minh bạch',
-        body: 'Toàn bộ gói đang dùng cấu trúc giá theo năm, giúp người dùng so sánh nhanh và ít nhiễu hơn.',
+const ROLE_VIEWS = {
+    coach: {
+        kicker: 'Coach plans',
+        title: 'Dành cho Coach',
+        subtitle: 'So sánh theo đúng ngưỡng tăng trưởng của coach.',
+        plans: ['free', 'coach_pro', 'coach_elite'] as PlanKey[],
+        recommended: 'coach_pro' as PlanKey,
     },
-    {
-        title: 'Nâng cấp theo vai trò',
-        body: 'Coach, athlete và gym center có nhu cầu rất khác nhau, nên bảng giá được tách rõ theo đúng job-to-be-done.',
+    athlete: {
+        kicker: 'Athlete plans',
+        title: 'Dành cho Athlete',
+        subtitle: 'Ít lựa chọn hơn để quyết định nâng cấp nhanh hơn.',
+        plans: ['free', 'athlete_premium'] as PlanKey[],
+        recommended: 'athlete_premium' as PlanKey,
     },
-    {
-        title: 'Kích hoạt tự động',
-        body: 'Sau khi thanh toán đúng nội dung chuyển khoản, gói sẽ được hệ thống xử lý và kích hoạt trong vài phút.',
+    gym: {
+        kicker: 'Gym Center plans',
+        title: 'Dành cho Gym Center',
+        subtitle: 'Tập trung vào khám phá chi nhánh và vận hành đội ngũ.',
+        plans: ['free', 'gym_business'] as PlanKey[],
+        recommended: 'gym_business' as PlanKey,
     },
-] as const;
+} as const;
+
+type PricingRoleView = keyof typeof ROLE_VIEWS;
 
 function formatPrice(price: number) {
     if (price === 0) return 'Miễn phí';
@@ -196,9 +200,18 @@ export default function PricingPage() {
     const [upgradeLoading, setUpgradeLoading] = useState<PlanKey | null>(null);
     const [checkoutInfo, setCheckoutInfo] = useState<CheckoutInfo | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [roleView, setRoleView] = useState<PricingRoleView>(
+        user?.user_type === 'athlete' ? 'athlete' : user?.user_type === 'gym_owner' ? 'gym' : 'coach'
+    );
     const canonicalBase = import.meta.env.VITE_CANONICAL_BASE_URL || 'https://gymerviet.com';
+    const activeView = ROLE_VIEWS[roleView];
 
     const handleUpgrade = async (plan: PlanKey) => {
+        trackEvent('pricing_cta_click', {
+            plan,
+            role_view: roleView,
+            authenticated: Boolean(user),
+        });
         if (!user) {
             navigate('/login');
             return;
@@ -227,14 +240,14 @@ export default function PricingPage() {
                 <title>Bảng giá — GYMERVIET</title>
                 <meta
                     name="description"
-                    content="Chọn gói phù hợp để mở khoá toàn bộ tính năng GYMERVIET. Bảng giá được tách rõ theo từng vai trò trong hệ sinh thái."
+                    content="Chọn gói GYMERVIET phù hợp theo từng vai trò."
                 />
                 <link rel="canonical" href={`${canonicalBase}/pricing`} />
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="Bảng giá — GYMERVIET" />
                 <meta
                     property="og:description"
-                    content="Coach, athlete và gym center có bảng giá rõ ràng, thanh toán theo năm và kích hoạt tự động qua SePay."
+                    content="Bảng giá rõ ràng cho coach, athlete và gym center."
                 />
                 <meta property="og:url" content={`${canonicalBase}/pricing`} />
                 <meta property="og:image" content="https://gymerviet.com/og-default.jpg" />
@@ -243,20 +256,8 @@ export default function PricingPage() {
                 <meta name="twitter:title" content="Bảng giá — GYMERVIET" />
                 <meta
                     name="twitter:description"
-                    content="Chọn gói phù hợp để mở khoá các tính năng dành cho coach, athlete và gym center trên GYMERVIET."
+                    content="Chọn gói phù hợp cho coach, athlete và gym center."
                 />
-                <script type="application/ld+json">{JSON.stringify({
-                    '@context': 'https://schema.org',
-                    '@type': 'FAQPage',
-                    mainEntity: FAQ_ITEMS.map((item) => ({
-                        '@type': 'Question',
-                        name: item.question,
-                        acceptedAnswer: {
-                            '@type': 'Answer',
-                            text: item.answer,
-                        },
-                    })),
-                })}</script>
             </Helmet>
 
             <section className="marketplace-hero">
@@ -268,7 +269,7 @@ export default function PricingPage() {
                                 Bảng giá rõ ràng cho từng vai trò trong hệ sinh thái GYMERVIET.
                             </h1>
                             <p className="marketplace-lead max-w-2xl">
-                                Không còn cảm giác như một microsite riêng. Bảng giá này dùng cùng ngôn ngữ với marketplace và gym routes: ít nhiễu hơn, dễ so sánh hơn và tập trung đúng vào quyết định nâng cấp.
+                                Ít nhiễu hơn, dễ so sánh hơn và tập trung đúng vào quyết định nâng cấp.
                             </p>
 
                             <div className="flex flex-wrap gap-2">
@@ -282,12 +283,20 @@ export default function PricingPage() {
                             <div className="flex flex-wrap gap-3">
                                 <Link
                                     to="/register"
+                                    onClick={() => trackEvent('homepage_cta_click', {
+                                        cta_id: 'pricing_register',
+                                        target: '/register',
+                                    })}
                                     className="btn-primary px-6 text-sm font-bold uppercase tracking-[0.16em]"
                                 >
                                     Tạo tài khoản
                                 </Link>
                                 <Link
                                     to="/coaches"
+                                    onClick={() => trackEvent('homepage_cta_click', {
+                                        cta_id: 'pricing_browse_coaches',
+                                        target: '/coaches',
+                                    })}
                                     className="btn-secondary px-6 text-sm font-bold uppercase tracking-[0.16em]"
                                 >
                                     Khám phá Coach
@@ -295,11 +304,29 @@ export default function PricingPage() {
                             </div>
                         </div>
 
-                        <div className="marketplace-panel gv-panel-pad">
-                            <div className="marketplace-section-kicker">Tóm tắt nhanh</div>
-                            <h2 className="marketplace-section-title mt-2">
-                                Mỗi gói được tổ chức theo đúng job-to-be-done của từng nhóm người dùng.
-                            </h2>
+                            <div className="marketplace-panel gv-panel-pad">
+                            <div className="marketplace-section-kicker">Đang xem theo vai trò</div>
+                            <h2 className="marketplace-section-title mt-2">{activeView.title}</h2>
+                            <p className="mt-3 text-sm leading-7 text-gray-600">{activeView.subtitle}</p>
+                            <div className="mt-5 flex flex-wrap gap-2">
+                                {(Object.keys(ROLE_VIEWS) as PricingRoleView[]).map((key) => (
+                                    <button
+                                        key={key}
+                                        type="button"
+                                        onClick={() => {
+                                            trackEvent('browse_filter_use', {
+                                                route: 'pricing',
+                                                action: 'role_view',
+                                                value: key,
+                                            });
+                                            setRoleView(key);
+                                        }}
+                                        className={key === roleView ? 'filter-chip filter-chip-active' : 'filter-chip filter-chip-idle'}
+                                    >
+                                        {ROLE_VIEWS[key].title}
+                                    </button>
+                                ))}
+                            </div>
                             <div className="mt-6 space-y-4">
                                 {HERO_POINTS.map((item) => (
                                     <div key={item.title} className="rounded-lg border border-gray-200 bg-white/70 p-4">
@@ -328,34 +355,20 @@ export default function PricingPage() {
                 )}
 
                 <Section
-                    kicker="Coach plans"
-                    title="Dành cho Coach"
-                    subtitle="Từ giai đoạn thử nghiệm đến khi mở rộng quy mô học viên, các gói dưới đây chia rõ ngưỡng nhu cầu để bạn không phải đoán mình nên nâng cấp lúc nào."
-                    columnsClassName="lg:grid-cols-3"
+                    kicker={activeView.kicker}
+                    title={activeView.title}
+                    subtitle={activeView.subtitle}
+                    columnsClassName={activeView.plans.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}
                 >
-                    <PlanColumn planKey="free" onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
-                    <PlanColumn planKey="coach_pro" highlighted onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
-                    <PlanColumn planKey="coach_elite" onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
-                </Section>
-
-                <Section
-                    kicker="Athlete plans"
-                    title="Dành cho Athlete"
-                    subtitle="Người tập không cần một ma trận giá phức tạp. Bảng giá athlete giữ ít lựa chọn hơn để quyết định nâng cấp diễn ra nhanh và rõ."
-                    columnsClassName="lg:grid-cols-2"
-                >
-                    <PlanColumn planKey="free" onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
-                    <PlanColumn planKey="athlete_premium" highlighted onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
-                </Section>
-
-                <Section
-                    kicker="Gym Center plans"
-                    title="Dành cho Gym Center"
-                    subtitle="Gym center được so sánh trên cùng bề mặt với coach và athlete, nhưng lợi ích được viết đúng ngữ cảnh vận hành chi nhánh và khả năng được khám phá."
-                    columnsClassName="lg:grid-cols-2"
-                >
-                    <PlanColumn planKey="free" onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
-                    <PlanColumn planKey="gym_business" highlighted onUpgrade={handleUpgrade} isLoading={upgradeLoading} />
+                    {activeView.plans.map((planKey) => (
+                        <PlanColumn
+                            key={planKey}
+                            planKey={planKey}
+                            highlighted={planKey === activeView.recommended}
+                            onUpgrade={handleUpgrade}
+                            isLoading={upgradeLoading}
+                        />
+                    ))}
                 </Section>
             </section>
 
@@ -368,7 +381,7 @@ export default function PricingPage() {
                                     <div className="marketplace-section-kicker">Checkout</div>
                                     <h2 className="marketplace-section-title">Thanh toán qua SePay</h2>
                                     <p className="text-sm leading-7 text-gray-600">
-                                        Chuyển khoản đúng số tiền và nội dung để kích hoạt gói tự động. Hệ thống sẽ xử lý trong vài phút sau khi giao dịch được xác nhận.
+                                        Chuyển khoản đúng số tiền và nội dung để kích hoạt gói tự động.
                                     </p>
                                 </div>
                                 <button
@@ -387,7 +400,7 @@ export default function PricingPage() {
                             </div>
 
                             <p className="mt-4 text-sm leading-6 text-gray-500">
-                                Sau khi chuyển khoản thành công, bạn có thể đóng hộp thoại này. Gói sẽ tự cập nhật khi hệ thống xác nhận giao dịch.
+                                Gói sẽ tự cập nhật sau khi giao dịch được xác nhận.
                             </p>
                         </div>
                     </div>

@@ -115,27 +115,25 @@ export default function Profile() {
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
 
-            <div className="min-h-screen bg-white flex flex-col pb-nav lg:pb-0">
-                {/* ── MODERN GLASSMORTPHISM HEADER ───────────────────────────── */}
-                <div className="relative h-[300px] sm:h-[350px] w-full overflow-hidden bg-black">
+            <div className="min-h-screen bg-[linear-gradient(180deg,#fafaf9_0%,#f5f5f4_100%)] flex flex-col pb-nav lg:pb-0">
+                <div className="relative min-h-[300px] w-full overflow-hidden border-b border-gray-200 bg-stone-100 sm:min-h-[350px]">
                     {/* Background Image / Pattern */}
                     {myProfile?.cover_image_url ? (
                         <div className="absolute inset-0">
                             <img
                                 src={myProfile.cover_image_url}
                                 alt="Cover"
-                                className="w-full h-full object-cover scale-105 blur-[2px] opacity-40 grayscale group-hover:grayscale-0 transition-all duration-1000"
+                                className="h-full w-full object-cover opacity-25 transition-opacity duration-500"
                                 width={1920}
                                 height={640}
                                 fetchPriority="high"
                                 decoding="async"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-black/20"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#fafaf9] via-[#fafaf9]/88 to-white/70"></div>
                         </div>
                     ) : (
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-gray-900 via-black to-black opacity-80">
-                            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-black/40"></div>
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(24,24,27,0.06),_transparent_45%),linear-gradient(180deg,#fafaf9_0%,#f1efe9_100%)]">
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#fafaf9] via-white/80 to-transparent"></div>
                         </div>
                     )}
 
@@ -149,17 +147,17 @@ export default function Profile() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     className="relative group shrink-0"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-600 rounded-lg blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+                                    <div className="absolute inset-0 rounded-lg bg-stone-300/50 blur-xl opacity-80 transition-opacity duration-500" />
                                     <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-lg overflow-hidden border-[6px] border-white shadow-md bg-white">
                                         <img
                                             src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || 'U')}&background=000&color=fff&size=200`}
                                             alt={user?.full_name}
-                                            className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
+                                            className="h-full w-full object-cover"
                                             decoding="async"
                                         />
                                     </div>
                                     {((user?.user_type === 'trainer' || user?.user_type === 'athlete') && user?.is_verified) && (
-                                        <div className="absolute bottom-2 right-2 bg-blue-500 text-white p-1.5 rounded-lg border-4 border-white shadow-md" title="Verified Professional">
+                                        <div className="absolute bottom-2 right-2 rounded-lg border-4 border-white bg-emerald-600 p-1.5 text-white shadow-md" title="Verified Professional">
                                             <CheckCircle className="w-5 h-5 fill-current" />
                                         </div>
                                     )}
@@ -173,23 +171,23 @@ export default function Profile() {
                                         transition={{ delay: 0.1 }}
                                     >
                                         <div className="flex flex-wrap items-center gap-3 mb-2">
-                                            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">{user?.full_name}</h1>
-                                            <span className="px-3 py-1 bg-black/5 backdrop-blur-md border border-black/10 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest text-gray-600">
-                                                {user?.user_type === 'trainer' ? 'Certified Coach' : user?.user_type === 'athlete' ? 'Elite Athlete' : 'Member'}
+                                            <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-gray-900">{user?.full_name}</h1>
+                                            <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-600 shadow-sm sm:text-xs">
+                                                {user?.user_type === 'trainer' ? 'Coach profile' : user?.user_type === 'athlete' ? 'Athlete profile' : 'Member profile'}
                                             </span>
                                         </div>
-                                        <p className="text-gray-500 font-medium text-sm sm:text-lg max-w-2xl leading-relaxed">
+                                        <p className="max-w-2xl text-sm font-medium leading-relaxed text-gray-600 sm:text-lg">
                                             {myProfile?.headline || "Chưa thiết lập tiêu đề giới thiệu."}
                                         </p>
 
-                                        <div className="flex flex-wrap items-center gap-4 mt-4 text-xs sm:text-sm font-semibold text-gray-500">
+                                        <div className="mt-4 flex flex-wrap items-center gap-4 text-xs font-semibold text-gray-500 sm:text-sm">
                                             <div className="flex items-center gap-1.5">
-                                                <MapPin className="w-4 h-4 text-red-500" />
+                                                <MapPin className="w-4 h-4 text-gray-500" />
                                                 <span>{myProfile?.location || 'Chưa cập nhật vị trí'}</span>
                                             </div>
-                                            <div className="w-1 h-1 rounded-full bg-gray-100 hidden sm:block"></div>
+                                            <div className="hidden h-1 w-1 rounded-full bg-gray-300 sm:block"></div>
                                             <div className="flex items-center gap-1.5 hover:text-black transition-colors cursor-default">
-                                                <Award className="w-4 h-4 text-yellow-500" />
+                                                <Award className="w-4 h-4 text-gray-500" />
                                                 <span>{myProfile?.years_experience || 0} năm kinh nghiệm</span>
                                             </div>
                                         </div>
@@ -228,7 +226,7 @@ export default function Profile() {
                 </div>
 
                 {/* Internal Navigation / Breadcrumbs (Modern Styled) */}
-                <div className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-16 z-30">
+                <div className="sticky top-16 z-30 border-b border-gray-200 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
                         <div className="flex items-center gap-4 overflow-x-auto no-scrollbar after:content-[''] after:block after:w-4 after:shrink-0">
                             <Link to="/dashboard" className="shrink-0 p-2 hover:bg-gray-50 rounded-lg transition-colors">

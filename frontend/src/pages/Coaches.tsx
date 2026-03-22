@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import { ChevronDown } from 'lucide-react';
 import { SPECIALTY_CATEGORIES } from '../data/coachSpecialtyTaxonomy';
 import { CoachDirectoryCard, type CoachDirectoryTrainer } from '../components/coaches/CoachDirectoryCard';
+import { trackEvent } from '../lib/analytics';
 import '../styles/marketplace.css';
 import { useMobileReducedEffects } from '../hooks/useMobileReducedEffects';
 
@@ -321,9 +322,16 @@ export default function Coaches() {
     useEffect(() => {
         const urlQ = searchParams.get('q') || '';
         if (urlQ !== debouncedQ) {
+            if (debouncedQ.trim()) {
+                trackEvent('browse_search_use', {
+                    route: 'coaches',
+                    query: debouncedQ.trim(),
+                    type: currentType,
+                });
+            }
             patchParams({ q: debouncedQ, page: 1 });
         }
-    }, [debouncedQ, patchParams, searchParams]);
+    }, [currentType, debouncedQ, patchParams, searchParams]);
 
     const searchForQuery = searchParams.get('q') || '';
 
@@ -353,6 +361,11 @@ export default function Coaches() {
 
     const resetFilters = () => {
         setQInput('');
+        trackEvent('browse_filter_use', {
+            route: 'coaches',
+            action: 'reset_all',
+            type: currentType,
+        });
         patchParams({
             q: '',
             specialty: '',
@@ -364,15 +377,39 @@ export default function Coaches() {
     };
 
     const setSpecialty = (s: string) => {
+        trackEvent('browse_filter_use', {
+            route: 'coaches',
+            action: 'specialty',
+            value: s || 'all',
+            type: currentType,
+        });
         patchParams({ specialty: s, page: 1 });
     };
     const setPriceIdx = (i: number) => {
+        trackEvent('browse_filter_use', {
+            route: 'coaches',
+            action: 'price_range',
+            value: PRICE_RANGES[i]?.label ?? 'all',
+            type: currentType,
+        });
         patchParams({ priceIdx: i, page: 1 });
     };
     const setCity = (c: string) => {
+        trackEvent('browse_filter_use', {
+            route: 'coaches',
+            action: 'city',
+            value: c || 'all',
+            type: currentType,
+        });
         patchParams({ city: c, page: 1 });
     };
     const setSort = (s: TrainerFilters['sort']) => {
+        trackEvent('browse_filter_use', {
+            route: 'coaches',
+            action: 'sort',
+            value: s,
+            type: currentType,
+        });
         patchParams({ sort: s, page: 1 });
     };
     const setPage = (p: number) => {
@@ -416,6 +453,10 @@ export default function Coaches() {
                                 type="button"
                                 onClick={() => {
                                     setQInput('');
+                                    trackEvent('homepage_cta_click', {
+                                        cta_id: 'coaches_switch_trainer',
+                                        target: '/coaches',
+                                    });
                                     setSearchParams(new URLSearchParams(), { replace: true });
                                 }}
                                 className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
@@ -430,6 +471,10 @@ export default function Coaches() {
                                 type="button"
                                 onClick={() => {
                                     setQInput('');
+                                    trackEvent('homepage_cta_click', {
+                                        cta_id: 'coaches_switch_athlete',
+                                        target: '/coaches?type=athlete',
+                                    });
                                     setSearchParams(new URLSearchParams({ type: 'athlete' }), { replace: true });
                                 }}
                                 className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
@@ -500,6 +545,10 @@ export default function Coaches() {
                         <div className="mt-4 flex flex-col gap-2 border-t border-gray-200 pt-4">
                             <Link
                                 to="/register"
+                                onClick={() => trackEvent('homepage_cta_click', {
+                                    cta_id: 'coaches_create_profile',
+                                    target: '/register',
+                                })}
                                 className="btn-primary inline-flex justify-center px-4 py-2.5 text-center text-sm font-bold uppercase tracking-[0.12em]"
                             >
                                 Tạo hồ sơ
@@ -538,7 +587,14 @@ export default function Coaches() {
                                 ? 'border-gray-900 bg-gray-900 text-white'
                                 : 'border-gray-200 bg-gray-50 text-gray-900 shadow-sm'
                         }`}
-                        onClick={() => setShowMobileFilters((v) => !v)}
+                        onClick={() => {
+                            trackEvent('browse_filter_use', {
+                                route: 'coaches',
+                                action: showMobileFilters ? 'close_panel' : 'open_panel',
+                                type: currentType,
+                            });
+                            setShowMobileFilters((v) => !v);
+                        }}
                     >
                         Bộ lọc
                         {hasActiveFilters && <span className="rounded-full bg-white/20 px-1.5 text-xs">•</span>}
@@ -695,6 +751,12 @@ export default function Coaches() {
                                             trainer={trainer}
                                             index={index}
                                             reducedEffects={reducedEffects}
+                                            onClick={() => trackEvent('card_click', {
+                                                route: 'coaches',
+                                                card_type: currentType,
+                                                entity_id: trainer.id,
+                                                target: trainer.profile_slug || trainer.id,
+                                            })}
                                         />
                                     ))}
                                 </div>

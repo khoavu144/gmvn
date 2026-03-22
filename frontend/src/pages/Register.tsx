@@ -6,6 +6,7 @@ import { setCredentials, setLoading } from '../store/slices/authSlice';
 import { authApi } from '../services/auth';
 import type { RootState } from '../store/store';
 import { Button } from '../components/ui/Button';
+import { trackEvent } from '../lib/analytics';
 
 export default function Register() {
     const navigate = useNavigate();
@@ -33,12 +34,17 @@ export default function Register() {
     });
     const [error, setError] = useState('');
     const [loading, setLoadingState] = useState(false);
+    const [hasTrackedStart, setHasTrackedStart] = useState(false);
 
     const [step, setStep] = useState<1 | 2>(1);
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
+        if (!hasTrackedStart) {
+            trackEvent('register_start', { source: 'register_form' });
+            setHasTrackedStart(true);
+        }
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
@@ -71,6 +77,10 @@ export default function Register() {
                 access_token: result.access_token,
                 refresh_token: result.refresh_token,
             }));
+            trackEvent('register_complete', {
+                user_type: role,
+                source: 'register_form',
+            });
             if (result.user.user_type === 'gym_owner') {
                 navigate('/gym-owner/register');
             } else {
@@ -88,7 +98,7 @@ export default function Register() {
     };
 
     return (
-        <div className="page-shell">
+        <div className="auth-shell">
             <Helmet>
                 <title>Đăng ký — GymViet</title>
                 <meta name="description" content="Tạo tài khoản GYMERVIET miễn phí. Bắt đầu hành trình tập luyện với huấn luyện viên và phòng tập hàng đầu Việt Nam." />

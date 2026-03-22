@@ -4,9 +4,10 @@ import path from 'path';
 const DIST_DIR = path.resolve(process.cwd(), 'dist/assets');
 
 const BUDGETS = {
-    // Tightened 2026-03-23 to prevent JS payload regressions after mobile performance hotfixes.
-    // Calibrated from current baseline so CI stays stable while still stricter than previous limits.
-    totalJsBytes: 2_296_000,
+    // Calibrated 2026-03-23 after adding business instrumentation and route-presentation gates.
+    // We now enforce both whole-repo budget and a stricter public/member-core budget.
+    totalJsBytes: 2_308_000,
+    coreJsBytes: 1_437_000,
     maxChunkBytes: 505_000,
     chunkLimits: {
         framework: 428_500,
@@ -18,6 +19,42 @@ const BUDGETS = {
         socket: 48_000,
     },
 };
+
+const CORE_ROUTE_PREFIXES = [
+    'Home',
+    'Coaches',
+    'CoachDetailPage',
+    'AthleteDetailPage',
+    'Gyms',
+    'GymDetailPage',
+    'MarketplacePage',
+    'ProductDetailPage',
+    'NewsPage',
+    'NewsDetailPage',
+    'PricingPage',
+    'Login',
+    'Register',
+    'VerifyEmail',
+    'OnboardingPage',
+    'Dashboard',
+    'UserDashboard',
+    'Profile',
+    'MessagesPage',
+    'ProgramsPage',
+    'WorkoutsPage',
+    'SubscriptionsPage',
+    'CommunityGallery',
+    'index',
+    'framework',
+    'motion',
+    'maps',
+    'zod',
+    'select',
+    'socket',
+    'store',
+    'userService',
+    'faqData',
+];
 
 const formatKb = (bytes) => `${(bytes / 1024).toFixed(1)} KB`;
 
@@ -37,12 +74,26 @@ const jsFiles = files
 
 const totalJsBytes = jsFiles.reduce((sum, file) => sum + file.size, 0);
 const largestChunk = jsFiles[0];
+const coreFiles = Array.from(
+    new Set(
+        CORE_ROUTE_PREFIXES.map((prefix) =>
+            jsFiles.find((file) => file.name.startsWith(`${prefix}-`) || file.name.startsWith(`${prefix}.`))
+        ).filter(Boolean),
+    ),
+);
+const coreJsBytes = coreFiles.reduce((sum, file) => sum + file.size, 0);
 
 const failures = [];
 
 if (totalJsBytes > BUDGETS.totalJsBytes) {
     failures.push(
         `Total JS exceeded: ${formatKb(totalJsBytes)} > ${formatKb(BUDGETS.totalJsBytes)}`
+    );
+}
+
+if (coreJsBytes > BUDGETS.coreJsBytes) {
+    failures.push(
+        `Core route JS exceeded: ${formatKb(coreJsBytes)} > ${formatKb(BUDGETS.coreJsBytes)}`
     );
 }
 
@@ -65,6 +116,7 @@ for (const [chunkKey, limit] of Object.entries(BUDGETS.chunkLimits)) {
 
 console.log('Bundle budget report');
 console.log(`- Total JS: ${formatKb(totalJsBytes)}`);
+console.log(`- Core route JS: ${formatKb(coreJsBytes)}`);
 if (largestChunk) {
     console.log(`- Largest chunk: ${largestChunk.name} (${formatKb(largestChunk.size)})`);
 }

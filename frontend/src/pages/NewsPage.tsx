@@ -5,6 +5,7 @@ import { Clock } from 'lucide-react';
 import apiClient from '../services/api';
 import { Skeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
+import { trackEvent } from '../lib/analytics';
 
 interface NewsArticle {
     id: string;
@@ -57,6 +58,11 @@ function NewsCard({ article }: { article: NewsArticle }) {
     return (
         <Link
             to={`/news/${article.slug}`}
+            onClick={() => trackEvent('card_click', {
+                route: 'news',
+                entity_id: article.id,
+                target: `/news/${article.slug}`,
+            })}
             className="marketplace-panel group flex h-full flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_55px_rgba(53,41,26,0.1)]"
         >
             <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
@@ -123,6 +129,8 @@ export default function NewsPage() {
     const [totalPages, setTotalPages] = useState(1);
     const [activeCategory, setActiveCategory] = useState('all');
     const canonicalBase = import.meta.env.VITE_CANONICAL_BASE_URL || 'https://gymerviet.com';
+    const safeTotalPages = Math.max(1, totalPages);
+    const hasArticles = articles.length > 0;
 
     /* eslint-disable react-hooks/set-state-in-effect -- list fetch: loading/error flags belong to request lifecycle */
     useEffect(() => {
@@ -135,7 +143,7 @@ export default function NewsPage() {
         apiClient.get<NewsApiResponse>('/news', { params })
             .then((res) => {
                 setArticles(res.data.data);
-                setTotalPages(res.data.meta.totalPages);
+                setTotalPages(Math.max(1, res.data.meta.totalPages));
             })
             .catch(() => setError('Không thể tải danh sách bài viết. Vui lòng thử lại.'))
             .finally(() => setLoading(false));
@@ -143,6 +151,11 @@ export default function NewsPage() {
     /* eslint-enable react-hooks/set-state-in-effect */
 
     const handleCategoryChange = (category: string) => {
+        trackEvent('browse_filter_use', {
+            route: 'news',
+            action: 'category',
+            value: category,
+        });
         setActiveCategory(category);
         setPage(1);
     };
@@ -193,11 +206,11 @@ export default function NewsPage() {
                                         </div>
                                     </div>
                                     <div className="rounded-lg border border-gray-200 bg-white/70 p-4">
-                                        <div className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-gray-500">
+                                    <div className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-gray-500">
                                             Trang hiện tại
                                         </div>
                                         <div className="mt-2 text-2xl font-bold tracking-[-0.05em] text-gray-900">
-                                            {page} / {totalPages}
+                                            {hasArticles ? `${page} / ${safeTotalPages}` : 'Đang làm mới'}
                                         </div>
                                     </div>
                                 </div>
@@ -216,7 +229,7 @@ export default function NewsPage() {
                                 </h2>
                             </div>
                             <div className="text-sm text-gray-500">
-                                {loading ? 'Đang đồng bộ bài viết…' : `${articles.length} bài viết ở trang này`}
+                                {loading ? 'Đang đồng bộ bài viết…' : hasArticles ? `${articles.length} bài viết ở trang này` : 'Ưu tiên chất lượng nội dung trước số lượng'}
                             </div>
                         </div>
 
@@ -262,16 +275,28 @@ export default function NewsPage() {
                         </div>
                     )}
 
-                    {!loading && !error && articles.length === 0 && (
+                    {!loading && !error && !hasArticles && (
                         <div className="marketplace-panel">
                             <EmptyState
                                 numberIcon={0}
-                                description="Chưa có bài viết trong danh mục này. Hệ thống sẽ tự động cập nhật hàng ngày."
+                                title="Chưa có bài viết trong chủ đề này"
+                                description="GYMERVIET đang ưu tiên nội dung thực sự đáng đọc. Bạn có thể xem tất cả chủ đề hoặc quay lại các luồng khám phá chính."
                             />
+                            <div className="mt-5 flex flex-col items-center justify-center gap-3 border-t border-gray-200 pt-5 sm:flex-row">
+                                <button type="button" onClick={() => handleCategoryChange('all')} className="btn-primary px-5 py-2.5 text-sm font-bold">
+                                    Xem tất cả chủ đề
+                                </button>
+                                <Link to="/coaches" className="btn-secondary px-5 py-2.5 text-sm font-bold">
+                                    Khám phá Coach
+                                </Link>
+                                <Link to="/gyms" className="btn-secondary px-5 py-2.5 text-sm font-bold">
+                                    Tìm phòng tập
+                                </Link>
+                            </div>
                         </div>
                     )}
 
-                    {!loading && !error && articles.length > 0 && (
+                    {!loading && !error && hasArticles && (
                         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                             {articles.map((article) => (
                                 <NewsCard key={article.id} article={article} />
@@ -280,7 +305,7 @@ export default function NewsPage() {
                     )}
                 </section>
 
-                {totalPages > 1 && (
+                {hasArticles && safeTotalPages > 1 && (
                     <section className="marketplace-container mt-8">
                         <div className="marketplace-panel gv-panel-pad-sm flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -300,12 +325,12 @@ export default function NewsPage() {
                                     ← Trang trước
                                 </button>
                                 <span className="min-w-[80px] text-center text-sm text-gray-500">
-                                    {page} / {totalPages}
+                                    {page} / {safeTotalPages}
                                 </span>
                                 <button
                                     type="button"
-                                    disabled={page === totalPages}
-                                    onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+                                    disabled={page === safeTotalPages}
+                                    onClick={() => setPage((current) => Math.min(safeTotalPages, current + 1))}
                                     className="btn-secondary px-4 text-sm font-bold disabled:opacity-40"
                                 >
                                     Trang sau →

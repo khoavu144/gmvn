@@ -11,18 +11,32 @@ interface GalleryCardProps {
 
 export default function GalleryCard({ item, onClick }: GalleryCardProps) {
     const [isLoaded, setIsLoaded] = useState(false);
+    const profileHref =
+        item.linked_user?.slug
+            ? item.linked_user.user_type === 'athlete'
+                ? `/athlete/${item.linked_user.slug}`
+                : `/coach/${item.linked_user.slug}`
+            : '#';
 
     // Randomize aspect ratios for masonry effect if not provided by backend
     // Since images might be strictly square or rectangular, we use natural flow in CSS.
     
     return (
-        <div 
-            className="group relative cursor-zoom-in overflow-hidden rounded-lg bg-white/5"
+        <div
+            className="group relative cursor-zoom-in overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
             onClick={onClick}
+            onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onClick();
+                }
+            }}
+            role="button"
+            tabIndex={0}
         >
             {/* Loading Skeleton */}
             {!isLoaded && (
-                <div className="absolute inset-0 animate-pulse bg-white/10" />
+                <div className="absolute inset-0 animate-pulse bg-gray-100" />
             )}
 
             <img
@@ -36,7 +50,7 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
             />
 
             {/* Hover overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#1f1c18]/90 via-[#1f1c18]/35 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
             {/* Featured Badge */}
             {item.is_featured && (
@@ -56,11 +70,10 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
 
                 {/* Linked User Mini Profile */}
                 {item.linked_user ? (
-                    <div 
+                    <div
                         className="flex items-center gap-3"
-                        onClick={(e) => e.stopPropagation()} // Prevent opening lightbox if clicking on profile
                     >
-                        <Link to={`/coach/${item.linked_user.slug}`}>
+                        <Link to={profileHref} onClick={(e) => e.stopPropagation()}>
                             <div className="w-10 h-10 rounded-full border border-white/20 overflow-hidden bg-white/10 flex-shrink-0 transition-transform hover:scale-110">
                                 {item.linked_user.avatar_url ? (
                                     <img src={item.linked_user.avatar_url} alt={item.linked_user.full_name} className="w-full h-full object-cover" />
@@ -72,7 +85,7 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
                             </div>
                         </Link>
                         <div className="flex-1 min-w-0">
-                            <Link to={`/coach/${item.linked_user.slug}`} className="group/name block">
+                            <Link to={profileHref} onClick={(e) => e.stopPropagation()} className="group/name block">
                                 <div className="flex items-center gap-1.5">
                                     <h4 className="text-white font-bold text-sm truncate group-hover/name:underline">
                                         {item.linked_user.full_name}
@@ -85,7 +98,8 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
                             </Link>
                         </div>
                         <Link 
-                            to={`/coach/${item.linked_user.slug}`}
+                            to={profileHref}
+                            onClick={(e) => e.stopPropagation()}
                             className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-100 transition-colors"
                         >
                             <ArrowRight size={14} />

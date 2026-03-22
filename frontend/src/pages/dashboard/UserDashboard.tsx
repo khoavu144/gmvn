@@ -15,6 +15,7 @@ import {
 import type { RootState } from '../../store/store';
 import QuickActionCard from '../../components/dashboard/QuickActionCard';
 import { USER_TAB_QUERY_KEY, parseUserTabParam } from './userDashboardNav';
+import { trackEvent } from '../../lib/analytics';
 
 const UserDashboard: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);
@@ -77,12 +78,6 @@ const UserDashboard: React.FC = () => {
             title: 'Tin tức',
             desc: 'Cập nhật từ GYMERVIET',
         },
-        {
-            to: '/dashboard/marketplace',
-            icon: <Store className="h-5 w-5" />,
-            title: 'Cửa hàng của bạn',
-            desc: 'Quản lý bài đăng marketplace',
-        },
     ];
 
     const journeyBlock = (
@@ -140,6 +135,10 @@ const UserDashboard: React.FC = () => {
                         {!isProfileComplete && (
                             <Link
                                 to="/profile"
+                                onClick={() => trackEvent('dashboard_shortcut_click', {
+                                    shortcut_id: 'profile_complete',
+                                    route: '/profile',
+                                })}
                                 className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-gray-900 hover:underline"
                             >
                                 Cập nhật hồ sơ <ArrowRight className="h-4 w-4" aria-hidden />
@@ -157,6 +156,10 @@ const UserDashboard: React.FC = () => {
                         <p className="mt-1 text-sm text-gray-600">Gym, yoga, pilates phù hợp quanh bạn.</p>
                         <Link
                             to="/gyms"
+                            onClick={() => trackEvent('dashboard_shortcut_click', {
+                                shortcut_id: 'journey_gyms',
+                                route: '/gyms',
+                            })}
                             className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-gray-900 hover:underline"
                         >
                             Xem danh sách gym <ArrowRight className="h-4 w-4" aria-hidden />
@@ -173,6 +176,10 @@ const UserDashboard: React.FC = () => {
                         </p>
                         <Link
                             to="/profile"
+                            onClick={() => trackEvent('dashboard_shortcut_click', {
+                                shortcut_id: 'journey_upgrade_profile',
+                                route: '/profile',
+                            })}
                             className="mt-3 inline-flex items-center gap-2 text-sm font-bold text-gray-900 hover:underline"
                         >
                             Tìm hiểu trên hồ sơ <ArrowRight className="h-4 w-4" aria-hidden />
@@ -184,15 +191,18 @@ const UserDashboard: React.FC = () => {
             <div className="mt-8 flex flex-col gap-4 rounded-lg border border-gray-200 bg-gray-50/80 p-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h3 className="flex items-center gap-2 font-bold text-gray-900">
-                        <Store className="h-5 w-5" aria-hidden /> Bán hàng trên Marketplace
+                        <Store className="h-5 w-5" aria-hidden /> Muốn thử bán hàng trên Marketplace?
                     </h3>
-                    <p className="mt-1 text-sm text-gray-600">Đăng sản phẩm vật lý; listing đầu tiên miễn phí.</p>
+                    <p className="mt-1 text-sm text-gray-600">Chúng tôi giữ luồng này ở vai trò phụ để dashboard của bạn tập trung hơn. Bạn vẫn có thể mở cửa hàng khi đã sẵn sàng.</p>
                 </div>
                 <Link
                     to="/dashboard/marketplace"
+                    onClick={() => trackEvent('marketplace_seller_cta_click', {
+                        source: 'user_dashboard_secondary_cta',
+                    })}
                     className="inline-flex items-center gap-2 self-start rounded-sm bg-gray-900 px-5 py-3 text-sm font-bold text-white hover:bg-gray-800 sm:self-auto"
                 >
-                    Quản lý cửa hàng <ArrowRight className="h-4 w-4" aria-hidden />
+                    Bắt đầu bán hàng <ArrowRight className="h-4 w-4" aria-hidden />
                 </Link>
             </div>
         </div>
@@ -206,6 +216,10 @@ const UserDashboard: React.FC = () => {
                     <QuickActionCard
                         key={card.to}
                         to={card.to}
+                        onClick={() => trackEvent('dashboard_shortcut_click', {
+                            shortcut_id: card.title,
+                            route: card.to,
+                        })}
                         icon={card.icon}
                         title={card.title}
                         description={card.desc}

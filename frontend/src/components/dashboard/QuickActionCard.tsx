@@ -39,7 +39,7 @@ export default function QuickActionCard({
 
     const className = 'card flex flex-col group border-black hover:bg-black hover:text-white transition-colors';
 
-    if (onClick) {
+    if (onClick && !to) {
         return (
             <button onClick={onClick} className={`${className} text-left`}>
                 {content}
@@ -48,7 +48,7 @@ export default function QuickActionCard({
     }
 
     return (
-        <Link to={to || '#'} className={className}>
+        <Link to={to || '#'} className={className} onClick={onClick}>
             {content}
         </Link>
     );
