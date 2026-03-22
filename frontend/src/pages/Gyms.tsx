@@ -81,6 +81,8 @@ interface CategoryStripProps {
     slug: string;
     /** Desktop only: alternate big card left / right between strips */
     reverseLayout?: boolean;
+    /** Narrow column: one representative card + CTA (for 3-col editorial row) */
+    layout?: 'strip' | 'column';
 }
 
 const CategoryStrip: React.FC<CategoryStripProps> = ({
@@ -90,10 +92,37 @@ const CategoryStrip: React.FC<CategoryStripProps> = ({
     onFilter,
     slug,
     reverseLayout = false,
+    layout = 'strip',
 }) => {
     if (items.length === 0) return null;
 
     const [primary, ...rest] = items;
+
+    if (layout === 'column') {
+        return (
+            <div className="flex h-full min-h-0 flex-col space-y-3">
+                <header className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-start md:gap-x-2">
+                    <div className="min-w-0">
+                        <div className="marketplace-section-kicker">Phân loại</div>
+                        <h2 className="marketplace-section-title mt-0.5 text-base sm:text-lg">{label}</h2>
+                        <p className="mt-1.5 text-xs sm:text-sm text-gray-500 leading-relaxed line-clamp-3">
+                            {desc}
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={() => onFilter(slug)}
+                        className="shrink-0 justify-self-start text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-gray-900 border-b border-gray-900 pb-0.5 hover:opacity-70 transition-opacity whitespace-nowrap md:pt-0.5"
+                    >
+                        Xem tất cả →
+                    </button>
+                </header>
+                <div className="min-h-0 flex-1 flex flex-col">
+                    <GymCard gym={primary} variant="standard" index={0} className="h-full min-h-0" />
+                </div>
+            </div>
+        );
+    }
     const secondaries = rest.slice(0, 2);
     const secCount = secondaries.length;
 
@@ -525,37 +554,50 @@ const Gyms: React.FC = () => {
                                             </div>
                                         </div>
 
-                                        <div
-                                            className={
-                                                featuredGyms.length === 1
-                                                    ? 'grid grid-cols-1 gap-4'
-                                                    : featuredGyms.length === 2
-                                                      ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4'
-                                                      : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'
-                                            }
-                                        >
-                                            <div
-                                                className={
-                                                    featuredGyms.length >= 3
-                                                        ? 'sm:col-span-2 lg:col-span-2 h-full min-h-0'
-                                                        : 'h-full min-h-0'
-                                                }
-                                            >
-                                                <GymCard gym={featuredGyms[0]} variant="featured" index={0} />
-                                            </div>
-                                            {featuredGyms.slice(1, 3).map((gym, idx) => (
-                                                <div key={gym.id} className="h-full min-h-0">
-                                                    <GymCard gym={gym} variant="compact" index={idx + 1} />
+                                        {featuredGyms.length === 1 ? (
+                                            <div className="grid grid-cols-1 gap-4">
+                                                <div className="h-full min-h-0">
+                                                    <GymCard gym={featuredGyms[0]} variant="featured" index={0} />
                                                 </div>
-                                            ))}
-                                        </div>
+                                            </div>
+                                        ) : featuredGyms.length === 2 ? (
+                                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                                                <div className="h-full min-h-0">
+                                                    <GymCard gym={featuredGyms[0]} variant="featured" index={0} />
+                                                </div>
+                                                <div className="h-full min-h-0">
+                                                    <GymCard gym={featuredGyms[1]} variant="compact" index={1} />
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-stretch lg:gap-4">
+                                                <div className="min-h-0">
+                                                    <GymCard gym={featuredGyms[0]} variant="featured" index={0} />
+                                                </div>
+                                                <div className="flex min-h-0 flex-col gap-4 lg:h-full lg:min-h-0">
+                                                    {featuredGyms.slice(1, 3).map((gym, idx) => (
+                                                        <div
+                                                            key={gym.id}
+                                                            className="flex min-h-0 flex-1 flex-col basis-0"
+                                                        >
+                                                            <GymCard
+                                                                gym={gym}
+                                                                variant="compact"
+                                                                index={idx + 1}
+                                                                className="h-full min-h-0"
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )}
 
                             {/* ── Editorial category strips (only when no venue-type filter active) ── */}
                             {showEditorialSections && (
-                                <div className="flex flex-col gap-6 md:gap-8">
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-6">
                                     {EDITORIAL_CATEGORIES.map((cat, stripIdx) => {
                                         const items = categoryBuckets.get(cat.slug) || [];
                                         return (
@@ -563,8 +605,8 @@ const Gyms: React.FC = () => {
                                                 key={cat.slug}
                                                 className={
                                                     stripIdx % 2 === 1
-                                                        ? 'rounded-xl border border-gray-200/80 border-l-[3px] border-l-gray-900/18 bg-gray-50/50 p-4 md:p-5'
-                                                        : 'rounded-xl border border-gray-200/70 bg-white/80 p-4 md:p-5'
+                                                        ? 'flex min-h-0 flex-col rounded-xl border border-gray-200/80 border-l-[3px] border-l-gray-900/18 bg-gray-50/50 p-4 md:p-5'
+                                                        : 'flex min-h-0 flex-col rounded-xl border border-gray-200/70 bg-white/80 p-4 md:p-5'
                                                 }
                                             >
                                                 <CategoryStrip
@@ -573,7 +615,7 @@ const Gyms: React.FC = () => {
                                                     desc={cat.desc}
                                                     items={items}
                                                     onFilter={handleFilterByCategory}
-                                                    reverseLayout={stripIdx % 2 === 1}
+                                                    layout="column"
                                                 />
                                             </div>
                                         );
