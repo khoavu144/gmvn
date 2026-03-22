@@ -6,6 +6,8 @@ import apiClient from '../services/api';
 import type { Trainer } from '../types';
 import { usePrefetchProfile } from '../hooks/usePrefetchProfile';
 import { HomeProfileSpotlight } from '../components/home/HomeProfileSpotlight';
+import { FAQAccordion } from '../components/FAQAccordion';
+import { HOME_FAQ_PREVIEW_ITEMS } from '../data/faqData';
 
 type FeaturedTrainer = Trainer & {
     is_verified?: boolean;
@@ -398,32 +400,9 @@ export default function Home() {
                             <h2 id="home-faq-heading" className="marketplace-section-title mt-2">
                                 Trước khi bạn bắt đầu
                             </h2>
-                            <ul className="mt-6 space-y-5 text-sm leading-7 text-gray-600">
-                                <li>
-                                    <p className="font-bold text-gray-900">Dùng GYMERVIET có mất phí không?</p>
-                                    <p className="mt-1">
-                                        Đăng ký và xem hồ sơ công khai là miễn phí. Gói trả phí chỉ khi bạn chọn nâng cấp —{' '}
-                                        <Link to="/pricing" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
-                                            xem bảng giá
-                                        </Link>
-                                        .
-                                    </p>
-                                </li>
-                                <li>
-                                    <p className="font-bold text-gray-900">Tôi tìm Coach hoặc phòng tập thế nào?</p>
-                                    <p className="mt-1">
-                                        Vào{' '}
-                                        <Link to="/coaches" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
-                                            danh sách Coach
-                                        </Link>
-                                        {' '}hoặc{' '}
-                                        <Link to="/gyms" className="font-semibold text-gray-900 underline underline-offset-2 hover:no-underline">
-                                            marketplace phòng tập
-                                        </Link>
-                                        , lọc theo chuyên môn hoặc khu vực rồi mở hồ sơ chi tiết.
-                                    </p>
-                                </li>
-                            </ul>
+                            <div className="mt-6">
+                                <FAQAccordion items={HOME_FAQ_PREVIEW_ITEMS} />
+                            </div>
                             <div className="mt-6 border-t border-gray-200 pt-5">
                                 <Link
                                     to="/faq"
