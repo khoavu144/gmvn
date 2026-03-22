@@ -16,22 +16,22 @@ type FeaturedTrainer = Trainer & {
 const AUDIENCE_PILLARS = [
     {
         kicker: 'Người tập',
-        title: 'Bắt đầu từ đúng người, đúng nơi và đúng ngữ cảnh tập luyện.',
-        body: 'GYMERVIET giúp người tập đi từ khám phá coach, so sánh venue, tham khảo marketplace cho tới cập nhật kiến thức mà không phải nhảy giữa nhiều hệ thống rời rạc.',
+        title: 'Tìm Coach và phòng tập đúng với mục tiêu của bạn.',
+        body: 'Xem hồ sơ thật, mức giá và khu vực; đọc tin & kiến thức tập luyện — không cần nhảy qua nhiều trang lạ.',
         href: '/coaches',
-        cta: 'Khám phá coach',
+        cta: 'Tìm Coach',
     },
     {
         kicker: 'Coach',
-        title: 'Xây hiện diện công khai và vận hành hành trình huấn luyện rõ ràng hơn.',
-        body: 'Coach có một nơi để xuất bản hồ sơ, mở gói tập, được khám phá bởi học viên mới và giữ mạch giao tiếp nhất quán trong cùng một hệ sinh thái.',
+        title: 'Thu hút học viên mới, hồ sơ gọn và dễ tìm.',
+        body: 'Trưng bày chuyên môn, giá và lịch; để người tập hiểu bạn là ai trước khi nhắn tin hay đăng ký gói.',
         href: '/register',
         cta: 'Trở thành Coach',
     },
     {
-        kicker: 'Gym Center',
-        title: 'Đưa venue lên đúng bề mặt khám phá thay vì chìm trong những danh sách vô định.',
-        body: 'Gym có thể trình bày không gian tập, chi nhánh, đội ngũ và giá khởi điểm bằng một cấu trúc dễ đọc hơn cho người dùng mới.',
+        kicker: 'Chủ phòng tập',
+        title: 'Đưa phòng tập lên bản đồ tìm kiếm của người tập.',
+        body: 'Giới thiệu không gian, chi nhánh và giá khởi điểm rõ ràng — giúp khách mới so sánh và chọn nhanh hơn.',
         href: '/gym-owner/register',
         cta: 'Đăng ký đối tác',
     },
@@ -41,17 +41,17 @@ const ECOSYSTEM_STEPS = [
     {
         step: '01',
         title: 'Khám phá',
-        body: 'Người dùng bắt đầu từ những bề mặt công khai như coach, venue, marketplace và knowledge hub.',
+        body: 'Lướt Coach, phòng tập, cửa hàng và tin tức — mọi thứ nằm trong cùng một ứng dụng.',
     },
     {
         step: '02',
         title: 'So sánh',
-        body: 'Quyết định dựa trên tín hiệu thật: hồ sơ, hình ảnh, giá khởi điểm, ngữ cảnh sử dụng và mức độ phù hợp.',
+        body: 'Đối chiếu ảnh, giá, khu vực và thông tin hồ sơ để chọn người và nơi phù hợp với bạn.',
     },
     {
         step: '03',
         title: 'Hành động',
-        body: 'Khi đã hiểu mình cần gì, họ mới đi tiếp sang đăng ký, nhắn tin, mua gói hoặc trở thành đối tác trong hệ sinh thái.',
+        body: 'Đăng ký tài khoản, liên hệ Coach hoặc phòng tập, hoặc chọn gói trả phí — khi bạn đã sẵn sàng bước tiếp.',
     },
 ] as const;
 
@@ -106,17 +106,17 @@ export default function Home() {
     return (
         <main className="marketplace-shell min-h-screen pb-24">
             <Helmet>
-                <title>GYMERVIET — Hệ sinh thái dành cho người tập, Coach và Gym</title>
+                <title>GYMERVIET — Tìm Coach, phòng tập và kiến thức fitness</title>
                 <meta
                     name="description"
-                    content="GYMERVIET kết nối người tập, Coach và Gym trong cùng một hệ sinh thái để khám phá, so sánh và hành động rõ ràng hơn."
+                    content="Khám phá Coach và phòng tập có hồ sơ rõ ràng, so sánh giá và địa điểm. Đọc tin tập luyện và tạo tài khoản miễn phí trên GYMERVIET."
                 />
                 <link rel="canonical" href={canonicalBase} />
                 <meta property="og:type" content="website" />
-                <meta property="og:title" content="GYMERVIET — Hệ sinh thái dành cho người tập, Coach và Gym" />
+                <meta property="og:title" content="GYMERVIET — Tìm Coach, phòng tập và kiến thức fitness" />
                 <meta
                     property="og:description"
-                    content="Một hệ sinh thái thống nhất để khám phá coach, venue, marketplace và kiến thức tập luyện theo cách dễ hiểu hơn."
+                    content="Xem hồ sơ thật, so sánh giá và địa điểm. Một nơi cho người tập, Coach và phòng tập tại Việt Nam."
                 />
                 <meta property="og:url" content={canonicalBase} />
                 <meta property="og:image" content="https://gymerviet.com/og-default.jpg" />
@@ -124,10 +124,10 @@ export default function Home() {
                 <meta property="og:image:height" content="630" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content="@gymerviet" />
-                <meta name="twitter:title" content="GYMERVIET — Hệ sinh thái dành cho người tập, Coach và Gym" />
+                <meta name="twitter:title" content="GYMERVIET — Tìm Coach, phòng tập và kiến thức fitness" />
                 <meta
                     name="twitter:description"
-                    content="Người tập, Coach và Gym gặp nhau trên cùng một bề mặt khám phá, so sánh và hành động rõ ràng hơn."
+                    content="Khám phá Coach và phòng tập, đọc tin tập luyện và bắt đầu miễn phí."
                 />
                 <meta name="twitter:image" content="https://gymerviet.com/og-default.jpg" />
                 <script
@@ -160,23 +160,32 @@ export default function Home() {
 
             <section className="marketplace-hero pt-header">
                 <div className="marketplace-container">
-                    <div className="grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)] lg:items-end">
-                        <div className="space-y-5">
-                            <span className="marketplace-eyebrow">Balanced fitness ecosystem</span>
+                    <div className="grid gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)] lg:items-start lg:gap-10">
+                        <div className="space-y-5 lg:max-w-[40rem] lg:pt-1">
+                            <span className="marketplace-eyebrow">Tập đúng người · đúng chỗ</span>
                             <h1 className="marketplace-title max-w-4xl text-balance">
-                                GYMERVIET là nơi người tập, Coach và Gym gặp nhau trong cùng một hệ sinh thái.
+                                Tìm Coach, chọn phòng tập — tất cả trên một nền tảng.
                             </h1>
                             <p className="marketplace-lead max-w-2xl">
-                                Trang chủ này không cố bán ngay. Nó chỉ trả lời ngắn gọn GYMERVIET là gì: một cấu trúc chung để khám phá, so sánh và hành động rõ ràng hơn quanh hành trình tập luyện tại Việt Nam.
+                                Xem hồ sơ thật, so sánh giá và khu vực, đọc tin tập luyện — rồi quyết định bước tiếp theo cho mục tiêu tập luyện của bạn trên GYMERVIET.
+                            </p>
+                            <p className="text-xs font-medium uppercase tracking-[0.12em] text-stone-500">
+                                Đăng ký miễn phí · Hồ sơ có thể được xác minh · Lọc phòng tập theo khu vực
                             </p>
 
                             <div className="flex flex-wrap gap-3">
                                 <a
-                                    href="#ecosystem"
+                                    href="#ba-vai-tro"
                                     className="btn-primary px-6 text-sm font-bold uppercase tracking-[0.16em]"
                                 >
-                                    Xem hệ sinh thái
+                                    Khám phá 3 vai trò
                                 </a>
+                                <Link
+                                    to="/gyms"
+                                    className="btn-secondary px-6 text-sm font-bold uppercase tracking-[0.16em]"
+                                >
+                                    Tìm phòng tập
+                                </Link>
                                 <Link
                                     to="/register"
                                     className="btn-secondary px-6 text-sm font-bold uppercase tracking-[0.16em]"
@@ -186,14 +195,14 @@ export default function Home() {
                             </div>
                         </div>
 
-                        <div className="marketplace-panel p-6 sm:p-8">
-                            <div className="space-y-3 border-b border-[color:var(--mk-line)] pb-4">
-                                <div className="marketplace-section-kicker">Một lát cắt dữ liệu thật</div>
+                        <div className="marketplace-panel p-6 shadow-sm ring-1 ring-stone-900/[0.06] sm:p-8 lg:shadow-[0_12px_48px_-8px_rgba(15,23,42,0.12)]">
+                            <div className="space-y-3 border-b border-stone-200 pb-4">
+                                <div className="marketplace-section-kicker">Thành viên đang có mặt</div>
                                 <h2 className="marketplace-section-title">
-                                    Những hồ sơ đang hiện diện trên nền tảng ngay lúc này.
+                                    Một vài gương mặt bạn có thể xem ngay.
                                 </h2>
-                                <p className="text-sm leading-7 text-[color:var(--mk-text-soft)]">
-                                    Chỉ một nhóm nhỏ đại diện để cho thấy hệ sinh thái này được xây quanh người thật và nhu cầu thật.
+                                <p className="text-sm leading-7 text-stone-600">
+                                    Ảnh đại diện và chuyên môn thật — bấm vào để xem hồ sơ chi tiết.
                                 </p>
                             </div>
 
@@ -202,12 +211,12 @@ export default function Home() {
                                     {Array.from({ length: 3 }).map((_, index) => (
                                         <div
                                             key={index}
-                                            className="flex items-center gap-4 rounded-lg bg-[color:var(--mk-paper-strong)] p-4 animate-pulse"
+                                            className="flex items-center gap-4 rounded-lg bg-stone-100 p-4 animate-pulse"
                                         >
-                                            <div className="h-14 w-14 rounded-full bg-[color:var(--mk-line)]" />
+                                            <div className="h-14 w-14 rounded-full bg-stone-200" />
                                             <div className="min-w-0 flex-1 space-y-2">
-                                                <div className="h-4 w-1/2 rounded bg-[color:var(--mk-line)]" />
-                                                <div className="h-3 w-1/3 rounded bg-[color:var(--mk-line)]" />
+                                                <div className="h-4 w-1/2 rounded bg-stone-200" />
+                                                <div className="h-3 w-1/3 rounded bg-stone-200" />
                                             </div>
                                         </div>
                                     ))}
@@ -219,9 +228,9 @@ export default function Home() {
                                             key={coach.id}
                                             to={coachLink(coach)}
                                             onMouseEnter={() => handlePrefetch(coach)}
-                                            className="group flex items-center gap-4 rounded-lg border border-[color:var(--mk-line)] bg-white/70 p-4 transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(53,41,26,0.08)]"
+                                            className="group flex items-center gap-4 rounded-lg border border-stone-200 bg-white p-4 transition duration-300 hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)]"
                                         >
-                                            <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-[color:var(--mk-paper-strong)]">
+                                            <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full bg-stone-100">
                                                 {coach.avatar_url ? (
                                                     <img
                                                         src={coach.avatar_url}
@@ -234,7 +243,7 @@ export default function Home() {
                                                         decoding="async"
                                                     />
                                                 ) : (
-                                                    <div className="flex h-full w-full items-center justify-center text-xl font-black text-[color:var(--mk-muted)]">
+                                                    <div className="flex h-full w-full items-center justify-center text-xl font-black text-stone-400">
                                                         {coach.full_name.charAt(0)}
                                                     </div>
                                                 )}
@@ -242,7 +251,7 @@ export default function Home() {
 
                                             <div className="min-w-0 flex-1">
                                                 <div className="flex flex-wrap items-center gap-2">
-                                                    <div className="truncate text-base font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">
+                                                    <div className="truncate text-base font-bold tracking-[-0.03em] text-stone-900">
                                                         {coach.full_name}
                                                     </div>
                                                     {coach.is_verified && (
@@ -251,12 +260,12 @@ export default function Home() {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <div className="mt-1 text-sm leading-6 text-[color:var(--mk-text-soft)]">
-                                                    {coach.specialties?.[0] || 'Hồ sơ công khai trên hệ sinh thái'}
+                                                <div className="mt-1 text-sm leading-6 text-stone-600">
+                                                    {coach.specialties?.[0] || 'Coach / vận động viên'}
                                                 </div>
                                             </div>
 
-                                            <span className="text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--mk-text)] transition-transform group-hover:translate-x-1">
+                                            <span className="shrink-0 text-xs font-bold uppercase tracking-[0.16em] text-stone-900 transition-transform group-hover:translate-x-1">
                                                 Xem →
                                             </span>
                                         </Link>
@@ -264,9 +273,9 @@ export default function Home() {
                                 </div>
                             ) : (
                                 <div className="marketplace-empty px-0 pb-0 pt-6">
-                                    <strong>Danh sách hồ sơ đang được cập nhật.</strong>
+                                    <strong>Danh sách đang được cập nhật.</strong>
                                     <p>
-                                        Khi hệ thống có thêm dữ liệu, phần này sẽ tiếp tục đóng vai trò như tín hiệu chứng thực ngắn gọn cho thương hiệu.
+                                        Bạn có thể vào trang Coach để xem thêm hồ sơ hoặc quay lại sau.
                                     </p>
                                 </div>
                             )}
@@ -275,14 +284,14 @@ export default function Home() {
                 </div>
             </section>
 
-            <section id="ecosystem" className="marketplace-container mt-10">
+            <section id="ba-vai-tro" className="marketplace-container mt-10 lg:mt-14">
                 <div className="space-y-3">
-                    <div className="marketplace-section-kicker">Một hệ sinh thái · ba góc nhìn</div>
+                    <div className="marketplace-section-kicker">Ba nhóm chính</div>
                     <h2 className="marketplace-section-title">
-                        GYMERVIET chỉ cần rõ một điều: ba nhóm người dùng chính đang cùng tồn tại trong một cấu trúc chung.
+                        Bạn là người tập, Coach hay chủ phòng tập?
                     </h2>
                     <p className="marketplace-lead max-w-3xl">
-                        Thay vì kể quá nhiều sản phẩm rời rạc, trang chủ này rút về ba vai trò cốt lõi để giải thích thương hiệu ngắn gọn hơn.
+                        Mỗi nhóm có lối vào riêng — chọn đúng chỗ để bắt đầu nhanh.
                     </p>
                 </div>
 
@@ -291,19 +300,19 @@ export default function Home() {
                         <Link
                             key={item.title}
                             to={item.href}
-                            className="marketplace-panel group flex h-full flex-col gap-5 p-6 sm:p-7 transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_55px_rgba(53,41,26,0.1)]"
+                            className="marketplace-panel group flex h-full flex-col gap-5 p-6 shadow-sm ring-1 ring-stone-900/[0.05] sm:p-7 transition duration-300 hover:-translate-y-1 hover:border-stone-200 hover:shadow-[0_20px_50px_-12px_rgba(15,23,42,0.12)]"
                         >
                             <div className="space-y-3">
                                 <div className="marketplace-section-kicker">{item.kicker}</div>
-                                <h3 className="text-[1.3rem] font-bold leading-[1.18] tracking-[-0.04em] text-[color:var(--mk-text)]">
+                                <h3 className="text-[1.3rem] font-bold leading-[1.18] tracking-[-0.04em] text-stone-900">
                                     {item.title}
                                 </h3>
-                                <p className="text-sm leading-7 text-[color:var(--mk-text-soft)]">
+                                <p className="text-sm leading-7 text-stone-600">
                                     {item.body}
                                 </p>
                             </div>
 
-                            <span className="mt-auto inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[color:var(--mk-text)] transition-transform group-hover:translate-x-1">
+                            <span className="mt-auto inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-stone-900 transition-transform group-hover:translate-x-1">
                                 {item.cta} →
                             </span>
                         </Link>
@@ -311,24 +320,27 @@ export default function Home() {
                 </div>
             </section>
 
-            <section className="marketplace-container mt-12">
+            <section className="marketplace-container mt-12 lg:mt-16">
                 <div className="space-y-3">
-                    <div className="marketplace-section-kicker">Cách hệ sinh thái vận hành</div>
+                    <div className="marketplace-section-kicker">Cách dùng GYMERVIET</div>
                     <h2 className="marketplace-section-title">
-                        Phần cốt lõi không phức tạp: khám phá, so sánh, rồi mới hành động.
+                        Ba bước đơn giản: xem — so sánh — quyết định.
                     </h2>
                 </div>
 
                 <div className="mt-6 grid gap-4 lg:grid-cols-3">
                     {ECOSYSTEM_STEPS.map((item) => (
-                        <article key={item.step} className="marketplace-panel p-6 sm:p-7">
-                            <div className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">
+                        <article
+                            key={item.step}
+                            className="marketplace-panel p-6 shadow-sm ring-1 ring-stone-900/[0.05] sm:p-7"
+                        >
+                            <div className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-stone-500">
                                 Bước {item.step}
                             </div>
-                            <h3 className="mt-4 text-[1.2rem] font-bold tracking-[-0.035em] text-[color:var(--mk-text)]">
+                            <h3 className="mt-4 text-[1.2rem] font-bold tracking-[-0.035em] text-stone-900">
                                 {item.title}
                             </h3>
-                            <p className="mt-3 text-sm leading-7 text-[color:var(--mk-text-soft)]">
+                            <p className="mt-3 text-sm leading-7 text-stone-600">
                                 {item.body}
                             </p>
                         </article>
@@ -336,39 +348,82 @@ export default function Home() {
                 </div>
             </section>
 
-            <section className="marketplace-container mt-12">
-                <div className="marketplace-panel p-6 sm:p-8 lg:p-10">
-                    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <section className="marketplace-container mt-12 lg:mt-16">
+                <div className="marketplace-panel p-6 shadow-sm ring-1 ring-stone-900/[0.06] sm:p-8 lg:p-10 lg:shadow-[0_10px_40px_-12px_rgba(15,23,42,0.1)]">
+                    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                         <div className="space-y-4">
-                            <div className="marketplace-section-kicker">Khi đã hiểu mình đang ở đâu</div>
+                            <div className="marketplace-section-kicker">Bước tiếp theo</div>
                             <h2 className="marketplace-section-title max-w-3xl">
-                                Ba lối vào trực tiếp nhất của hệ sinh thái nằm ở đây.
+                                Chọn lối vào phù hợp với bạn.
                             </h2>
                             <p className="marketplace-lead max-w-2xl">
-                                Sau khi định vị thương hiệu xong, người dùng mới chỉ cần đi tiếp vào đúng điểm vào phù hợp với vai trò của họ.
+                                Xem Coach, tìm phòng tập hoặc tạo tài khoản miễn phí — mất vài giây để bắt đầu.
                             </p>
                         </div>
 
-                        <div className="flex flex-wrap gap-3 lg:justify-end">
+                        <div className="flex flex-wrap gap-3 lg:flex-nowrap lg:justify-end lg:self-center">
                             <Link
                                 to="/coaches"
-                                className="btn-secondary px-5 text-sm font-bold uppercase tracking-[0.16em]"
+                                className="btn-secondary min-w-[7.5rem] px-5 text-sm font-bold uppercase tracking-[0.16em] lg:text-center"
                             >
                                 Coach
                             </Link>
                             <Link
                                 to="/gyms"
-                                className="btn-secondary px-5 text-sm font-bold uppercase tracking-[0.16em]"
+                                className="btn-secondary min-w-[7.5rem] px-5 text-sm font-bold uppercase tracking-[0.16em] lg:text-center"
                             >
-                                Gym
+                                Phòng tập
                             </Link>
                             <Link
                                 to="/register"
-                                className="btn-primary px-5 text-sm font-bold uppercase tracking-[0.16em]"
+                                className="btn-primary px-6 text-sm font-bold uppercase tracking-[0.16em] lg:shrink-0"
                             >
                                 Tạo tài khoản
                             </Link>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className="marketplace-container mt-12 lg:mt-16" aria-labelledby="home-faq-heading">
+                <div className="marketplace-panel p-6 shadow-sm ring-1 ring-stone-900/[0.05] sm:p-8">
+                    <div className="marketplace-section-kicker">Câu hỏi nhanh</div>
+                    <h2 id="home-faq-heading" className="marketplace-section-title mt-2">
+                        Trước khi bạn bắt đầu
+                    </h2>
+                    <ul className="mt-6 space-y-5 text-sm leading-7 text-stone-600">
+                        <li>
+                            <p className="font-bold text-stone-900">Dùng GYMERVIET có mất phí không?</p>
+                            <p className="mt-1">
+                                Đăng ký và xem hồ sơ công khai là miễn phí. Gói trả phí chỉ khi bạn chọn nâng cấp —{' '}
+                                <Link to="/pricing" className="font-semibold text-stone-900 underline underline-offset-2 hover:no-underline">
+                                    xem bảng giá
+                                </Link>
+                                .
+                            </p>
+                        </li>
+                        <li>
+                            <p className="font-bold text-stone-900">Tôi tìm Coach hoặc phòng tập thế nào?</p>
+                            <p className="mt-1">
+                                Vào{' '}
+                                <Link to="/coaches" className="font-semibold text-stone-900 underline underline-offset-2 hover:no-underline">
+                                    danh sách Coach
+                                </Link>
+                                {' '}hoặc{' '}
+                                <Link to="/gyms" className="font-semibold text-stone-900 underline underline-offset-2 hover:no-underline">
+                                    marketplace phòng tập
+                                </Link>
+                                , lọc theo chuyên môn hoặc khu vực rồi mở hồ sơ chi tiết.
+                            </p>
+                        </li>
+                    </ul>
+                    <div className="mt-6 border-t border-stone-200 pt-5">
+                        <Link
+                            to="/faq"
+                            className="text-sm font-bold uppercase tracking-[0.14em] text-stone-900 hover:underline underline-offset-4"
+                        >
+                            Xem thêm câu hỏi thường gặp →
+                        </Link>
                     </div>
                 </div>
             </section>

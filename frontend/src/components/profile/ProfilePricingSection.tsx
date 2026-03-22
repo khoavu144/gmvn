@@ -15,14 +15,17 @@ interface ProfilePricingSectionProps {
 }
 
 export default function ProfilePricingSection({ packages, subscribing, onSubscribe }: ProfilePricingSectionProps) {
-  if (!packages.length) return null;
-
   return (
     <section className="profile-pricing-section">
       <div className="profile-pricing-inner">
         <h2 className="profile-section-title">Gói dịch vụ</h2>
         <p className="profile-section-subtitle">Chọn gói phù hợp với mục tiêu, lịch tập và ngân sách của bạn</p>
 
+        {!packages.length ? (
+          <p className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-5 text-sm leading-7 text-stone-600">
+            Coach chưa công bố gói công khai trên hồ sơ. Hãy nhắn tin để được tư vấn mức giá và lịch phù hợp với bạn.
+          </p>
+        ) : (
         <div className="profile-pricing-grid">
           {packages.map((pkg, i) => (
             <div key={i} className={`profile-pricing-card${pkg.is_popular ? ' profile-pricing-card--popular' : ''}`}>
@@ -64,6 +67,7 @@ export default function ProfilePricingSection({ packages, subscribing, onSubscri
             </div>
           ))}
         </div>
+        )}
       </div>
     </section>
   );

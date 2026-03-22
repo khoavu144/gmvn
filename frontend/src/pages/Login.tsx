@@ -60,7 +60,7 @@ export default function Login() {
     return (
         <div className="page-shell">
             <Helmet>
-                <title>Đăng nhập — GymViet</title>
+                <title>Đăng nhập — GYMERVIET</title>
                 <meta name="description" content="Đăng nhập tài khoản GYMERVIET để quản lý hồ sơ, kết nối Coach và theo dõi tiến trình tập luyện." />
             </Helmet>
             <div className="page-container max-w-md py-16 sm:py-20">
@@ -74,7 +74,7 @@ export default function Login() {
                 <div className="card">
                     <form onSubmit={handleSubmit} className="space-y-4" aria-label="Biểu mẫu đăng nhập">
                         {error && (
-                            <div role="alert" aria-live="assertive" className="bg-red-50 border border-red-200 text-[color:var(--mk-text)] px-4 py-3 rounded-xs text-sm">
+                            <div role="alert" aria-live="assertive" className="bg-red-50 border border-red-200 text-stone-900 px-4 py-3 rounded-xs text-sm">
                                 {error}
                             </div>
                         )}
@@ -129,7 +129,7 @@ export default function Login() {
                         </button>
                     </form>
 
-                    <div className="mt-6 pt-6 border-t border-[color:var(--mk-line)] text-center text-sm text-[color:var(--mk-text-soft)]">
+                    <div className="mt-6 pt-6 border-t border-stone-200 text-center text-sm text-stone-600">
                         Chưa có tài khoản?{' '}
                         <Link
                             to="/register"

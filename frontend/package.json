@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "test:e2e": "playwright test",
     "test:e2e:prod": "PLAYWRIGHT_BASE_URL=https://gymerviet.com playwright test",
+    "screenshots:prod": "node scripts/capture-prod-screens.mjs",
     "test:e2e:ui": "playwright test --ui",
     "lh:a11y": "lighthouse http://127.0.0.1:4173/ --only-categories=accessibility --chrome-flags=\"--headless --no-sandbox\""
   },

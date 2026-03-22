@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 const footerLinks = [
     {
-        title: 'Nền tảng',
+        title: 'Về chúng tôi',
         links: [
             { label: 'Về GYMERVIET', to: '/about' },
             { label: 'Bảo mật & Quyền riêng tư', to: '/privacy' },

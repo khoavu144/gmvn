@@ -59,7 +59,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
             to={`/news/${article.slug}`}
             className="marketplace-panel group flex h-full flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_55px_rgba(53,41,26,0.1)]"
         >
-            <div className="relative aspect-[16/10] overflow-hidden bg-[color:var(--mk-paper-strong)]">
+            <div className="relative aspect-[16/10] overflow-hidden bg-stone-100">
                 {article.thumbnail_url ? (
                     <img
                         src={article.thumbnail_url}
@@ -69,7 +69,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
                         decoding="async"
                     />
                 ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-[color:var(--mk-paper)] text-5xl font-black text-[color:var(--mk-muted)]">
+                    <div className="flex h-full w-full items-center justify-center bg-stone-50 text-5xl font-black text-stone-500">
                         {article.title.charAt(0)}
                     </div>
                 )}
@@ -88,17 +88,17 @@ function NewsCard({ article }: { article: NewsArticle }) {
 
             <div className="flex flex-1 flex-col gap-4 p-5 sm:p-6">
                 <div className="space-y-3">
-                    <h2 className="text-[1.18rem] font-bold leading-[1.28] tracking-[-0.035em] text-[color:var(--mk-text)] transition-colors group-hover:text-[color:var(--mk-accent-ink)]">
+                    <h2 className="text-[1.18rem] font-bold leading-[1.28] tracking-[-0.035em] text-stone-900 transition-colors group-hover:text-stone-800">
                         {article.title}
                     </h2>
                     {article.excerpt && (
-                        <p className="text-sm leading-7 text-[color:var(--mk-text-soft)] line-clamp-3">
+                        <p className="text-sm leading-7 text-stone-600 line-clamp-3">
                             {article.excerpt}
                         </p>
                     )}
                 </div>
 
-                <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-[color:var(--mk-line)] pt-4 text-[0.78rem] text-[color:var(--mk-muted)]">
+                <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-stone-200 pt-4 text-[0.78rem] text-stone-500">
                     {article.read_time_min && (
                         <span className="inline-flex items-center gap-1.5">
                             <Clock className="h-3.5 w-3.5" />
@@ -106,7 +106,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
                         </span>
                     )}
                     {dateStr && <span>{dateStr}</span>}
-                    <span className="ml-auto inline-flex items-center gap-2 font-bold uppercase tracking-[0.16em] text-[color:var(--mk-text)] transition-transform group-hover:translate-x-1">
+                    <span className="ml-auto inline-flex items-center gap-2 font-bold uppercase tracking-[0.16em] text-stone-900 transition-transform group-hover:translate-x-1">
                         Đọc tiếp →
                     </span>
                 </div>
@@ -180,23 +180,23 @@ export default function NewsPage() {
                                 <h2 className="marketplace-section-title mt-2">
                                     {CATEGORY_MAP[activeCategory] || 'Tổng hợp'}
                                 </h2>
-                                <p className="mt-3 text-sm leading-7 text-[color:var(--mk-text-soft)]">
+                                <p className="mt-3 text-sm leading-7 text-stone-600">
                                     {CATEGORY_NOTES[activeCategory] || CATEGORY_NOTES.all}
                                 </p>
                                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                                    <div className="rounded-lg border border-[color:var(--mk-line)] bg-white/70 p-4">
-                                        <div className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">
+                                    <div className="rounded-lg border border-stone-200 bg-white/70 p-4">
+                                        <div className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-stone-500">
                                             Số bài viết / trang
                                         </div>
-                                        <div className="mt-2 text-2xl font-bold tracking-[-0.05em] text-[color:var(--mk-text)]">
+                                        <div className="mt-2 text-2xl font-bold tracking-[-0.05em] text-stone-900">
                                             12
                                         </div>
                                     </div>
-                                    <div className="rounded-lg border border-[color:var(--mk-line)] bg-white/70 p-4">
-                                        <div className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">
+                                    <div className="rounded-lg border border-stone-200 bg-white/70 p-4">
+                                        <div className="text-[0.72rem] font-bold uppercase tracking-[0.18em] text-stone-500">
                                             Trang hiện tại
                                         </div>
-                                        <div className="mt-2 text-2xl font-bold tracking-[-0.05em] text-[color:var(--mk-text)]">
+                                        <div className="mt-2 text-2xl font-bold tracking-[-0.05em] text-stone-900">
                                             {page} / {totalPages}
                                         </div>
                                     </div>
@@ -215,7 +215,7 @@ export default function NewsPage() {
                                     Lọc nhanh theo chủ đề bạn muốn đọc tiếp theo.
                                 </h2>
                             </div>
-                            <div className="text-sm text-[color:var(--mk-muted)]">
+                            <div className="text-sm text-stone-500">
                                 {loading ? 'Đang đồng bộ bài viết…' : `${articles.length} bài viết ở trang này`}
                             </div>
                         </div>
@@ -227,8 +227,8 @@ export default function NewsPage() {
                                     type="button"
                                     onClick={() => handleCategoryChange(key)}
                                     className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${activeCategory === key
-                                            ? 'bg-[color:var(--mk-text)] text-white'
-                                            : 'border border-[color:var(--mk-line)] bg-white text-[color:var(--mk-text-soft)] hover:border-[color:var(--mk-text)] hover:text-[color:var(--mk-text)]'
+                                            ? 'bg-stone-900 text-white'
+                                            : 'border border-stone-200 bg-white text-stone-600 hover:border-stone-900 hover:text-stone-900'
                                         }`}
                                 >
                                     {label}
@@ -285,7 +285,7 @@ export default function NewsPage() {
                         <div className="marketplace-panel flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <div className="marketplace-section-kicker">Phân trang</div>
-                                <p className="mt-2 text-sm leading-6 text-[color:var(--mk-text-soft)]">
+                                <p className="mt-2 text-sm leading-6 text-stone-600">
                                     Tiếp tục sang trang sau để xem thêm bài viết trong cùng nhịp biên tập.
                                 </p>
                             </div>
@@ -299,7 +299,7 @@ export default function NewsPage() {
                                 >
                                     ← Trang trước
                                 </button>
-                                <span className="min-w-[80px] text-center text-sm text-[color:var(--mk-muted)]">
+                                <span className="min-w-[80px] text-center text-sm text-stone-500">
                                     {page} / {totalPages}
                                 </span>
                                 <button

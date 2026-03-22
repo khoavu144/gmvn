@@ -46,7 +46,7 @@ const PUBLIC_NAV: NavGroup[] = [
         icon: <ImageIcon className="w-4 h-4" />,
         children: [
             { to: '/news', label: 'Tin Tức', description: 'Kiến thức và tin tức thể hình mới nhất', icon: <Newspaper className="w-4 h-4" /> },
-            { to: '/gallery', label: 'Community Gallery', description: 'Khoảnh khắc từ cộng đồng tập luyện', icon: <ImageIcon className="w-4 h-4" /> },
+            { to: '/gallery', label: 'Thư viện ảnh', description: 'Ảnh và khoảnh khắc từ cộng đồng tập luyện', icon: <ImageIcon className="w-4 h-4" /> },
         ],
     },
     {
@@ -54,7 +54,7 @@ const PUBLIC_NAV: NavGroup[] = [
         label: 'Cửa Hàng',
         icon: <ShoppingBag className="w-4 h-4" />,
         children: [
-            { to: '/marketplace', label: 'Marketplace', description: 'Thực phẩm bổ sung, phụ kiện, trang phục thể thao', icon: <ShoppingBag className="w-4 h-4" /> },
+            { to: '/marketplace', label: 'Đồ tập & dinh dưỡng', description: 'Thực phẩm bổ sung, phụ kiện và trang phục', icon: <ShoppingBag className="w-4 h-4" /> },
         ],
     },
 ];

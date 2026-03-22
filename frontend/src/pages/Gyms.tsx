@@ -96,11 +96,11 @@ const CategoryStrip: React.FC<CategoryStripProps> = ({ label, desc, accent, item
                     <div className="marketplace-section-kicker">Phân loại</div>
                     <h2 className="marketplace-section-title mt-0.5">{label}</h2>
                 </div>
-                <p className="hidden md:block max-w-[40%] text-sm text-[color:var(--mk-muted)] leading-relaxed text-right">{desc}</p>
+                <p className="hidden md:block max-w-[40%] text-sm text-stone-500 leading-relaxed text-right">{desc}</p>
                 <button
                     type="button"
                     onClick={() => onFilter(slug)}
-                    className="shrink-0 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[color:var(--mk-text)] border-b border-[color:var(--mk-text)] pb-0.5 hover:opacity-70 transition-opacity whitespace-nowrap"
+                    className="shrink-0 text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-stone-900 border-b border-stone-900 pb-0.5 hover:opacity-70 transition-opacity whitespace-nowrap"
                 >
                     Xem tất cả →
                 </button>
@@ -351,7 +351,7 @@ const Gyms: React.FC = () => {
                                 <div className="marketplace-field flex items-end">
                                     <button
                                         type="button"
-                                        className={`w-full h-11 px-4 flex items-center justify-center gap-2 rounded-lg border font-bold text-sm transition-colors ${showAdvancedFilters ? 'bg-black text-white border-black' : 'bg-white text-[color:var(--mk-text)] border-[color:var(--mk-line)] hover:border-[color:var(--mk-text)]'}`}
+                                        className={`w-full h-11 px-4 flex items-center justify-center gap-2 rounded-lg border font-bold text-sm transition-colors ${showAdvancedFilters ? 'bg-black text-white border-black' : 'bg-white text-stone-900 border-stone-200 hover:border-stone-900'}`}
                                         onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                                     >
                                         <Filter className="w-4 h-4" />
@@ -362,7 +362,7 @@ const Gyms: React.FC = () => {
 
                             {/* Advanced Filters */}
                             {showAdvancedFilters && (
-                                <div className="pt-4 border-t border-[color:var(--mk-line)] animate-fade-in space-y-4">
+                                <div className="pt-4 border-t border-stone-200 animate-fade-in space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="marketplace-field">
                                             <label htmlFor="marketplace-search">Tìm theo tên, đặc điểm</label>
@@ -415,12 +415,12 @@ const Gyms: React.FC = () => {
                             {/* View toggle + Reset */}
                             <div className="flex flex-wrap items-center gap-3 pt-2">
                                 {/* View mode toggle: Grid | List | Map */}
-                                <div className="inline-flex overflow-hidden rounded-lg border border-[color:var(--mk-line)] bg-white/70 p-1">
+                                <div className="inline-flex overflow-hidden rounded-lg border border-stone-200 bg-white/70 p-1">
                                     <button
                                         type="button"
                                         title="Dạng lưới"
                                         onClick={() => setViewMode('grid')}
-                                        className={`rounded-md px-3 py-2 transition flex items-center gap-1.5 text-xs font-bold ${viewMode === 'grid' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
+                                        className={`rounded-md px-3 py-2 transition flex items-center gap-1.5 text-xs font-bold ${viewMode === 'grid' ? 'bg-stone-900 text-white' : 'text-stone-600'}`}
                                     >
                                         <LayoutGrid className="w-3.5 h-3.5" />
                                         <span className="hidden sm:inline uppercase tracking-[0.14em]">Lưới</span>
@@ -429,7 +429,7 @@ const Gyms: React.FC = () => {
                                         type="button"
                                         title="Dạng danh sách"
                                         onClick={() => setViewMode('list')}
-                                        className={`rounded-md px-3 py-2 transition flex items-center gap-1.5 text-xs font-bold ${viewMode === 'list' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
+                                        className={`rounded-md px-3 py-2 transition flex items-center gap-1.5 text-xs font-bold ${viewMode === 'list' ? 'bg-stone-900 text-white' : 'text-stone-600'}`}
                                     >
                                         <List className="w-3.5 h-3.5" />
                                         <span className="hidden sm:inline uppercase tracking-[0.14em]">Danh sách</span>
@@ -438,7 +438,7 @@ const Gyms: React.FC = () => {
                                         type="button"
                                         title="Bản đồ"
                                         onClick={() => setViewMode('map')}
-                                        className={`rounded-md px-3 py-2 transition text-xs font-bold uppercase tracking-[0.14em] ${viewMode === 'map' ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)]'}`}
+                                        className={`rounded-md px-3 py-2 transition text-xs font-bold uppercase tracking-[0.14em] ${viewMode === 'map' ? 'bg-stone-900 text-white' : 'text-stone-600'}`}
                                     >
                                         Map
                                     </button>
@@ -472,12 +472,12 @@ const Gyms: React.FC = () => {
                             {Array.from({ length: 6 }).map((_, idx) => (
                                 <div key={idx}>
                                     <div className="marketplace-panel overflow-hidden animate-pulse">
-                                        <div className="aspect-[4/3] bg-[color:var(--mk-paper-strong)]" />
+                                        <div className="aspect-[4/3] bg-stone-100" />
                                         <div className="space-y-3 p-5">
-                                            <div className="h-3 w-24 rounded-lg bg-[color:var(--mk-line)]" />
-                                            <div className="h-7 w-3/4 rounded-lg bg-[color:var(--mk-line)]" />
-                                            <div className="h-4 w-full rounded-lg bg-[color:var(--mk-line)]" />
-                                            <div className="h-4 w-2/3 rounded-lg bg-[color:var(--mk-line)]" />
+                                            <div className="h-3 w-24 rounded-lg bg-stone-200" />
+                                            <div className="h-7 w-3/4 rounded-lg bg-stone-200" />
+                                            <div className="h-4 w-full rounded-lg bg-stone-200" />
+                                            <div className="h-4 w-2/3 rounded-lg bg-stone-200" />
                                         </div>
                                     </div>
                                 </div>
@@ -493,7 +493,7 @@ const Gyms: React.FC = () => {
                         </div>
                     ) : viewMode === 'map' ? (
                         <div className="marketplace-panel overflow-hidden p-3">
-                            <Suspense fallback={<div className="h-[560px] animate-pulse rounded-lg bg-[color:var(--mk-paper-strong)]" />}>
+                            <Suspense fallback={<div className="h-[560px] animate-pulse rounded-lg bg-stone-100" />}>
                                 <GymMapView gyms={gyms} />
                             </Suspense>
                         </div>
@@ -608,9 +608,9 @@ const Gyms: React.FC = () => {
                                         { title: 'Mức chi phí', body: 'Đừng chỉ nhìn mức giá tối đa. Hãy xem điểm giá khởi điểm để bắt đầu nhanh.' },
                                         { title: 'Phù hợp mục tiêu', body: 'Các thẻ như người mới, ưu tiên nữ giới hay dân thể thao giúp loại bớt lựa chọn sai.' },
                                     ].map((item) => (
-                                        <div key={item.title} className="rounded-lg border border-[color:var(--mk-line)] bg-white/70 p-4">
-                                            <div className="text-sm font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">{item.title}</div>
-                                            <p className="mt-2 text-sm leading-6 text-[color:var(--mk-muted)]">{item.body}</p>
+                                        <div key={item.title} className="rounded-lg border border-stone-200 bg-white/70 p-4">
+                                            <div className="text-sm font-bold tracking-[-0.03em] text-stone-900">{item.title}</div>
+                                            <p className="mt-2 text-sm leading-6 text-stone-500">{item.body}</p>
                                         </div>
                                     ))}
                                 </div>

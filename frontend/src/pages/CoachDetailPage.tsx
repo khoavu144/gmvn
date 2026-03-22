@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { logger } from '../lib/logger';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -63,6 +63,33 @@ interface SimilarCoach {
     base_price_monthly: number | null;
 }
 
+interface CoachTestimonial {
+    id: string;
+    client_name: string;
+    client_avatar?: string;
+    rating: number;
+    comment: string;
+}
+
+interface BeforeAfterPhoto {
+    id: string;
+    before_url: string;
+    after_url: string;
+    client_name?: string;
+    duration_weeks?: number;
+    story?: string;
+}
+
+interface TrainerProfile {
+    slug?: string;
+    headline?: string | null;
+    location?: string | null;
+    bio_long?: string | null;
+    is_accepting_clients?: boolean;
+    years_experience?: number | null;
+    social_links?: Record<string, string> | null;
+}
+
 interface PremiumPayload {
     hero?: {
         tagline?: string | null;
@@ -74,6 +101,35 @@ interface PremiumPayload {
     pressMentions?: Array<{ id: string; source_name: string; title: string; excerpt: string | null; mention_url: string | null }>;
 }
 
+function truncateMetaDescription(text: string, maxLen: number): string {
+    const t = text.trim();
+    if (t.length <= maxLen) return t;
+    const slice = t.slice(0, maxLen);
+    const lastSpace = slice.lastIndexOf(' ');
+    const head = lastSpace > 40 ? slice.slice(0, lastSpace) : slice;
+    return `${head.trimEnd()}…`;
+}
+
+function buildCoachMetaDescription(opts: {
+    bio: string | null;
+    fullName: string;
+    specialties: string[] | null;
+    location: string | null | undefined;
+}): string {
+    const suffix = ' — GYMERVIET';
+    const max = Math.max(80, 155 - suffix.length);
+    if (opts.bio?.trim()) {
+        return truncateMetaDescription(opts.bio.trim(), max) + suffix;
+    }
+    const spec = opts.specialties?.filter(Boolean).slice(0, 2).join(', ');
+    const loc = opts.location?.trim();
+    let base = `${opts.fullName} là huấn luyện viên`;
+    if (spec) base += ` — ${spec}`;
+    if (loc) base += ` · ${loc}`;
+    base += '.';
+    return truncateMetaDescription(base, max) + suffix;
+}
+
 export default function CoachDetailPage() {
     const { toast, ToastComponent } = useToast();
     const { trainerId, slug } = useParams<{ trainerId?: string; slug?: string }>();
@@ -83,14 +139,17 @@ export default function CoachDetailPage() {
 
     const [trainer, setTrainer] = useState<Trainer | null>(null);
     const [programs, setPrograms] = useState<Program[]>([]);
-    const [testimonials, setTestimonials] = useState<any[]>([]);
-    const [beforeAfterPhotos, setBeforeAfterPhotos] = useState<any[]>([]);
+    const [testimonials, setTestimonials] = useState<CoachTestimonial[]>([]);
+    const [beforeAfterPhotos, setBeforeAfterPhotos] = useState<BeforeAfterPhoto[]>([]);
     const [similarCoaches, setSimilarCoaches] = useState<SimilarCoach[]>([]);
     const [premium, setPremium] = useState<PremiumPayload | null>(null);
-    const [trainerProfile, setTrainerProfile] = useState<any>(null);
-    const [profileSkillsData, setProfileSkillsData] = useState<any[]>([]);
-    const [profileExperienceData, setProfileExperienceData] = useState<any[]>([]);
-    const [profilePackagesData, setProfilePackagesData] = useState<any[]>([]);
+    const [trainerProfile, setTrainerProfile] = useState<TrainerProfile | null>(null);
+    const [profileSkillsData, setProfileSkillsData] = useState<Array<{ name: string; level: number; category: string }>>([]);
+    const [profileExperienceData, setProfileExperienceData] = useState<Array<Record<string, unknown>>>([]);
+    /** API mixes profile packages with legacy `Program` rows — keep loose until unified DTO */
+    const [profilePackagesData, setProfilePackagesData] = useState<
+        Array<Record<string, unknown> & { id?: string; name?: string }>
+    >([]);
     const [loading, setLoading] = useState(true);
     const [subscribing, setSubscribing] = useState<string | null>(null);
     const [pendingPayment, setPendingPayment] = useState<{
@@ -141,14 +200,18 @@ export default function CoachDetailPage() {
                     ...trainerData,
                     slug: profileData?.slug || trainerData?.slug || slug || null,
                 });
-                setTrainerProfile(profileData || null);
+                setTrainerProfile((profileData as TrainerProfile | null) || null);
                 setProfileSkillsData(profileRes?.data?.skills || []);
-                setProfileExperienceData(profileRes?.data?.experience || []);
-                setProfilePackagesData(profileRes?.data?.packages || []);
+                setProfileExperienceData((profileRes?.data?.experience || []) as Array<Record<string, unknown>>);
+                setProfilePackagesData(
+                    (profileRes?.data?.packages || []) as Array<Record<string, unknown> & { id?: string; name?: string }>
+                );
                 setPremium(profileRes?.data?.premium || null);
                 setPrograms(programsRes.data.programs || []);
-                setTestimonials(testimonialsRes.data.testimonials || []);
-                setBeforeAfterPhotos(Array.isArray(beforeAfterRes.data) ? beforeAfterRes.data : []);
+                setTestimonials((testimonialsRes.data.testimonials || []) as CoachTestimonial[]);
+                setBeforeAfterPhotos(
+                    (Array.isArray(beforeAfterRes.data) ? beforeAfterRes.data : []) as BeforeAfterPhoto[]
+                );
                 setSimilarCoaches(Array.isArray(similarRes.data?.data) ? similarRes.data.data : Array.isArray(similarRes.data) ? similarRes.data : []);
             } catch (err) {
                 logger.error(err);
@@ -215,22 +278,38 @@ export default function CoachDetailPage() {
         }
     };
 
-    const handleMessage = () => {
+    const handleMessage = useCallback(() => {
         if (!user) {
             navigate('/login');
             return;
         }
         navigate(`/messages?to=${trainer?.id}`);
-    };
+    }, [user, navigate, trainer?.id]);
+
+    const scrollToPackages = useCallback(() => {
+        const el = document.getElementById('section-packages');
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, []);
 
     const primaryCta = useMemo(() => {
-        if (!user) return { text: 'Đăng nhập để đặt lịch', action: () => navigate('/login') };
-        if (user.user_type === 'gym_owner') return { text: 'Mời về phòng tập', action: () => toast.success('Tính năng "Mời về phòng tập" đang được phát triển!') };
-        return { text: 'Đặt lịch tập', action: () => {
-            const el = document.getElementById('section-packages');
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } };
-    }, [user, navigate, toast]);
+        if (!user) return { text: 'Đăng nhập để xem gói & liên hệ', action: () => navigate('/login') };
+        if (user.user_type === 'gym_owner') {
+            return { text: 'Liên hệ hợp tác', action: () => navigate('/contact') };
+        }
+        const pkgCount = profilePackagesData.length > 0 ? profilePackagesData.length : programs.length;
+        const accepting = trainerProfile?.is_accepting_clients !== false;
+        if (!accepting) return { text: 'Nhắn tin cho Coach', action: handleMessage };
+        if (pkgCount === 0) return { text: 'Nhắn tin để tư vấn', action: handleMessage };
+        return { text: 'Xem gói tập', action: scrollToPackages };
+    }, [
+        user,
+        navigate,
+        trainerProfile?.is_accepting_clients,
+        profilePackagesData.length,
+        programs.length,
+        handleMessage,
+        scrollToPackages,
+    ]);
 
     const secondaryCta = { text: 'Nhắn tin để tư vấn', action: handleMessage };
 
@@ -246,10 +325,14 @@ export default function CoachDetailPage() {
     }, [trainer?.full_name]);
 
     const seoDescription = useMemo(() => {
-        if (trainer?.bio) return trainer.bio.slice(0, 155);
         if (!trainer?.full_name) return 'Trang chi tiết huấn luyện viên tại GYMERVIET.';
-        return `${trainer.full_name} là huấn luyện viên được xác thực trên GYMERVIET.`;
-    }, [trainer?.bio, trainer?.full_name]);
+        return buildCoachMetaDescription({
+            bio: trainer.bio,
+            fullName: trainer.full_name,
+            specialties: trainer.specialties,
+            location: trainerProfile?.location,
+        });
+    }, [trainer?.bio, trainer?.full_name, trainer?.specialties, trainerProfile?.location]);
 
     // Derived data — must be computed unconditionally before any early returns (Rules of Hooks)
     const sidebarSocialLinks = useMemo(() => {
@@ -261,7 +344,10 @@ export default function CoachDetailPage() {
     const profileSkills = useMemo(() => profileSkillsData, [profileSkillsData]);
     const profileExperiences = useMemo(() => profileExperienceData, [profileExperienceData]);
     const profilePackages = useMemo(
-        () => profilePackagesData.length > 0 ? profilePackagesData : programs,
+        () =>
+            (profilePackagesData.length > 0 ? profilePackagesData : programs) as unknown as Parameters<
+                typeof ProfilePricingSection
+            >[0]['packages'],
         [profilePackagesData, programs]
     );
     const profileCerts: never[] = [];
@@ -287,10 +373,10 @@ export default function CoachDetailPage() {
 
     if (!trainer) {
         return (
-            <div className="min-h-screen bg-[color:var(--mk-paper)] flex flex-col items-center justify-center gap-4 px-4 text-center">
+            <div className="min-h-screen bg-stone-50 flex flex-col items-center justify-center gap-4 px-4 text-center">
                 <div className="text-5xl font-extrabold text-gray-100 mb-2">404</div>
-                <div className="text-[color:var(--mk-text)] font-bold text-lg">Không tìm thấy Hồ sơ</div>
-                <p className="text-sm text-[color:var(--mk-muted)] max-w-sm">Người dùng này có thể đã thay đổi URL hoặc không còn hoạt động trên GYMERVIET.</p>
+                <div className="text-stone-900 font-bold text-lg">Không tìm thấy Hồ sơ</div>
+                <p className="text-sm text-stone-500 max-w-sm">Người dùng này có thể đã thay đổi URL hoặc không còn hoạt động trên GYMERVIET.</p>
                 {/* FIX: use Link not <a href> for SPA-smooth navigation */}
                 <Link to="/coaches" className="btn-primary mt-4 px-6">← Về trang khám phá</Link>
             </div>
@@ -324,7 +410,7 @@ export default function CoachDetailPage() {
                     '@context': 'https://schema.org',
                     '@type': 'Person',
                     name: trainer.full_name,
-                    jobTitle: (trainer as any).headline || 'Huấn luyện viên cá nhân',
+                    jobTitle: trainerProfile?.headline || 'Huấn luyện viên cá nhân',
                     description: seoDescription,
                     image: trainer.avatar_url || undefined,
                     url: canonicalUrl,
@@ -350,12 +436,21 @@ export default function CoachDetailPage() {
             <CoachMobileNav name={trainer.full_name} onMessage={handleMessage} primaryCta={primaryCta} />
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-0">
-                <div className="flex items-center justify-end">
+                <div className="flex flex-wrap items-center justify-end gap-2">
                     <ShareButton
                         url={shareUrl}
                         title={seoTitle}
                         text={seoDescription}
-                        label="Chia sẻ Facebook"
+                        label="Chia sẻ"
+                        variant="default"
+                        titleAttr="Chia sẻ hoặc sao chép liên kết hồ sơ"
+                        className="bg-white"
+                    />
+                    <ShareButton
+                        url={shareUrl}
+                        title={seoTitle}
+                        text={seoDescription}
+                        label="Facebook"
                         variant="facebook"
                         titleAttr="Chia sẻ hồ sơ này lên Facebook"
                         className="bg-white"
@@ -381,7 +476,7 @@ export default function CoachDetailPage() {
                 />
 
                 {/* Scrollable main content */}
-                <main className="coach-profile-main">
+                <div className="coach-profile-main">
 
                     {/* §1 Hero / About */}
                     <div id="section-about" className="profile-section-anchor">
@@ -419,7 +514,7 @@ export default function CoachDetailPage() {
                     {/* §4 Experience / Timeline */}
                     <div id="section-experience" className="profile-section-anchor">
                         <ProfileExperienceSection
-                            experiences={profileExperiences}
+                            experiences={profileExperiences as never}
                             certifications={profileCerts}
                             awards={profileAwards}
                             yearsExperience={trainerProfile?.years_experience || null}
@@ -454,7 +549,7 @@ export default function CoachDetailPage() {
                     {/* Related Coaches (full-width below) */}
                     <CoachRelatedFooter coaches={similarCoaches} />
 
-                </main>
+                </div>
             </div>
 
             {/* Payment Modal — FIX: proper dialog semantics + focus management */}
@@ -466,29 +561,30 @@ export default function CoachDetailPage() {
                     aria-labelledby="payment-dialog-title"
                 >
                     <div className="bg-white rounded-lg p-6 sm:p-8 max-w-sm w-full space-y-6 shadow-md">
-                        <div className="flex justify-between items-center border-b border-[color:var(--mk-line)] pb-4">
+                        <div className="flex justify-between items-center border-b border-stone-200 pb-4">
                             <h3 id="payment-dialog-title" className="text-xl font-extrabold">Thanh Toán</h3>
                             <button
                                 ref={paymentCloseRef}
+                                type="button"
                                 onClick={() => setPendingPayment(null)}
-                                className="text-[color:var(--mk-muted)] hover:text-black text-lg"
+                                className="rounded-md p-1 text-stone-500 hover:text-black text-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-900 focus-visible:ring-offset-2"
                                 aria-label="Đóng hộp thoại thanh toán"
                             >✕</button>
                         </div>
                         <div className="text-center space-y-4">
-                            <p className="text-sm text-[color:var(--mk-text-soft)]">Chuyển khoản với nội dung chính xác bên dưới.</p>
+                            <p className="text-sm text-stone-600">Chuyển khoản với nội dung chính xác bên dưới.</p>
                             <img
                                 src={`https://img.vietqr.io/image/970436-${import.meta.env.VITE_PLATFORM_BANK_ACCOUNT || '0987654321'}-compact2.png?amount=${pendingPayment.amount}&addInfo=${encodeURIComponent(pendingPayment.transfer_content)}&accountName=GYMERVIET`}
-                                alt="QR Code"
-                                className="mx-auto border border-[color:var(--mk-line)] rounded-lg w-48 h-48 object-contain"
+                                alt="Mã QR VietQR chuyển khoản thanh toán gói tập"
+                                className="mx-auto border border-stone-200 rounded-lg w-48 h-48 object-contain"
                             />
-                            <div className="bg-[color:var(--mk-paper)] p-4 rounded-lg text-left text-sm space-y-2 font-mono">
+                            <div className="bg-stone-50 p-4 rounded-lg text-left text-sm space-y-2 font-mono">
                                 <div className="flex justify-between">
-                                    <span className="text-[color:var(--mk-muted)]">Số tiền:</span>
+                                    <span className="text-stone-500">Số tiền:</span>
                                     <span className="font-bold text-black">{pendingPayment.amount.toLocaleString('vi-VN')} VND</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-[color:var(--mk-muted)]">Nội dung:</span>
+                                    <span className="text-stone-500">Nội dung:</span>
                                     <span className="font-bold text-black border-b border-black">{pendingPayment.transfer_content}</span>
                                 </div>
                             </div>

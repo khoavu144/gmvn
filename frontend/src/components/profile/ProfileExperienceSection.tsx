@@ -34,7 +34,19 @@ const TYPE_DOT: Record<string, { active: boolean }> = {
 export default function ProfileExperienceSection({
   experiences, certifications, awards, yearsExperience,
 }: ProfileExperienceSectionProps) {
-  if (!experiences.length && !certifications.length && !awards.length) return null;
+  if (!experiences.length && !certifications.length && !awards.length) {
+    return (
+      <section className="profile-experience-section">
+        <div className="profile-experience-inner">
+          <h2 className="profile-section-title">Kinh nghiệm & chứng chỉ</h2>
+          <p className="profile-section-subtitle">Lộ trình nghề nghiệp và thành tích được cập nhật trên hồ sơ</p>
+          <p className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-5 text-sm leading-7 text-stone-600">
+            Chưa có mốc kinh nghiệm hay chứng chỉ công khai. Nhắn tin Coach nếu bạn cần xác minh thêm về nền tảng chuyên môn.
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   const allCerts = [
     ...certifications.map(c => ({ name: c.name, issuer: c.issuer, detail: String(c.year), icon: 'verified' })),

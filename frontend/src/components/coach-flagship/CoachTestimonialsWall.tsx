@@ -11,7 +11,23 @@ interface Props {
 }
 
 export default function CoachTestimonialsWall({ testimonials }: Props) {
-    if (testimonials.length === 0) return null;
+    if (testimonials.length === 0) {
+        return (
+            <section className="py-12 sm:py-16 bg-white">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500 mb-2">
+                        Phản hồi từ học viên
+                    </div>
+                    <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black mb-4">
+                        Họ nói gì về Coach
+                    </h2>
+                    <p className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-5 text-sm leading-7 text-stone-600 max-w-2xl">
+                        Chưa có đánh giá công khai. Sau khi tập cùng Coach, bạn có thể để lại phản hồi để giúp người khác quyết định.
+                    </p>
+                </div>
+            </section>
+        );
+    }
 
     const heroTestimonials = testimonials.slice(0, 2);
     const gridTestimonials = testimonials.slice(2);
@@ -19,7 +35,7 @@ export default function CoachTestimonialsWall({ testimonials }: Props) {
     return (
         <section className="py-12 sm:py-16 bg-white">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)] mb-2">
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500 mb-2">
                     Phản hồi từ học viên
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black mb-8">
@@ -46,7 +62,10 @@ export default function CoachTestimonialsWall({ testimonials }: Props) {
                                             {t.client_name.charAt(0)}
                                         </div>
                                     )}
-                                    <div className="text-sm font-semibold text-white">{t.client_name}</div>
+                                    <div>
+                                        <div className="text-sm font-semibold text-white">{t.client_name}</div>
+                                        <div className="text-[11px] font-medium uppercase tracking-wider text-white/45">Học viên</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -57,20 +76,23 @@ export default function CoachTestimonialsWall({ testimonials }: Props) {
                 {gridTestimonials.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {gridTestimonials.map(t => (
-                            <div key={t.id} className="border border-[color:var(--mk-line)] rounded-lg p-5 bg-[color:var(--mk-paper)]/50">
+                            <div key={t.id} className="border border-stone-200 rounded-lg p-5 bg-stone-50/80">
                                 <div className="text-yellow-500 text-xs mb-3">
                                     {'★'.repeat(t.rating)}{'☆'.repeat(5 - t.rating)}
                                 </div>
-                                <p className="text-sm text-[color:var(--mk-text-soft)] leading-relaxed mb-4 line-clamp-4">{t.comment}</p>
-                                <div className="flex items-center gap-2 pt-3 border-t border-[color:var(--mk-line)]">
+                                <p className="text-sm text-stone-600 leading-relaxed mb-4 line-clamp-4">{t.comment}</p>
+                                <div className="flex items-center gap-2 pt-3 border-t border-stone-200">
                                     {t.client_avatar ? (
                                         <img src={t.client_avatar} alt={t.client_name} className="w-7 h-7 rounded-full object-cover" />
                                     ) : (
-                                        <div className="w-7 h-7 rounded-full bg-[color:var(--mk-paper-strong)] flex items-center justify-center text-xs font-bold">
+                                        <div className="w-7 h-7 rounded-full bg-stone-200 flex items-center justify-center text-xs font-bold text-stone-700">
                                             {t.client_name.charAt(0)}
                                         </div>
                                     )}
-                                    <span className="text-xs font-semibold text-[color:var(--mk-text)]">{t.client_name}</span>
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-semibold text-stone-900">{t.client_name}</span>
+                                        <span className="text-[10px] font-medium uppercase tracking-wider text-stone-500">Học viên</span>
+                                    </div>
                                 </div>
                             </div>
                         ))}

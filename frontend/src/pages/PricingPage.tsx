@@ -100,11 +100,7 @@ function PlanColumn({
 
     return (
         <article
-            className="marketplace-panel relative flex h-full flex-col gap-6 p-6 sm:p-7"
-            style={highlighted ? {
-                background: 'color-mix(in oklab, var(--mk-accent-soft) 52%, white 48%)',
-                borderColor: 'color-mix(in oklab, var(--mk-accent) 38%, var(--mk-line) 62%)',
-            } : undefined}
+            className={`marketplace-panel relative flex h-full flex-col gap-6 p-6 sm:p-7 ${highlighted ? '!border-amber-200 !bg-amber-50/80' : ''}`}
         >
             {highlighted && (
                 <span className="marketplace-badge marketplace-badge--accent absolute right-5 top-5">
@@ -114,20 +110,19 @@ function PlanColumn({
 
             <div className={`space-y-3 ${highlighted ? 'pr-14' : ''}`}>
                 <div className="marketplace-section-kicker">{PLAN_LABELS[planKey]}</div>
-                <h3 className="text-[1.7rem] font-bold tracking-[-0.05em] text-[color:var(--mk-text)]">
+                <h3 className="text-[1.7rem] font-bold tracking-[-0.05em] text-stone-900">
                     {formatPrice(price)}
                 </h3>
-                <p className="text-sm leading-7 text-[color:var(--mk-text-soft)]">
+                <p className="text-sm leading-7 text-stone-600">
                     {PLAN_SUMMARIES[planKey]}
                 </p>
             </div>
 
-            <ul className="space-y-3 border-t border-[color:var(--mk-line)] pt-5">
+            <ul className="space-y-3 border-t border-stone-200 pt-5">
                 {DESCRIPTIONS[planKey].map((feature) => (
-                    <li key={feature} className="flex items-start gap-3 text-sm leading-6 text-[color:var(--mk-text-soft)]">
+                    <li key={feature} className="flex items-start gap-3 text-sm leading-6 text-stone-600">
                         <span
-                            className="mt-2 h-2 w-2 shrink-0 rounded-full"
-                            style={{ background: 'var(--mk-forest)' }}
+                            className="mt-2 h-2 w-2 shrink-0 rounded-full bg-emerald-600"
                             aria-hidden="true"
                         />
                         <span>{feature}</span>
@@ -135,9 +130,9 @@ function PlanColumn({
                 ))}
             </ul>
 
-            <div className="mt-auto border-t border-[color:var(--mk-line)] pt-5">
+            <div className="mt-auto border-t border-stone-200 pt-5">
                 {isFree ? (
-                    <div className="rounded-lg border border-[color:var(--mk-line)] bg-white/60 px-4 py-3 text-sm font-medium leading-6 text-[color:var(--mk-text-soft)]">
+                    <div className="rounded-lg border border-stone-200 bg-white/60 px-4 py-3 text-sm font-medium leading-6 text-stone-600">
                         Gói miễn phí luôn sẵn sàng để bạn bắt đầu trước khi cần mở rộng sâu hơn.
                     </div>
                 ) : (
@@ -184,11 +179,11 @@ function Section({
 
 function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
     return (
-        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[color:var(--mk-line)] py-3 last:border-b-0 last:pb-0 first:pt-0">
-            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[color:var(--mk-muted)]">
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-stone-200 py-3 last:border-b-0 last:pb-0 first:pt-0">
+            <span className="text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
                 {label}
             </span>
-            <span className={`max-w-[18rem] text-right text-sm font-semibold text-[color:var(--mk-text)] ${mono ? 'font-mono break-all' : ''}`}>
+            <span className={`max-w-[18rem] text-right text-sm font-semibold text-stone-900 ${mono ? 'font-mono break-all' : ''}`}>
                 {value}
             </span>
         </div>
@@ -307,11 +302,11 @@ export default function PricingPage() {
                             </h2>
                             <div className="mt-6 space-y-4">
                                 {HERO_POINTS.map((item) => (
-                                    <div key={item.title} className="rounded-lg border border-[color:var(--mk-line)] bg-white/70 p-4">
-                                        <div className="text-sm font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">
+                                    <div key={item.title} className="rounded-lg border border-stone-200 bg-white/70 p-4">
+                                        <div className="text-sm font-bold tracking-[-0.03em] text-stone-900">
                                             {item.title}
                                         </div>
-                                        <p className="mt-2 text-sm leading-6 text-[color:var(--mk-text-soft)]">
+                                        <p className="mt-2 text-sm leading-6 text-stone-600">
                                             {item.body}
                                         </p>
                                     </div>
@@ -372,7 +367,7 @@ export default function PricingPage() {
                                 <div className="space-y-3">
                                     <div className="marketplace-section-kicker">Checkout</div>
                                     <h2 className="marketplace-section-title">Thanh toán qua SePay</h2>
-                                    <p className="text-sm leading-7 text-[color:var(--mk-text-soft)]">
+                                    <p className="text-sm leading-7 text-stone-600">
                                         Chuyển khoản đúng số tiền và nội dung để kích hoạt gói tự động. Hệ thống sẽ xử lý trong vài phút sau khi giao dịch được xác nhận.
                                     </p>
                                 </div>
@@ -385,16 +380,13 @@ export default function PricingPage() {
                                 </button>
                             </div>
 
-                            <div
-                                className="mt-6 rounded-lg border border-[color:var(--mk-line)] p-5"
-                                style={{ background: 'color-mix(in oklab, var(--mk-paper) 56%, white 44%)' }}
-                            >
+                            <div className="mt-6 rounded-lg border border-stone-200 bg-stone-50 p-5">
                                 <Row label="Gói" value={PLAN_LABELS[checkoutInfo.plan]} />
                                 <Row label="Số tiền" value={`${checkoutInfo.amount.toLocaleString('vi-VN')}đ`} />
                                 <Row label="Nội dung CK" value={checkoutInfo.description} mono />
                             </div>
 
-                            <p className="mt-4 text-sm leading-6 text-[color:var(--mk-muted)]">
+                            <p className="mt-4 text-sm leading-6 text-stone-500">
                                 Sau khi chuyển khoản thành công, bạn có thể đóng hộp thoại này. Gói sẽ tự cập nhật khi hệ thống xác nhận giao dịch.
                             </p>
                         </div>
