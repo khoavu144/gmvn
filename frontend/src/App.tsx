@@ -148,7 +148,7 @@ const RouteFallback = () => {
   }, [location.pathname, location.search, location.hash]);
 
   return (
-    <div className="min-h-[70vh] flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-black" />
     </div>
   );

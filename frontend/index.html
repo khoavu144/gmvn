@@ -35,12 +35,6 @@
   <!-- Preload logo to avoid FOUC -->
   <link rel="preload" href="/logo.png" as="image" type="image/png">
 
-  <!-- Noto Sans Display — display=swap in URL avoids FOIT, HTTP/2 loads it async -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Inter 800: font-extrabold on sans; Manrope weights match display/condensed usage -->
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
   <!-- Critical domain preconnects — saves handshake time on first CDN/API request -->
   <link rel="preconnect" href="https://rxgpsbzxqvprwnypsuqp.supabase.co" crossorigin>
   <link rel="dns-prefetch" href="https://rxgpsbzxqvprwnypsuqp.supabase.co">

@@ -375,6 +375,8 @@ export default function Header() {
                     <img
                         src="/logo.png"
                         alt="GYMERVIET"
+                        width={260}
+                        height={72}
                         className="h-8 sm:h-9 w-auto object-contain"
                         decoding="async"
                         fetchPriority="high"

@@ -24,6 +24,18 @@
   align-content: start;
 }
 
+.marketplace-editorial-copy {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.marketplace-editorial-intro--filtered {
+  max-width: none;
+  grid-template-columns: minmax(0, 0.94fr) minmax(0, 1.06fr);
+  gap: 1rem 1.4rem;
+  align-items: end;
+}
+
 .marketplace-editorial-title {
   font-family: var(--font-display);
   font-size: var(--type-display-lg);
@@ -50,6 +62,12 @@
   margin-top: 0.25rem;
 }
 
+.marketplace-editorial-search--filtered {
+  max-width: none;
+  width: 100%;
+  margin-top: 0;
+}
+
 .marketplace-editorial-search-input {
   flex: 1;
   height: 48px;
@@ -71,41 +89,43 @@
 .marketplace-editorial-search-input::placeholder { color: var(--cur-on-surface-var); opacity: 0.6; }
 
 .marketplace-quick-faq {
-  margin-top: 0.35rem;
+  margin-top: 0.4rem;
   border: 1px solid color-mix(in oklab, var(--cur-outline-var) 34%, transparent);
   border-radius: var(--cur-radius-lg);
   background: color-mix(in oklab, var(--cur-surface-lowest) 94%, var(--cur-surface-high));
-  padding: 0.9rem 1rem;
+  padding: 0.9rem 0.95rem;
+  min-height: 14.25rem;
+  display: grid;
+  align-content: start;
 }
 
 .marketplace-quick-faq-list {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .marketplace-quick-faq-item {
   border-radius: var(--cur-radius-md);
   border: 1px solid color-mix(in oklab, var(--cur-outline-var) 24%, transparent);
   background: var(--cur-surface-lowest);
-  padding: 0.55rem 0.7rem;
+  padding: 0.62rem 0.75rem;
 }
 
-.marketplace-quick-faq-item summary {
-  list-style: none;
-  cursor: pointer;
+.marketplace-quick-faq-item strong {
+  display: block;
   font-size: 0.86rem;
   font-weight: 700;
   color: var(--cur-on-surface);
-}
-
-.marketplace-quick-faq-item summary::-webkit-details-marker {
-  display: none;
+  line-height: 1.35;
 }
 
 .marketplace-quick-faq-item p {
-  margin: 0.45rem 0 0;
-  font-size: 0.84rem;
-  line-height: 1.6;
+  margin: 0.28rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
   color: var(--cur-on-surface-var);
 }
 
@@ -138,6 +158,10 @@
 
 .marketplace-browse-hero {
   padding-bottom: var(--gv-space-4);
+}
+
+.marketplace-browse-hero--filtered {
+  padding-bottom: var(--gv-space-3);
 }
 
 .marketplace-browse-hero-grid {
@@ -178,8 +202,8 @@
 /* ── Category pills ──────────────────────────────────────────── */
 .marketplace-cat-bar {
   display: flex;
-  gap: .75rem;
-  padding: 0.5rem 0 0.75rem;
+  gap: 0.55rem;
+  padding: 0.25rem 0 0.6rem;
   overflow-x: auto;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -189,48 +213,13 @@
 }
 .marketplace-cat-bar::-webkit-scrollbar { display: none; }
 
-@media (min-width: 768px) {
-  .marketplace-cat-bar {
-    flex-wrap: wrap;
-    overflow-x: visible;
-    scroll-snap-type: none;
-  }
-}
-
 .marketplace-cat-pill {
   display: inline-flex;
   align-items: center;
-  gap: .4rem;
-  min-height: 38px;
-  padding: .45rem 1rem;
-  border-radius: var(--cur-radius-full);
-  background: var(--cur-surface-high);
-  border: 1px solid color-mix(in oklab, var(--cur-outline-var) 34%, transparent);
-  color: var(--cur-on-surface-var);
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: none;
-  letter-spacing: 0.01em;
-  cursor: pointer;
-  transition: background-color .2s, color .2s, box-shadow .2s;
+  gap: 0.35rem;
   white-space: nowrap;
   flex-shrink: 0;
   scroll-snap-align: start;
-}
-.marketplace-cat-pill:hover {
-  background: var(--cur-surface-highest);
-  color: var(--cur-on-surface);
-}
-.marketplace-cat-pill:focus-visible {
-  outline: 2px solid var(--cur-primary);
-  outline-offset: 3px;
-}
-.marketplace-cat-pill--active {
-  background: var(--cur-surface-lowest);
-  color: var(--cur-on-surface);
-  border-color: color-mix(in oklab, var(--cur-on-surface) 24%, transparent);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 /* ── Toolbar ─────────────────────────────────────────────────── */
@@ -242,6 +231,28 @@
   padding: 0;
   border-bottom: 0;
   margin-bottom: 0;
+}
+
+.marketplace-toolbar--filtered {
+  border: 1px solid color-mix(in oklab, var(--cur-outline-var) 34%, transparent);
+  border-radius: 0.95rem;
+  background: color-mix(in oklab, var(--cur-surface-lowest) 96%, var(--cur-surface-high));
+  padding: 0.9rem 0.95rem;
+  align-items: end;
+  gap: 0.9rem 1.1rem;
+}
+
+.marketplace-filter-summary {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.marketplace-filter-summary-value {
+  margin: 0;
+  color: var(--cur-on-surface);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .marketplace-toolbar-main {
@@ -1765,6 +1776,12 @@ a.marketplace-typo-slot:hover {
 }
 
 @media (max-width: 767px) {
+  .marketplace-editorial-intro--filtered {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.8rem;
+    align-items: stretch;
+  }
+
   .marketplace-editorial-intro {
     padding: 1.35rem 0 0.75rem;
     max-width: none;
@@ -1785,7 +1802,29 @@ a.marketplace-typo-slot:hover {
     max-width: none;
   }
 
+  .marketplace-editorial-search--filtered {
+    flex-direction: row;
+  }
+
   .marketplace-editorial-search-btn {
+    width: 100%;
+  }
+
+  .marketplace-editorial-search--filtered .marketplace-editorial-search-btn {
+    width: auto;
+    min-width: 7rem;
+  }
+
+  .marketplace-toolbar--filtered {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .marketplace-toolbar--filtered .marketplace-sort {
+    width: 100%;
+  }
+
+  .marketplace-toolbar--filtered .marketplace-sort-select {
     width: 100%;
   }
 
@@ -1799,22 +1838,60 @@ a.marketplace-typo-slot:hover {
 .mpd-page {
   max-width: 1240px;
   margin: 0 auto;
-  padding: 1.5rem 1rem 4rem;
+  padding: 1.4rem 1rem 3.25rem;
 }
 
 .mpd-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
-  align-items: start;
-  margin-bottom: 2rem;
+  gap: 1.25rem;
+  align-items: stretch;
+  margin-bottom: 1.25rem;
 }
 
 @media (min-width: 960px) {
   .mpd-layout {
-    grid-template-columns: minmax(0, 1.08fr) minmax(20rem, 0.92fr);
-    gap: 2.5rem;
+    grid-template-columns: minmax(0, 1.06fr) minmax(21rem, 0.94fr);
+    gap: 1.35rem;
   }
+}
+
+.mpd-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-height: 100%;
+}
+
+.mpd-gallery-main {
+  flex: 1 1 auto;
+  min-height: clamp(18rem, 35vw, 32rem);
+  max-height: none;
+}
+
+.mpd-gallery-thumbs {
+  margin-top: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.mpd-gallery-thumb {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+}
+
+.mpd-gallery-thumb--more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  border-color: color-mix(in oklab, var(--cur-outline-var) 60%, transparent);
+  background: color-mix(in oklab, var(--cur-surface-high) 72%, var(--cur-surface-low));
+  color: var(--cur-on-surface-var);
+  font-size: 0.84rem;
+  font-weight: 700;
 }
 
 .mpd-info {
@@ -1863,7 +1940,7 @@ a.marketplace-typo-slot:hover {
   overflow-x: auto;
   scrollbar-width: none;
   padding-bottom: 0.25rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.2rem;
 }
 
 .mpd-section-nav::-webkit-scrollbar {
@@ -1891,15 +1968,15 @@ a.marketplace-typo-slot:hover {
 .mpd-stacked-sections {
   display: flex;
   flex-direction: column;
-  gap: 2.25rem;
+  gap: 1.55rem;
   border-top: 1px solid var(--cur-surface-highest);
-  padding-top: 2rem;
+  padding-top: 1.2rem;
 }
 
 .mpd-section-head {
   display: grid;
   gap: 0.45rem;
-  margin-bottom: 1.25rem;
+  margin-bottom: 0.85rem;
 }
 
 .mpd-section-copy {
@@ -1912,14 +1989,14 @@ a.marketplace-typo-slot:hover {
 
 .mpd-overview-layout {
   display: grid;
-  gap: 1.5rem;
+  gap: 1rem;
   align-items: start;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .mpd-overview-layout {
-    grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
-    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1.16fr) minmax(18rem, 0.84fr);
+    gap: 1.2rem;
   }
 }
 
@@ -1929,20 +2006,22 @@ a.marketplace-typo-slot:hover {
 
 .mpd-overview-facts {
   display: grid;
-  gap: 0.8rem;
+  gap: 0.55rem;
   align-content: start;
 }
 
 .mpd-overview-fact {
   display: grid;
-  gap: 0.15rem;
-  padding-top: 0.85rem;
-  border-top: 1px solid color-mix(in oklab, var(--cur-outline-var) 30%, transparent);
+  gap: 0.2rem;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid color-mix(in oklab, var(--cur-outline-var) 30%, transparent);
+  border-radius: var(--cur-radius-md);
+  background: color-mix(in oklab, var(--cur-surface-low) 82%, var(--cur-surface-lowest));
 }
 
 .mpd-overview-fact:first-child {
-  padding-top: 0;
-  border-top: 0;
+  padding-top: 0.65rem;
+  border-top: 1px solid color-mix(in oklab, var(--cur-outline-var) 30%, transparent);
 }
 
 .mpd-overview-fact dt {
@@ -1956,8 +2035,28 @@ a.marketplace-typo-slot:hover {
 .mpd-overview-fact dd {
   margin: 0;
   font-size: 0.98rem;
-  line-height: 1.55;
+  line-height: 1.45;
   color: var(--cur-on-surface);
+}
+
+@media (min-width: 700px) and (max-width: 1279px) {
+  .mpd-overview-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.mpd-specs-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (min-width: 1320px) {
+  .mpd-specs-layout {
+    grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
+    gap: 1.2rem;
+  }
 }
 
 .mpd-program-accordion {
@@ -2053,6 +2152,12 @@ a.marketplace-typo-slot:hover {
   padding: 1rem;
 }
 
+.mpd-fulfillment-panel--plain {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
 .mpd-fulfillment-panel-title {
   margin: 0 0 0.35rem;
   font-family: var(--font-display);
@@ -2105,6 +2210,10 @@ a.marketplace-typo-slot:hover {
   line-height: 1.55;
 }
 
+.mpd-fulfillment-panel--plain .mpd-fulfillment-panel-note {
+  margin-top: auto;
+}
+
 .mpd-related-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2129,6 +2238,14 @@ a.marketplace-typo-slot:hover {
 @media (max-width: 768px) {
   .mpd-page {
     padding-bottom: calc(6.75rem + env(safe-area-inset-bottom));
+  }
+
+  .mpd-gallery-main {
+    min-height: 0;
+  }
+
+  .mpd-gallery-thumbs {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .mpd-cta-row {
