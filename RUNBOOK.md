@@ -64,7 +64,10 @@ Cuốn cẩm nang ghi lại tất cả các **Quy Trình Triển Khai (Deploymen
 - `RUN_SEED=false`
 - `ALLOWED_ORIGINS` được cấu hình explicit, không wildcard
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` đầy đủ
-- `SEPAY_WEBHOOK_SECRET` đầy đủ
+- Có ít nhất 1 cơ chế xác thực SePay webhook:
+  - `SEPAY_WEBHOOK_SECRET` (legacy), hoặc
+  - `SEPAY_WEBHOOK_TOKEN` (khuyến nghị, dùng token trong webhook URL)
+  - Nếu dùng API Key mode từ SePay, backend chấp nhận `Authorization: Apikey <token>` (hoặc `Bearer <token>`)
 - `DATABASE_URL`, `REDIS_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET` hợp lệ
 - DNS/mail đã hoàn tất: `AAAA`, `MX`, `SPF`, `DKIM`, `DMARC`, `DNSSEC`
 
@@ -145,7 +148,10 @@ Trước khi gộp code, bạn cần tích (checked) các hộp yêu cầu sau t
   - replay webhook tạo dữ liệu lặp
   - `/api/v1/health/deps` báo `billing=down`
 - **Cách khắc phục**:
-  1. Kiểm tra `SEPAY_WEBHOOK_SECRET`
+  1. Kiểm tra auth webhook:
+     - Nếu dùng secret: `SEPAY_WEBHOOK_SECRET` phải là token (không phải URL)
+     - Nếu dùng URL token: `SEPAY_WEBHOOK_TOKEN` phải khớp query `?token=...` trong callback URL đã khai trên SePay
+     - Nếu SePay gửi header `Authorization: Apikey ...`, token phải khớp env ở backend
   2. Tìm theo `transfer_content` trong `platform_checkout_intents`
   3. Tìm theo `provider_transaction_id` trong:
      - `platform_checkout_intents`

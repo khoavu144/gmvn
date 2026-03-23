@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import crypto from 'crypto';
 import { platformSubscriptionService, PLAN_CONFIG, PlatformPlan } from '../services/platformSubscriptionService';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
+import { verifySepayWebhookAuth } from '../utils/sepayWebhookAuth';
 
 const VALID_PLANS: PlatformPlan[] = ['coach_pro', 'coach_elite', 'athlete_premium', 'gym_business'];
 
@@ -48,9 +48,6 @@ export const cancelMyPlan = asyncHandler(async (req: Request, res: Response): Pr
 
 // ── SePay Webhook (public — called by SePay) ────────────────────────────────
 export const sepayPlatformWebhook = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const signature = req.headers['x-sepay-signature'] as string;
-    const apiKey = req.headers['authorization'];
-    const secret = process.env.SEPAY_WEBHOOK_SECRET;
     const body = (req.body ?? {}) as {
         content?: string;
         amount?: number;
@@ -61,25 +58,12 @@ export const sepayPlatformWebhook = asyncHandler(async (req: Request, res: Respo
         provider: 'sepay',
         providerTransactionId: body.transaction_id ?? null,
         transferContent: body.content ?? null,
-        signature: signature ?? null,
+        signature: (req.headers['x-sepay-signature'] as string) ?? null,
         payload: body as Record<string, unknown>,
     });
 
     try {
-        if (secret) {
-            if (signature) {
-                const rawBody = (req as any).rawBody;
-                if (!rawBody) {
-                    throw new AppError('Missing raw body', 400, 'WEBHOOK_RAW_BODY_MISSING');
-                }
-                const digest = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-                if (signature !== digest) {
-                    throw new AppError('Invalid signature', 401, 'WEBHOOK_INVALID_SIGNATURE');
-                }
-            } else if (apiKey !== secret) {
-                throw new AppError('Unauthorized', 401, 'WEBHOOK_UNAUTHORIZED');
-            }
-        }
+        verifySepayWebhookAuth(req);
 
         if (!body.content?.trim()) {
             throw new AppError('Missing transfer content', 400, 'WEBHOOK_TRANSFER_CONTENT_REQUIRED');

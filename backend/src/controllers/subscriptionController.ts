@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import crypto from 'crypto';
 import { subscriptionService } from '../services/subscriptionService';
+import { AppError } from '../utils/AppError';
+import { verifySepayWebhookAuth } from '../utils/sepayWebhookAuth';
 
 export const createCheckout = async (req: Request, res: Response) => {
     try {
@@ -52,32 +53,27 @@ export const cancelSubscription = async (req: Request, res: Response) => {
 
 export const sepayWebhook = async (req: Request, res: Response) => {
     try {
-        const apiKey = req.headers['authorization'];
-        const signature = req.headers['x-sepay-signature'] as string;
-        const secret = process.env.SEPAY_WEBHOOK_SECRET;
-
-        // P0-2: HMAC-SHA256 verify
-        if (secret) {
-            if (signature) {
-                const rawBody = (req as any).rawBody;
-                if (!rawBody) {
-                    return res.status(400).json({ error: 'Missing raw body for signature verification' });
-                }
-                const hmac = crypto.createHmac('sha256', secret);
-                const digest = hmac.update(rawBody).digest('hex');
-                if (signature !== digest) {
-                    console.warn('Invalid SePay signature');
-                    return res.status(401).json({ error: 'Invalid signature' });
-                }
-            } else if (apiKey !== secret) {
-                console.warn('Unauthorized SePay webhook attempt');
-                return res.status(401).json({ error: 'Unauthorized' });
-            }
-        }
+        verifySepayWebhookAuth(req);
 
         await subscriptionService.handleSepayWebhook(req.body);
         res.json({ success: true });
     } catch (err: any) {
-        res.status(500).json({ error: err.message });
+        if (err instanceof AppError) {
+            return res.status(err.statusCode).json({
+                success: false,
+                error: {
+                    message: err.message,
+                    code: err.code,
+                },
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            error: {
+                message: err.message,
+                code: 'INTERNAL_SERVER_ERROR',
+            },
+        });
     }
 };

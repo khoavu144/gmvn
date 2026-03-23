@@ -19,6 +19,7 @@ const EnvSchema = z.object({
     SMTP_PASS: z.string().optional(),
     SMTP_FROM: z.string().optional(),
     SEPAY_WEBHOOK_SECRET: z.string().optional(),
+    SEPAY_WEBHOOK_TOKEN: z.string().optional(),
     SENTRY_DSN: z.string().url().optional(),
     SENTRY_ENVIRONMENT: z.string().optional(),
     SENTRY_RELEASE: z.string().optional(),
@@ -42,7 +43,6 @@ const EnvSchema = z.object({
         'SMTP_USER',
         'SMTP_PASS',
         'SMTP_FROM',
-        'SEPAY_WEBHOOK_SECRET',
     ];
 
     for (const key of requiredKeys) {
@@ -53,6 +53,22 @@ const EnvSchema = z.object({
                 message: `${key} is required in production`,
             });
         }
+    }
+
+    if (!value.SEPAY_WEBHOOK_SECRET && !value.SEPAY_WEBHOOK_TOKEN) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['SEPAY_WEBHOOK_SECRET'],
+            message: 'SEPAY_WEBHOOK_SECRET or SEPAY_WEBHOOK_TOKEN is required in production',
+        });
+    }
+
+    if (value.SEPAY_WEBHOOK_SECRET && /^https?:\/\//i.test(value.SEPAY_WEBHOOK_SECRET.trim())) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['SEPAY_WEBHOOK_SECRET'],
+            message: 'SEPAY_WEBHOOK_SECRET must be a secret token, not a webhook URL',
+        });
     }
 
     if (value.RUN_SEED === 'true') {
