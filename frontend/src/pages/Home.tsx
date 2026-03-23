@@ -170,7 +170,7 @@ export default function Home() {
                 })}</script>
             </Helmet>
 
-            <section className="marketplace-hero">
+            <section className="marketplace-hero home-hero">
                 <div className="marketplace-container">
                     <div className="grid gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(20rem,0.92fr)] lg:items-start lg:gap-10">
                         <div className="space-y-5 lg:max-w-[40rem] lg:pt-1">
@@ -304,7 +304,7 @@ export default function Home() {
                 </div>
             </section>
 
-            <section id="ba-vai-tro" className="marketplace-container gv-section-gap">
+            <section id="ba-vai-tro" className="marketplace-container mt-8 lg:mt-10">
                 <div className="space-y-3">
                     <div className="marketplace-section-kicker">Ba nhóm chính</div>
                     <h2 className="marketplace-section-title">

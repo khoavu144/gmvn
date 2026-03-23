@@ -198,7 +198,6 @@ export default function MarketplacePage() {
     const [railCanPrev, setRailCanPrev] = useState(false);
     const [railCanNext, setRailCanNext] = useState(false);
     const reducedEffects = useMobileReducedEffects();
-    const [heroDataLoaded, setHeroDataLoaded] = useState(false);
 
     const updateRailScrollState = useCallback(() => {
         const el = merchRailRef.current;
@@ -235,48 +234,28 @@ export default function MarketplacePage() {
     }, [qParam]);
 
     useEffect(() => {
-        if (heroDataLoaded) return;
-        if (typeof window === 'undefined') return;
+        let alive = true;
 
-        const runIdle = (cb: () => void) => {
-            const requestIdle = (globalThis as unknown as {
-                requestIdleCallback?: (fn: () => void) => number;
-                cancelIdleCallback?: (id: number) => void;
-            }).requestIdleCallback;
-            const cancelIdle = (globalThis as unknown as {
-                cancelIdleCallback?: (id: number) => void;
-            }).cancelIdleCallback;
-
-            if (requestIdle) {
-                const id = requestIdle(cb);
-                return () => {
-                    cancelIdle?.(id);
-                };
+        Promise.allSettled([
+            axios.get<MarketplaceCategoriesResponse>(`${API}/marketplace/categories`),
+            axios.get<MarketplaceFeaturedResponse>(`${API}/marketplace/featured`),
+        ]).then(([categoriesResult, featuredResult]) => {
+            if (!alive) return;
+            if (categoriesResult.status === 'fulfilled') {
+                setCategories(categoriesResult.value.data.categories);
             }
-            const timeout = setTimeout(cb, 650);
-            return () => clearTimeout(timeout);
-        };
-
-        const cancel = runIdle(() => {
-            axios.get<MarketplaceCategoriesResponse>(`${API}/marketplace/categories`)
-                .then((response) => setCategories(response.data.categories))
-                .catch(() => {});
-
-            axios.get<MarketplaceFeaturedResponse>(`${API}/marketplace/featured`)
-                .then((response) => {
-                    setFeatured(response.data.featured ?? []);
-                    setNewArrivals(response.data.new_arrivals ?? []);
-                    setHeroDataLoaded(true);
-                })
-                .catch(() => {
-                    setHeroDataLoaded(true);
-                });
+            if (featuredResult.status === 'fulfilled') {
+                setFeatured(featuredResult.value.data.featured ?? []);
+                setNewArrivals(featuredResult.value.data.new_arrivals ?? []);
+            }
         });
 
-        return cancel;
-    }, [heroDataLoaded]);
+        return () => {
+            alive = false;
+        };
+    }, []);
 
-    const pageLimit = reducedEffects ? 8 : 20;
+    const pageLimit = reducedEffects ? 8 : 12;
 
     const loadProducts = useCallback(async (pg = 1) => {
         setLoading(true);
@@ -426,7 +405,7 @@ export default function MarketplacePage() {
                                         placeholder="Tìm gói tập, whey protein, găng tay..."
                                         value={searchInput}
                                         onChange={(event) => setSearchInput(event.target.value)}
-                                        className="marketplace-editorial-search-input"
+                                        className="marketplace-editorial-search-input gv-search-control"
                                         aria-label="Tìm kiếm sản phẩm marketplace"
                                     />
                                     <button type="submit" className="marketplace-editorial-search-btn">
@@ -434,6 +413,14 @@ export default function MarketplacePage() {
                                         Tìm kiếm
                                     </button>
                                 </form>
+                                {showHero && (
+                                    <div className="marketplace-quick-faq" aria-label="Hỏi nhanh trước khi chọn sản phẩm">
+                                        <p className="marketplace-section-kicker">Hỏi nhanh marketplace</p>
+                                        <p className="marketplace-quick-faq-text">
+                                            Ưu tiên gói có lộ trình rõ trước khi mua.
+                                        </p>
+                                    </div>
+                                )}
                             </section>
 
                             {showHero && spotlightProduct && (

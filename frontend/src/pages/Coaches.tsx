@@ -508,7 +508,9 @@ export default function Coaches() {
                                 <button
                                     key={cat.id}
                                     type="button"
-                                    className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-semibold text-gray-900 transition hover:border-gray-900/35"
+                                    className={`gv-pill-btn text-xs ${
+                                        specialty === cat.shortcutSpecialty ? 'gv-pill-btn--active' : 'gv-pill-btn--soft'
+                                    }`}
                                     onClick={() => setSpecialty(cat.shortcutSpecialty)}
                                 >
                                     {cat.label}
@@ -516,7 +518,7 @@ export default function Coaches() {
                             ))}
                             <button
                                 type="button"
-                                className="rounded-full border border-dashed border-gray-500/50 bg-gray-50 px-3 py-1 text-xs font-semibold text-gray-600 transition hover:border-gray-900/30 hover:text-gray-900"
+                                className={`gv-pill-btn text-xs ${specialty ? 'gv-pill-btn--dashed' : 'gv-pill-btn--active'}`}
                                 onClick={() => {
                                     if (typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches) {
                                         filtersSidebarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -573,7 +575,7 @@ export default function Coaches() {
                         </div>
                         <input
                             type="search"
-                            className="form-input coaches-dir-control w-full pl-10"
+                            className="form-input coaches-dir-control gv-search-control w-full pl-10"
                             placeholder="Tìm theo tên, chuyên môn hoặc từ khóa..."
                             aria-label="Tìm kiếm Coach và VĐV"
                             value={qInput}
