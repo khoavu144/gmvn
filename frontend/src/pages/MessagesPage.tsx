@@ -197,7 +197,7 @@ export default function MessagesPage() {
     return (
         <div className="page-shell-muted">
             <Helmet>
-                <title>Tin nhắn — GymViet</title>
+                <title>Tin nhắn — GYMERVIET</title>
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             <div className="page-container gv-pad-y-sm">

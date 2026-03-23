@@ -58,7 +58,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
     const { toast, ToastComponent } = useToast();
     const dispatch = useDispatch<AppDispatch>();
     const [certsError, setCertsError] = useState('');
-    const profilePathLabel = publicBasePath === '/athletes' ? 'gymerviet.com/athletes/' : 'gymerviet.com/coach/';
+    const profilePathLabel = publicBasePath === '/athletes' ? 'gymerviet.com/athlete/' : 'gymerviet.com/coach/';
 
     // Upload state
     const [isCropModalOpen, setIsCropModalOpen] = useState(false);

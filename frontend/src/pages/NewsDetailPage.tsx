@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import apiClient from '../services/api';
 import { sanitizeNewsArticleHtml } from '../utils/sanitizeNewsContent';
 import { Clock, ArrowLeft, Tag, Eye } from 'lucide-react';
+import { SITE_LOGO_URL, SITE_ORIGIN, SITE_TWITTER_HANDLE } from '../lib/site';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -36,7 +37,7 @@ export default function NewsDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const canonicalBase = import.meta.env.VITE_CANONICAL_BASE_URL || 'https://gymerviet.com';
+    const canonicalBase = SITE_ORIGIN;
 
     /* eslint-disable react-hooks/set-state-in-effect -- article fetch lifecycle */
     useEffect(() => {
@@ -109,7 +110,7 @@ export default function NewsDetailPage() {
         'publisher': {
             '@type': 'Organization',
             'name': 'GYMERVIET',
-            'logo': { '@type': 'ImageObject', 'url': `${canonicalBase}/logo.png` },
+            'logo': { '@type': 'ImageObject', 'url': SITE_LOGO_URL },
         },
     };
 
@@ -126,6 +127,7 @@ export default function NewsDetailPage() {
                 {ogImage && <meta property="og:image" content={ogImage} />}
                 {article.og_image_alt && <meta property="og:image:alt" content={article.og_image_alt} />}
                 <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:site" content={SITE_TWITTER_HANDLE} />
                 <meta name="twitter:title" content={pageTitle} />
                 <meta name="twitter:description" content={pageDesc} />
                 {ogImage && <meta name="twitter:image" content={ogImage} />}

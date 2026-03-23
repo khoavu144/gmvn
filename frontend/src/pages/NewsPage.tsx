@@ -6,6 +6,7 @@ import apiClient from '../services/api';
 import { Skeleton } from '../components/ui/Skeleton';
 import { EmptyState } from '../components/ui/EmptyState';
 import { trackEvent } from '../lib/analytics';
+import { SITE_OG_IMAGE, SITE_ORIGIN, SITE_TWITTER_HANDLE } from '../lib/site';
 
 interface NewsArticle {
     id: string;
@@ -128,7 +129,7 @@ export default function NewsPage() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [activeCategory, setActiveCategory] = useState('all');
-    const canonicalBase = import.meta.env.VITE_CANONICAL_BASE_URL || 'https://gymerviet.com';
+    const canonicalBase = SITE_ORIGIN;
     const safeTotalPages = Math.max(1, totalPages);
     const hasArticles = articles.length > 0;
 
@@ -172,6 +173,10 @@ export default function NewsPage() {
                 <meta property="og:title" content="Tin Tức Thể Hình — GYMERVIET" />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${canonicalBase}/news`} />
+                <meta property="og:image" content={SITE_OG_IMAGE} />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:site" content={SITE_TWITTER_HANDLE} />
+                <meta name="twitter:image" content={SITE_OG_IMAGE} />
             </Helmet>
 
             <main className="marketplace-shell min-h-screen">

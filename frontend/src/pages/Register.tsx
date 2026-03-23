@@ -100,7 +100,7 @@ export default function Register() {
     return (
         <div className="auth-shell">
             <Helmet>
-                <title>Đăng ký — GymViet</title>
+                <title>Đăng ký — GYMERVIET</title>
                 <meta name="description" content="Tạo tài khoản GYMERVIET miễn phí. Bắt đầu hành trình tập luyện với huấn luyện viên và phòng tập hàng đầu Việt Nam." />
             </Helmet>
             <div className="page-container max-w-md py-16 sm:py-20">

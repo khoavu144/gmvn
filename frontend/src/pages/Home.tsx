@@ -9,6 +9,7 @@ import { usePrefetchProfile } from '../hooks/usePrefetchProfile';
 import { HomeProfileSpotlight } from '../components/home/HomeProfileSpotlight';
 import { FAQAccordion } from '../components/FAQAccordion';
 import { HOME_FAQ_PREVIEW_ITEMS } from '../data/faqData';
+import { SITE_OG_IMAGE, SITE_ORIGIN, SITE_TWITTER_HANDLE } from '../lib/site';
 
 type FeaturedTrainer = Trainer & {
     is_verified?: boolean;
@@ -71,7 +72,7 @@ export default function Home() {
     const [coaches, setCoaches] = useState<FeaturedTrainer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const { prefetchCoach, prefetchAthlete } = usePrefetchProfile();
-    const canonicalBase = import.meta.env.VITE_CANONICAL_BASE_URL || 'https://gymerviet.com';
+    const canonicalBase = SITE_ORIGIN;
 
     useEffect(() => {
         apiClient.get('/users/trainers')
@@ -130,17 +131,17 @@ export default function Home() {
                     content="Xem hồ sơ thật, so sánh giá và địa điểm. Một nơi cho người tập, Coach và phòng tập tại Việt Nam."
                 />
                 <meta property="og:url" content={canonicalBase} />
-                <meta property="og:image" content="https://gymerviet.com/og-default.jpg" />
+                <meta property="og:image" content={SITE_OG_IMAGE} />
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:site" content="@gymerviet" />
+                <meta name="twitter:site" content={SITE_TWITTER_HANDLE} />
                 <meta name="twitter:title" content="GYMERVIET — Tìm Coach, phòng tập và kiến thức fitness" />
                 <meta
                     name="twitter:description"
                     content="Khám phá Coach và phòng tập, đọc tin tập luyện và bắt đầu miễn phí."
                 />
-                <meta name="twitter:image" content="https://gymerviet.com/og-default.jpg" />
+                <meta name="twitter:image" content={SITE_OG_IMAGE} />
                 <script
                     type="application/ld+json"
                 >{JSON.stringify({

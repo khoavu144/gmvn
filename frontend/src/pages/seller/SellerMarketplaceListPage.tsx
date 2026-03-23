@@ -94,7 +94,7 @@ export default function SellerMarketplaceListPage() {
     return (
         <div className="page-shell-muted min-h-[70vh]">
             <Helmet>
-                <title>Quản lý Marketplace — GymViet</title>
+                <title>Quản lý Marketplace — GYMERVIET</title>
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             <div className="bg-white border-b border-gray-200">

@@ -23,6 +23,7 @@ import GymMapSection from '../components/gym-detail/GymMapSection';
 import { GymSectionHeading } from '../components/gym-detail/GymSectionHeading';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useMobileReducedEffects } from '../hooks/useMobileReducedEffects';
+import { absoluteUrl } from '../lib/site';
 
 function truncateMetaDescription(text: string, maxLen: number): string {
     const t = text.trim();
@@ -515,7 +516,7 @@ const GymDetailPage: React.FC = () => {
 
     const venueLabel = getPrimaryVenueLabel(gym);
     const leadAction = resolveLeadRoute(gym, branchDetail);
-    const canonicalUrl = `https://gymerviet.com/gyms/${gym.slug || gym.id}`;
+    const canonicalUrl = absoluteUrl(`/gyms/${gym.slug || gym.id}`);
     const seoTitle = `${gym.name} — ${venueLabel} trên GYMERVIET`;
     const seoDescription = gym.discovery_blurb || gym.tagline || gym.description || `${gym.name} — ${venueLabel} trên GYMERVIET.`;
     const metaDescription = truncateMetaDescription(seoDescription, 155);

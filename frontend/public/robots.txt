@@ -10,4 +10,4 @@ Disallow: /reset-password
 Disallow: /forgot-password
 Disallow: /verify-email
 
-Sitemap: https://gymerviet.vn/sitemap.xml
+Sitemap: https://gymerviet.com/sitemap.xml

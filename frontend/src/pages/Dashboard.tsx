@@ -53,7 +53,7 @@ export default function Dashboard() {
     return (
         <div className="page-shell-muted">
             <Helmet>
-                <title>Bảng điều khiển — GymViet</title>
+                <title>Bảng điều khiển — GYMERVIET</title>
                 <meta name="description" content="Quản lý hồ sơ, tin nhắn, và các tính năng nâng cao trên GYMERVIET." />
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>

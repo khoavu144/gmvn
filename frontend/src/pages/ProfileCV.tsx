@@ -24,6 +24,7 @@ import { Helmet } from 'react-helmet-async';
 import apiClient from '../services/api';
 import { fetchPublicProfile } from '../store/slices/profileSlice';
 import type { AppDispatch, RootState } from '../store/store';
+import { SITE_ORIGIN, absoluteUrl } from '../lib/site';
 
 interface SimilarCoach {
     id: string;
@@ -229,10 +230,10 @@ export default function ProfileCV() {
     const sectionHdr = isDark ? 'text-white font-bold text-xs uppercase tracking-widest border-b border-gray-800 pb-2 mb-5' : 'text-black font-bold text-xs uppercase tracking-widest border-b border-[color:var(--mk-line)] pb-2 mb-5';
 
     // SEO
-    const seoTitle = `${trainer?.full_name} — ${profile.headline || 'Personal Trainer'} | GymViet`;
-    const seoDesc = profile.bio_short || `${trainer?.full_name} là huấn luyện viên cá nhân tại GymViet với ${profile.years_experience}+ năm kinh nghiệm.`;
+    const seoTitle = `${trainer?.full_name} — ${profile.headline || 'Huấn luyện viên cá nhân'} | GYMERVIET`;
+    const seoDesc = profile.bio_short || `${trainer?.full_name} là huấn luyện viên cá nhân trên GYMERVIET với ${profile.years_experience}+ năm kinh nghiệm.`;
     const seoImage = trainer?.avatar_url || profile.cover_image_url || '';
-    const canonicalUrl = `https://gymviet.vn/coach/${slug}`;
+    const canonicalUrl = absoluteUrl(primaryDetailLink);
 
     const typeLabels: Record<string, string> = {
         work: 'Công việc', education: 'Học vấn', certification: 'Chứng chỉ', achievement: 'Thành tích',
@@ -261,7 +262,7 @@ export default function ProfileCV() {
                 <meta property="og:description" content={seoDesc} />
                 <meta property="og:image" content={seoImage} />
                 <meta property="og:url" content={canonicalUrl} />
-                <meta property="og:site_name" content="GymViet" />
+                <meta property="og:site_name" content="GYMERVIET" />
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:title" content={seoTitle} />
@@ -278,7 +279,7 @@ export default function ProfileCV() {
                         "description": seoDesc,
                         "image": seoImage,
                         "url": canonicalUrl,
-                        "worksFor": { "@type": "Organization", "name": "GymViet" },
+                        "worksFor": { "@type": "Organization", "name": "GYMERVIET", "url": SITE_ORIGIN },
                     }
                 })}</script>
             </Helmet>

@@ -133,7 +133,7 @@ const GymOwnerDashboard: React.FC = () => {
     return (
         <div className="min-h-[calc(100vh-4rem)] flex flex-col md:flex-row bg-white relative">
             <Helmet>
-                <title>Gym Owner Dashboard — GymViet</title>
+                <title>Gym Owner Dashboard — GYMERVIET</title>
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             {/* Mobile Header Toggle */}

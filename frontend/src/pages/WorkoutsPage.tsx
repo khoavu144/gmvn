@@ -59,7 +59,7 @@ export default function WorkoutsPage() {
     return (
         <div className="page-shell-muted">
             <Helmet>
-                <title>Lịch tập của tôi — GymViet</title>
+                <title>Lịch tập của tôi — GYMERVIET</title>
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             {ToastComponent}

@@ -43,7 +43,7 @@ export default function SubscriptionsPage() {
     return (
         <div className="page-shell-muted">
             <Helmet>
-                <title>Quản lý Gói tập — GymViet</title>
+                <title>Quản lý Gói tập — GYMERVIET</title>
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             {ToastComponent}

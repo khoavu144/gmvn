@@ -7,6 +7,7 @@ import { ChevronDown } from 'lucide-react';
 import { SPECIALTY_CATEGORIES } from '../data/coachSpecialtyTaxonomy';
 import { CoachDirectoryCard, type CoachDirectoryTrainer } from '../components/coaches/CoachDirectoryCard';
 import { trackEvent } from '../lib/analytics';
+import { SITE_OG_IMAGE, SITE_TWITTER_HANDLE, absoluteUrl } from '../lib/site';
 import '../styles/marketplace.css';
 import { useMobileReducedEffects } from '../hooks/useMobileReducedEffects';
 
@@ -418,8 +419,8 @@ export default function Coaches() {
 
     const canonical =
         currentType === 'athlete'
-            ? 'https://gymerviet.com/coaches?type=athlete'
-            : 'https://gymerviet.com/coaches';
+            ? absoluteUrl('/coaches?type=athlete')
+            : absoluteUrl('/coaches');
 
     return (
         <main className="marketplace-shell min-h-screen">
@@ -440,9 +441,9 @@ export default function Coaches() {
                     content={`${currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET`}
                 />
                 <meta property="og:url" content={canonical} />
-                <meta property="og:image" content="https://gymerviet.com/og-default.jpg" />
+                <meta property="og:image" content={SITE_OG_IMAGE} />
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:site" content="@gymerviet" />
+                <meta name="twitter:site" content={SITE_TWITTER_HANDLE} />
             </Helmet>
 
             <div className="marketplace-container gv-pad-y">

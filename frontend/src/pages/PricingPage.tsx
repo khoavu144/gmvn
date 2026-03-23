@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { RootState } from '../store/store';
 import apiClient from '../services/api';
 import { trackEvent } from '../lib/analytics';
+import { SITE_OG_IMAGE, SITE_ORIGIN, SITE_TWITTER_HANDLE } from '../lib/site';
 
 type PlanKey = 'free' | 'coach_pro' | 'coach_elite' | 'athlete_premium' | 'gym_business';
 
@@ -203,7 +204,7 @@ export default function PricingPage() {
     const [roleView, setRoleView] = useState<PricingRoleView>(
         user?.user_type === 'athlete' ? 'athlete' : user?.user_type === 'gym_owner' ? 'gym' : 'coach'
     );
-    const canonicalBase = import.meta.env.VITE_CANONICAL_BASE_URL || 'https://gymerviet.com';
+    const canonicalBase = SITE_ORIGIN;
     const activeView = ROLE_VIEWS[roleView];
 
     const handleUpgrade = async (plan: PlanKey) => {
@@ -250,14 +251,15 @@ export default function PricingPage() {
                     content="Bảng giá rõ ràng cho coach, athlete và gym center."
                 />
                 <meta property="og:url" content={`${canonicalBase}/pricing`} />
-                <meta property="og:image" content="https://gymerviet.com/og-default.jpg" />
+                <meta property="og:image" content={SITE_OG_IMAGE} />
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:site" content="@gymerviet" />
+                <meta name="twitter:site" content={SITE_TWITTER_HANDLE} />
                 <meta name="twitter:title" content="Bảng giá — GYMERVIET" />
                 <meta
                     name="twitter:description"
                     content="Chọn gói phù hợp cho coach, athlete và gym center."
                 />
+                <meta name="twitter:image" content={SITE_OG_IMAGE} />
             </Helmet>
 
             <section className="marketplace-hero">

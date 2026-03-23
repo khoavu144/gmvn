@@ -21,6 +21,7 @@ import CoachResultsShowcase from '../components/coach-flagship/CoachResultsShowc
 import CoachRelatedFooter from '../components/coach-flagship/CoachRelatedFooter';
 import { Skeleton } from '../components/ui/Skeleton';
 import type { TrainerExperience, TrainerPackage } from '../types';
+import { SITE_ORIGIN, absoluteUrl } from '../lib/site';
 
 interface RelatedAthlete {
   id: string;
@@ -115,7 +116,7 @@ export default function AthleteDetailPage() {
       .catch(() => { });
   }, [profile?.trainer_id, isAthleteProfile]);
 
-  const BASE_URL = import.meta.env.VITE_CANONICAL_BASE_URL ?? (typeof window !== 'undefined' ? window.location.origin : 'https://gymerviet.com');
+  const BASE_URL = SITE_ORIGIN;
 
   const canonicalPath = useMemo(() => {
     if (profile?.slug) return `/athlete/${profile.slug}`;
@@ -334,14 +335,14 @@ export default function AthleteDetailPage() {
           image: avatarUrl || undefined,
           url: canonicalUrl,
           knowsAbout: athlete.specialties ?? [],
-          worksFor: { '@type': 'Organization', name: 'GYMERVIET', url: 'https://gymerviet.com' },
+          worksFor: { '@type': 'Organization', name: 'GYMERVIET', url: SITE_ORIGIN },
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'BreadcrumbList',
           itemListElement: [
-            { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://gymerviet.com' },
-            { '@type': 'ListItem', position: 2, name: 'Vận động viên', item: 'https://gymerviet.com/coaches?type=athlete' },
+            { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: SITE_ORIGIN },
+            { '@type': 'ListItem', position: 2, name: 'Vận động viên', item: absoluteUrl('/coaches?type=athlete') },
             { '@type': 'ListItem', position: 3, name: athlete.full_name },
           ],
         })}</script>

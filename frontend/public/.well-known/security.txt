@@ -1,0 +1,5 @@
+Contact: mailto:security@gymerviet.com
+Contact: mailto:support@gymerviet.com
+Expires: 2027-03-23T00:00:00.000Z
+Preferred-Languages: vi, en
+Canonical: https://gymerviet.com/.well-known/security.txt

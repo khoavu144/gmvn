@@ -26,6 +26,7 @@ import CoachTestimonialsWall from '../components/coach-flagship/CoachTestimonial
 import CoachRelatedFooter from '../components/coach-flagship/CoachRelatedFooter';
 import ShareButton from '../components/ShareButton';
 import { buildProfileShareUrl } from '../utils/share';
+import { SITE_ORIGIN, absoluteUrl } from '../lib/site';
 
 interface Program {
     id: string;
@@ -313,7 +314,7 @@ export default function CoachDetailPage() {
 
     const secondaryCta = { text: 'Nhắn tin để tư vấn', action: handleMessage };
 
-    const BASE_URL = import.meta.env.VITE_CANONICAL_BASE_URL ?? 'https://gymerviet.com';
+    const BASE_URL = SITE_ORIGIN;
     const canonicalPath = trainer?.slug ? `/coach/${trainer.slug}` : `/coaches/${trainerId ?? ''}`;
     const canonicalUrl = `${BASE_URL}${canonicalPath}`;
     const shareIdentifier = trainer?.slug ?? trainer?.id ?? slug ?? trainerId ?? '';
@@ -415,15 +416,15 @@ export default function CoachDetailPage() {
                     image: trainer.avatar_url || undefined,
                     url: canonicalUrl,
                     knowsAbout: (trainer.specialties as string[] | undefined) ?? [],
-                    worksFor: { '@type': 'Organization', name: 'GYMERVIET', url: 'https://gymerviet.com' },
+                    worksFor: { '@type': 'Organization', name: 'GYMERVIET', url: SITE_ORIGIN },
                 })}</script>
                 {/* JSON-LD: BreadcrumbList */}
                 <script type="application/ld+json">{JSON.stringify({
                     '@context': 'https://schema.org',
                     '@type': 'BreadcrumbList',
                     itemListElement: [
-                        { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: 'https://gymerviet.com' },
-                        { '@type': 'ListItem', position: 2, name: 'Coach', item: 'https://gymerviet.com/coaches' },
+                        { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: SITE_ORIGIN },
+                        { '@type': 'ListItem', position: 2, name: 'Coach', item: absoluteUrl('/coaches') },
                         { '@type': 'ListItem', position: 3, name: trainer.full_name },
                     ],
                 })}</script>

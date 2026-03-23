@@ -3,13 +3,15 @@ import { AppDataSource } from '../config/database';
 import { User } from '../entities/User';
 import { GymCenter } from '../entities/GymCenter';
 
-const BASE_URL = process.env.FRONTEND_URL || 'https://gymerviet.com';
+const BASE_URL = (process.env.FRONTEND_URL || 'https://gymerviet.com').replace(/\/+$/, '');
 
 // Static high-value pages
 const STATIC_URLS = [
     { path: '/',         priority: '1.0', changefreq: 'daily'   },
     { path: '/coaches',  priority: '0.9', changefreq: 'daily'   },
     { path: '/gyms',     priority: '0.9', changefreq: 'daily'   },
+    { path: '/marketplace', priority: '0.8', changefreq: 'daily' },
+    { path: '/news',     priority: '0.7', changefreq: 'daily'   },
     { path: '/gallery',  priority: '0.6', changefreq: 'weekly'  },
     { path: '/pricing',  priority: '0.7', changefreq: 'monthly' },
 ];
@@ -55,7 +57,7 @@ export const generateSitemap = async (_req: Request, res: Response): Promise<voi
 
         for (const t of trainers) {
             urls.push(xmlUrl(
-                `${BASE_URL}/coaches/${t.slug || t.id}`,
+                t.slug ? `${BASE_URL}/coach/${t.slug}` : `${BASE_URL}/coaches/${t.id}`,
                 toW3CDate(t.updated_at ?? new Date()),
                 'weekly',
                 '0.8',
@@ -88,7 +90,7 @@ export const generateSitemap = async (_req: Request, res: Response): Promise<voi
 
         for (const a of athletes) {
             urls.push(xmlUrl(
-                `${BASE_URL}/athlete/${a.slug || a.id}`,
+                a.slug ? `${BASE_URL}/athlete/${a.slug}` : `${BASE_URL}/athletes/${a.id}`,
                 toW3CDate(a.updated_at ?? new Date()),
                 'monthly',
                 '0.5',

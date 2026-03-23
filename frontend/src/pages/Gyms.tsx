@@ -5,6 +5,7 @@ import { Filter, LayoutGrid, List } from 'lucide-react';
 import GymCard from '../components/GymCard';
 import { gymService } from '../services/gymService';
 import type { GymCenter } from '../types';
+import { SITE_OG_IMAGE, absoluteUrl } from '../lib/site';
 
 const GymMapView = lazy(() => import('../components/GymMapView'));
 
@@ -190,6 +191,7 @@ const CategoryStrip: React.FC<CategoryStripProps> = ({
 // ─── Main page ─────────────────────────────────────────────────────────────────
 
 const Gyms: React.FC = () => {
+    const canonicalUrl = absoluteUrl('/gyms');
     const [viewMode, setViewMode] = useState<ViewMode>('grid');
     const [searchTerm, setSearchTerm] = useState('');
     const [cityFilter, setCityFilter] = useState('');
@@ -277,15 +279,15 @@ const Gyms: React.FC = () => {
                     name="description"
                     content="Khám phá gym, fitness club, yoga studio, pilates studio và recovery spaces theo khu vực, mức giá và trải nghiệm phù hợp với mục tiêu tập luyện của bạn."
                 />
-                <link rel="canonical" href="https://gymerviet.com/gyms" />
+                <link rel="canonical" href={canonicalUrl} />
                 <meta property="og:type" content="website" />
                 <meta property="og:title" content="Marketplace Phòng tập — GYMERVIET" />
                 <meta
                     property="og:description"
                     content="Khám phá không gian tập luyện được biên tập: thumbnail, giá khởi điểm rõ ràng, trải nghiệm phù hợp từng mục tiêu."
                 />
-                <meta property="og:url" content={import.meta.env.VITE_CANONICAL_BASE_URL ? `${import.meta.env.VITE_CANONICAL_BASE_URL}/gyms` : "https://gymerviet.com/gyms"} />
-                <meta property="og:image" content="https://gymerviet.com/og-default.jpg" />
+                <meta property="og:url" content={canonicalUrl} />
+                <meta property="og:image" content={SITE_OG_IMAGE} />
                 <meta property="og:image:alt" content="GYMERVIET Gyms Marketplace" />
                 <meta name="twitter:card" content="summary_large_image" />
             </Helmet>
