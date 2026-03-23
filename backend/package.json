@@ -10,6 +10,8 @@
     "start": "node dist/server.js",
     "migrate:check": "ts-node src/scripts/checkMigrationState.ts",
     "migrate:run": "ts-node src/scripts/runMigrations.ts",
+    "emails:process": "ts-node src/scripts/processEmailOutbox.ts",
+    "billing:reconcile": "ts-node src/scripts/reconcilePlatformBilling.ts",
     "bundle:supabase-sql": "node scripts/bundle-sql-migrations.mjs",
     "seed": "ts-node src/seeds/fullSeed.ts",
     "seed:check": "ts-node src/scripts/checkSeedDataset.ts",

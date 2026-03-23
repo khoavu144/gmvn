@@ -3,10 +3,15 @@ import { AppDataSource } from './config/database';
 import { getEnv } from './config/env';
 import { runPendingMigrations } from './services/sqlMigrationService';
 import { refreshTokenStore } from './services/refreshTokenStore';
+import { emailOutboxService } from './services/emailOutboxService';
 
 const bootstrap = async () => {
     try {
         const env = getEnv();
+        if (env.NODE_ENV === 'production' && env.RUN_SEED === 'true') {
+            throw new Error('RUN_SEED=true is forbidden in production');
+        }
+
         let redisConnected = false;
 
         try {
@@ -35,6 +40,20 @@ const bootstrap = async () => {
         const { startNewsCron } = await import('./services/newsCronScheduler');
         startNewsCron();
 
+        const runEmailOutboxWorker = async () => {
+            try {
+                const processed = await emailOutboxService.processPending();
+                if (processed.length > 0) {
+                    console.log(`📬 Processed ${processed.length} email outbox record(s)`);
+                }
+            } catch (error) {
+                console.error('❌ Email outbox worker failed:', error);
+            }
+        };
+
+        await runEmailOutboxWorker();
+        setInterval(runEmailOutboxWorker, 60_000).unref();
+
         httpServer.listen(env.PORT, async () => {
             console.log(`🚀 Server running on port ${env.PORT}`);
             console.log(`📡 API: http://localhost:${env.PORT}/api/v1`);
@@ -44,7 +63,7 @@ const bootstrap = async () => {
                 console.warn('⚠️ Application is running in degraded mode without Redis.');
             }
 
-            if (env.RUN_SEED === 'true') {
+            if (env.RUN_SEED === 'true' && env.NODE_ENV !== 'production') {
                 console.log('🌱 RUN_SEED flag detected. Running full seed...');
                 try {
                     const { fullSeed } = await import('./seeds/fullSeed');

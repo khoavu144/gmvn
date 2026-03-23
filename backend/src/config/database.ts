@@ -22,6 +22,8 @@ import { ProgramReport } from '../entities/ProgramReport';
 import { FinancialTransaction } from '../entities/FinancialTransaction';
 import { AdminAuditLog } from '../entities/AdminAuditLog';
 import { RevenueTier } from '../entities/RevenueTier';
+import { AuthRefreshSession } from '../entities/AuthRefreshSession';
+import { EmailOutbox } from '../entities/EmailOutbox';
 
 // Gym Center Entities
 import { GymCenter } from '../entities/GymCenter';
@@ -56,6 +58,7 @@ import { EmailVerificationToken } from '../entities/EmailVerificationToken';
 import { PasswordResetToken } from '../entities/PasswordResetToken';
 import { CoachApplication } from '../entities/CoachApplication';
 import { PlatformSubscription } from '../entities/PlatformSubscription';
+import { PlatformCheckoutIntent } from '../entities/PlatformCheckoutIntent';
 import { AppSetting } from '../entities/AppSetting';
 
 // Product Marketplace Entities
@@ -107,6 +110,8 @@ export const AppDataSource = new DataSource({
         FinancialTransaction,
         AdminAuditLog,
         RevenueTier,
+        AuthRefreshSession,
+        EmailOutbox,
         // Gym Center Module
         GymCenter,
         GymBranch,
@@ -141,6 +146,7 @@ export const AppDataSource = new DataSource({
         CoachApplication,
         // Platform Subscription (Free/Pro/Elite tiers)
         PlatformSubscription,
+        PlatformCheckoutIntent,
         AppSetting,
         // Product Marketplace
         ProductCategory,

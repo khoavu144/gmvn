@@ -31,17 +31,15 @@ import userProfileCatalogRoutes from './routes/userProfileCatalog';
 import { generateSitemap } from './controllers/sitemapController';
 
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
-import { User } from './entities/User';
-import { GymCenter } from './entities/GymCenter';
-import { AppDataSource } from './config/database';
+import { getEnv } from './config/env';
 import { initSocket } from './socket';
-import { refreshTokenStore } from './services/refreshTokenStore';
 import { requestLogger } from './middleware/requestLogger';
+import { systemHealthService } from './services/systemHealthService';
 
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const env = getEnv();
 
 // Trust reverse proxy (Render, Nginx) — required for express-rate-limit & real IP
 app.set('trust proxy', 1);
@@ -64,22 +62,19 @@ app.use(helmet({
     }
 }));
 app.use(requestLogger);
-const allowedOrigins = [
-    'http://localhost:5173',
-    'https://gymerviet.com',
-    'https://www.gymerviet.com'
-];
-
-if (process.env.FRONTEND_URL && !allowedOrigins.includes(process.env.FRONTEND_URL)) {
-    allowedOrigins.push(process.env.FRONTEND_URL);
-}
+const defaultOrigins = ['http://localhost:5173', 'https://gymerviet.com', 'https://www.gymerviet.com'];
+const allowedOrigins = Array.from(new Set([
+    ...defaultOrigins,
+    env.FRONTEND_URL,
+    ...(env.ALLOWED_ORIGINS?.split(',').map((origin) => origin.trim()).filter(Boolean) ?? []),
+]));
 
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
 
-        if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+        if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -88,7 +83,7 @@ app.use(cors({
     credentials: true,
 }));
 
-const isDev = process.env.NODE_ENV !== 'production';
+const isDev = env.NODE_ENV !== 'production';
 const apiLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
     max: isDev ? 1000 : 100, // Dev: 1000/min, Production: 100/min
@@ -142,12 +137,40 @@ app.use('/api/v1/news', newsRoutes);
 app.use('/api/v1/integrations/google-form', googleFormIngestRoutes);
 
 // Health check (Public standard mode - P0-4 Security Fix)
-app.get('/api/v1/health', (_req, res) => {
+app.get('/api/v1/health/live', (_req, res) => {
     res.status(200).json({
         status: 'OK',
         timestamp: new Date().toISOString(),
-        env: process.env.NODE_ENV
+        env: env.NODE_ENV,
+        process: 'up',
     });
+});
+
+app.get('/api/v1/health/ready', async (_req, res, next) => {
+    try {
+        const snapshot = await systemHealthService.getSnapshot();
+        res.status(snapshot.status === 'ERROR' ? 503 : 200).json(snapshot);
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.get('/api/v1/health/deps', async (_req, res, next) => {
+    try {
+        const snapshot = await systemHealthService.getSnapshot();
+        res.status(snapshot.status === 'ERROR' ? 503 : 200).json(snapshot);
+    } catch (error) {
+        next(error);
+    }
+});
+
+app.get('/api/v1/health', async (_req, res, next) => {
+    try {
+        const snapshot = await systemHealthService.getSnapshot();
+        res.status(snapshot.status === 'ERROR' ? 503 : 200).json(snapshot);
+    } catch (error) {
+        next(error);
+    }
 });
 
 // Root health checks (for Render/platform checks)

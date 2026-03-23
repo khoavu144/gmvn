@@ -1,8 +1,10 @@
 import { AppDataSource } from '../config/database';
 import { PlatformSubscription, PlatformPlan } from '../entities/PlatformSubscription';
+import { PlatformCheckoutIntent } from '../entities/PlatformCheckoutIntent';
 import { AppSetting } from '../entities/AppSetting';
 import { User } from '../entities/User';
 import redisClient from '../config/redis';
+import { AppError } from '../utils/AppError';
 
 export type { PlatformPlan };
 
@@ -76,6 +78,7 @@ const CACHE_TTL_MS = 60_000; // 1 minute
 // ─── Service ──────────────────────────────────────────────────────────────────
 class PlatformSubscriptionService {
     private get repo() { return AppDataSource.getRepository(PlatformSubscription); }
+    private get checkoutRepo() { return AppDataSource.getRepository(PlatformCheckoutIntent); }
     private get settingsRepo() { return AppDataSource.getRepository(AppSetting); }
     private get userRepo() { return AppDataSource.getRepository(User); }
 
@@ -86,7 +89,7 @@ class PlatformSubscriptionService {
             return _billingEnabledCache;
         }
         const setting = await this.settingsRepo.findOneBy({ key: 'billing_enabled' });
-        _billingEnabledCache = setting?.value === 'true';
+        _billingEnabledCache = setting?.value !== 'false';
         _cacheTs = now;
         return _billingEnabledCache;
     }
@@ -133,6 +136,8 @@ class PlatformSubscriptionService {
         label: string;
         description: string;
         amount: number;
+        checkout_intent_id: string;
+        expires_at: Date;
     }> {
         const user = await this.userRepo.findOneBy({ id: userId });
         if (!user) throw new Error('User not found');
@@ -149,12 +154,24 @@ class PlatformSubscriptionService {
         // Use a unique random suffix to completely prevent collisions in webhook matching
         const uniqueId = Math.random().toString(36).substring(2, 6).toUpperCase();
         const description = `GYMERVIET-PLAN-${plan.toUpperCase()}-${userShort}-${uniqueId}`;
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-        // Store checkout intent in Redis for 24 hours (86400s)
+        const intent = await this.checkoutRepo.save(this.checkoutRepo.create({
+            user_id: userId,
+            plan,
+            transfer_content: description,
+            amount: config.price,
+            status: 'pending',
+            expires_at: expiresAt,
+            metadata: {
+                userShort,
+            },
+        }));
+
         try {
-            await redisClient.set(`checkout:${description}`, JSON.stringify({ userId, plan }), { EX: 86400 });
+            await redisClient.set(`checkout:${description}`, JSON.stringify({ userId, plan, intentId: intent.id }), { EX: 86400 });
         } catch (e) {
-            console.warn('[checkout] Failed to write to Redis, falling back to substring match', e);
+            console.warn('[checkout] Failed to mirror intent to Redis cache', e);
         }
 
         return {
@@ -163,35 +180,114 @@ class PlatformSubscriptionService {
             label: config.label,
             description,
             amount: config.price,
+            checkout_intent_id: intent.id,
+            expires_at: intent.expires_at,
         };
     }
 
-    /**
-     * Called by SePay webhook when a platform payment is confirmed.
-     * Activates or upgrades the user's platform subscription.
-     */
-    async activateFromWebhook(userId: string, plan: PlatformPlan, transactionId: string, amount: number): Promise<void> {
-        // Cancel any existing active sub
-        await this.repo.update(
-            { user_id: userId, status: 'active' },
-            { status: 'cancelled' }
-        );
+    async activateFromWebhook(content: string, transactionId: string, amount: number) {
+        return AppDataSource.transaction(async (manager) => {
+            const checkoutRepo = manager.getRepository(PlatformCheckoutIntent);
+            const subRepo = manager.getRepository(PlatformSubscription);
 
-        const now = new Date();
-        const expiresAt = new Date(now);
-        expiresAt.setFullYear(expiresAt.getFullYear() + 1); // 1 year from now
+            const intent = await checkoutRepo
+                .createQueryBuilder('intent')
+                .setLock('pessimistic_write')
+                .where('intent.transfer_content = :content', { content })
+                .getOne();
 
-        const sub = this.repo.create({
-            user_id: userId,
-            plan,
-            status: 'active',
-            price_paid: amount,
-            started_at: now,
-            expires_at: expiresAt,
-            sepay_transaction_id: transactionId,
+            if (!intent) {
+                return { ignored: true, reason: 'checkout_intent_not_found' as const };
+            }
+
+            if (intent.status === 'paid' && intent.provider_transaction_id === transactionId) {
+                return {
+                    ignored: false,
+                    idempotent: true,
+                    user_id: intent.user_id,
+                    plan: intent.plan,
+                };
+            }
+
+            if (intent.status === 'paid' && intent.provider_transaction_id && intent.provider_transaction_id !== transactionId) {
+                throw new AppError('Checkout intent already claimed by another transaction', 409);
+            }
+
+            if (intent.expires_at < new Date()) {
+                intent.status = 'expired';
+                await checkoutRepo.save(intent);
+                return { ignored: true, reason: 'checkout_intent_expired' as const };
+            }
+
+            if (Number(intent.amount) !== Number(amount)) {
+                intent.status = 'failed';
+                intent.metadata = {
+                    ...intent.metadata,
+                    last_amount_mismatch: {
+                        expected: Number(intent.amount),
+                        received: Number(amount),
+                        at: new Date().toISOString(),
+                    },
+                };
+                await checkoutRepo.save(intent);
+                throw new AppError('Webhook amount mismatch', 400);
+            }
+
+            if (transactionId) {
+                const existingSub = await subRepo.findOneBy({ sepay_transaction_id: transactionId });
+                if (existingSub) {
+                    intent.status = 'paid';
+                    intent.provider_transaction_id = transactionId;
+                    intent.paid_at = existingSub.started_at ?? new Date();
+                    await checkoutRepo.save(intent);
+                    return {
+                        ignored: false,
+                        idempotent: true,
+                        user_id: intent.user_id,
+                        plan: intent.plan,
+                    };
+                }
+            }
+
+            await subRepo.update(
+                { user_id: intent.user_id, status: 'active' },
+                { status: 'cancelled' }
+            );
+
+            const now = new Date();
+            const expiresAt = new Date(now);
+            expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+
+            const sub = subRepo.create({
+                user_id: intent.user_id,
+                plan: intent.plan,
+                status: 'active',
+                price_paid: amount,
+                started_at: now,
+                expires_at: expiresAt,
+                sepay_transaction_id: transactionId,
+            });
+
+            await subRepo.save(sub);
+
+            intent.status = 'paid';
+            intent.provider_transaction_id = transactionId;
+            intent.paid_at = now;
+            await checkoutRepo.save(intent);
+
+            try {
+                await redisClient.del(`checkout:${content}`);
+            } catch (error) {
+                console.warn('[platform-webhook] Failed to clear checkout cache', error);
+            }
+
+            return {
+                ignored: false,
+                idempotent: false,
+                user_id: intent.user_id,
+                plan: intent.plan,
+            };
         });
-
-        await this.repo.save(sub);
     }
 
     /** Cancel active platform subscription (returns to free immediately) */
@@ -207,6 +303,13 @@ class PlatformSubscriptionService {
      * Called once on server startup and then every 24h.
      */
     async expireOverdue(): Promise<number> {
+        await this.checkoutRepo
+            .createQueryBuilder()
+            .update()
+            .set({ status: 'expired' })
+            .where('status = :status AND expires_at < :now', { status: 'pending', now: new Date() })
+            .execute();
+
         const result = await this.repo
             .createQueryBuilder()
             .update()
@@ -247,13 +350,39 @@ class PlatformSubscriptionService {
             total,
         };
     }
+
+    async reconcileCheckoutIntents() {
+        const expired = await this.checkoutRepo
+            .createQueryBuilder()
+            .update()
+            .set({ status: 'expired' })
+            .where('status = :status AND expires_at < :now', { status: 'pending', now: new Date() })
+            .execute();
+
+        const paidWithoutSubscription = await this.checkoutRepo
+            .createQueryBuilder('intent')
+            .leftJoin(PlatformSubscription, 'sub', 'sub.sepay_transaction_id = intent.provider_transaction_id')
+            .where('intent.status = :status', { status: 'paid' })
+            .andWhere('intent.provider_transaction_id IS NOT NULL')
+            .andWhere('sub.id IS NULL')
+            .getCount();
+
+        const pending = await this.checkoutRepo.count({
+            where: { status: 'pending' },
+        });
+
+        return {
+            expiredPendingIntents: expired.affected ?? 0,
+            pendingIntents: pending,
+            paidWithoutSubscription,
+        };
+    }
 }
 
 export const platformSubscriptionService = new PlatformSubscriptionService();
 
 /** Helper: does userPlan satisfy a required minimum plan? */
 export function planSatisfies(userPlan: PlatformPlan, required: PlatformPlan): boolean {
-    const hierarchy: PlatformPlan[] = ['free', 'coach_pro', 'coach_elite', 'athlete_premium', 'gym_business'];
     // For coach plans: free < pro < elite
     // athlete_premium and gym_business are standalone (only satisfy themselves)
     if (required === 'coach_pro') return userPlan === 'coach_pro' || userPlan === 'coach_elite';

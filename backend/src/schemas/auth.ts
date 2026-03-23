@@ -5,7 +5,7 @@ export const RegisterSchema = z.object({
     email: z.string().email('Invalid email'),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     full_name: z.string().min(2, 'Name must be at least 2 characters'),
-    user_type: z.enum(['athlete', 'trainer', 'gym_owner']),
+    user_type: z.enum(['user', 'athlete', 'trainer', 'gym_owner']),
 });
 
 export const LoginSchema = z.object({
@@ -47,8 +47,12 @@ export const validateRequest = (schema: z.ZodSchema) => {
         } catch (error: any) {
             return res.status(400).json({
                 success: false,
-                error: 'Validation failed',
-                details: error.errors,
+                error: {
+                    message: 'Validation failed',
+                    code: 'VALIDATION_ERROR',
+                    details: error.issues ?? error.errors ?? [],
+                },
+                requestId: req.id,
             });
         }
     };

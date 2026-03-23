@@ -1,23 +1,52 @@
 import nodemailer from 'nodemailer';
 import { getEnv } from '../config/env';
 
-const env = getEnv();
+const DEV_FALLBACK_HOST = 'smtp.ethereal.email';
+const DEV_FALLBACK_PORT = 587;
+const DEV_FALLBACK_FROM = '"Gymerviet" <noreply@gymerviet.com>';
 
-// Configure the SMTP transporter. Add these to .env:
-// SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-    },
-});
+class EmailService {
+    isConfigured() {
+        return Boolean(
+            process.env.SMTP_HOST &&
+            process.env.SMTP_PORT &&
+            process.env.SMTP_USER &&
+            process.env.SMTP_PASS &&
+            process.env.SMTP_FROM
+        );
+    }
 
-export const emailService = {
+    getDefaultFrom() {
+        return process.env.SMTP_FROM || DEV_FALLBACK_FROM;
+    }
+
+    private getTransportOptions() {
+        const env = getEnv();
+        const configured = this.isConfigured();
+
+        if (!configured && env.NODE_ENV === 'production') {
+            throw new Error('SMTP transport is not configured');
+        }
+
+        return {
+            host: process.env.SMTP_HOST || DEV_FALLBACK_HOST,
+            port: Number(process.env.SMTP_PORT || DEV_FALLBACK_PORT),
+            secure: Number(process.env.SMTP_PORT || DEV_FALLBACK_PORT) === 465,
+            auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
+            },
+        };
+    }
+
+    private createTransporter() {
+        return nodemailer.createTransport(this.getTransportOptions());
+    }
+
     async sendVerificationEmail(to: string, code: string) {
-        const mailOptions = {
-            from: process.env.SMTP_FROM || '"Gymerviet" <noreply@gymerviet.com>',
+        const transporter = this.createTransporter();
+        await transporter.sendMail({
+            from: this.getDefaultFrom(),
             to,
             subject: 'Xác thực tài khoản Gymerviet của bạn',
             html: `
@@ -31,18 +60,13 @@ export const emailService = {
                     <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.</p>
                 </div>
             `,
-        };
-        try {
-            await transporter.sendMail(mailOptions);
-        } catch (error) {
-            console.error('Email send error:', error);
-            // Non-critical, just log for now. In prod, throw or alert.
-        }
-    },
+        });
+    }
 
     async sendPasswordResetEmail(to: string, code: string) {
-        const mailOptions = {
-            from: process.env.SMTP_FROM || '"Gymerviet" <noreply@gymerviet.com>',
+        const transporter = this.createTransporter();
+        await transporter.sendMail({
+            from: this.getDefaultFrom(),
             to,
             subject: 'Đặt lại mật khẩu Gymerviet',
             html: `
@@ -56,11 +80,8 @@ export const emailService = {
                     <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email.</p>
                 </div>
             `,
-        };
-        try {
-            await transporter.sendMail(mailOptions);
-        } catch (error) {
-            console.error('Email send error:', error);
-        }
+        });
     }
-};
+}
+
+export const emailService = new EmailService();

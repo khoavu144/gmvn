@@ -1,20 +1,16 @@
-import { randomUUID } from 'crypto';
 import { AppDataSource } from '../config/database';
+import { EntityManager } from 'typeorm';
 import { User } from '../entities/User';
 import { EmailVerificationToken } from '../entities/EmailVerificationToken';
 import { PasswordResetToken } from '../entities/PasswordResetToken';
-import { emailService } from './emailService';
 import { RegisterInput, LoginInput, ResetPasswordInput } from '../schemas/auth';
 import {
-    generateAccessToken,
-    generateRefreshToken,
     verifyRefreshToken,
     type AppUserType,
     type RefreshTokenPayload,
     type TokenPayload,
 } from '../utils/jwt';
 import { hashPassword, verifyPassword } from '../utils/password';
-import { refreshTokenStore } from './refreshTokenStore';
 import {
     setUserSelections,
     validateSelections,
@@ -23,6 +19,8 @@ import {
 } from './userProfileCatalogService';
 import type { AppUserType as ProfileRulesUserType } from '../config/userProfileRules';
 import { AppError } from '../utils/AppError';
+import { authSessionService } from './authSessionService';
+import { emailOutboxService } from './emailOutboxService';
 
 const getUserRepo = () => AppDataSource.getRepository(User);
 
@@ -53,56 +51,104 @@ class AuthService {
         };
     }
 
-    private async issueSessionTokens(user: User, sessionId: string = randomUUID()) {
-        const payload = this.buildTokenPayload(user);
-        const access_token = generateAccessToken(payload);
-        const refresh_token = generateRefreshToken({
-            ...payload,
-            session_id: sessionId,
+    private async issueSessionTokens(user: User, sessionId?: string, manager?: EntityManager) {
+        return authSessionService.issueSessionTokens(
+            user,
+            this.buildTokenPayload(user),
+            sessionId,
+            manager,
+        );
+    }
+
+    private async createVerificationToken(userId: string, manager?: EntityManager) {
+        const tokenRepo = (manager ?? AppDataSource.manager).getRepository(EmailVerificationToken);
+        await tokenRepo.delete({ user_id: userId });
+
+        const code = generateCode();
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+        const tokenEntity = tokenRepo.create({
+            user_id: userId,
+            token: code,
+            expires_at: expiresAt,
         });
+        await tokenRepo.save(tokenEntity);
+        return code;
+    }
 
-        try {
-            await refreshTokenStore.storeRefreshToken(user.id, sessionId, refresh_token);
-        } catch (error) {
-            console.warn(`[Degraded Mode] Failed to store refresh token in Redis for user ${user.id}:`, error instanceof Error ? error.message : error);
-        }
+    private async createPasswordResetToken(userId: string, manager?: EntityManager) {
+        const tokenRepo = (manager ?? AppDataSource.manager).getRepository(PasswordResetToken);
+        await tokenRepo.delete({ user_id: userId });
 
-        return {
-            access_token,
-            refresh_token,
-        };
+        const code = generateCode();
+        const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+        const tokenEntity = tokenRepo.create({
+            user_id: userId,
+            token: code,
+            expires_at: expiresAt,
+        });
+        await tokenRepo.save(tokenEntity);
+        return code;
+    }
+
+    private async queueVerificationEmail(user: User, manager?: EntityManager) {
+        const code = await this.createVerificationToken(user.id, manager);
+        return emailOutboxService.enqueue({
+            userId: user.id,
+            recipientEmail: user.email,
+            emailType: 'verify_email',
+            subject: 'Xác thực tài khoản Gymerviet của bạn',
+            payload: { code },
+        }, manager);
+    }
+
+    private async queuePasswordResetEmail(user: User, manager?: EntityManager) {
+        const code = await this.createPasswordResetToken(user.id, manager);
+        return emailOutboxService.enqueue({
+            userId: user.id,
+            recipientEmail: user.email,
+            emailType: 'reset_password',
+            subject: 'Đặt lại mật khẩu Gymerviet',
+            payload: { code },
+        }, manager);
     }
 
     async register(input: RegisterInput) {
-        const existingUser = await getUserRepo().findOneBy({ email: input.email });
-        if (existingUser) {
-            throw new Error('Email already registered');
-        }
+        const { result, outboxId } = await AppDataSource.transaction(async (manager) => {
+            const userRepo = manager.getRepository(User);
+            const existingUser = await userRepo.findOneBy({ email: input.email });
+            if (existingUser) {
+                throw new Error('Email already registered');
+            }
 
-        const hashedPassword = await hashPassword(input.password);
+            const hashedPassword = await hashPassword(input.password);
+            const newUser = userRepo.create({
+                email: input.email,
+                password: hashedPassword,
+                full_name: input.full_name,
+                user_type: input.user_type,
+            });
 
-        const newUser = getUserRepo().create({
-            email: input.email,
-            password: hashedPassword,
-            full_name: input.full_name,
-            user_type: input.user_type,
+            await userRepo.save(newUser);
+            const tokens = await this.issueSessionTokens(newUser, undefined, manager);
+            const outbox = await this.queueVerificationEmail(newUser, manager);
+
+            return {
+                result: {
+                    ...tokens,
+                    verification_delivery: 'queued',
+                    user: this.buildAuthUser(newUser),
+                },
+                outboxId: outbox.id,
+            };
         });
 
-        await getUserRepo().save(newUser);
+        void emailOutboxService.processRecord(outboxId).catch((error) => {
+            console.error('Failed to process verification email outbox record:', error);
+        });
 
-        const tokens = await this.issueSessionTokens(newUser);
-
-        try {
-            // P1-1: Send verification email directly after successful creation
-            await this.sendVerificationEmail(newUser.id);
-        } catch (emailError) {
-            console.error('Failed to auto-send verification email:', emailError);
-        }
-
-        return {
-            ...tokens,
-            user: this.buildAuthUser(newUser),
-        };
+        return result;
     }
 
     async login(input: LoginInput) {
@@ -129,21 +175,15 @@ class AuthService {
         if (!user) throw new Error('User not found');
         if (user.is_email_verified) throw new Error('Email is already verified');
 
-        const tokenRepo = AppDataSource.getRepository(EmailVerificationToken);
-        await tokenRepo.delete({ user_id: userId });
-
-        const code = generateCode();
-        const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
-
-        const tokenEntity = tokenRepo.create({
-            user_id: userId,
-            token: code,
-            expires_at: expiresAt
+        const outbox = await AppDataSource.transaction(async (manager) => {
+            return this.queueVerificationEmail(user, manager);
         });
-        await tokenRepo.save(tokenEntity);
 
-        await emailService.sendVerificationEmail(user.email, code);
-        return { message: 'Verification email sent' };
+        void emailOutboxService.processRecord(outbox.id).catch((error) => {
+            console.error('Failed to process verification email outbox record:', error);
+        });
+
+        return { message: 'Verification email queued', delivery_status: 'queued' };
     }
 
     async verifyEmail(userId: string, token: string) {
@@ -167,21 +207,15 @@ class AuthService {
             return { message: 'If the email exists, a reset code has been sent' };
         }
 
-        const tokenRepo = AppDataSource.getRepository(PasswordResetToken);
-        await tokenRepo.delete({ user_id: user.id });
-
-        const code = generateCode();
-        const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
-
-        const tokenEntity = tokenRepo.create({
-            user_id: user.id,
-            token: code,
-            expires_at: expiresAt
+        const outbox = await AppDataSource.transaction(async (manager) => {
+            return this.queuePasswordResetEmail(user, manager);
         });
-        await tokenRepo.save(tokenEntity);
 
-        await emailService.sendPasswordResetEmail(user.email, code);
-        return { message: 'If the email exists, a reset code has been sent' };
+        void emailOutboxService.processRecord(outbox.id).catch((error) => {
+            console.error('Failed to process password reset email outbox record:', error);
+        });
+
+        return { message: 'If the email exists, a reset code has been queued', delivery_status: 'queued' };
     }
 
     async completeOnboarding(userId: string, data: any) {
@@ -283,14 +317,7 @@ class AuthService {
             throw new Error('User not found');
         }
 
-        const storedRefreshToken = await refreshTokenStore.getRefreshToken(
-            payload.user_id,
-            payload.session_id
-        );
-
-        if (!storedRefreshToken || storedRefreshToken !== presentedRefreshToken) {
-            throw new Error('Refresh token revoked or rotated');
-        }
+        await authSessionService.validateRefreshSession(payload, presentedRefreshToken);
 
         const tokens = await this.issueSessionTokens(user, payload.session_id);
 
@@ -306,7 +333,7 @@ class AuthService {
 
         try {
             const payload = verifyRefreshToken(refreshToken);
-            await refreshTokenStore.revokeRefreshToken(payload.user_id, payload.session_id);
+            await authSessionService.revokeRefreshSession(payload.user_id, payload.session_id);
         } catch {
             // Allow logout to stay idempotent even if refresh token is already expired or invalid.
         }

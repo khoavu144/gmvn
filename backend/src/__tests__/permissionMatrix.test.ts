@@ -15,7 +15,7 @@ describe('Permission Matrix: canCreateProgram', () => {
     let mockCount: jest.Mock;
 
     beforeEach(() => {
-        req = { user: {} as any };
+        req = { user: {} as any, id: 'req-test' };
         res = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn()
@@ -50,7 +50,9 @@ describe('Permission Matrix: canCreateProgram', () => {
         expect(res.status).toHaveBeenCalledWith(403);
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
             success: false,
-            error: expect.stringContaining('must be a trainer or a verified athlete')
+            error: expect.objectContaining({
+                message: expect.stringContaining('must be a trainer or a verified athlete')
+            })
         }));
         expect(next).not.toHaveBeenCalled();
     });
@@ -66,8 +68,8 @@ describe('Permission Matrix: canCreateProgram', () => {
         expect(res.status).not.toHaveBeenCalled();
     });
 
-    it('should deny normal member', async () => {
-        req.user = { user_type: 'member', user_id: '4' } as any;
+    it('should deny normal user', async () => {
+        req.user = { user_type: 'user', user_id: '4' } as any;
 
         await canCreateProgram(req as Request, res as Response, next);
 

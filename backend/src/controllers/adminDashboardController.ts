@@ -6,8 +6,8 @@ import { FinancialTransaction } from '../entities/FinancialTransaction';
 import { User } from '../entities/User';
 import { UserProfileSection } from '../entities/UserProfileSection';
 import { GymCenter } from '../entities/GymCenter';
-import { refreshTokenStore } from '../services/refreshTokenStore';
 import { listGoogleFormImportLogs } from '../services/googleFormIngestService';
+import { systemHealthService } from '../services/systemHealthService';
 
 export const getAuditLogs = async (req: Request, res: Response) => {
     try {
@@ -80,21 +80,24 @@ export const getSystemHealth = async (_req: Request, res: Response) => {
     try {
         const userCount = await AppDataSource.getRepository(User).count();
         const gymCount = await AppDataSource.getRepository(GymCenter).count();
-        const redisHealthy = await refreshTokenStore.ping();
+        const snapshot = await systemHealthService.getSnapshot();
         res.status(200).json({
             success: true,
-            status: redisHealthy ? 'OK' : 'DEGRADED',
-            timestamp: new Date().toISOString(),
+            ...snapshot,
             db: {
                 users: userCount,
                 gyms: gymCount
             },
-            redis: {
-                connected: redisHealthy
-            }
         });
     } catch (error: any) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(500).json({
+            success: false,
+            error: {
+                message: error.message,
+                code: 'ADMIN_HEALTH_ERROR',
+            },
+            requestId: _req.id,
+        });
     }
 };
 
