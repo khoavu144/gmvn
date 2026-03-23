@@ -4,6 +4,8 @@ import { getEnv } from './config/env';
 import { runPendingMigrations } from './services/sqlMigrationService';
 import { refreshTokenStore } from './services/refreshTokenStore';
 import { emailOutboxService } from './services/emailOutboxService';
+import { opsWatchdogService } from './services/opsWatchdogService';
+import { sentryService } from './services/sentryService';
 
 const bootstrap = async () => {
     try {
@@ -54,10 +56,23 @@ const bootstrap = async () => {
         await runEmailOutboxWorker();
         setInterval(runEmailOutboxWorker, 60_000).unref();
 
+        const runOpsWatchdog = async () => {
+            try {
+                await opsWatchdogService.runCheck();
+            } catch (error) {
+                console.error('❌ Ops watchdog failed:', error);
+            }
+        };
+        await runOpsWatchdog();
+        setInterval(runOpsWatchdog, 60_000).unref();
+
         httpServer.listen(env.PORT, async () => {
             console.log(`🚀 Server running on port ${env.PORT}`);
             console.log(`📡 API: http://localhost:${env.PORT}/api/v1`);
             console.log('💬 Socket.io enabled');
+            if (sentryService.isEnabled()) {
+                console.log('🛰️ Sentry transport enabled');
+            }
 
             if (!redisConnected) {
                 console.warn('⚠️ Application is running in degraded mode without Redis.');
@@ -76,6 +91,11 @@ const bootstrap = async () => {
         });
     } catch (error) {
         console.error('❌ Server boot failed:', error);
+        void sentryService.captureException(error, {
+            tags: {
+                phase: 'bootstrap',
+            },
+        });
         process.exit(1);
     }
 };

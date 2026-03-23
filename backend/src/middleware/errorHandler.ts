@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/AppError';
 import { logger } from '../utils/logger';
+import { sentryService } from '../services/sentryService';
 
 export const errorHandler = (
     err: Error,
@@ -9,10 +10,22 @@ export const errorHandler = (
     _next: NextFunction
 ) => {
     const reqLogger = (req as any).logger || logger;
+    const sentryContext = {
+        requestId: req.id,
+        userId: req.user?.user_id,
+        tags: {
+            path: req.path,
+            method: req.method,
+        },
+        extra: {
+            originalUrl: req.originalUrl || req.url,
+        },
+    };
 
     if (err instanceof AppError) {
         if (err.statusCode >= 500) {
             reqLogger.error(`${err.message}\n${err.stack}`);
+            void sentryService.captureException(err, sentryContext);
         } else {
             reqLogger.warn(`${err.message}`);
         }
@@ -30,6 +43,7 @@ export const errorHandler = (
 
     // Unhandled errors
     reqLogger.error(`Unhandled Error: ${err.message}\n${err.stack}`);
+    void sentryService.captureException(err, sentryContext);
     const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
 
     res.status(statusCode).json({

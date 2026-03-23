@@ -134,18 +134,25 @@ export const listAllPlatformSubs = asyncHandler(async (req: Request, res: Respon
 });
 
 export const listCheckoutIntents = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const page = parseInt(String(req.query.page ?? '1'), 10);
-    const limit = parseInt(String(req.query.limit ?? '50'), 10);
+    const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10) || 50));
     const status = typeof req.query.status === 'string' ? req.query.status : undefined;
-    const result = await platformSubscriptionService.listCheckoutIntents(page, limit, { status });
+    const plan = typeof req.query.plan === 'string' ? req.query.plan : undefined;
+    const q = typeof req.query.q === 'string' ? req.query.q.trim() : undefined;
+    const result = await platformSubscriptionService.listCheckoutIntents(page, limit, { status, plan, q });
     res.json({ success: true, ...result });
 });
 
 export const listWebhookEvents = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const page = parseInt(String(req.query.page ?? '1'), 10);
-    const limit = parseInt(String(req.query.limit ?? '50'), 10);
+    const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10) || 50));
     const status = typeof req.query.status === 'string' ? req.query.status : undefined;
-    const result = await platformSubscriptionService.listWebhookEvents(page, limit, { status });
+    const q = typeof req.query.q === 'string' ? req.query.q.trim() : undefined;
+    const from = typeof req.query.from === 'string' ? new Date(req.query.from) : undefined;
+    const to = typeof req.query.to === 'string' ? new Date(req.query.to) : undefined;
+    const safeFrom = from && !Number.isNaN(from.getTime()) ? from : undefined;
+    const safeTo = to && !Number.isNaN(to.getTime()) ? to : undefined;
+    const result = await platformSubscriptionService.listWebhookEvents(page, limit, { status, q, from: safeFrom, to: safeTo });
     res.json({ success: true, ...result });
 });
 

@@ -113,3 +113,6 @@ jobs:
 
       - name: Mobile smoke
         run: npx playwright test e2e/mobile-interactions.spec.ts --project=mobile-chrome --project=mobile-safari
+
+      - name: Mobile critical deterministic
+        run: npx playwright test e2e/mobile-critical.spec.ts --project=mobile-chrome --project=mobile-safari

@@ -107,6 +107,35 @@ class EmailOutboxService {
         });
     }
 
+    async getOpsSummary() {
+        const repo = this.getRepo();
+        const now = new Date();
+        const [pendingReady, failedTotal, processingCount] = await Promise.all([
+            repo.count({
+                where: {
+                    status: In(['pending', 'failed']),
+                    next_attempt_at: LessThanOrEqual(now),
+                },
+            }),
+            repo.count({
+                where: {
+                    status: 'failed',
+                },
+            }),
+            repo.count({
+                where: {
+                    status: 'processing',
+                },
+            }),
+        ]);
+
+        return {
+            pending_ready: pendingReady,
+            failed_total: failedTotal,
+            processing: processingCount,
+        };
+    }
+
     async list(page: number = 1, limit: number = 50, filters?: { status?: string; emailType?: string }) {
         const repo = this.getRepo();
         const qb = repo.createQueryBuilder('email')

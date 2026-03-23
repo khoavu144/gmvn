@@ -12,6 +12,7 @@ import {
     getUserProfileCatalogExport,
 } from '../controllers/adminDashboardController';
 import {
+    getBillingOpsOverview,
     listEmailOutbox,
     resendVerificationForUser,
     retryEmailOutboxRecord,
@@ -32,6 +33,7 @@ router.get('/transactions', getFinancialTransactions);
 router.get('/health', getSystemHealth);
 router.get('/form-imports', getGoogleFormImportLogs);
 router.get('/catalog-export', getUserProfileCatalogExport);
+router.get('/billing-ops/overview', getBillingOpsOverview);
 router.get('/email-outbox', listEmailOutbox);
 router.post('/email-outbox/:id/retry', retryEmailOutboxRecord);
 router.post('/users/:userId/resend-verification', resendVerificationForUser);

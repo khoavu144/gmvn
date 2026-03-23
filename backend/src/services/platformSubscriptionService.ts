@@ -386,7 +386,11 @@ class PlatformSubscriptionService {
         };
     }
 
-    async listCheckoutIntents(page: number = 1, limit: number = 50, filters?: { status?: string }) {
+    async listCheckoutIntents(
+        page: number = 1,
+        limit: number = 50,
+        filters?: { status?: string; plan?: string; q?: string },
+    ) {
         const qb = this.checkoutRepo.createQueryBuilder('intent')
             .leftJoinAndSelect('intent.user', 'user')
             .orderBy('intent.created_at', 'DESC')
@@ -395,6 +399,17 @@ class PlatformSubscriptionService {
 
         if (filters?.status) {
             qb.andWhere('intent.status = :status', { status: filters.status });
+        }
+
+        if (filters?.plan) {
+            qb.andWhere('intent.plan = :plan', { plan: filters.plan });
+        }
+
+        if (filters?.q) {
+            qb.andWhere(
+                `(intent.transfer_content ILIKE :q OR intent.provider_transaction_id ILIKE :q OR user.email ILIKE :q OR user.full_name ILIKE :q)`,
+                { q: `%${filters.q}%` },
+            );
         }
 
         const [intents, total] = await qb.getManyAndCount();
@@ -424,7 +439,11 @@ class PlatformSubscriptionService {
         };
     }
 
-    async listWebhookEvents(page: number = 1, limit: number = 50, filters?: { status?: string }) {
+    async listWebhookEvents(
+        page: number = 1,
+        limit: number = 50,
+        filters?: { status?: string; q?: string; from?: Date; to?: Date },
+    ) {
         const qb = this.webhookRepo.createQueryBuilder('event')
             .orderBy('event.received_at', 'DESC')
             .skip((page - 1) * limit)
@@ -434,12 +453,84 @@ class PlatformSubscriptionService {
             qb.andWhere('event.status = :status', { status: filters.status });
         }
 
+        if (filters?.q) {
+            qb.andWhere(
+                `(event.provider_transaction_id ILIKE :q OR event.transfer_content ILIKE :q OR event.error_message ILIKE :q)`,
+                { q: `%${filters.q}%` },
+            );
+        }
+
+        if (filters?.from) {
+            qb.andWhere('event.received_at >= :from', { from: filters.from });
+        }
+
+        if (filters?.to) {
+            qb.andWhere('event.received_at <= :to', { to: filters.to });
+        }
+
         const [events, total] = await qb.getManyAndCount();
         return {
             events,
             total,
             page,
             totalPages: Math.max(1, Math.ceil(total / limit)),
+        };
+    }
+
+    async getOpsOverview(windowMinutes: number = 60) {
+        const now = new Date();
+        const windowStart = new Date(now.getTime() - windowMinutes * 60_000);
+        const stalePendingBefore = new Date(now.getTime() - 30 * 60_000);
+
+        const [
+            pendingIntents,
+            stalePendingIntents,
+            paidWithoutSubscription,
+            receivedWebhookCount,
+            failedWebhookCount,
+            processedWebhookCount,
+        ] = await Promise.all([
+            this.checkoutRepo.count({ where: { status: 'pending' } }),
+            this.checkoutRepo
+                .createQueryBuilder('intent')
+                .where('intent.status = :status', { status: 'pending' })
+                .andWhere('intent.created_at <= :stalePendingBefore', { stalePendingBefore })
+                .getCount(),
+            this.checkoutRepo
+                .createQueryBuilder('intent')
+                .leftJoin(PlatformSubscription, 'sub', 'sub.sepay_transaction_id = intent.provider_transaction_id')
+                .where('intent.status = :status', { status: 'paid' })
+                .andWhere('intent.provider_transaction_id IS NOT NULL')
+                .andWhere('sub.id IS NULL')
+                .getCount(),
+            this.webhookRepo
+                .createQueryBuilder('event')
+                .where('event.received_at >= :windowStart', { windowStart })
+                .getCount(),
+            this.webhookRepo
+                .createQueryBuilder('event')
+                .where('event.received_at >= :windowStart', { windowStart })
+                .andWhere('event.status = :status', { status: 'failed' })
+                .getCount(),
+            this.webhookRepo
+                .createQueryBuilder('event')
+                .where('event.received_at >= :windowStart', { windowStart })
+                .andWhere('event.status = :status', { status: 'processed' })
+                .getCount(),
+        ]);
+
+        return {
+            window_minutes: windowMinutes,
+            checkout: {
+                pending: pendingIntents,
+                stale_pending: stalePendingIntents,
+                paid_without_subscription: paidWithoutSubscription,
+            },
+            webhooks: {
+                received_last_window: receivedWebhookCount,
+                failed_last_window: failedWebhookCount,
+                processed_last_window: processedWebhookCount,
+            },
         };
     }
 

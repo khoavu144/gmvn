@@ -20,7 +20,8 @@ export default class ErrorBoundary extends Component<Props, State> {
     }
 
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        logger.error(`ErrorBoundary (${this.props.scope || 'app'})`, error, errorInfo);
+        logger.error(error);
+        logger.error(`ErrorBoundary (${this.props.scope || 'app'})`, errorInfo.componentStack);
     }
 
     private handleRetry = () => {
