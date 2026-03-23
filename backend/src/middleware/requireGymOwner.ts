@@ -1,6 +1,7 @@
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { RequestHandler } from 'express';
 import { AppDataSource } from '../config/database';
 import { User } from '../entities/User';
+import { AppError } from '../utils/AppError';
 
 /**
  * Middleware: chỉ cho phép user có user_type='gym_owner' VÀ gym_owner_status='approved'
@@ -10,10 +11,7 @@ export const gymOwnerOnly: RequestHandler = async (req, res, next) => {
     const userType = req.user?.user_type;
 
     if (!userId || userType !== 'gym_owner') {
-        res.status(403).json({
-            success: false,
-            error: 'Chỉ Gym Owner mới có quyền thực hiện thao tác này'
-        });
+        next(new AppError('Chỉ Gym Owner mới có quyền thực hiện thao tác này', 403, 'GYM_OWNER_REQUIRED'));
         return;
     }
 
@@ -23,21 +21,22 @@ export const gymOwnerOnly: RequestHandler = async (req, res, next) => {
         const user = await userRepo.findOne({ where: { id: userId } });
 
         if (!user) {
-            res.status(401).json({ success: false, error: 'User không tồn tại' });
+            next(new AppError('User không tồn tại', 401, 'USER_NOT_FOUND'));
             return;
         }
 
         if (user.gym_owner_status !== 'approved') {
-            res.status(403).json({
-                success: false,
-                error: 'Tài khoản Gym Owner chưa được duyệt',
-                gym_owner_status: user.gym_owner_status,
-            });
+            next(new AppError(
+                'Tài khoản Gym Owner chưa được duyệt',
+                403,
+                'GYM_OWNER_NOT_APPROVED',
+                { gym_owner_status: user.gym_owner_status },
+            ));
             return;
         }
 
         next();
     } catch (error) {
-        res.status(500).json({ success: false, error: 'Internal server error' });
+        next(new AppError('Internal server error', 500, 'GYM_OWNER_GUARD_ERROR'));
     }
 };

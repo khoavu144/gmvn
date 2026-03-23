@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { RootState } from '../store/store';
 import apiClient from '../services/api';
 import { trackEvent } from '../lib/analytics';
+import { extractApiErrorMessage } from '../lib/apiErrors';
 import { SITE_OG_IMAGE, SITE_ORIGIN, SITE_TWITTER_HANDLE } from '../lib/site';
 
 type PlanKey = 'free' | 'coach_pro' | 'coach_elite' | 'athlete_premium' | 'gym_business';
@@ -229,7 +230,7 @@ export default function PricingPage() {
                 plan: res.data.plan,
             });
         } catch (err: any) {
-            setError(err?.response?.data?.error ?? 'Lỗi khi tạo đơn thanh toán');
+            setError(extractApiErrorMessage(err, 'Lỗi khi tạo đơn thanh toán'));
         } finally {
             setUpgradeLoading(null);
         }

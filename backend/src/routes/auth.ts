@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import { authController } from '../controllers/authController';
 import { getEnv } from '../config/env';
@@ -18,6 +18,19 @@ import {
 const router = Router();
 const env = getEnv();
 const isDev = env.NODE_ENV !== 'production';
+const rateLimitHandler = (message: string, code: string) => (
+    req: Request,
+    res: Response,
+) => {
+    res.status(429).json({
+        success: false,
+        error: {
+            message,
+            code,
+        },
+        requestId: req.id,
+    });
+};
 
 const authAttemptLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -25,9 +38,10 @@ const authAttemptLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     skip: () => isDev && env.SKIP_RATE_LIMIT === 'true',
-    message: {
-        error: 'Too many authentication attempts. Please try again in 15 minutes.',
-    },
+    handler: rateLimitHandler(
+        'Too many authentication attempts. Please try again in 15 minutes.',
+        'AUTH_RATE_LIMITED',
+    ),
 });
 
 const refreshTokenLimiter = rateLimit({
@@ -36,9 +50,10 @@ const refreshTokenLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     skip: () => isDev && env.SKIP_RATE_LIMIT === 'true',
-    message: {
-        error: 'Too many token refresh attempts. Please try again in 15 minutes.',
-    },
+    handler: rateLimitHandler(
+        'Too many token refresh attempts. Please try again in 15 minutes.',
+        'REFRESH_RATE_LIMITED',
+    ),
 });
 
 // Public routes

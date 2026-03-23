@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { platformSubscriptionService, planSatisfies, PlatformPlan, PlanLimits, PLAN_CONFIG } from '../services/platformSubscriptionService';
+import { platformSubscriptionService, planSatisfies, PlatformPlan, PlanLimits } from '../services/platformSubscriptionService';
+import { AppError } from '../utils/AppError';
 
 /** Get user plan with request-level cache to avoid repeated DB queries */
 async function getCachedPlan(req: Request, userId: string): Promise<{ plan: PlatformPlan; limits: PlanLimits }> {
@@ -28,19 +29,19 @@ export const requirePlatformPlan = (minPlan: PlatformPlan) => {
             if (!billingEnabled) { next(); return; } // Master switch OFF → no limits
 
             const userId = req.user?.user_id;
-            if (!userId) { res.status(401).json({ error: 'Authentication required' }); return; }
+            if (!userId) { next(new AppError('Authentication required', 401, 'AUTHENTICATION_REQUIRED')); return; }
 
             const { plan } = await getCachedPlan(req, userId);
             if (planSatisfies(plan, minPlan)) { next(); return; }
 
-            res.status(402).json({
-                error: 'Tính năng yêu cầu gói trả phí',
-                required_plan: minPlan,
-                current_plan: plan,
-                upgrade_url: '/pricing',
-            });
+            next(new AppError(
+                'Tính năng yêu cầu gói trả phí',
+                402,
+                'PLAN_UPGRADE_REQUIRED',
+                { required_plan: minPlan, current_plan: plan, upgrade_url: '/pricing' },
+            ));
         } catch (err: any) {
-            res.status(500).json({ error: err.message });
+            next(new AppError(err.message, 500, 'PLAN_GUARD_ERROR'));
         }
     };
 };
@@ -66,13 +67,14 @@ export const requireProgramLimit = async (req: Request, res: Response, next: Nex
 
         if (count < limits.maxPrograms) { next(); return; }
 
-        res.status(402).json({
-            error: `Gói miễn phí giới hạn tối đa ${limits.maxPrograms} chương trình. Nâng cấp để tạo thêm.`,
-            required_plan: 'coach_pro',
-            upgrade_url: '/pricing',
-        });
+        next(new AppError(
+            `Gói miễn phí giới hạn tối đa ${limits.maxPrograms} chương trình. Nâng cấp để tạo thêm.`,
+            402,
+            'PROGRAM_LIMIT_REACHED',
+            { required_plan: 'coach_pro', upgrade_url: '/pricing' },
+        ));
     } catch (err: any) {
-        res.status(500).json({ error: err.message });
+        next(new AppError(err.message, 500, 'PROGRAM_LIMIT_GUARD_ERROR'));
     }
 };
 
@@ -98,13 +100,13 @@ export const requireBranchLimit = async (req: Request, res: Response, next: Next
         const count = await AppDataSource.getRepository(GymBranch).countBy({ gym_center_id: center.id });
         if (count < limits.maxBranches) { next(); return; }
 
-        res.status(402).json({
-            error: `Gói Starter giới hạn ${limits.maxBranches} chi nhánh. Nâng cấp Gym Business để thêm.`,
-            required_plan: 'gym_business',
-            upgrade_url: '/pricing',
-        });
+        next(new AppError(
+            `Gói Starter giới hạn ${limits.maxBranches} chi nhánh. Nâng cấp Gym Business để thêm.`,
+            402,
+            'BRANCH_LIMIT_REACHED',
+            { required_plan: 'gym_business', upgrade_url: '/pricing' },
+        ));
     } catch (err: any) {
-        res.status(500).json({ error: err.message });
+        next(new AppError(err.message, 500, 'BRANCH_LIMIT_GUARD_ERROR'));
     }
 };
-

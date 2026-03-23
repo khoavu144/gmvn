@@ -1,6 +1,7 @@
 import { AppDataSource } from '../config/database';
 import { PlatformSubscription, PlatformPlan } from '../entities/PlatformSubscription';
 import { PlatformCheckoutIntent } from '../entities/PlatformCheckoutIntent';
+import { PlatformWebhookEvent, PlatformWebhookEventStatus } from '../entities/PlatformWebhookEvent';
 import { AppSetting } from '../entities/AppSetting';
 import { User } from '../entities/User';
 import redisClient from '../config/redis';
@@ -79,6 +80,7 @@ const CACHE_TTL_MS = 60_000; // 1 minute
 class PlatformSubscriptionService {
     private get repo() { return AppDataSource.getRepository(PlatformSubscription); }
     private get checkoutRepo() { return AppDataSource.getRepository(PlatformCheckoutIntent); }
+    private get webhookRepo() { return AppDataSource.getRepository(PlatformWebhookEvent); }
     private get settingsRepo() { return AppDataSource.getRepository(AppSetting); }
     private get userRepo() { return AppDataSource.getRepository(User); }
 
@@ -183,6 +185,39 @@ class PlatformSubscriptionService {
             checkout_intent_id: intent.id,
             expires_at: intent.expires_at,
         };
+    }
+
+    async recordWebhookEvent(input: {
+        provider?: string;
+        providerTransactionId?: string | null;
+        transferContent?: string | null;
+        signature?: string | null;
+        payload: Record<string, unknown>;
+        metadata?: Record<string, unknown>;
+    }) {
+        return this.webhookRepo.save(this.webhookRepo.create({
+            provider: input.provider ?? 'sepay',
+            provider_transaction_id: input.providerTransactionId ?? null,
+            transfer_content: input.transferContent ?? null,
+            signature: input.signature ?? null,
+            payload: input.payload,
+            metadata: input.metadata ?? {},
+            status: 'received',
+            received_at: new Date(),
+        }));
+    }
+
+    async finalizeWebhookEvent(id: string, status: PlatformWebhookEventStatus, metadata?: Record<string, unknown>, errorMessage?: string | null) {
+        const event = await this.webhookRepo.findOneBy({ id });
+        if (!event) {
+            return;
+        }
+
+        event.status = status;
+        event.metadata = metadata ?? {};
+        event.error_message = errorMessage ?? null;
+        event.processed_at = new Date();
+        await this.webhookRepo.save(event);
     }
 
     async activateFromWebhook(content: string, transactionId: string, amount: number) {
@@ -348,6 +383,63 @@ class PlatformSubscriptionService {
                 user: { id: s.user.id, full_name: s.user.full_name, email: s.user.email, user_type: s.user.user_type },
             })),
             total,
+        };
+    }
+
+    async listCheckoutIntents(page: number = 1, limit: number = 50, filters?: { status?: string }) {
+        const qb = this.checkoutRepo.createQueryBuilder('intent')
+            .leftJoinAndSelect('intent.user', 'user')
+            .orderBy('intent.created_at', 'DESC')
+            .skip((page - 1) * limit)
+            .take(limit);
+
+        if (filters?.status) {
+            qb.andWhere('intent.status = :status', { status: filters.status });
+        }
+
+        const [intents, total] = await qb.getManyAndCount();
+        return {
+            intents: intents.map((intent) => ({
+                id: intent.id,
+                user_id: intent.user_id,
+                plan: intent.plan,
+                transfer_content: intent.transfer_content,
+                amount: Number(intent.amount),
+                status: intent.status,
+                provider_transaction_id: intent.provider_transaction_id,
+                expires_at: intent.expires_at,
+                paid_at: intent.paid_at,
+                created_at: intent.created_at,
+                metadata: intent.metadata,
+                user: intent.user ? {
+                    id: intent.user.id,
+                    full_name: intent.user.full_name,
+                    email: intent.user.email,
+                    user_type: intent.user.user_type,
+                } : null,
+            })),
+            total,
+            page,
+            totalPages: Math.max(1, Math.ceil(total / limit)),
+        };
+    }
+
+    async listWebhookEvents(page: number = 1, limit: number = 50, filters?: { status?: string }) {
+        const qb = this.webhookRepo.createQueryBuilder('event')
+            .orderBy('event.received_at', 'DESC')
+            .skip((page - 1) * limit)
+            .take(limit);
+
+        if (filters?.status) {
+            qb.andWhere('event.status = :status', { status: filters.status });
+        }
+
+        const [events, total] = await qb.getManyAndCount();
+        return {
+            events,
+            total,
+            page,
+            totalPages: Math.max(1, Math.ceil(total / limit)),
         };
     }
 

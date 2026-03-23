@@ -55,7 +55,7 @@ describe('Auth API /api/v1/auth', () => {
             expect(response.status).toBe(409);
             expect(response.body.success).toBe(false);
             expect(response.body.error.message).toBe('Email already registered');
-            expect(response.body.error.code).toBe('Error');
+            expect(response.body.error.code).toBe('EMAIL_ALREADY_REGISTERED');
         });
 
         it('should return 400 validation error if missing fields', async () => {
@@ -104,6 +104,7 @@ describe('Auth API /api/v1/auth', () => {
             expect(response.status).toBe(401);
             expect(response.body.success).toBe(false);
             expect(response.body.error.message).toBe('Invalid email or password');
+            expect(response.body.error.code).toBe('INVALID_CREDENTIALS');
         });
     });
 
@@ -146,6 +147,7 @@ describe('Auth API /api/v1/auth', () => {
 
             expect(response.status).toBe(401);
             expect(response.body.error.message).toContain('jwt expired');
+            expect(response.body.error.code).toBe('INVALID_REFRESH_TOKEN');
         });
     });
 

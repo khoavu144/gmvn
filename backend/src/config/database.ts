@@ -59,6 +59,7 @@ import { PasswordResetToken } from '../entities/PasswordResetToken';
 import { CoachApplication } from '../entities/CoachApplication';
 import { PlatformSubscription } from '../entities/PlatformSubscription';
 import { PlatformCheckoutIntent } from '../entities/PlatformCheckoutIntent';
+import { PlatformWebhookEvent } from '../entities/PlatformWebhookEvent';
 import { AppSetting } from '../entities/AppSetting';
 
 // Product Marketplace Entities
@@ -147,6 +148,7 @@ export const AppDataSource = new DataSource({
         // Platform Subscription (Free/Pro/Elite tiers)
         PlatformSubscription,
         PlatformCheckoutIntent,
+        PlatformWebhookEvent,
         AppSetting,
         // Product Marketplace
         ProductCategory,

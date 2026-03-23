@@ -7,6 +7,7 @@ import { authApi } from '../services/auth';
 import type { RootState } from '../store/store';
 import { Button } from '../components/ui/Button';
 import { trackEvent } from '../lib/analytics';
+import { extractApiErrorMessage } from '../lib/apiErrors';
 
 export default function Register() {
     const navigate = useNavigate();
@@ -87,9 +88,7 @@ export default function Register() {
                 navigate('/verify-email');
             }
         } catch (err: any) {
-            setError(
-                err.response?.data?.error || 'Registration failed. Please try again.'
-            );
+            setError(extractApiErrorMessage(err, 'Registration failed. Please try again.'));
             dispatch(setLoading(false));
             setStep(1); // Go back to step 1 on error
         } finally {

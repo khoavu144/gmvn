@@ -11,7 +11,7 @@ export const authController = {
             return res.status(201).json({ success: true, data: result });
         } catch (error: any) {
             if (error.message === 'Email already registered') {
-                throw new AppError(error.message, 409);
+                throw new AppError(error.message, 409, 'EMAIL_ALREADY_REGISTERED');
             }
             throw error; // Will be caught by asyncHandler -> 500 Error Handler
         }
@@ -22,7 +22,7 @@ export const authController = {
             const result = await authService.login(req.body);
             return res.status(200).json({ success: true, data: result });
         } catch (error: any) {
-            throw new AppError(error.message || 'Invalid email or password', 401);
+            throw new AppError(error.message || 'Invalid email or password', 401, 'INVALID_CREDENTIALS');
         }
     }),
 
@@ -33,7 +33,7 @@ export const authController = {
             const result = await authService.refreshToken(payload, refresh_token);
             return res.status(200).json({ success: true, data: result });
         } catch (error: any) {
-            throw new AppError(error.message || 'Invalid refresh token', 401);
+            throw new AppError(error.message || 'Invalid refresh token', 401, 'INVALID_REFRESH_TOKEN');
         }
     }),
 
@@ -48,7 +48,7 @@ export const authController = {
             const profile = await authService.getProfile(userId);
             return res.status(200).json({ success: true, data: profile });
         } catch (error: any) {
-            throw new AppError(error.message || 'User not found', 404);
+            throw new AppError(error.message || 'User not found', 404, 'USER_NOT_FOUND');
         }
     }),
 
@@ -63,7 +63,7 @@ export const authController = {
             const result = await authService.verifyEmail(req.user!.user_id, token);
             res.status(200).json({ success: true, data: result });
         } catch (error: any) {
-            throw new AppError(error.message || 'Verification failed', 400);
+            throw new AppError(error.message || 'Verification failed', 400, 'VERIFY_EMAIL_FAILED');
         }
     }),
 
@@ -82,7 +82,7 @@ export const authController = {
             const result = await authService.resetPassword(req.body);
             res.status(200).json({ success: true, data: result });
         } catch (error: any) {
-            throw new AppError(error.message || 'Reset password failed', 400);
+            throw new AppError(error.message || 'Reset password failed', 400, 'RESET_PASSWORD_FAILED');
         }
     }),
 };

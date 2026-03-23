@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import apiClient from '../services/api';
 import { Button } from '../components/ui/Button';
+import { extractApiErrorMessage } from '../lib/apiErrors';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -22,7 +23,7 @@ export default function ForgotPassword() {
       await apiClient.post('/auth/forgot-password', { email });
       setSuccess('Nếu email có trong hệ thống, chúng tôi đã gửi mã khôi phục cho bạn. Vui lòng kiểm tra hộp thư (và thư mục rác).');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Không thể gửi yêu cầu');
+      setError(extractApiErrorMessage(err, 'Không thể gửi yêu cầu'));
     } finally {
       setLoading(false);
     }

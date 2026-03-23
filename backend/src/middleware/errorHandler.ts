@@ -21,7 +21,8 @@ export const errorHandler = (
             success: false,
             error: {
                 message: err.message,
-                code: err.name || 'API_ERROR',
+                code: err.code || err.name || 'API_ERROR',
+                ...(err.details !== undefined ? { details: err.details } : {}),
             },
             requestId: req.id,
         });

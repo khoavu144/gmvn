@@ -11,6 +11,11 @@ import {
     getGoogleFormImportLogs,
     getUserProfileCatalogExport,
 } from '../controllers/adminDashboardController';
+import {
+    listEmailOutbox,
+    resendVerificationForUser,
+    retryEmailOutboxRecord,
+} from '../controllers/adminSupportController';
 
 const router = Router();
 
@@ -27,5 +32,8 @@ router.get('/transactions', getFinancialTransactions);
 router.get('/health', getSystemHealth);
 router.get('/form-imports', getGoogleFormImportLogs);
 router.get('/catalog-export', getUserProfileCatalogExport);
+router.get('/email-outbox', listEmailOutbox);
+router.post('/email-outbox/:id/retry', retryEmailOutboxRecord);
+router.post('/users/:userId/resend-verification', resendVerificationForUser);
 
 export default router;

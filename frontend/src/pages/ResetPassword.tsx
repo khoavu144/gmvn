@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../services/api';
+import { extractApiErrorMessage } from '../lib/apiErrors';
 
 export default function ResetPassword() {
   const [email, setEmail] = useState('');
@@ -29,7 +30,7 @@ export default function ResetPassword() {
       setSuccess('Đặt lại mật khẩu thành công. Vui lòng đăng nhập.');
       setTimeout(() => navigate('/login'), 2000);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Đặt lại mật khẩu thất bại');
+      setError(extractApiErrorMessage(err, 'Đặt lại mật khẩu thất bại'));
     } finally {
       setLoading(false);
     }

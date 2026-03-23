@@ -9,6 +9,9 @@ import {
     getAdminBillingStatus,
     toggleAdminBilling,
     listAllPlatformSubs,
+    listCheckoutIntents,
+    listWebhookEvents,
+    reconcileBilling,
 } from '../controllers/platformSubscriptionController';
 
 const router = Router();
@@ -28,5 +31,8 @@ router.post('/webhook/sepay', sepayPlatformWebhook);
 router.get('/admin/billing', authenticate, adminOnly, getAdminBillingStatus);
 router.patch('/admin/billing', authenticate, adminOnly, toggleAdminBilling);
 router.get('/admin/subscriptions', authenticate, adminOnly, listAllPlatformSubs);
+router.get('/admin/checkout-intents', authenticate, adminOnly, listCheckoutIntents);
+router.get('/admin/webhook-events', authenticate, adminOnly, listWebhookEvents);
+router.post('/admin/reconcile', authenticate, adminOnly, reconcileBilling);
 
 export default router;

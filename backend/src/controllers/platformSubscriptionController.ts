@@ -51,43 +51,62 @@ export const sepayPlatformWebhook = asyncHandler(async (req: Request, res: Respo
     const signature = req.headers['x-sepay-signature'] as string;
     const apiKey = req.headers['authorization'];
     const secret = process.env.SEPAY_WEBHOOK_SECRET;
-
-    if (secret) {
-        if (signature) {
-            const rawBody = (req as any).rawBody;
-            if (!rawBody) {
-                throw new AppError('Missing raw body', 400);
-            }
-            const digest = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
-            if (signature !== digest) {
-                throw new AppError('Invalid signature', 401);
-            }
-        } else if (apiKey !== secret) {
-            throw new AppError('Unauthorized', 401);
-        }
-    }
-
-    const { content, amount, transaction_id } = req.body as {
+    const body = (req.body ?? {}) as {
         content?: string;
         amount?: number;
         transaction_id?: string;
     };
 
-    if (!content?.trim()) {
-        throw new AppError('Missing transfer content', 400);
+    const event = await platformSubscriptionService.recordWebhookEvent({
+        provider: 'sepay',
+        providerTransactionId: body.transaction_id ?? null,
+        transferContent: body.content ?? null,
+        signature: signature ?? null,
+        payload: body as Record<string, unknown>,
+    });
+
+    try {
+        if (secret) {
+            if (signature) {
+                const rawBody = (req as any).rawBody;
+                if (!rawBody) {
+                    throw new AppError('Missing raw body', 400, 'WEBHOOK_RAW_BODY_MISSING');
+                }
+                const digest = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+                if (signature !== digest) {
+                    throw new AppError('Invalid signature', 401, 'WEBHOOK_INVALID_SIGNATURE');
+                }
+            } else if (apiKey !== secret) {
+                throw new AppError('Unauthorized', 401, 'WEBHOOK_UNAUTHORIZED');
+            }
+        }
+
+        if (!body.content?.trim()) {
+            throw new AppError('Missing transfer content', 400, 'WEBHOOK_TRANSFER_CONTENT_REQUIRED');
+        }
+
+        if (!body.transaction_id?.trim()) {
+            throw new AppError('Missing transaction id', 400, 'WEBHOOK_TRANSACTION_ID_REQUIRED');
+        }
+
+        const result = await platformSubscriptionService.activateFromWebhook(
+            body.content,
+            body.transaction_id,
+            body.amount ?? 0,
+        );
+
+        await platformSubscriptionService.finalizeWebhookEvent(
+            event.id,
+            result.ignored ? 'ignored' : 'processed',
+            { result },
+        );
+
+        res.json({ success: true, ...result });
+    } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        await platformSubscriptionService.finalizeWebhookEvent(event.id, 'failed', { payload: body }, message);
+        throw error;
     }
-
-    if (!transaction_id?.trim()) {
-        throw new AppError('Missing transaction id', 400);
-    }
-
-    const result = await platformSubscriptionService.activateFromWebhook(
-        content,
-        transaction_id,
-        amount ?? 0,
-    );
-
-    res.json({ success: true, ...result });
 });
 
 // ── Admin: get billing status ──────────────────────────────────────────────
@@ -111,5 +130,26 @@ export const listAllPlatformSubs = asyncHandler(async (req: Request, res: Respon
     const page = parseInt(String(req.query.page ?? '1'), 10);
     const limit = parseInt(String(req.query.limit ?? '50'), 10);
     const result = await platformSubscriptionService.listAll(page, limit);
+    res.json({ success: true, ...result });
+});
+
+export const listCheckoutIntents = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const page = parseInt(String(req.query.page ?? '1'), 10);
+    const limit = parseInt(String(req.query.limit ?? '50'), 10);
+    const status = typeof req.query.status === 'string' ? req.query.status : undefined;
+    const result = await platformSubscriptionService.listCheckoutIntents(page, limit, { status });
+    res.json({ success: true, ...result });
+});
+
+export const listWebhookEvents = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const page = parseInt(String(req.query.page ?? '1'), 10);
+    const limit = parseInt(String(req.query.limit ?? '50'), 10);
+    const status = typeof req.query.status === 'string' ? req.query.status : undefined;
+    const result = await platformSubscriptionService.listWebhookEvents(page, limit, { status });
+    res.json({ success: true, ...result });
+});
+
+export const reconcileBilling = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
+    const result = await platformSubscriptionService.reconcileCheckoutIntents();
     res.json({ success: true, ...result });
 });

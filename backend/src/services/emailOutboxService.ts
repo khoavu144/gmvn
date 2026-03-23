@@ -106,6 +106,45 @@ class EmailOutboxService {
             },
         });
     }
+
+    async list(page: number = 1, limit: number = 50, filters?: { status?: string; emailType?: string }) {
+        const repo = this.getRepo();
+        const qb = repo.createQueryBuilder('email')
+            .leftJoinAndSelect('email.user', 'user')
+            .orderBy('email.created_at', 'DESC')
+            .skip((page - 1) * limit)
+            .take(limit);
+
+        if (filters?.status) {
+            qb.andWhere('email.status = :status', { status: filters.status });
+        }
+
+        if (filters?.emailType) {
+            qb.andWhere('email.email_type = :emailType', { emailType: filters.emailType });
+        }
+
+        const [items, total] = await qb.getManyAndCount();
+        return {
+            items,
+            total,
+            page,
+            totalPages: Math.max(1, Math.ceil(total / limit)),
+        };
+    }
+
+    async retryRecord(id: string) {
+        const repo = this.getRepo();
+        const record = await repo.findOne({ where: { id } });
+        if (!record) {
+            return null;
+        }
+
+        record.status = 'pending';
+        record.next_attempt_at = new Date();
+        record.last_error = null;
+        await repo.save(record);
+        return this.processRecord(record.id);
+    }
 }
 
 export const emailOutboxService = new EmailOutboxService();

@@ -13,13 +13,22 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction) =
 
     res.on('finish', () => {
         const duration = Date.now() - start;
-        const msg = `${req.method} ${req.originalUrl || req.url} ${res.statusCode} - ${duration}ms`;
+        const payload = {
+            method: req.method,
+            path: req.originalUrl || req.url,
+            statusCode: res.statusCode,
+            durationMs: duration,
+            ip: req.ip,
+            userAgent: req.headers['user-agent'],
+            userId: req.user?.user_id,
+        };
+
         if (res.statusCode >= 500) {
-            (req as any).logger.error(msg);
+            (req as any).logger.error('request_completed', { meta: payload });
         } else if (res.statusCode >= 400) {
-            (req as any).logger.warn(msg);
+            (req as any).logger.warn('request_completed', { meta: payload });
         } else {
-            (req as any).logger.info(msg);
+            (req as any).logger.info('request_completed', { meta: payload });
         }
     });
 

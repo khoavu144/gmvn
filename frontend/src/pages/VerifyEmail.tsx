@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import apiClient from '../services/api';
 import { trackEvent } from '../lib/analytics';
+import { extractApiErrorMessage } from '../lib/apiErrors';
 
 const RESEND_SECONDS = 45;
 
@@ -47,7 +48,7 @@ export default function VerifyEmail() {
             setSuccess('Xác thực thành công. Chúng tôi đang đưa bạn sang bước hoàn thiện hồ sơ.');
             window.setTimeout(() => navigate('/onboarding'), 900);
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Xác thực thất bại. Vui lòng thử lại.');
+            setError(extractApiErrorMessage(err, 'Xác thực thất bại. Vui lòng thử lại.'));
         } finally {
             setLoading(false);
         }
@@ -68,7 +69,7 @@ export default function VerifyEmail() {
             setSuccess('Mã xác thực mới đã được gửi. Hãy kiểm tra email của bạn.');
             setResendIn(RESEND_SECONDS);
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Không thể gửi lại email ngay lúc này.');
+            setError(extractApiErrorMessage(err, 'Không thể gửi lại email ngay lúc này.'));
         }
     };
 

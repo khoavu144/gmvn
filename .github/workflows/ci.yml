@@ -108,5 +108,8 @@ jobs:
       - name: Desktop smoke
         run: npx playwright test e2e/smoke.spec.ts --project=chromium
 
+      - name: Critical desktop flows
+        run: npx playwright test e2e/critical.spec.ts --project=chromium
+
       - name: Mobile smoke
         run: npx playwright test e2e/mobile-interactions.spec.ts --project=mobile-chrome --project=mobile-safari
