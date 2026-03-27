@@ -23,12 +23,12 @@ export default {
                     200: '#E5E5E5',
                     300: '#CACACA',
                     400: '#AAAAAA',
-                    500: '#888888',
-                    600: '#666666',
-                    700: '#444444',
-                    800: '#2A2A2A',
-                    900: '#141414',
-                    950: '#0A0A0A',
+                    500: '#71717A', // adjusted from #888888 for WCAG AA 4.5:1 contrast
+                    600: '#52525B', // adjusted from #666666
+                    700: '#3F3F46', // adjusted from #444444
+                    800: '#27272A', // adjusted from #2A2A2A
+                    900: '#18181B', // adjusted from #141414
+                    950: '#09090B', // adjusted from #0A0A0A
                 },
 
                 // Semantic — minimal palette

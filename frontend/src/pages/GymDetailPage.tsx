@@ -1,16 +1,13 @@
+import { truncateMetaDescription } from "../utils/seo";
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
-import { getOptimizedUrl, getSrcSet } from '../utils/image';
 import { gymService } from '../services/gymService';
 import type {
     GymBranch,
     GymCenter,
-    GymGallery,
-    GymTaxonomyTerm,
 } from '../types';
-import ShareButton from '../components/ShareButton';
 import { Skeleton } from '../components/ui/Skeleton';
 import GymProgramsSection from '../components/gym-detail/GymProgramsSection';
 import GymReviewsSection from '../components/gym-detail/GymReviewsSection';
@@ -18,24 +15,23 @@ import GymZonesSection from '../components/gym-detail/GymZonesSection';
 import GymFacilitiesSection from '../components/gym-detail/GymFacilitiesSection';
 import GymTrainersSection from '../components/gym-detail/GymTrainersSection';
 import GymPricingSection from '../components/gym-detail/GymPricingSection';
-import GymSimilarSection from '../components/gym-detail/GymSimilarSection';
 import GymMapSection from '../components/gym-detail/GymMapSection';
 import { GymSectionHeading } from '../components/gym-detail/GymSectionHeading';
-import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useMobileReducedEffects } from '../hooks/useMobileReducedEffects';
 import { absoluteUrl } from '../lib/site';
-
-function truncateMetaDescription(text: string, maxLen: number): string {
-    const t = text.trim();
-    if (t.length <= maxLen) return t;
-    const slice = t.slice(0, maxLen);
-    const lastSpace = slice.lastIndexOf(' ');
-    const head = lastSpace > 40 ? slice.slice(0, lastSpace) : slice;
-    return `${head.trimEnd()}…`;
-}
-
-const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
-const TODAY_KEY = DAY_KEYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+import GymDetailHero from '../components/gym-detail/GymDetailHero';
+import GymDetailLightbox from '../components/gym-detail/GymDetailLightbox';
+import GymDetailSidebar from '../components/gym-detail/GymDetailSidebar';
+import GymDetailMobileCTA from '../components/gym-detail/GymDetailMobileCTA';
+import {
+    getTaxonomyLabels,
+    getPrimaryVenueLabel,
+    getFallbackGallery,
+    resolveLeadRoute,
+    getTodayHours,
+    SummaryPill,
+    OverviewMetaRow
+} from '../utils/gymDetailUtils';
 
 const BILLING_LABELS: Record<string, string> = {
     per_day: '/ ngày',
@@ -44,169 +40,6 @@ const BILLING_LABELS: Record<string, string> = {
     per_year: '/ năm',
     per_session: '/ buổi',
 };
-function SummaryPill({ label, value }: { label: string; value: string }) {
-    return (
-        <div className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 shadow-[0_10px_28px_rgba(53,41,26,0.04)]">
-            <div className="text-[0.66rem] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)]">{label}</div>
-            <div className="mt-1 text-sm font-bold text-[color:var(--mk-text)]">{value}</div>
-        </div>
-    );
-}
-
-function OverviewMetaRow({ label, value }: { label: string; value: string }) {
-    return (
-        <div className="flex flex-row items-baseline justify-between gap-3 border-b border-[color:var(--mk-line)] py-2 last:border-b-0">
-            <span className="shrink-0 text-[0.66rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">{label}</span>
-            <span className="min-w-0 truncate text-right text-sm font-semibold text-[color:var(--mk-text)]">{value}</span>
-        </div>
-    );
-}
-
-function getTaxonomyLabels(gym: GymCenter | null, type: GymTaxonomyTerm['term_type'], limit = 3) {
-    if (!gym?.taxonomy_terms) return [];
-    const values = gym.taxonomy_terms
-        .map((item) => item.term)
-        .filter((term): term is GymTaxonomyTerm => term != null && term.term_type === type)
-        .map((term) => term.label);
-
-    return Array.from(new Set(values)).slice(0, limit);
-}
-
-function getPrimaryVenueLabel(gym: GymCenter | null) {
-    const primary = gym?.taxonomy_terms?.find((item) => item.is_primary && item.term)?.term;
-    return primary?.label || gym?.primary_venue_type_slug || 'Active Space';
-}
-
-function getFallbackGallery(gym: GymCenter | null, branchId?: string | null): GymGallery[] {
-    const imageUrl = gym?.listing_thumbnail?.image_url || gym?.cover_image_url || gym?.logo_url;
-    if (!imageUrl || !gym) return [];
-
-    return [
-        {
-            id: 'gym-cover-fallback',
-            branch_id: branchId || 'fallback',
-            image_url: imageUrl,
-            caption: gym.name,
-            image_type: 'other',
-            order_number: 0,
-            media_role: 'hero',
-            is_hero: true,
-        },
-    ];
-}
-
-function normalizePhone(raw?: string | null) {
-    return (raw || '').replace(/[^\d+]/g, '');
-}
-
-function buildWhatsappUrl(phone?: string | null, message?: string | null) {
-    const normalized = normalizePhone(phone).replace(/^0/, '84');
-    if (!normalized) return null;
-    const text = message ? `?text=${encodeURIComponent(message)}` : '';
-    return `https://wa.me/${normalized}${text}`;
-}
-
-function getTodayHours(branch: GymBranch | null) {
-    return branch?.opening_hours?.[TODAY_KEY] as { open?: string; close?: string; is_closed?: boolean } | undefined;
-}
-
-
-
-function resolveLeadRoute(gym: GymCenter | null, branch: GymBranch | null) {
-    const routes = branch?.lead_routes || [];
-    const preferred = routes.find((route) => route.inquiry_type === gym?.default_primary_cta)
-        || routes.find((route) => route.inquiry_type === 'consultation')
-        || routes[0]
-        || null;
-
-    if (!preferred && !branch) {
-        return {
-            href: '/messages',
-            label: 'Nhắn tư vấn',
-            isExternal: false,
-            helper: 'Tư vấn phù hợp mục tiêu và khu vực',
-        };
-    }
-
-    const phone = preferred?.phone || branch?.consultation_phone || branch?.phone || null;
-    const whatsapp = preferred?.whatsapp || branch?.whatsapp_number || null;
-    const messengerUrl = preferred?.messenger_url || branch?.messenger_url || null;
-    const email = preferred?.email || branch?.email || null;
-    const message = preferred?.auto_prefill_message || `Xin chào, tôi muốn nhận tư vấn về ${branch?.branch_name || gym?.name || 'venue'} trên Gymerviet.`;
-
-    if ((preferred?.primary_channel === 'whatsapp' || !preferred?.primary_channel) && whatsapp) {
-        return {
-            href: buildWhatsappUrl(whatsapp, message) || '/messages',
-            label: 'Nhắn WhatsApp',
-            isExternal: true,
-            helper: 'Trao đổi trực tiếp với chi nhánh',
-        };
-    }
-
-    if (preferred?.primary_channel === 'phone' && phone) {
-        return {
-            href: `tel:${normalizePhone(phone)}`,
-            label: 'Gọi tư vấn',
-            isExternal: true,
-            helper: 'Gọi trực tiếp cho chi nhánh',
-        };
-    }
-
-    if (preferred?.primary_channel === 'messenger' && messengerUrl) {
-        return {
-            href: messengerUrl,
-            label: 'Mở Messenger',
-            isExternal: true,
-            helper: 'Chat nhanh với venue',
-        };
-    }
-
-    if (preferred?.primary_channel === 'email' && email) {
-        return {
-            href: `mailto:${email}`,
-            label: 'Gửi email',
-            isExternal: true,
-            helper: 'Nhận báo giá qua email',
-        };
-    }
-
-    if (phone) {
-        return {
-            href: `tel:${normalizePhone(phone)}`,
-            label: 'Gọi tư vấn',
-            isExternal: true,
-            helper: 'Tư vấn đúng chi nhánh đang chọn',
-        };
-    }
-
-    if (messengerUrl) {
-        return {
-            href: messengerUrl,
-            label: 'Nhắn Messenger',
-            isExternal: true,
-            helper: 'Hỏi nhanh về lịch và giá',
-        };
-    }
-
-    return {
-        href: '/messages',
-        label: 'Nhắn tư vấn',
-        isExternal: false,
-        helper: 'Tư vấn phù hợp mục tiêu tập luyện',
-    };
-}
-
-function renderActionButton(action: { href: string; label: string; isExternal: boolean }, className: string) {
-    if (action.isExternal) {
-        return (
-            <a href={action.href} target={action.href.startsWith('http') ? '_blank' : undefined} rel={action.href.startsWith('http') ? 'noopener noreferrer' : undefined} className={className}>
-                {action.label}
-            </a>
-        );
-    }
-
-    return <Link to={action.href} className={className}>{action.label}</Link>;
-}
 
 
 
@@ -479,8 +312,6 @@ const GymDetailPage: React.FC = () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, [lightboxIdx, gallery.length]);
-
-    if (loading) {
         return (
             <div className="marketplace-shell min-h-screen">
                 <div className="marketplace-container gv-pad-y">
@@ -577,58 +408,14 @@ const GymDetailPage: React.FC = () => {
                 })}</script>
             </Helmet>
 
-            {activeImage && (
-                <div 
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(16,12,10,0.96)] p-4" 
-                    onClick={() => setLightboxIdx(null)}
-                    role="dialog"
-                    aria-modal="true"
-                    aria-label="Thư viện ảnh"
-                >
-                    <button
-                        type="button"
-                        onClick={() => setLightboxIdx(null)}
-                        className="absolute right-5 top-5 text-3xl font-bold text-white/75 transition motion-reduce:transition-none hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 rounded-full w-12 h-12 flex items-center justify-center"
-                        aria-label="Đóng thư viện ảnh"
-                    >
-                        ×
-                    </button>
-                    {gallery.length > 1 && (
-                        <>
-                            <button
-                                type="button"
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    setLightboxIdx((current) => current === null ? 0 : (current - 1 + gallery.length) % gallery.length);
-                                }}
-                                className="absolute left-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-xl font-bold text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
-                                aria-label="Ảnh trước"
-                            >
-                                ‹
-                            </button>
-                            <button
-                                type="button"
-                                onClick={(event) => {
-                                    event.stopPropagation();
-                                    setLightboxIdx((current) => current === null ? 0 : (current + 1) % gallery.length);
-                                }}
-                                className="absolute right-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-xl font-bold text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
-                                aria-label="Ảnh sau"
-                            >
-                                ›
-                            </button>
-                        </>
-                    )}
-                    <img
-                        src={activeImage.image_url}
-                        alt={activeImage.alt_text || activeImage.caption || gym.name}
-                        className="max-h-[88vh] max-w-full object-contain transition-transform motion-reduce:transition-none"
-                        onClick={(event) => event.stopPropagation()}
-                    />
-                </div>
-            )}
+            <GymDetailLightbox
+                gymName={gym.name}
+                gallery={gallery}
+                lightboxIdx={lightboxIdx}
+                setLightboxIdx={setLightboxIdx}
+            />
 
-            <div className="marketplace-shell gym-detail-page min-h-screen">
+            <div className="marketplace-shell gym-detail-page ui-detail-shell ui-detail-shell--marketplace min-h-screen">
                 <div className="marketplace-container gv-pad-y-sm">
                     <div className="mb-5 flex items-center justify-between gap-4">
                         <Link to="/gyms" className="back-link">← Quay lại marketplace</Link>
@@ -639,138 +426,22 @@ const GymDetailPage: React.FC = () => {
                         </div>
                     </div>
 
-                    <section className="marketplace-panel overflow-hidden">
-                        <div className="grid gap-0 lg:grid-cols-[1fr_1fr]">
-                            <div className="relative min-h-[13rem] max-h-[14rem] overflow-hidden bg-[color:var(--mk-paper-strong)] sm:min-h-[15rem] sm:max-h-[16rem] lg:min-h-[18rem] lg:max-h-[20rem]">
-                                {gallery.length > 0 && heroSlideItem && (
-                                    <p className="sr-only" aria-live="polite" aria-atomic="true">
-                                        {`Ảnh ${safeSlideIndex + 1} trên ${gallery.length}`}
-                                    </p>
-                                )}
-                                {heroSlideItem ? (
-                                    <>
-                                        <img
-                                            src={getOptimizedUrl(heroSlideItem.image_url, 1440) || heroSlideItem.image_url}
-                                            srcSet={getSrcSet(heroSlideItem.image_url, [640, 1024, 1600])}
-                                            sizes="(max-width: 1024px) 100vw, 50vw"
-                                            alt={heroSlideItem.alt_text || heroSlideItem.caption || gym.name}
-                                            className="h-full w-full object-cover"
-                                            fetchPriority="high"
-                                        />
-                                        {gallery.length > 0 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setLightboxIdx(safeSlideIndex)}
-                                                className="absolute inset-0 z-[1] cursor-zoom-in bg-transparent"
-                                                aria-label="Phóng to ảnh"
-                                            />
-                                        )}
-                                    </>
-                                ) : (
-                                    <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(circle_at_top_left,rgba(230,203,154,0.45),transparent_36%),linear-gradient(155deg,rgba(255,255,255,0.55),rgba(222,214,201,0.95))]">
-                                        <span className="text-[5rem] font-bold leading-none tracking-[-0.08em] text-[color:var(--mk-text)]/20">
-                                            {gym.name.slice(0, 2).toUpperCase()}
-                                        </span>
-                                    </div>
-                                )}
-                                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(26,20,16,0.82)] via-[rgba(26,20,16,0.14)] to-transparent" />
-
-                                <div className="absolute left-5 right-5 top-5 z-[2] flex flex-wrap items-start justify-between gap-3">
-                                    <div className="flex flex-wrap gap-2">
-                                        <span className="marketplace-badge marketplace-badge--accent">{venueLabel}</span>
-                                        {gym.is_verified && <span className="marketplace-badge marketplace-badge--verified">Đã xác minh</span>}
-                                        {branchStatusBadges.slice(0, 2).map((badge) => (
-                                            <span key={badge} className="marketplace-badge marketplace-badge--neutral border-white/16 bg-white/12 text-white">
-                                                {badge}
-                                            </span>
-                                        ))}
-                                    </div>
-                                    {branchDetail?.best_visit_time_summary && (
-                                        <div
-                                            className={`rounded-lg border border-white/16 bg-white/10 px-4 py-2 text-[0.72rem] font-semibold text-white/84 ${reducedEffects ? '' : 'backdrop-blur-sm'}`}
-                                        >
-                                            {branchDetail?.best_visit_time_summary}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col justify-between p-6 sm:p-7 lg:p-8">
-                                <div className="space-y-4">
-                                    <div className="marketplace-eyebrow">Chi tiết phòng tập</div>
-
-                                    <div>
-                                        <h1 className="text-[clamp(2.3rem,4vw,4.2rem)] font-bold leading-[0.92] tracking-[-0.07em] text-[color:var(--mk-text)]">
-                                            {gym.name}
-                                        </h1>
-                                        <p className="mt-4 line-clamp-3 text-[1.02rem] leading-7 text-[color:var(--mk-muted)] lg:line-clamp-4 lg:leading-8">
-                                            {seoDescription}
-                                        </p>
-                                        <button
-                                            type="button"
-                                            onClick={() => navigateToSection('overview')}
-                                            className="mt-2 text-left text-sm font-semibold text-[color:var(--mk-text)] underline decoration-[color:var(--mk-line)] underline-offset-4 transition hover:text-[color:var(--mk-accent-ink)]"
-                                        >
-                                            Xem thêm
-                                        </button>
-                                    </div>
-
-                                    {gallery.length > 1 && (
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                type="button"
-                                                onClick={() => setHeroSlideIndex((i) => (i - 1 + gallery.length) % gallery.length)}
-                                                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[color:var(--mk-line)] bg-white/90 text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45"
-                                                aria-label="Ảnh trước"
-                                            >
-                                                <ChevronLeft className="h-5 w-5" aria-hidden />
-                                            </button>
-                                            <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                                                {gallery.map((item, index) => (
-                                                    <button
-                                                        key={item.id}
-                                                        type="button"
-                                                        onClick={() => setHeroSlideIndex(index)}
-                                                        className={`relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border transition sm:h-20 sm:w-24 ${index === safeSlideIndex ? 'border-[color:var(--mk-text)] ring-2 ring-[color:var(--mk-text)]/20' : 'border-[color:var(--mk-line)] hover:border-[color:var(--mk-accent)]/45'}`}
-                                                    >
-                                                        <img
-                                                            src={getOptimizedUrl(item.image_url, 320) || item.image_url}
-                                                            alt={item.alt_text || item.caption || gym.name}
-                                                            className="h-full w-full object-cover"
-                                                            loading="lazy"
-                                                        />
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => setHeroSlideIndex((i) => (i + 1) % gallery.length)}
-                                                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[color:var(--mk-line)] bg-white/90 text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45"
-                                                aria-label="Ảnh sau"
-                                            >
-                                                <ChevronRight className="h-5 w-5" aria-hidden />
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    <div className="flex flex-wrap gap-2">
-                                        {overviewBadges.map((label) => (
-                                            <span key={label} className="marketplace-badge marketplace-badge--neutral">{label}</span>
-                                        ))}
-                                        {branchDetail?.neighborhood_label && (
-                                            <span className="marketplace-badge marketplace-badge--neutral">{branchDetail?.neighborhood_label}</span>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                                    {quickFacts.map((fact) => (
-                                        <SummaryPill key={fact.label} label={fact.label} value={fact.value} />
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                    <GymDetailHero
+                        gym={gym}
+                        gallery={gallery}
+                        safeSlideIndex={safeSlideIndex}
+                        heroSlideItem={heroSlideItem}
+                        venueLabel={venueLabel}
+                        seoDescription={seoDescription}
+                        overviewBadges={overviewBadges}
+                        branchStatusBadges={branchStatusBadges}
+                        branchDetail={branchDetail}
+                        quickFacts={quickFacts}
+                        reducedEffects={reducedEffects}
+                        navigateToSection={navigateToSection}
+                        setHeroSlideIndex={setHeroSlideIndex}
+                        setLightboxIdx={setLightboxIdx}
+                    />
                 </div>
 
                 <div className="marketplace-container mt-4 md:mt-6">
@@ -902,150 +573,33 @@ const GymDetailPage: React.FC = () => {
                         )}
                     </div>
 
-                    <aside className="gym-detail-sticky-rail space-y-4" style={{ contain: 'layout paint' }}>
-                        <div className="marketplace-panel gv-panel-pad-sm">
-                            <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Quyết định nhanh</div>
-                            <div className="mt-3 text-sm font-semibold text-[color:var(--mk-text-soft)]">Chi nhánh đang xem</div>
-                            <h3 className="mt-1 text-[1.55rem] font-bold leading-[0.98] tracking-[-0.05em] text-[color:var(--mk-text)]">
-                                {branchName}
-                            </h3>
-                            <p className="mt-3 text-sm leading-7 text-[color:var(--mk-muted)]">
-                                {branchDetail?.branch_tagline || branchDetail?.description || gym.discovery_blurb || 'Chọn đúng chi nhánh trước khi đặt hẹn tư vấn để nhận thông tin chuẩn nhất về giá mở cửa, lịch và trải nghiệm thực tế tại đó.'}
-                            </p>
-
-                            <div className="mt-5 rounded-lg bg-[color:var(--mk-text)] px-5 py-5 text-white">
-                                <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-white/55">Đầu tư ban đầu</div>
-                                <div className="mt-2 text-[2.3rem] font-bold leading-none tracking-[-0.07em]">
-                                    {lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫` : 'Liên hệ'}
-                                </div>
-                                <div className="mt-2 text-sm text-white/72">
-                                    {lowestPrice ? 'Chi phí tối thiểu tại chi nhánh đang xem' : 'Cơ sở này chưa công khai bảng giá hiện hành'}
-                                </div>
-                            </div>
-
-                            <div className="mt-5 space-y-3">
-                                {renderActionButton(
-                                    leadAction,
-                                    'block w-full rounded-lg bg-[color:var(--mk-accent)] px-4 py-4 text-center text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)] transition hover:translate-y-[-1px]'
-                                )}
-                                <button
-                                    type="button"
-                                    onClick={() => navigateToSection(branchPrograms.length > 0 ? 'schedule' : 'pricing')}
-                                    className="block w-full rounded-lg border border-[color:var(--mk-line)] bg-white/70 px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/55"
-                                >
-                                    {branchPrograms.length > 0 ? 'Xem lịch lớp' : 'Xem bảng giá'}
-                                </button>
-                            </div>
-
-                            <div className="mt-4 text-sm leading-6 text-[color:var(--mk-muted)]">{leadAction.helper}</div>
-                        </div>
-
-                        {branches.length > 1 && (
-                            <div className="marketplace-panel gv-panel-pad-sm">
-                                <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chuyển chi nhánh</div>
-                                <div className="mt-4 space-y-2">
-                                    {branches.map((branch) => (
-                                        <button
-                                            key={branch.id}
-                                            type="button"
-                                            onClick={() => setActiveBranchId(branch.id)}
-                                            className={`w-full rounded-lg border px-4 py-3 text-left transition ${branch.id === branchDetail?.id ? 'border-[color:var(--mk-accent)] bg-[color:var(--mk-accent-soft)]/55' : 'border-[color:var(--mk-line)] bg-white/70 hover:border-[color:var(--mk-accent)]/45'}`}
-                                        >
-                                            <div className="text-sm font-bold tracking-[-0.03em] text-[color:var(--mk-text)]">{branch.branch_name}</div>
-                                            <div className="mt-1 text-sm text-[color:var(--mk-muted)]">{[branch.district, branch.city].filter(Boolean).join(', ') || branch.address}</div>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {similarGyms.length > 0 && (
-                            <div className="marketplace-panel gv-panel-pad-sm">
-                                <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Venue tương tự</div>
-                                <p className="mt-1 text-sm leading-6 text-[color:var(--mk-muted)]">
-                                    Gợi ý theo loại hình và khu vực — cuộn để xem thêm.
-                                </p>
-                                <GymSimilarSection similarGyms={similarGyms} />
-                            </div>
-                        )}
-
-                        <div className="marketplace-panel gv-panel-pad-sm">
-                            <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Lưu ý tại điểm tập</div>
-                            <div className="mt-4 space-y-3">
-                                <SummaryPill
-                                    label="Hôm nay"
-                                    value={todayHours ? (todayHours.is_closed ? 'Đóng cửa' : `${todayHours.open || '—'} → ${todayHours.close || '—'}`) : 'Chưa cập nhật lịch'}
-                                />
-                                <SummaryPill label="Mật độ" value={branchDetail?.crowd_level_summary || 'Chưa cập nhật mật độ'} />
-                                <SummaryPill label="Khung giờ tốt nhất" value={branchDetail?.best_visit_time_summary || 'Gắn thẻ cơ sở để nhắc chọn giờ trải nghiệm'} />
-                                <SummaryPill label="Lưu ý đối tượng" value={branchDetail?.women_only_summary || branchDetail?.child_friendly_summary || 'Chưa có ghi chú riêng biệt'} />
-                            </div>
-                        </div>
-
-                        <div className="marketplace-panel gv-panel-pad-sm">
-                            <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Liên hệ nhanh</div>
-                            <div className="mt-4 grid gap-2">
-                                {branchPhone && (
-                                    <a href={`tel:${normalizePhone(branchPhone)}`} className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
-                                        Hotline · {branchPhone}
-                                    </a>
-                                )}
-                                {branchWhatsapp && (
-                                    <a href={buildWhatsappUrl(branchWhatsapp, `Xin chào, tôi muốn hỏi thêm về ${branchName}.`) || '#'} target="_blank" rel="noopener noreferrer" className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
-                                        WhatsApp · {branchWhatsapp}
-                                    </a>
-                                )}
-                                {branchEmail && (
-                                    <a href={`mailto:${branchEmail}`} className="rounded-lg border border-[color:var(--mk-line)] bg-white/75 px-4 py-3 text-sm font-bold text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45">
-                                        Email · {branchEmail}
-                                    </a>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="marketplace-panel gv-panel-pad-sm">
-                            <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Chia sẻ cơ sở</div>
-                            <div className="mt-4 flex flex-wrap gap-2">
-                                <ShareButton
-                                    url={canonicalUrl}
-                                    title={seoTitle}
-                                    text={seoDescription}
-                                    label="Chia sẻ Facebook"
-                                    variant="facebook"
-                                    className="!rounded-lg !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
-                                    titleAttr="Chia sẻ venue này lên Facebook"
-                                />
-                                <ShareButton
-                                    url={canonicalUrl}
-                                    title={seoTitle}
-                                    text={seoDescription}
-                                    label="Sao chép Link"
-                                    className="!rounded-lg !border-[color:var(--mk-line)] !bg-white/75 !px-4 !py-3 !text-sm !font-bold !text-[color:var(--mk-text)]"
-                                    titleAttr="Sao chép liên kết cơ sở"
-                                />
-                            </div>
-                        </div>
-                    </aside>
+                    <GymDetailSidebar
+                        gym={gym}
+                        branches={branches}
+                        branchDetail={branchDetail}
+                        branchName={branchName}
+                        branchPhone={branchPhone}
+                        branchEmail={branchEmail}
+                        branchWhatsapp={branchWhatsapp}
+                        branchPrograms={branchPrograms}
+                        similarGyms={similarGyms}
+                        lowestPrice={lowestPrice}
+                        todayHours={todayHours}
+                        leadAction={leadAction}
+                        canonicalUrl={canonicalUrl}
+                        seoTitle={seoTitle}
+                        seoDescription={seoDescription}
+                        navigateToSection={navigateToSection}
+                        setActiveBranchId={setActiveBranchId}
+                    />
                 </div>
 
-                <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden" style={{ contain: 'layout paint' }}>
-                    <div
-                        className={`rounded-lg border border-white/14 px-4 py-3 text-white shadow-[color:var(--mk-shadow-soft)] ${reducedEffects ? 'bg-[rgba(29,22,18,0.98)]' : 'bg-[rgba(29,22,18,0.94)] backdrop-blur-xl'}`}
-                    >
-                        <div className="flex items-center justify-between gap-3">
-                            <div>
-                                <div className="text-[0.64rem] font-bold uppercase tracking-[0.18em] text-white/48">Chi phí ước tính từ</div>
-                                <div className="mt-1 text-lg font-bold tracking-[-0.04em]">
-                                    {lowestPrice ? `${lowestPrice.toLocaleString('vi-VN')}₫` : 'Liên hệ'}
-                                </div>
-                            </div>
-                            {renderActionButton(
-                                leadAction,
-                                'rounded-lg bg-[color:var(--mk-accent)] px-5 py-3 text-xs font-bold uppercase tracking-[0.18em] text-[color:var(--mk-accent-ink)]'
-                            )}
-                        </div>
-                    </div>
-                </div>
+                <GymDetailMobileCTA
+                    lowestPrice={lowestPrice}
+                    leadAction={leadAction}
+                    reducedEffects={reducedEffects}
+                />
+            </div>
             </div>
         </>
     );

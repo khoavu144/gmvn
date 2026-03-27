@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactCrop, { type Crop, type PixelCrop } from 'react-image-crop';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 import 'react-image-crop/dist/ReactCrop.css';
 
 interface ImageCropperModalProps {
@@ -23,6 +24,19 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
     const [crop, setCrop] = useState<Crop>();
     const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
     const imgRef = useRef<HTMLImageElement>(null);
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    useFocusTrap(modalRef, isOpen);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen) {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
 
     useEffect(() => {
         if (imageFile) {
@@ -102,14 +116,20 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-800">
+            <div 
+                ref={modalRef}
+                role="dialog" 
+                aria-modal="true"
+                className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-800"
+            >
 
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
                     <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">{title}</h3>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-colors"
+                        aria-label="Đóng hộp thoại cắt ảnh"
+                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-colors"
                     >
                         <i className="fi fi-rr-cross"></i>
                     </button>

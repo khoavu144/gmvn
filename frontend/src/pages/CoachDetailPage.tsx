@@ -1,3 +1,5 @@
+import { truncateMetaDescription } from "../utils/seo";
+
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { logger } from '../lib/logger';
 import { useParams, useNavigate, Link } from 'react-router-dom';
@@ -100,15 +102,6 @@ interface PremiumPayload {
     highlights?: Array<{ id: string; title: string; value: string }>;
     mediaFeatures?: Array<{ id: string; media_type: 'image' | 'video'; url: string; thumbnail_url: string | null; caption: string | null }>;
     pressMentions?: Array<{ id: string; source_name: string; title: string; excerpt: string | null; mention_url: string | null }>;
-}
-
-function truncateMetaDescription(text: string, maxLen: number): string {
-    const t = text.trim();
-    if (t.length <= maxLen) return t;
-    const slice = t.slice(0, maxLen);
-    const lastSpace = slice.lastIndexOf(' ');
-    const head = lastSpace > 40 ? slice.slice(0, lastSpace) : slice;
-    return `${head.trimEnd()}…`;
 }
 
 function buildCoachMetaDescription(opts: {
@@ -385,7 +378,7 @@ export default function CoachDetailPage() {
     }
 
     return (
-        <div className="coach-profile-page">
+        <div className="coach-profile-page ui-detail-shell ui-detail-shell--profile">
             <Helmet>
                 <title>{seoTitle}</title>
                 <meta name="description" content={seoDescription} />

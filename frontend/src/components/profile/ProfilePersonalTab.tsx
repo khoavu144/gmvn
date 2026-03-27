@@ -86,30 +86,30 @@ export function ProfilePersonalTab({ user, onUpdate }: Props) {
 
             <form onSubmit={handlePersonal(onSubmitPersonal)} className="space-y-6">
                 <div>
-                    <label className="form-label">Họ và tên</label>
-                    <input type="text" {...regPersonal('full_name')} className="form-input" />
+                    <label htmlFor="personal-full-name" className="form-label">Họ và tên</label>
+                    <input id="personal-full-name" type="text" {...regPersonal('full_name')} className="form-input" />
                     {errorsPersonal.full_name && <p className="form-helper">{errorsPersonal.full_name.message}</p>}
                 </div>
 
                 <div>
-                    <label className="form-label">Giới thiệu bản thân</label>
-                    <textarea rows={4} {...regPersonal('bio')} placeholder="Viết một đoạn ngắn giới thiệu về bản thân..."
+                    <label htmlFor="personal-bio" className="form-label">Giới thiệu bản thân</label>
+                    <textarea id="personal-bio" rows={4} {...regPersonal('bio')} placeholder="Viết một đoạn ngắn giới thiệu về bản thân..."
                         className="form-input resize-none" />
                 </div>
 
                 {user.user_type === 'athlete' && (
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2 border-t border-gray-200 mt-6">
                         <div>
-                            <label className="form-label">Chiều cao (cm)</label>
-                            <input type="number" {...regPersonal('height_cm', { valueAsNumber: true })} className="form-input" />
+                            <label htmlFor="personal-height-cm" className="form-label">Chiều cao (cm)</label>
+                            <input id="personal-height-cm" type="number" {...regPersonal('height_cm', { valueAsNumber: true })} className="form-input" />
                         </div>
                         <div>
-                            <label className="form-label">Cân nặng (kg)</label>
-                            <input type="number" step="0.1" {...regPersonal('current_weight_kg', { valueAsNumber: true })} className="form-input" />
+                            <label htmlFor="personal-current-weight" className="form-label">Cân nặng (kg)</label>
+                            <input id="personal-current-weight" type="number" step="0.1" {...regPersonal('current_weight_kg', { valueAsNumber: true })} className="form-input" />
                         </div>
                         <div>
-                            <label className="form-label">Trình độ</label>
-                            <select {...regPersonal('experience_level')} className="form-input">
+                            <label htmlFor="personal-experience-level" className="form-label">Trình độ</label>
+                            <select id="personal-experience-level" {...regPersonal('experience_level')} className="form-input">
                                 <option value="beginner">Mới bắt đầu</option>
                                 <option value="intermediate">Có kinh nghiệm</option>
                                 <option value="advanced">Lão luyện</option>
@@ -120,8 +120,8 @@ export function ProfilePersonalTab({ user, onUpdate }: Props) {
                 {user.user_type === 'trainer' && (
                     <div className="grid grid-cols-1 gap-6 pt-6 border-t border-gray-200">
                         <div>
-                            <label className="form-label">Giá dịch vụ tham khảo (₫/tháng)</label>
-                            <input type="number" {...regPersonal('base_price_monthly', { valueAsNumber: true })} className="form-input" />
+                            <label htmlFor="personal-base-price-monthly" className="form-label">Giá dịch vụ tham khảo (₫/tháng)</label>
+                            <input id="personal-base-price-monthly" type="number" {...regPersonal('base_price_monthly', { valueAsNumber: true })} className="form-input" />
                         </div>
                         <p className="text-sm text-gray-500">
                             Chuyên môn huấn luyện: chọn từ danh sách có sẵn trong tab{' '}

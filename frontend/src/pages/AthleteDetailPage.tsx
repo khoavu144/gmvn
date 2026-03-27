@@ -1,3 +1,5 @@
+import { truncateMetaDescription } from "../utils/seo";
+
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -31,15 +33,6 @@ interface RelatedAthlete {
   avatar_url: string | null;
   specialties: string[] | null;
   user_type?: string;
-}
-
-function truncateMetaDescription(text: string, maxLen: number): string {
-  const t = text.trim();
-  if (t.length <= maxLen) return t;
-  const slice = t.slice(0, maxLen);
-  const lastSpace = slice.lastIndexOf(' ');
-  const head = lastSpace > 40 ? slice.slice(0, lastSpace) : slice;
-  return `${head.trimEnd()}…`;
 }
 
 function buildAthleteMetaDescription(opts: {
@@ -310,7 +303,7 @@ export default function AthleteDetailPage() {
   const packagesForPricing: TrainerPackage[] = packages;
 
   return (
-    <div className="coach-profile-page coach-profile-page--athlete">
+    <div className="coach-profile-page coach-profile-page--athlete ui-detail-shell ui-detail-shell--profile">
       <Helmet>
         <title>{seoTitle}</title>
         <meta name="description" content={seoDescription} />

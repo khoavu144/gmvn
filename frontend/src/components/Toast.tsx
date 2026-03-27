@@ -20,6 +20,9 @@ export function useToast() {
 
     const ToastComponent = message ? (
         <div
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
             className={cn(
                 'fixed top-4 right-4 z-toast flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg',
                 'border transition-colors duration-150',
@@ -37,8 +40,9 @@ export function useToast() {
             <span className="text-sm font-medium">{message.text}</span>
             <button
                 onClick={dismiss}
+                aria-label="Đóng thông báo"
                 className={cn(
-                    'ml-2 p-0.5 rounded transition-colors',
+                    'ml-2 p-2 rounded transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center',
                     message.type === 'success'
                         ? 'hover:bg-white/20 dark:hover:bg-black/20'
                         : 'hover:bg-red-100 dark:hover:bg-red-900'

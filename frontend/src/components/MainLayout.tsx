@@ -22,8 +22,9 @@ export default function MainLayout() {
             data-shell={routePresentation.shellType}
             data-objective={routePresentation.businessObjective}
         >
+            <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-black focus:text-white focus:rounded-lg focus:shadow-xl outline-none ring-2 ring-black">Bỏ qua điều hướng</a>
             {showHeader && <Header />}
-            <main className={cn('flex-1', showHeader && 'pt-header')}>
+            <main id="main-content" className={cn('flex-1', showHeader && 'pt-header')}>
                 <Outlet />
             </main>
             {showFooter && <Footer />}

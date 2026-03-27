@@ -1,3 +1,5 @@
+import { formatPrice } from "../utils/format";
+
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AlertCircle, ChevronLeft, ChevronRight, Search, Star } from 'lucide-react';
@@ -15,13 +17,6 @@ import type {
 } from '../types';
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001/api/v1';
-function formatPrice(n: number | string, currency = 'VND'): string {
-    const num = Number(n);
-    if (currency === 'VND') {
-        return num.toLocaleString('vi-VN') + 'đ';
-    }
-    return num.toLocaleString('en-US', { style: 'currency', currency });
-}
 
 function uniqueProductsById(items: Product[]) {
     const seen = new Set<string>();

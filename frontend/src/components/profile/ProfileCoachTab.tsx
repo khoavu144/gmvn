@@ -210,16 +210,16 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                     <h2 className="card-header">URL & Hiển thị</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label className="form-label">Đường dẫn hồ sơ</label>
+                            <label htmlFor="coach-slug" className="form-label">Đường dẫn hồ sơ</label>
                             <div className="flex border border-gray-200 rounded-xs bg-gray-50 focus-within:border-black focus-within:ring-1 focus-within:ring-black transition overflow-hidden">
                                 <span className="px-3 py-2.5 text-gray-500 text-sm border-r border-gray-200 select-none">{profilePathLabel}</span>
-                                <input type="text" {...regProfile('slug')} placeholder="ten-user"
+                                <input id="coach-slug" type="text" {...regProfile('slug')} placeholder="ten-user"
                                     className="flex-1 bg-white outline-none px-3 text-sm text-black w-full" />
                             </div>
                             {errorsProfile.slug && <p className="form-helper text-red-600">{errorsProfile.slug.message}</p>}
                         </div>
                         <div>
-                            <label className="form-label">Ảnh bìa hồ sơ</label>
+                            <label htmlFor="coach-cover-upload" className="form-label">Ảnh bìa hồ sơ</label>
                             <div className="flex flex-col gap-3">
                                 {watchProfile('cover_image_url') ? (
                                     <div className="relative w-full aspect-[21/9] bg-gray-50 border border-gray-200 rounded overflow-hidden">
@@ -233,7 +233,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                                         <span className="text-sm">Chưa có ảnh bìa</span>
                                     </div>
                                 )}
-                                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
+                                <input id="coach-cover-upload" type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                                 <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="btn-secondary w-fit text-sm">
                                     {isUploading ? 'Đang tải lên...' : 'Tải lên từ thiết bị'}
                                 </button>
@@ -242,12 +242,12 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                         </div>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-6 pt-4 border-t border-gray-200">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" {...regProfile('is_profile_public')} className="rounded-xs text-black border-gray-200 focus:ring-black" />
+                        <label htmlFor="coach-is-public" className="flex items-center gap-2 cursor-pointer">
+                            <input id="coach-is-public" type="checkbox" {...regProfile('is_profile_public')} className="rounded-xs text-black border-gray-200 focus:ring-black" />
                             <span className="text-sm font-medium text-black">Hiển thị hồ sơ công khai</span>
                         </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" {...regProfile('is_accepting_clients')} className="rounded-xs text-black border-gray-200 focus:ring-black" />
+                        <label htmlFor="coach-accepting-clients" className="flex items-center gap-2 cursor-pointer">
+                            <input id="coach-accepting-clients" type="checkbox" {...regProfile('is_accepting_clients')} className="rounded-xs text-black border-gray-200 focus:ring-black" />
                             <span className="text-sm font-medium text-black">Đang nhận học viên mới</span>
                         </label>
                     </div>
@@ -255,14 +255,14 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                     {/* Template & Theme Settings */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4 border-t border-gray-200 mt-4">
                         <div>
-                            <label className="form-label">Bố cục hồ sơ công khai</label>
+                            <label htmlFor="coach-profile-template-card" className="form-label">Bố cục hồ sơ công khai</label>
                             <div className="grid grid-cols-2 gap-2 mt-1">
                                 {[
                                     { value: 'card', label: 'Dạng thẻ cuộn', desc: 'Điều hướng ghim, thanh kỹ năng và bảng giá' },
                                     { value: 'hero', label: 'Bố cục nổi bật', desc: 'Phần mở đầu lớn và các mục nội dung toàn chiều rộng' },
                                 ].map(opt => (
                                     <label key={opt.value} className="cursor-pointer">
-                                        <input type="radio" value={opt.value} {...regProfile('profile_template')} className="sr-only" />
+                                        <input id={`coach-profile-template-${opt.value}`} type="radio" value={opt.value} {...regProfile('profile_template')} className="sr-only" />
                                         <div className={`p-3 border text-left transition-colors ${watchProfile('profile_template') === opt.value ? 'border-black bg-black text-white' : 'border-gray-200 hover:border-gray-200'}`}>
                                             <p className="text-xs font-bold">{opt.label}</p>
                                             <p className={`text-[10px] mt-0.5 ${watchProfile('profile_template') === opt.value ? 'text-gray-500' : 'text-gray-500'}`}>{opt.desc}</p>
@@ -272,14 +272,14 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                             </div>
                         </div>
                         <div>
-                            <label className="form-label">Chế độ màu hồ sơ</label>
+                            <label htmlFor="coach-theme-color-light" className="form-label">Chế độ màu hồ sơ</label>
                             <div className="grid grid-cols-2 gap-2 mt-1">
                                 {[
                                     { value: 'light', label: 'Sáng', desc: 'Nền sáng, chữ đậm' },
                                     { value: 'dark', label: 'Tối', desc: 'Nền tối, chữ sáng' },
                                 ].map(opt => (
                                     <label key={opt.value} className="cursor-pointer">
-                                        <input type="radio" value={opt.value} {...regProfile('theme_color')} className="sr-only" />
+                                        <input id={`coach-theme-color-${opt.value}`} type="radio" value={opt.value} {...regProfile('theme_color')} className="sr-only" />
                                         <div className={`p-3 border text-left transition-colors ${watchProfile('theme_color') === opt.value ? 'border-black bg-black text-white' : 'border-gray-200 hover:border-gray-200'}`}>
                                             <p className="text-xs font-bold">{opt.label}</p>
                                             <p className={`text-[10px] mt-0.5 ${watchProfile('theme_color') === opt.value ? 'text-gray-500' : 'text-gray-500'}`}>{opt.desc}</p>
@@ -310,7 +310,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                     <h2 className="card-header">Giới thiệu</h2>
                     <div className="space-y-6">
                         <div>
-                            <label className="form-label">Chức danh chính</label>
+                            <label htmlFor="coach-headline-select" className="form-label">Chức danh chính</label>
                             <CreatableSelect
                                 isClearable
                                 options={headlineOptions}
@@ -319,6 +319,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                                 placeholder="Chọn hoặc nhập chức danh..."
                                 className="text-sm"
                                 classNamePrefix="react-select"
+                                inputId="coach-headline-select"
                                 styles={{
                                     control: (base) => ({
                                         ...base,
@@ -342,12 +343,12 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                             />
                         </div>
                         <div>
-                            <label className="form-label">Tóm tắt ngắn (1-2 câu)</label>
-                            <textarea rows={2} {...regProfile('bio_short')} placeholder="Hiển thị ở đầu trang..." className="form-input resize-none" />
+                            <label htmlFor="coach-bio-short" className="form-label">Tóm tắt ngắn (1-2 câu)</label>
+                            <textarea id="coach-bio-short" rows={2} {...regProfile('bio_short')} placeholder="Hiển thị ở đầu trang..." className="form-input resize-none" />
                         </div>
                         <div>
-                            <label className="form-label">Giới thiệu chi tiết</label>
-                            <textarea rows={6} {...regProfile('bio_long')} placeholder="Câu chuyện, phương pháp, triết lý đào tạo..." className="form-input resize-none" />
+                            <label htmlFor="coach-bio-long" className="form-label">Giới thiệu chi tiết</label>
+                            <textarea id="coach-bio-long" rows={6} {...regProfile('bio_long')} placeholder="Câu chuyện, phương pháp, triết lý đào tạo..." className="form-input resize-none" />
                         </div>
                     </div>
                 </div>
@@ -356,22 +357,22 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                     <h2 className="card-header">Số liệu nghề nghiệp</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <div>
-                            <label className="form-label">Số năm kinh nghiệm</label>
-                            <input type="number" min={0} {...regProfile('years_experience', { valueAsNumber: true })} className="form-input" />
+                            <label htmlFor="coach-years-experience" className="form-label">Số năm kinh nghiệm</label>
+                            <input id="coach-years-experience" type="number" min={0} {...regProfile('years_experience', { valueAsNumber: true })} className="form-input" />
                         </div>
                         <div>
-                            <label className="form-label">Số học viên đã dạy</label>
-                            <input type="number" min={0} {...regProfile('clients_trained', { valueAsNumber: true })} className="form-input" />
+                            <label htmlFor="coach-clients-trained" className="form-label">Số học viên đã dạy</label>
+                            <input id="coach-clients-trained" type="number" min={0} {...regProfile('clients_trained', { valueAsNumber: true })} className="form-input" />
                         </div>
                         <div>
-                            <label className="form-label">Câu chuyện thành công</label>
-                            <input type="number" min={0} {...regProfile('success_stories', { valueAsNumber: true })} className="form-input" />
+                            <label htmlFor="coach-success-stories" className="form-label">Câu chuyện thành công</label>
+                            <input id="coach-success-stories" type="number" min={0} {...regProfile('success_stories', { valueAsNumber: true })} className="form-input" />
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-gray-200">
                         <div>
-                            <label className="form-label">Địa điểm hoạt động (Tỉnh/Thành)</label>
-                            <select {...regProfile('location')} className="form-input">
+                            <label htmlFor="coach-location" className="form-label">Địa điểm hoạt động (Tỉnh/Thành)</label>
+                            <select id="coach-location" {...regProfile('location')} className="form-input">
                                 <option value="">-- Chọn tỉnh/thành --</option>
                                 {VIETNAM_PROVINCES.map(p => (
                                     <option key={p} value={p}>{p}</option>
@@ -379,8 +380,8 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                             </select>
                         </div>
                         <div>
-                            <label className="form-label">Số điện thoại liên hệ (Tuỳ chọn)</label>
-                            <input type="text" {...regProfile('phone')} placeholder="+84..." className="form-input" />
+                            <label htmlFor="coach-phone" className="form-label">Số điện thoại liên hệ (Tuỳ chọn)</label>
+                            <input id="coach-phone" type="text" {...regProfile('phone')} placeholder="+84..." className="form-input" />
                         </div>
                     </div>
                 </div>
@@ -390,8 +391,8 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {(['facebook', 'instagram', 'youtube', 'tiktok', 'website'] as const).map((sn) => (
                             <div key={sn}>
-                                <label className="form-label capitalize">{sn}</label>
-                                <input type="url" {...regProfile(sn)} placeholder={`https://${sn}.com/...`} className="form-input" />
+                                <label htmlFor={`coach-social-${sn}`} className="form-label capitalize">{sn}</label>
+                                <input id={`coach-social-${sn}`} type="url" {...regProfile(sn)} placeholder={`https://${sn}.com/...`} className="form-input" />
                             </div>
                         ))}
                     </div>

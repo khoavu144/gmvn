@@ -1,9 +1,10 @@
 // src/components/ui/FilterModal.tsx
 // Bottom sheet filter modal (Q5) · Dark mode · Lucide icons
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, SlidersHorizontal, Check } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 
 interface FilterOption {
     id: string;
@@ -36,12 +37,28 @@ export function FilterModal({
     title = 'Bộ lọc',
 }: FilterModalProps) {
     const [localSelected, setLocalSelected] = useState<Record<string, string[]>>(selected);
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    useFocusTrap(modalRef, isOpen);
 
     /* eslint-disable react-hooks/set-state-in-effect -- reset draft filters when parent selection or sheet open state changes */
     useEffect(() => {
         setLocalSelected(selected);
     }, [selected, isOpen]);
     /* eslint-enable react-hooks/set-state-in-effect */
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
 
     const toggleOption = (groupId: string, optionId: string, multi: boolean = false) => {
         setLocalSelected((prev) => {
@@ -85,6 +102,9 @@ export function FilterModal({
 
             {/* Bottom Sheet */}
             <div
+                ref={modalRef}
+                role="dialog"
+                aria-modal="true"
                 className={cn(
                     'fixed inset-x-0 bottom-0 z-modal lg:hidden',
                     'bg-white dark:bg-gray-900 rounded-t-2xl',
@@ -104,8 +124,10 @@ export function FilterModal({
                         )}
                     </div>
                     <button
+                        type="button"
                         onClick={onClose}
-                        className="p-2 -mr-2 text-gray-500 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-200"
+                        className="-mr-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center p-2 text-gray-500 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-200"
+                        aria-label="Đóng bộ lọc"
                     >
                         <X className="w-5 h-5" />
                     </button>

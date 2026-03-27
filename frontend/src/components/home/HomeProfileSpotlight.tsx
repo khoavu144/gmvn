@@ -50,9 +50,10 @@ function SpotlightCarouselBody({ slides, resolveHref, onPrefetch }: BodyProps) {
             <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/[0.04]">
                 <div className="relative aspect-[4/5] w-full bg-gray-100">
                     <img
+                        key={current.id}
                         src={current.avatar_url!}
                         alt={current.full_name}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover animate-fade-in"
                         loading="lazy"
                         decoding="async"
                     />

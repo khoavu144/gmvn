@@ -19,4 +19,26 @@ test.describe('authenticated smoke', () => {
     await page.getByRole('button', { name: /đăng nhập/i }).click();
     await expect(page).toHaveURL(/\/(dashboard|gym-owner|onboarding)/, { timeout: 25_000 });
   });
+
+  test('logout returns to login', async ({ page }) => {
+    await page.goto('/login', { waitUntil: 'domcontentloaded' });
+    await page.getByLabel('Email', { exact: true }).fill(process.env.E2E_LOGIN_EMAIL!);
+    await page.getByLabel('Mật khẩu', { exact: true }).fill(process.env.E2E_LOGIN_PASSWORD!);
+    await page.getByRole('button', { name: /đăng nhập/i }).click();
+    await expect(page).toHaveURL(/\/(dashboard|gym-owner|onboarding)/, { timeout: 25_000 });
+
+    await page.getByRole('button', { name: /đăng xuất/i }).first().click({ timeout: 10_000 });
+    await expect(page).toHaveURL(/\/login/, { timeout: 25_000 });
+  });
+});
+
+test.describe('auth negative paths', () => {
+  test('invalid credentials show error', async ({ page }) => {
+    await page.goto('/login', { waitUntil: 'domcontentloaded' });
+    await page.getByLabel('Email', { exact: true }).fill('invalid@example.com');
+    await page.getByLabel('Mật khẩu', { exact: true }).fill('wrong-password');
+    await page.getByRole('button', { name: /đăng nhập/i }).click();
+
+    await expect(page.getByRole('alert')).toBeVisible({ timeout: 10_000 });
+  });
 });
