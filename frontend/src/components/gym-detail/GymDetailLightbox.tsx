@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import type { GymCenter, GymGallery } from '../../types';
+import type { GymGallery } from '../../types';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 
 export interface GymDetailLightboxProps {

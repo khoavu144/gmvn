@@ -29,7 +29,6 @@ import {
     getFallbackGallery,
     resolveLeadRoute,
     getTodayHours,
-    SummaryPill,
     OverviewMetaRow
 } from '../utils/gymDetailUtils';
 
@@ -154,7 +153,6 @@ const GymDetailPage: React.FC = () => {
         return getFallbackGallery(gym, branchId);
     }, [branchDetail?.gallery, branchId, gym]);
 
-    const activeImage = lightboxIdx !== null ? gallery[lightboxIdx] : null;
     const heroImage = gallery.find((item) => item.is_hero) || gallery[0] || null;
 
     const heroIndexInGallery = useMemo(() => {
@@ -291,8 +289,6 @@ const GymDetailPage: React.FC = () => {
         return () => observer.disconnect();
     }, [gym, visibleSections]);
 
-    useBodyScrollLock('gym-detail-lightbox', lightboxIdx !== null);
-
     useEffect(() => {
         if (lightboxIdx === null) return;
 
@@ -312,6 +308,8 @@ const GymDetailPage: React.FC = () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
     }, [lightboxIdx, gallery.length]);
+
+    if (loading) {
         return (
             <div className="marketplace-shell min-h-screen">
                 <div className="marketplace-container gv-pad-y">
@@ -599,7 +597,6 @@ const GymDetailPage: React.FC = () => {
                     leadAction={leadAction}
                     reducedEffects={reducedEffects}
                 />
-            </div>
             </div>
         </>
     );

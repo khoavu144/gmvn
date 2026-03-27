@@ -47,7 +47,7 @@ function MobileAccordion({ group, isOpen, onToggle, onClose }: {
 }
 
 interface MobileMenuDrawerProps {
-    mobileMenuRef: React.RefObject<HTMLDivElement>;
+    mobileMenuRef: React.RefObject<HTMLDivElement | null>;
     publicNav: NavGroup[];
     mobileOpenGroup: string | null;
     setMobileOpenGroup: React.Dispatch<React.SetStateAction<string | null>>;

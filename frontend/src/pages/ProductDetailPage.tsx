@@ -13,7 +13,7 @@ import { trackEvent } from '../lib/analytics';
 import { ProductBuyPanel } from '../components/product-detail/ProductBuyPanel';
 import { ProductProgramPreview } from '../components/product-detail/ProductProgramPreview';
 import { ProductReviews } from '../components/product-detail/ProductReviews';
-import { buildOverviewFacts, pickSalesRegionFromAttributes, buildFulfillmentPanel, buildBuyLead } from '../utils/productDetailUtils';
+import { buildOverviewFacts, buildFulfillmentPanel, buildBuyLead } from '../utils/productDetailUtils';
 
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:3001/api/v1';
 

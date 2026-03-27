@@ -11,7 +11,6 @@ interface BranchEquipmentTabProps {
 
 export const BranchEquipmentTab: React.FC<BranchEquipmentTabProps> = ({
     equipment,
-    setEquipment,
     newEquip,
     setNewEquip,
     handleUpdateEquipment
