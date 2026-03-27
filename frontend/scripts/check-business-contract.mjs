@@ -19,7 +19,7 @@ const requiredRoutes = [
   ['/coaches','coaches','browse_to_profile'],
   ['/gyms','gyms','find_gym_fast'],
   ['/marketplace','marketplace','browse_to_product'],
-  ['/pricing','pricing','drive_upgrade_decision'],
+  ['/pricing','pricing','announce_free_access'],
   ['/news','news','build_seo_trust'],
 ];
 

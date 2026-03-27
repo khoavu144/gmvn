@@ -1,21 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import apiClient from '../services/api';
+import type { PlanLimits } from './usePlatformPlan.types';
 
 export type PlatformPlan = 'free' | 'coach_pro' | 'coach_elite' | 'athlete_premium' | 'gym_business';
-
-export interface PlanLimits {
-    maxPrograms: number;
-    maxClients: number;
-    maxBranches: number;
-    maxGymTrainers: number;
-    prioritySearch: boolean;
-    badge: boolean;
-    customShareCard: boolean;
-    unlimitedProgressPhotos: boolean;
-    fullSubscriptionHistory: boolean;
-    coachComparison: boolean;
-}
-
 
 interface PlatformPlanState {
     plan: PlatformPlan;
@@ -27,16 +14,16 @@ interface PlatformPlanState {
 }
 
 const DEFAULT_LIMITS: PlanLimits = {
-    maxPrograms: 3,
-    maxClients: 10,
-    maxBranches: 1,
-    maxGymTrainers: 5,
-    prioritySearch: false,
-    badge: false,
-    customShareCard: false,
-    unlimitedProgressPhotos: false,
-    fullSubscriptionHistory: false,
-    coachComparison: false,
+    maxPrograms: 999999,
+    maxClients: 999999,
+    maxBranches: 999999,
+    maxGymTrainers: 999999,
+    prioritySearch: true,
+    badge: true,
+    customShareCard: true,
+    unlimitedProgressPhotos: true,
+    fullSubscriptionHistory: true,
+    coachComparison: true,
 };
 
 export function usePlatformPlan(): PlatformPlanState {
@@ -61,7 +48,7 @@ export function usePlatformPlan(): PlatformPlanState {
                 error: null,
             });
         } catch {
-            setState(prev => ({ ...prev, isLoading: false }));
+            setState((prev) => ({ ...prev, isLoading: false }));
         }
     }, []);
 
@@ -74,4 +61,4 @@ export function usePlatformPlan(): PlatformPlanState {
     return state;
 }
 
-export type { PlatformPlanState };
+export type { PlatformPlanState, PlanLimits };

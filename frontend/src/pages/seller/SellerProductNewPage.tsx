@@ -84,7 +84,7 @@ export default function SellerProductNewPage() {
             if (isAxiosError(err) && err.response?.data) {
                 const d = err.response.data as MarketplaceSellerApiError;
                 if (d.needs_membership) {
-                    setError(`${d.error ?? ''} Nâng cấp tại trang Gói thành viên.`);
+                    setError(d.error || 'Không tạo được sản phẩm.');
                     return;
                 }
                 setError(d.error || 'Không tạo được sản phẩm.');
@@ -133,35 +133,32 @@ export default function SellerProductNewPage() {
                     <form onSubmit={submit} className="space-y-4 bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                         {error && (
                             <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-                                {error}{' '}
-                                {error.includes('Gói') && (
-                                    <Link to="/dashboard/subscriptions" className="font-bold underline">
-                                        Đi tới gói thành viên
-                                    </Link>
-                                )}
+                                {error}
                             </div>
                         )}
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-product-title" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 Tiêu đề
                             </label>
-                            <input className="form-input w-full" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                            <input id="seller-product-title" className="form-input w-full" value={title} onChange={(e) => setTitle(e.target.value)} required />
                         </div>
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-product-description" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 Mô tả
                             </label>
                             <textarea
+                                id="seller-product-description"
                                 className="form-input w-full min-h-[100px]"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-product-category" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 Danh mục
                             </label>
                             <select
+                                id="seller-product-category"
                                 className="form-input w-full"
                                 value={categoryId}
                                 onChange={(e) => setCategoryId(e.target.value)}
@@ -178,10 +175,11 @@ export default function SellerProductNewPage() {
                         </div>
                         {!restrictPhysical && (
                             <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                                <label htmlFor="seller-product-type" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                     Loại sản phẩm
                                 </label>
                                 <select
+                                    id="seller-product-type"
                                     className="form-input w-full"
                                     value={productType}
                                     onChange={(e) => setProductType(e.target.value as typeof productType)}
@@ -193,10 +191,11 @@ export default function SellerProductNewPage() {
                             </div>
                         )}
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-product-price" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 Giá (VND)
                             </label>
                             <input
+                                id="seller-product-price"
                                 className="form-input w-full"
                                 inputMode="numeric"
                                 value={price}
@@ -206,10 +205,11 @@ export default function SellerProductNewPage() {
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-product-compare-at" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 Giá so sánh (tuỳ chọn)
                             </label>
                             <input
+                                id="seller-product-compare-at"
                                 className="form-input w-full"
                                 inputMode="numeric"
                                 value={compareAt}
@@ -217,10 +217,11 @@ export default function SellerProductNewPage() {
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-product-stock" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 Tồn kho (tuỳ chọn)
                             </label>
                             <input
+                                id="seller-product-stock"
                                 className="form-input w-full"
                                 inputMode="numeric"
                                 value={stock}
@@ -228,10 +229,11 @@ export default function SellerProductNewPage() {
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-product-thumbnail" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 URL ảnh đại diện
                             </label>
                             <input
+                                id="seller-product-thumbnail"
                                 className="form-input w-full"
                                 value={thumbnailUrl}
                                 onChange={(e) => setThumbnailUrl(e.target.value)}
@@ -239,10 +241,11 @@ export default function SellerProductNewPage() {
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-product-gallery" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 Gallery (mỗi URL một dòng)
                             </label>
                             <textarea
+                                id="seller-product-gallery"
                                 className="form-input w-full min-h-[80px] font-mono text-xs"
                                 value={galleryText}
                                 onChange={(e) => setGalleryText(e.target.value)}

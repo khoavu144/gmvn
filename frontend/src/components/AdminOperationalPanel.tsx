@@ -29,50 +29,6 @@ type AuditRow = {
     timestamp: string;
 };
 
-type BillingOpsSummary = {
-    health_status: 'OK' | 'DEGRADED' | 'ERROR';
-    health_checks: Record<string, DependencyCheck>;
-    outbox: {
-        pending_ready: number;
-        failed_total: number;
-        processing: number;
-    };
-    billing: {
-        window_minutes: number;
-        checkout: {
-            pending: number;
-            stale_pending: number;
-            paid_without_subscription: number;
-        };
-        webhooks: {
-            received_last_window: number;
-            failed_last_window: number;
-            processed_last_window: number;
-        };
-    };
-};
-
-type CheckoutIntent = {
-    id: string;
-    plan: string;
-    transfer_content: string;
-    amount: number;
-    status: string;
-    provider_transaction_id: string | null;
-    created_at: string;
-    expires_at: string;
-    user: { full_name?: string; email?: string } | null;
-};
-
-type WebhookEvent = {
-    id: string;
-    status: string;
-    provider_transaction_id: string | null;
-    transfer_content: string | null;
-    error_message: string | null;
-    received_at: string;
-};
-
 type EmailOutboxRecord = {
     id: string;
     status: string;
@@ -82,6 +38,14 @@ type EmailOutboxRecord = {
     last_error: string | null;
     next_attempt_at: string;
     created_at: string;
+};
+
+type PlatformBillingStatus = {
+    success: boolean;
+    billing_enabled: boolean;
+    deprecated?: boolean;
+    mode?: string;
+    message?: string;
 };
 
 function apiErrorMessage(error: unknown, fallback: string) {
@@ -107,7 +71,7 @@ function statusTone(status: string) {
     if (normalized === 'degraded' || normalized === 'pending' || normalized === 'processing' || normalized === 'received') {
         return 'text-amber-700 bg-amber-50 border-amber-200';
     }
-    if (normalized === 'ignored') {
+    if (normalized === 'ignored' || normalized === 'disabled') {
         return 'text-slate-700 bg-slate-50 border-slate-200';
     }
     return 'text-red-700 bg-red-50 border-red-200';
@@ -123,13 +87,8 @@ function fmtDate(value?: string | null) {
 export default function AdminOperationalPanel() {
     const [health, setHealth] = useState<HealthResponse | null>(null);
     const [pending, setPending] = useState<AuditRow[]>([]);
-    const [opsSummary, setOpsSummary] = useState<BillingOpsSummary | null>(null);
-    const [checkoutIntents, setCheckoutIntents] = useState<CheckoutIntent[]>([]);
-    const [webhookEvents, setWebhookEvents] = useState<WebhookEvent[]>([]);
     const [emailOutbox, setEmailOutbox] = useState<EmailOutboxRecord[]>([]);
-    const [checkoutStatus, setCheckoutStatus] = useState('');
-    const [webhookStatus, setWebhookStatus] = useState('');
-    const [billingSearch, setBillingSearch] = useState('');
+    const [platformBilling, setPlatformBilling] = useState<PlatformBillingStatus | null>(null);
     const [rejectReason, setRejectReason] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(true);
     const [busyId, setBusyId] = useState<string | null>(null);
@@ -139,46 +98,28 @@ export default function AdminOperationalPanel() {
         setLoading(true);
         setErr(null);
         try {
-            const [h, p, ops, intents, events, outbox] = await Promise.all([
+            const [h, p, outbox, billing] = await Promise.all([
                 apiClient.get('/admin/health'),
                 apiClient.get('/admin/pending-approvals'),
-                apiClient.get('/admin/billing-ops/overview', { params: { window_minutes: 60 } }),
-                apiClient.get('/platform/admin/checkout-intents', {
-                    params: {
-                        page: 1,
-                        limit: 20,
-                        status: checkoutStatus || undefined,
-                        q: billingSearch || undefined,
-                    },
-                }),
-                apiClient.get('/platform/admin/webhook-events', {
-                    params: {
-                        page: 1,
-                        limit: 20,
-                        status: webhookStatus || undefined,
-                        q: billingSearch || undefined,
-                    },
-                }),
                 apiClient.get('/admin/email-outbox', {
                     params: {
                         page: 1,
                         limit: 20,
                     },
                 }),
+                apiClient.get('/platform/admin/billing'),
             ]);
 
             setHealth(h.data as HealthResponse);
             setPending((p.data.requests || []) as AuditRow[]);
-            setOpsSummary((ops.data.summary ?? null) as BillingOpsSummary | null);
-            setCheckoutIntents((intents.data.intents ?? []) as CheckoutIntent[]);
-            setWebhookEvents((events.data.events ?? []) as WebhookEvent[]);
             setEmailOutbox((outbox.data.items ?? []) as EmailOutboxRecord[]);
+            setPlatformBilling(billing.data as PlatformBillingStatus);
         } catch (error) {
             setErr(apiErrorMessage(error, 'Không tải được dữ liệu'));
         } finally {
             setLoading(false);
         }
-    }, [checkoutStatus, webhookStatus, billingSearch]);
+    }, []);
 
     useEffect(() => {
         void load();
@@ -230,19 +171,6 @@ export default function AdminOperationalPanel() {
         }
     }, [load]);
 
-    const reconcileBilling = useCallback(async () => {
-        setBusyId('billing-reconcile');
-        setErr(null);
-        try {
-            await apiClient.post('/platform/admin/reconcile');
-            await load();
-        } catch (error) {
-            setErr(apiErrorMessage(error, 'Reconcile billing thất bại.'));
-        } finally {
-            setBusyId(null);
-        }
-    }, [load]);
-
     const statusEntries = useMemo(
         () => Object.entries(health?.checks || {}),
         [health?.checks],
@@ -261,12 +189,12 @@ export default function AdminOperationalPanel() {
             )}
 
             <section>
-                <h3 className="text-lg font-black uppercase tracking-tight border-b border-gray-200 pb-2 mb-4">
+                <h3 className="mb-4 border-b border-gray-200 pb-2 text-lg font-black uppercase tracking-tight">
                     Sức khỏe hệ thống
                 </h3>
                 {health ? (
                     <div className="space-y-4">
-                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+                        <div className="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
                             <div className="rounded-lg border border-gray-200 p-4">
                                 <div className="text-xs font-bold uppercase text-gray-500">Trạng thái</div>
                                 <div className={`mt-1 inline-flex rounded border px-2 py-1 text-xs font-semibold ${statusTone(health.status)}`}>
@@ -283,7 +211,7 @@ export default function AdminOperationalPanel() {
                             </div>
                             <div className="rounded-lg border border-gray-200 p-4">
                                 <div className="text-xs font-bold uppercase text-gray-500">Timestamp</div>
-                                <div className="mt-1 font-bold text-xs">{fmtDate(health.timestamp)}</div>
+                                <div className="mt-1 text-xs font-bold">{fmtDate(health.timestamp)}</div>
                             </div>
                         </div>
                         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
@@ -308,194 +236,81 @@ export default function AdminOperationalPanel() {
             </section>
 
             <section>
-                <h3 className="text-lg font-black uppercase tracking-tight border-b border-gray-200 pb-2 mb-4">
-                    Billing ops overview
+                <h3 className="mb-4 border-b border-gray-200 pb-2 text-lg font-black uppercase tracking-tight">
+                    Trạng thái monetization nền tảng
                 </h3>
-                {opsSummary ? (
-                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 text-sm">
-                        <div className="rounded-lg border border-gray-200 p-4">
-                            <div className="text-xs uppercase font-bold text-gray-500">Webhook failed ({opsSummary.billing.window_minutes}m)</div>
-                            <div className="mt-1 text-lg font-black">{opsSummary.billing.webhooks.failed_last_window}</div>
-                        </div>
-                        <div className="rounded-lg border border-gray-200 p-4">
-                            <div className="text-xs uppercase font-bold text-gray-500">Checkout pending</div>
-                            <div className="mt-1 text-lg font-black">{opsSummary.billing.checkout.pending}</div>
-                        </div>
-                        <div className="rounded-lg border border-gray-200 p-4">
-                            <div className="text-xs uppercase font-bold text-gray-500">Checkout stale pending</div>
-                            <div className="mt-1 text-lg font-black">{opsSummary.billing.checkout.stale_pending}</div>
-                        </div>
-                        <div className="rounded-lg border border-gray-200 p-4">
-                            <div className="text-xs uppercase font-bold text-gray-500">Email outbox pending</div>
-                            <div className="mt-1 text-lg font-black">{opsSummary.outbox.pending_ready}</div>
-                        </div>
+                <div className="rounded-lg border border-gray-200 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-700">
+                    <div className="flex flex-wrap items-center gap-3">
+                        <span className={`rounded border px-2 py-1 text-xs font-semibold ${statusTone(platformBilling?.billing_enabled ? 'up' : 'disabled')}`}>
+                            {platformBilling?.billing_enabled ? 'enabled' : 'disabled'}
+                        </span>
+                        <span className="font-semibold text-gray-900">Free-first mode đang hoạt động</span>
                     </div>
-                ) : (
-                    <p className="text-sm text-gray-500">Chưa có dữ liệu billing ops.</p>
-                )}
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                    <button
-                        type="button"
-                        className="btn-primary text-xs py-2 px-3"
-                        disabled={busyId === 'billing-reconcile'}
-                        onClick={() => void reconcileBilling()}
-                    >
-                        {busyId === 'billing-reconcile' ? 'Đang reconcile...' : 'Reconcile checkout intents'}
-                    </button>
+                    <p className="mt-3">
+                        Thu phí nền tảng đã bị vô hiệu hóa. Các panel checkout intent, webhook event và reconcile platform billing không còn là bề mặt vận hành chính.
+                    </p>
+                    <p className="mt-2 text-xs text-gray-500">
+                        Coach / gym commerce vẫn được giữ ở các flow riêng, không điều khiển từ panel này.
+                    </p>
                 </div>
             </section>
 
             <section>
-                <h3 className="text-lg font-black uppercase tracking-tight border-b border-gray-200 pb-2 mb-4">
-                    Billing queues & events
+                <h3 className="mb-4 border-b border-gray-200 pb-2 text-lg font-black uppercase tracking-tight">
+                    Email outbox
                 </h3>
-                <div className="mb-3 grid gap-2 md:grid-cols-[minmax(0,1fr)_auto_auto]">
-                    <input
-                        type="text"
-                        className="form-input text-sm"
-                        placeholder="Tìm theo transfer content / tx id / email"
-                        value={billingSearch}
-                        onChange={(event) => setBillingSearch(event.target.value)}
-                    />
-                    <select
-                        className="form-input text-sm min-w-[11rem]"
-                        value={checkoutStatus}
-                        onChange={(event) => setCheckoutStatus(event.target.value)}
-                    >
-                        <option value="">Checkout: tất cả</option>
-                        <option value="pending">pending</option>
-                        <option value="paid">paid</option>
-                        <option value="failed">failed</option>
-                        <option value="expired">expired</option>
-                        <option value="cancelled">cancelled</option>
-                    </select>
-                    <select
-                        className="form-input text-sm min-w-[11rem]"
-                        value={webhookStatus}
-                        onChange={(event) => setWebhookStatus(event.target.value)}
-                    >
-                        <option value="">Webhook: tất cả</option>
-                        <option value="received">received</option>
-                        <option value="processed">processed</option>
-                        <option value="ignored">ignored</option>
-                        <option value="failed">failed</option>
-                    </select>
-                </div>
-
-                <div className="space-y-5">
-                    <div>
-                        <h4 className="text-sm font-bold uppercase tracking-[0.1em] text-gray-500 mb-2">Checkout intents (latest)</h4>
-                        <div className="overflow-x-auto rounded-lg border border-gray-200">
-                            <table className="w-full text-xs text-left">
-                                <thead className="bg-gray-50 uppercase text-gray-500">
-                                    <tr>
-                                        <th className="p-2">Status</th>
-                                        <th className="p-2">Plan</th>
-                                        <th className="p-2">User</th>
-                                        <th className="p-2">Amount</th>
-                                        <th className="p-2">Transfer content</th>
-                                        <th className="p-2">Created</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {checkoutIntents.map((intent) => (
-                                    <tr key={intent.id} className="border-t border-gray-200">
-                                            <td className="p-2">
-                                                <span className={`rounded border px-2 py-1 text-[11px] font-semibold ${statusTone(intent.status)}`}>
-                                                    {intent.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-2">{intent.plan}</td>
-                                            <td className="p-2">{intent.user?.email || intent.user?.full_name || intent.user?.email || '—'}</td>
-                                            <td className="p-2">{Number(intent.amount).toLocaleString('vi-VN')}</td>
-                                            <td className="p-2 max-w-[260px] truncate">{intent.transfer_content}</td>
-                                            <td className="p-2 whitespace-nowrap">{fmtDate(intent.created_at)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h4 className="text-sm font-bold uppercase tracking-[0.1em] text-gray-500 mb-2">Webhook events (latest)</h4>
-                        <div className="overflow-x-auto rounded-lg border border-gray-200">
-                            <table className="w-full text-xs text-left">
-                                <thead className="bg-gray-50 uppercase text-gray-500">
-                                    <tr>
-                                        <th className="p-2">Status</th>
-                                        <th className="p-2">Transaction</th>
-                                        <th className="p-2">Transfer content</th>
-                                        <th className="p-2">Error</th>
-                                        <th className="p-2">Received</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {webhookEvents.map((event) => (
-                                        <tr key={event.id} className="border-t border-gray-200">
-                                            <td className="p-2">
-                                                <span className={`rounded border px-2 py-1 text-[11px] font-semibold ${statusTone(event.status)}`}>
-                                                    {event.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-2">{event.provider_transaction_id || '—'}</td>
-                                            <td className="p-2 max-w-[220px] truncate">{event.transfer_content || '—'}</td>
-                                            <td className="p-2 max-w-[220px] truncate text-red-700">{event.error_message || '—'}</td>
-                                            <td className="p-2 whitespace-nowrap">{fmtDate(event.received_at)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h4 className="text-sm font-bold uppercase tracking-[0.1em] text-gray-500 mb-2">Email outbox</h4>
-                        <div className="overflow-x-auto rounded-lg border border-gray-200">
-                            <table className="w-full text-xs text-left">
-                                <thead className="bg-gray-50 uppercase text-gray-500">
-                                    <tr>
-                                        <th className="p-2">Status</th>
-                                        <th className="p-2">Type</th>
-                                        <th className="p-2">Recipient</th>
-                                        <th className="p-2">Attempts</th>
-                                        <th className="p-2">Last error</th>
-                                        <th className="p-2">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {emailOutbox.map((item) => (
-                                        <tr key={item.id} className="border-t border-gray-200">
-                                            <td className="p-2">
-                                                <span className={`rounded border px-2 py-1 text-[11px] font-semibold ${statusTone(item.status)}`}>
-                                                    {item.status}
-                                                </span>
-                                            </td>
-                                            <td className="p-2">{item.email_type}</td>
-                                            <td className="p-2">{item.recipient_email}</td>
-                                            <td className="p-2">{item.attempt_count}</td>
-                                            <td className="p-2 max-w-[220px] truncate text-red-700">{item.last_error || '—'}</td>
-                                            <td className="p-2">
-                                                <button
-                                                    type="button"
-                                                    className="btn-secondary text-[11px] py-1 px-2"
-                                                    disabled={busyId === item.id}
-                                                    onClick={() => void retryOutbox(item.id)}
-                                                >
-                                                    Retry
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div className="overflow-x-auto rounded-lg border border-gray-200">
+                    <table className="w-full text-left text-xs">
+                        <thead className="bg-gray-50 uppercase text-gray-500">
+                            <tr>
+                                <th className="p-2">Status</th>
+                                <th className="p-2">Type</th>
+                                <th className="p-2">Recipient</th>
+                                <th className="p-2">Attempts</th>
+                                <th className="p-2">Next attempt</th>
+                                <th className="p-2">Last error</th>
+                                <th className="p-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {emailOutbox.map((item) => (
+                                <tr key={item.id} className="border-t border-gray-200">
+                                    <td className="p-2">
+                                        <span className={`rounded border px-2 py-1 text-[11px] font-semibold ${statusTone(item.status)}`}>
+                                            {item.status}
+                                        </span>
+                                    </td>
+                                    <td className="p-2">{item.email_type}</td>
+                                    <td className="p-2">{item.recipient_email}</td>
+                                    <td className="p-2">{item.attempt_count}</td>
+                                    <td className="p-2 whitespace-nowrap">{fmtDate(item.next_attempt_at)}</td>
+                                    <td className="max-w-[220px] truncate p-2 text-red-700">{item.last_error || '—'}</td>
+                                    <td className="p-2">
+                                        <button
+                                            type="button"
+                                            className="btn-secondary px-2 py-1 text-[11px]"
+                                            disabled={busyId === item.id}
+                                            onClick={() => void retryOutbox(item.id)}
+                                        >
+                                            Retry
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {emailOutbox.length === 0 && (
+                                <tr>
+                                    <td colSpan={7} className="p-4 text-center text-sm text-gray-500">
+                                        Không có email outbox record.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
             </section>
 
             <section>
-                <h3 className="text-lg font-black uppercase tracking-tight border-b border-gray-200 pb-2 mb-4">
+                <h3 className="mb-4 border-b border-gray-200 pb-2 text-lg font-black uppercase tracking-tight">
                     Duyệt hành động rủi ro cao
                 </h3>
                 {pending.length === 0 ? (
@@ -511,12 +326,12 @@ export default function AdminOperationalPanel() {
                                 </div>
                                 <div className="mt-1 text-gray-500">Lý do: {row.reason}</div>
                                 <div className="mt-1 text-xs">Admin yêu cầu: {row.admin_id}</div>
-                                <div className="flex flex-wrap gap-2 mt-3">
+                                <div className="mt-3 flex flex-wrap gap-2">
                                     <button
                                         type="button"
                                         disabled={busyId === row.id}
                                         onClick={() => void approve(row.id)}
-                                        className="btn-primary text-xs py-2 px-3"
+                                        className="btn-primary px-3 py-2 text-xs"
                                     >
                                         Duyệt
                                     </button>
@@ -527,13 +342,13 @@ export default function AdminOperationalPanel() {
                                         onChange={(event) =>
                                             setRejectReason((prev) => ({ ...prev, [row.id]: event.target.value }))
                                         }
-                                        className="form-input text-sm flex-1 min-w-[160px]"
+                                        className="form-input min-w-[160px] flex-1 text-sm"
                                     />
                                     <button
                                         type="button"
                                         disabled={busyId === row.id}
                                         onClick={() => void reject(row.id)}
-                                        className="btn-secondary text-xs py-2 px-3"
+                                        className="btn-secondary px-3 py-2 text-xs"
                                     >
                                         Từ chối
                                     </button>
@@ -543,7 +358,6 @@ export default function AdminOperationalPanel() {
                     </div>
                 )}
             </section>
-
         </div>
     );
 }

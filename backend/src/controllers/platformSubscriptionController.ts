@@ -1,115 +1,69 @@
 import { Request, Response } from 'express';
-import { platformSubscriptionService, PLAN_CONFIG, PlatformPlan } from '../services/platformSubscriptionService';
+import {
+    platformSubscriptionService,
+    FULL_ACCESS_LIMITS,
+    type PlatformPlan,
+} from '../services/platformSubscriptionService';
 import { asyncHandler } from '../utils/asyncHandler';
 import { AppError } from '../utils/AppError';
-import { verifySepayWebhookAuth } from '../utils/sepayWebhookAuth';
 
-const VALID_PLANS: PlatformPlan[] = ['coach_pro', 'coach_elite', 'athlete_premium', 'gym_business'];
-
-// ── User: get own plan ──────────────────────────────────────────────────────
-export const getMyPlan = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const result = await platformSubscriptionService.getMyPlan(req.user!.user_id);
-    const billingEnabled = await platformSubscriptionService.isBillingEnabled();
-    res.json({ success: true, ...result, billing_enabled: billingEnabled });
-});
-
-// ── User: get pricing info (public) ────────────────────────────────────────
-export const getPricingInfo = async (_req: Request, res: Response): Promise<void> => {
-    const plans = Object.entries(PLAN_CONFIG).map(([key, config]) => ({
-        plan: key,
-        label: config.label,
-        price: config.price,
-        limits: config.limits,
-    }));
-    res.json({ success: true, plans });
+const DISABLED_REASON = 'Thu phí nền tảng đã bị vô hiệu hóa vĩnh viễn.';
+const FREE_PLATFORM_PLAN = {
+    plan: 'free' as PlatformPlan,
+    label: 'Miễn phí',
+    price: 0,
+    limits: FULL_ACCESS_LIMITS,
 };
 
-// ── User: create checkout ──────────────────────────────────────────────────
-export const createCheckout = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { plan } = req.body as { plan: PlatformPlan };
-    if (!VALID_PLANS.includes(plan)) {
-        throw new AppError('Gói không hợp lệ', 400);
-    }
-
-    const billingEnabled = await platformSubscriptionService.isBillingEnabled();
-    if (!billingEnabled) {
-        throw new AppError('Hệ thống thu phí chưa được kích hoạt', 400);
-    }
-
-    const checkout = await platformSubscriptionService.createCheckout(req.user!.user_id, plan);
-    res.json({ success: true, ...checkout });
+export const getMyPlan = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const result = await platformSubscriptionService.getMyPlan(req.user!.user_id);
+    res.json({ success: true, ...result, billing_enabled: false });
 });
 
-// ── User: cancel plan ──────────────────────────────────────────────────────
-export const cancelMyPlan = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    await platformSubscriptionService.cancelPlan(req.user!.user_id);
-    res.json({ success: true, message: 'Đã huỷ gói. Tài khoản trở về miễn phí.' });
-});
-
-// ── SePay Webhook (public — called by SePay) ────────────────────────────────
-export const sepayPlatformWebhook = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const body = (req.body ?? {}) as {
-        content?: string;
-        amount?: number;
-        transaction_id?: string;
-    };
-
-    const event = await platformSubscriptionService.recordWebhookEvent({
-        provider: 'sepay',
-        providerTransactionId: body.transaction_id ?? null,
-        transferContent: body.content ?? null,
-        signature: (req.headers['x-sepay-signature'] as string) ?? null,
-        payload: body as Record<string, unknown>,
+export const getPricingInfo = async (_req: Request, res: Response): Promise<void> => {
+    res.json({
+        success: true,
+        billing_enabled: false,
+        deprecated: true,
+        plans: [FREE_PLATFORM_PLAN],
     });
+};
 
-    try {
-        verifySepayWebhookAuth(req);
-
-        if (!body.content?.trim()) {
-            throw new AppError('Missing transfer content', 400, 'WEBHOOK_TRANSFER_CONTENT_REQUIRED');
-        }
-
-        if (!body.transaction_id?.trim()) {
-            throw new AppError('Missing transaction id', 400, 'WEBHOOK_TRANSACTION_ID_REQUIRED');
-        }
-
-        const result = await platformSubscriptionService.activateFromWebhook(
-            body.content,
-            body.transaction_id,
-            body.amount ?? 0,
-        );
-
-        await platformSubscriptionService.finalizeWebhookEvent(
-            event.id,
-            result.ignored ? 'ignored' : 'processed',
-            { result },
-        );
-
-        res.json({ success: true, ...result });
-    } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        await platformSubscriptionService.finalizeWebhookEvent(event.id, 'failed', { payload: body }, message);
-        throw error;
-    }
+export const createCheckout = asyncHandler(async (_req: Request, _res: Response): Promise<void> => {
+    throw new AppError(DISABLED_REASON, 400, 'BILLING_DISABLED');
 });
 
-// ── Admin: get billing status ──────────────────────────────────────────────
+export const cancelMyPlan = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
+    res.json({
+        success: true,
+        billing_enabled: false,
+        deprecated: true,
+        message: 'Không có gói nền tảng trả phí nào đang hoạt động.',
+    });
+});
+
+export const sepayPlatformWebhook = async (_req: Request, res: Response): Promise<void> => {
+    res.status(200).json({
+        success: true,
+        ignored: true,
+        billing_enabled: false,
+        reason: 'platform_billing_disabled',
+    });
+};
+
 export const getAdminBillingStatus = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
-    const enabled = await platformSubscriptionService.isBillingEnabled();
-    res.json({ success: true, billing_enabled: enabled });
+    res.json({ success: true, billing_enabled: false, deprecated: true, mode: 'disabled' });
 });
 
-// ── Admin: toggle billing ──────────────────────────────────────────────────
-export const toggleAdminBilling = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { enabled } = req.body as { enabled: boolean };
-    if (typeof enabled !== 'boolean') {
-        throw new AppError('`enabled` must be boolean', 400);
-    }
-    await platformSubscriptionService.setBillingEnabled(enabled);
-    res.json({ success: true, billing_enabled: enabled });
+export const toggleAdminBilling = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
+    res.json({
+        success: true,
+        billing_enabled: false,
+        deprecated: true,
+        message: DISABLED_REASON,
+    });
 });
 
-// ── Admin: list paid subscriptions ────────────────────────────────────────
 export const listAllPlatformSubs = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const page = parseInt(String(req.query.page ?? '1'), 10);
     const limit = parseInt(String(req.query.limit ?? '50'), 10);
@@ -120,23 +74,14 @@ export const listAllPlatformSubs = asyncHandler(async (req: Request, res: Respon
 export const listCheckoutIntents = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10) || 50));
-    const status = typeof req.query.status === 'string' ? req.query.status : undefined;
-    const plan = typeof req.query.plan === 'string' ? req.query.plan : undefined;
-    const q = typeof req.query.q === 'string' ? req.query.q.trim() : undefined;
-    const result = await platformSubscriptionService.listCheckoutIntents(page, limit, { status, plan, q });
+    const result = await platformSubscriptionService.listCheckoutIntents(page, limit);
     res.json({ success: true, ...result });
 });
 
 export const listWebhookEvents = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10) || 50));
-    const status = typeof req.query.status === 'string' ? req.query.status : undefined;
-    const q = typeof req.query.q === 'string' ? req.query.q.trim() : undefined;
-    const from = typeof req.query.from === 'string' ? new Date(req.query.from) : undefined;
-    const to = typeof req.query.to === 'string' ? new Date(req.query.to) : undefined;
-    const safeFrom = from && !Number.isNaN(from.getTime()) ? from : undefined;
-    const safeTo = to && !Number.isNaN(to.getTime()) ? to : undefined;
-    const result = await platformSubscriptionService.listWebhookEvents(page, limit, { status, q, from: safeFrom, to: safeTo });
+    const result = await platformSubscriptionService.listWebhookEvents(page, limit);
     res.json({ success: true, ...result });
 });
 

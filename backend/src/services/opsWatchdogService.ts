@@ -1,7 +1,6 @@
 import { getEnv } from '../config/env';
 import { emailOutboxService } from './emailOutboxService';
 import { opsAlertService } from './opsAlertService';
-import { platformSubscriptionService } from './platformSubscriptionService';
 import { systemHealthService } from './systemHealthService';
 import { logger } from '../utils/logger';
 
@@ -9,19 +8,15 @@ class OpsWatchdogService {
     private readonly env = getEnv();
     private readinessFailureCount = 0;
     private readinessInAlert = false;
-    private webhookInAlert = false;
     private outboxInAlert = false;
 
     async runCheck() {
         const readinessFailureThreshold = this.env.ALERT_READINESS_CONSECUTIVE_FAILURES ?? 3;
         const outboxThreshold = this.env.ALERT_EMAIL_OUTBOX_PENDING_THRESHOLD ?? 50;
-        const webhookWindowMinutes = this.env.ALERT_WEBHOOK_FAILED_WINDOW_MINUTES ?? 30;
-        const webhookThreshold = this.env.ALERT_WEBHOOK_FAILED_THRESHOLD ?? 5;
 
-        const [health, outboxSummary, billingOps] = await Promise.all([
+        const [health, outboxSummary] = await Promise.all([
             systemHealthService.getSnapshot(),
             emailOutboxService.getOpsSummary(),
-            platformSubscriptionService.getOpsOverview(webhookWindowMinutes),
         ]);
 
         const readinessDegraded = health.status !== 'OK';
@@ -84,41 +79,11 @@ class OpsWatchdogService {
             });
         }
 
-        const failedWebhooks = billingOps.webhooks.failed_last_window;
-        const webhookOverThreshold = failedWebhooks >= webhookThreshold;
-        if (webhookOverThreshold) {
-            this.webhookInAlert = true;
-            await opsAlertService.send({
-                key: 'billing-webhook-failures',
-                severity: 'critical',
-                title: 'Webhook failure spike',
-                message: `${failedWebhooks} failed webhook events in last ${webhookWindowMinutes} minutes.`,
-                details: {
-                    threshold: webhookThreshold,
-                    billing: billingOps,
-                },
-            });
-        } else if (this.webhookInAlert) {
-            this.webhookInAlert = false;
-            await opsAlertService.send({
-                key: 'billing-webhook-recovered',
-                severity: 'resolved',
-                title: 'Webhook failures recovered',
-                message: `Failed webhook count dropped to ${failedWebhooks} in ${webhookWindowMinutes} minutes.`,
-                details: {
-                    billing: billingOps,
-                },
-                force: true,
-            });
-        }
-
         logger.info('ops_watchdog_check', {
             meta: {
                 readiness: health.status,
                 readinessFailureCount: this.readinessFailureCount,
                 outboxPendingReady: outboxSummary.pending_ready,
-                failedWebhooks,
-                webhookWindowMinutes,
             },
         });
     }

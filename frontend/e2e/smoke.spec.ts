@@ -41,5 +41,6 @@ test.describe('public smoke', () => {
     await page.goto('/pricing', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('main')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('button', { name: /^Nâng cấp ngay$/ })).toHaveCount(0);
   });
 });

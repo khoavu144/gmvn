@@ -99,7 +99,7 @@ export default function SellerTrainingPackageNewPage() {
                     return;
                 }
                 if (d.needs_membership) {
-                    setError(`${d.error ?? ''}`);
+                    setError(d.error || 'Không tạo được gói tập.');
                     return;
                 }
                 setError(d.error || 'Không tạo được gói tập.');
@@ -147,36 +147,31 @@ export default function SellerTrainingPackageNewPage() {
                 ) : (
                     <form onSubmit={submit} className="space-y-4 bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
                         {error && (
-                            <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
-                                {error}{' '}
-                                {error.includes('listing') || error.includes('membership') ? (
-                                    <Link to="/dashboard/subscriptions" className="font-bold underline">
-                                        Gói thành viên
-                                    </Link>
-                                ) : null}
-                            </div>
+                            <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">{error}</div>
                         )}
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-training-title" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 Tiêu đề
                             </label>
-                            <input className="form-input w-full" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                            <input id="seller-training-title" className="form-input w-full" value={title} onChange={(e) => setTitle(e.target.value)} required />
                         </div>
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-training-description" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 Mô tả
                             </label>
                             <textarea
+                                id="seller-training-description"
                                 className="form-input w-full min-h-[100px]"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-training-category" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 Danh mục
                             </label>
                             <select
+                                id="seller-training-category"
                                 className="form-input w-full"
                                 value={categoryId}
                                 onChange={(e) => setCategoryId(e.target.value)}
@@ -193,10 +188,10 @@ export default function SellerTrainingPackageNewPage() {
                         </div>
                         <div className="grid sm:grid-cols-2 gap-4">
                             <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                                <label htmlFor="seller-training-goal" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                     Mục tiêu
                                 </label>
-                                <select className="form-input w-full" value={goal} onChange={(e) => setGoal(e.target.value)}>
+                                <select id="seller-training-goal" className="form-input w-full" value={goal} onChange={(e) => setGoal(e.target.value)}>
                                     {GOALS.map((g) => (
                                         <option key={g.v} value={g.v}>
                                             {g.l}
@@ -205,10 +200,10 @@ export default function SellerTrainingPackageNewPage() {
                                 </select>
                             </div>
                             <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                                <label htmlFor="seller-training-level" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                     Cấp độ
                                 </label>
-                                <select className="form-input w-full" value={level} onChange={(e) => setLevel(e.target.value)}>
+                                <select id="seller-training-level" className="form-input w-full" value={level} onChange={(e) => setLevel(e.target.value)}>
                                     {LEVELS.map((g) => (
                                         <option key={g.v} value={g.v}>
                                             {g.l}
@@ -219,10 +214,11 @@ export default function SellerTrainingPackageNewPage() {
                         </div>
                         <div className="grid sm:grid-cols-2 gap-4">
                             <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                                <label htmlFor="seller-training-duration" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                     Số tuần
                                 </label>
                                 <input
+                                    id="seller-training-duration"
                                     className="form-input w-full"
                                     inputMode="numeric"
                                     value={durationWeeks}
@@ -230,10 +226,11 @@ export default function SellerTrainingPackageNewPage() {
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                                <label htmlFor="seller-training-sessions" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                     Buổi / tuần
                                 </label>
                                 <input
+                                    id="seller-training-sessions"
                                     className="form-input w-full"
                                     inputMode="numeric"
                                     value={sessionsPerWeek}
@@ -260,10 +257,11 @@ export default function SellerTrainingPackageNewPage() {
                             </label>
                         </div>
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-training-price" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 Giá (VND)
                             </label>
                             <input
+                                id="seller-training-price"
                                 className="form-input w-full"
                                 inputMode="numeric"
                                 value={price}
@@ -272,10 +270,11 @@ export default function SellerTrainingPackageNewPage() {
                             />
                         </div>
                         <div>
-                            <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                            <label htmlFor="seller-training-thumbnail" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                 URL ảnh đại diện
                             </label>
                             <input
+                                id="seller-training-thumbnail"
                                 className="form-input w-full"
                                 value={thumbnailUrl}
                                 onChange={(e) => setThumbnailUrl(e.target.value)}

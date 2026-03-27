@@ -151,13 +151,8 @@ function assertNotAdminSeller(user: User): void {
 }
 
 export async function assertSellerListingMembershipQuota(user: User): Promise<void> {
-    const n = await countSellerListings(user.id);
-    if (n >= 1 && !user.marketplace_membership_active) {
-        throw new MarketplaceSellerRuleError(
-            'NEEDS_MEMBERSHIP',
-            'Bạn đã dùng 1 listing miễn phí. Nâng cấp membership để đăng thêm sản phẩm.',
-        );
-    }
+    void user;
+    return;
 }
 
 export function assertSellerStandardProductType(user: User, input: CreateProductInput): void {

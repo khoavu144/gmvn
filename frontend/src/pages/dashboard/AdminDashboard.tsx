@@ -19,7 +19,6 @@ import AdminGymApproval from '../../components/AdminGymApproval';
 import AdminReviewManagement from '../../components/AdminReviewManagement';
 import AdminGalleryManagement from '../../components/AdminGalleryManagement';
 import AdminCoachApplications from '../../components/AdminCoachApplications';
-import BillingToggleSection from '../../components/dashboard/BillingToggleSection';
 import AdminOperationalPanel from '../../components/AdminOperationalPanel';
 import AdminUsersPanel from '../../components/AdminUsersPanel';
 import AdminContentMarketplacePanel from '../../components/AdminContentMarketplacePanel';
@@ -137,6 +136,13 @@ const AdminDashboard: React.FC = () => {
                         ))}
                     </div>
 
+                    <div className="mb-8 rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm leading-7 text-emerald-900">
+                        <div className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Free-first mode</div>
+                        <p className="mt-2">
+                            Thu phí nền tảng đã bị vô hiệu hóa. Coach, athlete và gym owner dùng full tính năng nền tảng miễn phí; panel vận hành hiện chỉ còn theo dõi health, outbox và duyệt hành động rủi ro cao.
+                        </p>
+                    </div>
+
                     <h3 className="text-h3 mb-4 border-b border-gray-200 pb-2">Truy cập nhanh</h3>
                     <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {[
@@ -144,7 +150,7 @@ const AdminDashboard: React.FC = () => {
                                 tab: 'ops' as const,
                                 icon: <Activity className="h-5 w-5" />,
                                 title: 'Vận hành',
-                                desc: 'Sức khỏe hệ thống, audit, giao dịch, gói platform',
+                                desc: 'Sức khỏe hệ thống, audit và email outbox',
                             },
                             {
                                 tab: 'users' as const,
@@ -193,9 +199,6 @@ const AdminDashboard: React.FC = () => {
                             />
                         ))}
                     </div>
-
-                    <h3 className="text-h3 mb-4 border-b border-gray-200 pb-2">Thu phí nền tảng</h3>
-                    <BillingToggleSection />
                 </div>
             )}
 

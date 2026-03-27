@@ -62,7 +62,7 @@ test.describe('critical flows', () => {
     await expect(page).toHaveURL(/\/onboarding$/);
   });
 
-  test('pricing checkout success shows transfer instructions for authenticated user', async ({ page }) => {
+  test('pricing announces free-first access for authenticated user', async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem('access_token', 'access-token-critical');
       localStorage.setItem('refresh_token', 'refresh-token-critical');
@@ -79,63 +79,18 @@ test.describe('critical flows', () => {
       });
     });
 
-    await page.route('**/api/v1/platform/checkout', async (route) => {
-      const body = route.request().postDataJSON();
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          description: `GYMERVIET-PLAN-${String(body.plan).toUpperCase()}-ABCD1234`,
-          amount: 499999,
-          plan: body.plan,
-        }),
-      });
-    });
-
     await page.goto('/pricing', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('button', { name: /^Nâng cấp ngay$/ }).first().click();
-
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await expect(page.getByText('Thanh toán qua SePay')).toBeVisible();
-    await expect(page.getByText('Nội dung CK')).toBeVisible();
-    await expect(page.getByText(/GYMERVIET-PLAN-/)).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('miễn phí');
+    await expect(page.getByRole('link', { name: /vào dashboard/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Nâng cấp ngay$/ })).toHaveCount(0);
+    await expect(page.getByText('Thanh toán qua SePay')).toHaveCount(0);
   });
 
-  test('pricing checkout failure shows envelope error without silent fallback', async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem('access_token', 'access-token-critical');
-      localStorage.setItem('refresh_token', 'refresh-token-critical');
-    });
-
-    await page.route('**/api/v1/auth/me', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: true,
-          data: mockUser,
-        }),
-      });
-    });
-
-    await page.route('**/api/v1/platform/checkout', async (route) => {
-      await route.fulfill({
-        status: 400,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          success: false,
-          error: {
-            message: 'Hệ thống thu phí chưa được kích hoạt',
-            code: 'BILLING_DISABLED',
-          },
-          requestId: 'req-pricing-failed',
-        }),
-      });
-    });
-
+  test('pricing for guest focuses on free access instead of checkout', async ({ page }) => {
     await page.goto('/pricing', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('button', { name: /^Nâng cấp ngay$/ }).first().click();
-    await expect(page.getByRole('alert')).toContainText('Hệ thống thu phí chưa được kích hoạt');
+    await expect(page.getByRole('link', { name: /tạo tài khoản miễn phí/i })).toBeVisible();
+    await expect(page.getByText('Platform billing đã tắt vĩnh viễn')).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Nâng cấp ngay$/ })).toHaveCount(0);
+    await expect(page.getByText('Nội dung CK')).toHaveCount(0);
   });
 });

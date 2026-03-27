@@ -50,7 +50,7 @@ export default function SellerMarketplaceListPage() {
     }, []);
 
     useEffect(() => {
-        load();
+        void load();
     }, [load]);
 
     const handleRegister = async (e: React.FormEvent) => {
@@ -77,8 +77,6 @@ export default function SellerMarketplaceListPage() {
     };
 
     const canTraining = user?.user_type === 'athlete' || user?.user_type === 'trainer';
-    const atListingLimit =
-        products.length >= 1 && user && !user.marketplace_membership_active;
 
     if (user?.user_type === 'admin') {
         return (
@@ -104,17 +102,12 @@ export default function SellerMarketplaceListPage() {
                     </p>
                     <h1 className="page-title">Cửa hàng của bạn</h1>
                     <p className="page-description max-w-2xl">
-                        Đăng ký bán, xem bài đăng và chỉnh sửa sản phẩm. Listing đầu tiên miễn phí; từ sản phẩm thứ
-                        hai cần membership.
+                        Đăng ký bán, theo dõi listing và chỉnh sửa sản phẩm. Marketplace seller hiện không còn bị chặn bởi membership quota nội bộ.
                     </p>
                     <div className="mt-6 flex flex-wrap gap-3">
                         <Link
                             to="/dashboard/marketplace/new"
-                            className={`btn-primary inline-flex items-center gap-2 ${atListingLimit ? 'pointer-events-none opacity-50' : ''}`}
-                            aria-disabled={atListingLimit ? true : undefined}
-                            onClick={(e) => {
-                                if (atListingLimit) e.preventDefault();
-                            }}
+                            className="btn-primary inline-flex items-center gap-2"
                         >
                             <Plus className="w-4 h-4" />
                             Thêm sản phẩm
@@ -122,11 +115,7 @@ export default function SellerMarketplaceListPage() {
                         {canTraining && (
                             <Link
                                 to="/dashboard/marketplace/new/training"
-                                className={`btn-secondary inline-flex items-center gap-2 ${atListingLimit ? 'pointer-events-none opacity-50' : ''}`}
-                                aria-disabled={atListingLimit ? true : undefined}
-                                onClick={(e) => {
-                                    if (atListingLimit) e.preventDefault();
-                                }}
+                                className="btn-secondary inline-flex items-center gap-2"
                             >
                                 <Package className="w-4 h-4" />
                                 Thêm gói tập / giáo án
@@ -137,15 +126,6 @@ export default function SellerMarketplaceListPage() {
                             Xem chợ
                         </Link>
                     </div>
-                    {atListingLimit && (
-                        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                            Bạn đã dùng 1 listing miễn phí.{' '}
-                            <Link to="/dashboard/subscriptions" className="font-bold underline">
-                                Nâng cấp membership
-                            </Link>{' '}
-                            để đăng thêm sản phẩm.
-                        </div>
-                    )}
                 </div>
             </div>
 
@@ -168,10 +148,11 @@ export default function SellerMarketplaceListPage() {
                         </p>
                         <form onSubmit={handleRegister} className="space-y-4">
                             <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                                <label htmlFor="seller-shop-name" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                     Tên cửa hàng
                                 </label>
                                 <input
+                                    id="seller-shop-name"
                                     className="form-input w-full"
                                     value={shopName}
                                     onChange={(e) => setShopName(e.target.value)}
@@ -180,10 +161,11 @@ export default function SellerMarketplaceListPage() {
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                                <label htmlFor="seller-business-type" className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
                                     Loại hình
                                 </label>
                                 <select
+                                    id="seller-business-type"
                                     className="form-input w-full"
                                     value={businessType}
                                     onChange={(e) => setBusinessType(e.target.value as SellerBusinessType)}
@@ -206,6 +188,9 @@ export default function SellerMarketplaceListPage() {
                                 <span className="font-bold">{profile.shop_name}</span>
                                 <span className="text-gray-500"> · /marketplace/sellers/{profile.shop_slug}</span>
                             </div>
+                            <div className="text-xs uppercase tracking-[0.14em] text-gray-500">
+                                {total.toLocaleString('vi-VN')} listing
+                            </div>
                             <Link
                                 to={`/marketplace/sellers/${profile.shop_slug}`}
                                 className="text-xs font-bold uppercase tracking-widest hover:underline inline-flex items-center gap-1"
@@ -217,7 +202,7 @@ export default function SellerMarketplaceListPage() {
                         </div>
 
                         {products.length === 0 ? (
-                            <p className="text-gray-500">Chưa có sản phẩm nào. Thêm sản phẩm đầu tiên.</p>
+                            <p className="text-gray-500">Chưa có sản phẩm nào. Thêm listing đầu tiên.</p>
                         ) : (
                             <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
                                 <table className="w-full text-sm">
@@ -268,9 +253,6 @@ export default function SellerMarketplaceListPage() {
                                         ))}
                                     </tbody>
                                 </table>
-                                <div className="px-3 py-2 text-xs text-gray-500 border-t border-gray-200">
-                                    Tổng {total} sản phẩm
-                                </div>
                             </div>
                         )}
                     </>

@@ -35,8 +35,7 @@ const bootstrap = async () => {
         const { rankingService } = await import('./services/rankingService');
         rankingService.scheduleCronJobs();
 
-        const { startPlatformSubCron } = await import('./scripts/expirePlatformSubs');
-        startPlatformSubCron();
+        // Platform billing is permanently disabled in free-first mode.
 
         // Start News auto-crawl cron (daily 02:00 AM Vietnam time)
         const { startNewsCron } = await import('./services/newsCronScheduler');
