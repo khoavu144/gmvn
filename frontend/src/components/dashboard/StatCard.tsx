@@ -37,10 +37,10 @@ export default function StatCard({
           className
         )}
       >
-        <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-gray-500 mb-1">
+        <p className="text-xs font-bold uppercase tracking-[0.12em] text-gray-500 mb-1">
           {label}
         </p>
-        <p className="text-[14px] font-bold text-black leading-snug">{value}</p>
+        <p className="text-sm font-bold text-black leading-snug">{value}</p>
       </div>
     );
   }
@@ -61,8 +61,8 @@ export default function StatCard({
           </div>
         )}
         <div>
-          <p className="text-2xl font-black text-black">{value}</p>
-          <p className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-[0.12em] mt-1 truncate">
+          <p className="text-xl sm:text-2xl font-black text-black">{value}</p>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.12em] mt-1 truncate">
             {label}
           </p>
         </div>
@@ -85,8 +85,8 @@ export default function StatCard({
         </div>
       )}
       <div>
-        <p className="text-2xl font-black text-black">{value}</p>
-        <p className="text-[10px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-[0.12em] mt-1 truncate">
+        <p className="text-xl sm:text-2xl font-black text-black">{value}</p>
+        <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.12em] mt-1 truncate">
           {label}
         </p>
       </div>

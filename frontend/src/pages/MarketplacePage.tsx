@@ -323,9 +323,13 @@ export default function MarketplacePage() {
     const curatedPicks = useMemo(
         () =>
             products
-                .filter((product) => (product.featured_weight ?? 0) > 80 && !featuredItems.some((item) => item.id === product.id))
+                .filter((product) =>
+                    (product.featured_weight ?? 0) > 80 &&
+                    !featuredItems.some((item) => item.id === product.id) &&
+                    !newArrivalsItems.some((item) => item.id === product.id)
+                )
                 .slice(0, reducedEffects ? 2 : 4),
-        [products, featuredItems, reducedEffects]
+        [products, featuredItems, newArrivalsItems, reducedEffects]
     );
 
     const spotlightProduct = useMemo(

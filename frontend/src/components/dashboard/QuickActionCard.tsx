@@ -24,20 +24,20 @@ export default function QuickActionCard({
 }: QuickActionCardProps) {
     const content = (
         <>
-            <div className="text-gray-600 mb-4 group-hover:text-white">{icon}</div>
+            <div className="text-gray-500 mb-4 group-hover:text-gray-900 transition-colors">{icon}</div>
             <h4
-                className={`text-sm font-black tracking-tight mb-2 group-hover:text-white ${uppercaseTitle ? 'uppercase' : ''}`}
+                className={`text-sm font-black tracking-tight mb-2 text-gray-900 ${uppercaseTitle ? 'uppercase' : ''}`}
             >
                 {title}
             </h4>
-            <p className="text-xs text-gray-600 mb-6 flex-1 group-hover:text-gray-300">{description}</p>
-            <span className="text-black text-[10px] font-bold tracking-widest uppercase group-hover:text-white transition-colors inline-block border-b-2 border-black group-hover:border-white pb-1 w-fit">
+            <p className="text-xs text-gray-500 mb-6 flex-1">{description}</p>
+            <span className="text-black text-xs font-bold tracking-widest uppercase inline-block border-b-2 border-black pb-1 w-fit">
                 Truy cập
             </span>
         </>
     );
 
-    const className = 'card flex flex-col group border-black hover:bg-black hover:text-white transition-colors';
+    const className = 'card flex flex-col group border-gray-200 hover:border-gray-900 hover:shadow-md transition-all duration-150';
 
     if (onClick && !to) {
         return (

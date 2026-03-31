@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Dumbbell, Users, User, Newspaper, Image as ImageIcon, ShoppingBag } from 'lucide-react';
+import { Dumbbell, Users, Newspaper, Image as ImageIcon, ShoppingBag } from 'lucide-react';
 
 export interface NavChild {
     to: string;
@@ -23,7 +23,6 @@ export const PUBLIC_NAV: NavGroup[] = [
         children: [
             { to: '/gyms', label: 'Phòng Tập', description: 'Tìm gym center phù hợp gần bạn', icon: <Dumbbell className="w-4 h-4" /> },
             { to: '/coaches', label: 'Huấn Luyện Viên', description: 'Kết nối với coach chuyên nghiệp', icon: <Users className="w-4 h-4" /> },
-            { to: '/coaches?type=athlete', label: 'Vận Động Viên', description: 'Hồ sơ VĐV đang hoạt động', icon: <User className="w-4 h-4" /> },
         ],
     },
     {
@@ -32,7 +31,6 @@ export const PUBLIC_NAV: NavGroup[] = [
         icon: <ImageIcon className="w-4 h-4" />,
         children: [
             { to: '/news', label: 'Tin Tức', description: 'Kiến thức và tin tức thể hình mới nhất', icon: <Newspaper className="w-4 h-4" /> },
-            { to: '/gallery', label: 'Thư viện ảnh', description: 'Ảnh và khoảnh khắc từ cộng đồng tập luyện', icon: <ImageIcon className="w-4 h-4" /> },
         ],
     },
     {

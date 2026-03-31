@@ -42,9 +42,9 @@ function SpotlightCarouselBody({ slides, resolveHref, onPrefetch }: BodyProps) {
 
     return (
         <div className="flex flex-col">
-            <p className="marketplace-section-kicker mb-2 lg:mb-3">Gợi ý hồ sơ</p>
+            <p className="marketplace-section-kicker mb-2 lg:mb-3">Khám phá hồ sơ</p>
             <p className="mb-4 text-sm leading-6 text-gray-600 lg:mb-5">
-                Vuốt ảnh hoặc dùng nút để xem thêm thành viên ngẫu nhiên.
+                Vuốt hoặc dùng nút để xem thành viên khác.
             </p>
 
             <div className="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm ring-1 ring-gray-900/[0.04]">
@@ -77,7 +77,7 @@ function SpotlightCarouselBody({ slides, resolveHref, onPrefetch }: BodyProps) {
                         type="button"
                         onClick={goPrev}
                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-800 transition hover:bg-gray-50"
-                        aria-label="Ảnh trước"
+                        aria-label="Trước"
                     >
                         <ChevronLeft className="h-5 w-5" strokeWidth={2} aria-hidden />
                     </button>
@@ -88,7 +88,7 @@ function SpotlightCarouselBody({ slides, resolveHref, onPrefetch }: BodyProps) {
                         type="button"
                         onClick={goNext}
                         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-800 transition hover:bg-gray-50"
-                        aria-label="Ảnh tiếp"
+                        aria-label="Tiếp"
                     >
                         <ChevronRight className="h-5 w-5" strokeWidth={2} aria-hidden />
                     </button>
@@ -121,10 +121,10 @@ export function HomeProfileSpotlight({ profiles, resolveHref, onPrefetch }: Prop
     if (slides.length < 2) {
         return (
             <div className="flex flex-col rounded-xl border border-gray-200 bg-gray-50/80 p-5">
-                <p className="marketplace-section-kicker mb-2">Gợi ý hồ sơ</p>
+                <p className="marketplace-section-kicker mb-2">Khám phá hồ sơ</p>
                 <p className="text-sm leading-6 text-gray-600">
                     {slides.length === 1
-                        ? 'Chỉ có một hồ sơ có ảnh đại diện để xem nhanh. Mở danh sách Coach để xem thêm.'
+                        ? 'Chỉ có một hồ sơ có ảnh. Mở danh sách Coach để xem thêm.'
                         : 'Chưa có đủ hồ sơ có ảnh để xem nhanh. Khám phá Coach trên GYMERVIET.'}
                 </p>
                 <Link

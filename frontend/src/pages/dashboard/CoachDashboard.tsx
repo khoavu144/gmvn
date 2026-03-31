@@ -35,7 +35,7 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                 setInvitations((prev) => prev.filter((i) => i.id !== id));
             }
         } catch {
-            toast.error('Không thực hiện được. Thử lại sau.');
+            toast.error('Thử lại');
         }
     };
 
@@ -47,7 +47,7 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                 setInvitations((prev) => prev.filter((i) => i.id !== id));
             }
         } catch {
-            toast.error('Không thực hiện được. Thử lại sau.');
+            toast.error('Thử lại');
         }
     };
 
@@ -59,7 +59,7 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                 <div className="rounded-lg border-2 border-amber-400/80 bg-amber-50 p-5 sm:p-6">
                     <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-amber-950">
                         <Bell className="h-5 w-5 shrink-0" aria-hidden />
-                        Bạn có {invitations.length} lời mời hợp tác từ phòng gym
+                        Bạn có {invitations.length} lời mời hợp tác
                     </h2>
                     <ul className="grid gap-4">
                         {invitations.map((inv) => (
@@ -95,6 +95,40 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                     </ul>
                 </div>
             )}
+
+            {(() => {
+                const checks = [
+                    { done: !!user?.avatar_url, label: 'Ảnh đại diện', link: '/profile' },
+                    { done: !!(user?.bio && user.bio.trim().length > 10), label: 'Giới thiệu bản thân', link: '/profile' },
+                    { done: !!(user?.specialties && user.specialties.length > 0), label: 'Chuyên môn', link: '/profile' },
+                    { done: (overview.total_programs ?? 0) > 0, label: 'Tạo gói tập đầu tiên', link: '/programs' },
+                    { done: (overview.published_programs ?? 0) > 0, label: 'Xuất bản ít nhất 1 gói', link: '/programs' },
+                ];
+                const done = checks.filter(c => c.done).length;
+                if (done === checks.length) return null;
+                const pct = Math.round((done / checks.length) * 100);
+                const missing = checks.filter(c => !c.done);
+                return (
+                    <div className="rounded-lg border border-gray-200 bg-white p-5">
+                        <div className="mb-3 flex items-center justify-between">
+                            <div>
+                                <span className="page-kicker">Hoàn thiện hồ sơ</span>
+                                <p className="mt-0.5 text-sm font-semibold text-gray-900">{done}/{checks.length} mục hoàn thành ({pct}%)</p>
+                            </div>
+                        </div>
+                        <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                            <div className="h-full rounded-full bg-gray-900 transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                            {missing.map(item => (
+                                <a key={item.label} href={item.link} className="inline-flex items-center gap-1 rounded-sm border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:border-gray-900 hover:text-black transition-colors">
+                                    + {item.label}
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })()}
 
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 {[

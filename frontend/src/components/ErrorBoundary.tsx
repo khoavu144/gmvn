@@ -40,7 +40,7 @@ export default class ErrorBoundary extends Component<Props, State> {
                         GYMERVIET
                     </p>
                     <h1 className="mt-4 text-3xl font-black tracking-tight">
-                        Đã xảy ra lỗi ở {this.props.scope || 'ứng dụng'}
+                        Đã có lỗi ở {this.props.scope || 'ứng dụng'}
                     </h1>
                     <p className="mt-3 text-sm leading-6 text-gray-600">
                         Phiên hiển thị hiện tại đã bị gián đoạn. Bạn có thể tải lại trang hoặc quay về trang chủ.

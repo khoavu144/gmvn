@@ -305,8 +305,7 @@ const Gyms: React.FC = () => {
                                         Chọn nơi tập bằng không gian, cảm giác và quyết định đúng.
                                     </h1>
                                     <p className="marketplace-lead">
-                                        Một marketplace dành cho người thật sự muốn tìm đúng không gian tập: gym chất lượng cao,
-                                        fitness club cao cấp, yoga studio, pilates reformer và không gian recovery.
+                                        Gym, yoga, pilates và recovery — tìm không gian phù hợp với cách bạn muốn tập.
                                     </p>
                                 </div>
                             </div>
@@ -535,11 +534,20 @@ const Gyms: React.FC = () => {
                         </div>
                     ) : gyms.length === 0 ? (
                         <div className="marketplace-panel marketplace-empty">
-                            <strong>Không có venue khớp với nhịp tìm kiếm này.</strong>
+                            <strong>Không có venue khớp với bộ lọc này.</strong>
                             <p>
-                                Thử nới rộng khu vực, bỏ bớt một filter hoặc chuyển sang một loại hình khác như yoga,
-                                pilates hoặc recovery để tìm thêm lựa chọn phù hợp.
+                                Thử nới rộng khu vực, bỏ bớt một filter hoặc chuyển sang loại hình khác như yoga,
+                                pilates hoặc recovery để tìm thêm lựa chọn.
                             </p>
+                            {(searchTerm || cityFilter || districtFilter || venueType || audienceTag) && (
+                                <button
+                                    type="button"
+                                    onClick={() => { setSearchTerm(''); setCityFilter(''); setDistrictFilter(''); setVenueType(''); setAudienceTag(''); }}
+                                    className="mt-4 btn-primary px-5 py-2 text-sm"
+                                >
+                                    Xoá bộ lọc
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <>

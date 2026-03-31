@@ -206,7 +206,7 @@ export default function ProfileCV() {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-[color:var(--mk-paper)] text-center px-4">
                 <div className="text-4xl font-black text-gray-200">404</div>
-                <p className="text-[color:var(--mk-text-soft)] font-medium">Profile không tồn tại hoặc chưa được công khai.</p>
+                <p className="text-[color:var(--mk-text-soft)] font-medium">Hồ sơ không tồn tại hoặc chưa được công khai.</p>
                 <Link to="/coaches" className="text-sm font-medium text-black underline underline-offset-4 hover:text-[color:var(--mk-text-soft)] transition-colors">
                     ← Xem danh sách Coach
                 </Link>

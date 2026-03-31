@@ -127,7 +127,7 @@ export default function MessagesPage() {
             setConversations(res.data.conversations || []);
         } catch (err: any) {
             logger.error(err);
-            setError('Lỗi tải danh sách đối thoại.');
+            setError('Lỗi tải danh sách tin nhắn.');
         }
     };
 
@@ -139,7 +139,7 @@ export default function MessagesPage() {
             setMessages(res.data.messages || []);
         } catch (err: any) {
             logger.error(err);
-            setError('Không thể tải tin nhắn.');
+            setError('Lỗi tải tin nhắn.');
         } finally { setLoading(false); }
     };
 
@@ -224,7 +224,7 @@ export default function MessagesPage() {
                                     <div className="mb-3 text-4xl">👋</div>
                                     <h3 className="mb-1 font-bold text-gray-900">Hộp thư trống</h3>
                                     <p className="mb-6 text-xs text-gray-500">
-                                        Các cuộc trò chuyện với Coach hoặc học viên sẽ xuất hiện ở đây.
+                                        Tin nhắn từ Coach hoặc học viên sẽ hiện ở đây.
                                     </p>
                                     <Link to="/coaches" className="btn-primary text-xs uppercase tracking-[0.14em]">
                                         Tìm Coach ngay
@@ -282,7 +282,9 @@ export default function MessagesPage() {
                                     </div>
                                     <div>
                                         <div className="page-kicker mb-1">Đang trao đổi</div>
-                                        <span className="font-semibold text-black">{activeConv?.partner?.full_name || 'Unknown'}</span>
+                                        <Link to={`/coaches/${activePartner}`} className="font-semibold text-black hover:underline underline-offset-2">
+                                            {activeConv?.partner?.full_name || 'Xem hồ sơ'}
+                                        </Link>
                                     </div>
                                 </div>
 
@@ -302,7 +304,7 @@ export default function MessagesPage() {
                                         ) : messages.length === 0 ? (
                                             <div className="flex h-full items-center justify-center">
                                                 <div className="rounded-lg border border-dashed border-gray-200 bg-white px-6 py-5 text-center text-sm text-gray-500 shadow-sm">
-                                                    Hãy gửi lời chào!
+                                                    Gửi lời chào đầu tiên
                                                 </div>
                                             </div>
                                         ) : (

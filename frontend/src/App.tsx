@@ -89,7 +89,6 @@ const GymDetailPage = lazyWithChunkRetry(() => import('./pages/GymDetailPage'), 
 const GymRegisterPage = lazyWithChunkRetry(() => import('./pages/GymRegisterPage'), 'gym-register');
 const GymOwnerDashboard = lazyWithChunkRetry(() => import('./pages/GymOwnerDashboard'), 'gym-owner-dashboard');
 const CommunityGallery = lazyWithChunkRetry(() => import('./pages/CommunityGallery'), 'community-gallery');
-const PricingPage = lazyWithChunkRetry(() => import('./pages/PricingPage'), 'pricing');
 const MarketplacePage = lazyWithChunkRetry(() => import('./pages/MarketplacePage'), 'marketplace');
 const ProductDetailPage = lazyWithChunkRetry(() => import('./pages/ProductDetailPage'), 'product-detail');
 const SellerMarketplaceListPage = lazyWithChunkRetry(() => import('./pages/seller/SellerMarketplaceListPage'), 'seller-marketplace');
@@ -167,7 +166,7 @@ const RouteErrorFallback = () => {
       ? error.message
       : isRouteErrorResponse(error)
         ? `${error.status} ${error.statusText}`
-        : 'Đã xảy ra lỗi không xác định';
+        : 'Lỗi không xác định';
 
   const isChunkError = /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Loading chunk [\d]+ failed/i.test(rawMessage);
 
@@ -176,7 +175,7 @@ const RouteErrorFallback = () => {
       <div className="w-full max-w-xl rounded-lg border border-gray-200 bg-white p-8 shadow-sm text-center">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-gray-500">GYMERVIET</p>
         <h1 className="mt-4 text-2xl font-bold text-black tracking-tight">
-          {isChunkError ? 'Ứng dụng vừa cập nhật, vui lòng tải lại trang' : 'Không thể tải trang này'}
+          {isChunkError ? 'Ứng dụng đã cập nhật, vui lòng tải lại' : 'Không thể tải trang này'}
         </h1>
         <p className="mt-3 text-sm text-gray-600 leading-6">
           {isChunkError
@@ -346,7 +345,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/pricing',
-        element: lazyRoute(<PricingPage />),
+        element: <Navigate to="/faq" replace />,
       },
 
       // Gym Module Routes

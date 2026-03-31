@@ -45,7 +45,7 @@ export default function CoachTestimonialsWall({ testimonials }: Props) {
                 {/* Hero testimonials */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     {heroTestimonials.map(t => (
-                        <div key={t.id} className="relative bg-[#0a0a0a] text-white p-6 sm:p-8 rounded-lg">
+                        <div key={t.id} className="relative bg-black text-white p-6 sm:p-8 rounded-lg">
                             <div className="text-4xl font-extrabold text-white/10 absolute top-4 right-6 select-none">"</div>
                             <div className="relative">
                                 <div className="text-yellow-400 text-sm mb-4">

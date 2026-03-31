@@ -20,7 +20,7 @@ export function ProductReviews({ reviews, reviewCount }: ProductReviewsProps) {
             </div>
             <div className="mpd-reviews">
                 {reviews.length === 0 ? (
-                    <p className="mpd-empty-text">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
+                    <p className="mpd-empty-text">Không có đánh giá. Hãy là người đầu tiên!</p>
                 ) : (
                     reviews.map((review) => (
                         <div key={review.id} className="mpd-review">

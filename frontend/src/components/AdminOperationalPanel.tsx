@@ -72,7 +72,7 @@ function statusTone(status: string) {
         return 'text-amber-700 bg-amber-50 border-amber-200';
     }
     if (normalized === 'ignored' || normalized === 'disabled') {
-        return 'text-slate-700 bg-slate-50 border-slate-200';
+        return 'text-gray-700 bg-gray-50 border-gray-200';
     }
     return 'text-red-700 bg-red-50 border-red-200';
 }

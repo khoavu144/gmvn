@@ -127,14 +127,14 @@ export function GalleryLightbox({
                         <button
                             onClick={goToPrevious}
                             className="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-                            aria-label="Ảnh trước"
+                            aria-label="Trước"
                         >
                             <ChevronLeft className="w-6 h-6" />
                         </button>
                         <button
                             onClick={goToNext}
                             className="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
-                            aria-label="Ảnh tiếp"
+                            aria-label="Tiếp"
                         >
                             <ChevronRight className="w-6 h-6" />
                         </button>

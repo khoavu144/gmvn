@@ -58,20 +58,20 @@ export function useGymOwnerDashboard() {
 
     const handleCreateBranch = async () => {
         if (!newBranchForm.branch_name || !newBranchForm.address) {
-            toast.error('Vui lòng nhập tên chi nhánh và địa chỉ');
+            toast.error('Nhập tên chi nhánh và địa chỉ không được bỏ trống');
             return;
         }
         setCreatingBranch(true);
         try {
             const res = await gymService.createBranch(newBranchForm);
             if (res.success) {
-                toast.success(`✅ Đã tạo chi nhánh "${newBranchForm.branch_name}" thành công!`);
+                toast.success(`Tạo chi nhánh "${newBranchForm.branch_name}" thành công!`);
                 setShowNewBranchForm(false);
                 setNewBranchForm({ branch_name: '', address: '', city: '', district: '', phone: '', description: '' });
                 fetchMyGym(); // reload fresh data
             }
         } catch {
-            toast.error('Lỗi tạo chi nhánh. Thử lại nhé!');
+            toast.error('Lỗi tạo chi nhánh');
         } finally {
             setCreatingBranch(false);
         }
@@ -84,7 +84,7 @@ export function useGymOwnerDashboard() {
             const res = await gymService.updateGymCenter(gym.id, settingsForm);
             if (res.success) {
                 setGym((prev: GymCenter | null) => prev ? { ...prev, ...settingsForm } : prev);
-                toast.success('Đã cập nhật thông tin thành công!');
+                toast.success('Cập nhật thành công!');
             }
         } catch {
             toast.error('Lỗi cập nhật cài đặt');

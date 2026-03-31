@@ -109,7 +109,7 @@ apiClient.interceptors.response.use(
         }
 
         if (!error.response && error.code === 'ECONNABORTED') {
-            error.message = 'Yêu cầu đến máy chủ bị timeout. Vui lòng thử lại.';
+            error.message = 'Không thể kết nối. Vui lòng thử lại.';
         }
 
         return Promise.reject(error);

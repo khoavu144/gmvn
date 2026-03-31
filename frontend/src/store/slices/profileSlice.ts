@@ -82,7 +82,7 @@ export const fetchMyProfile = createAsyncThunk(
                 faq: TrainerFAQ[];
             };
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || 'Không thể tải profile');
+            return rejectWithValue(err.response?.data?.error || 'Không thể tải hồ sơ');
         }
     }
 );
@@ -150,11 +150,11 @@ export const fetchPublicProfile = createAsyncThunk(
                             // User not found at all
                         }
                     }
-                    return rejectWithValue(fallbackErr.response?.data?.error || 'Profile không tồn tại');
+                    return rejectWithValue(fallbackErr.response?.data?.error || 'Hồ sơ không tồn tại');
                 }
             }
 
-            return rejectWithValue(err.response?.data?.error || 'Profile không tồn tại');
+            return rejectWithValue(err.response?.data?.error || 'Hồ sơ không tồn tại');
         }
     }
 );
@@ -166,7 +166,7 @@ export const updateProfile = createAsyncThunk(
             const response = await apiClient.put('/profiles/me', data);
             return response.data.profile as TrainerProfile;
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || 'Lỗi khi cập nhật profile');
+            return rejectWithValue(err.response?.data?.error || 'Lỗi cập nhật hồ sơ');
         }
     }
 );
@@ -179,7 +179,7 @@ export const addExperienceThunk = createAsyncThunk(
         try {
             return await profileApiService.addExperience(data);
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || 'Lỗi khi thêm kinh nghiệm');
+            return rejectWithValue(err.response?.data?.error || 'Lỗi thêm kinh nghiệm');
         }
     }
 );
@@ -190,7 +190,7 @@ export const updateExperienceThunk = createAsyncThunk(
         try {
             return await profileApiService.updateExperience(id, data);
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || 'Lỗi khi cập nhật kinh nghiệm');
+            return rejectWithValue(err.response?.data?.error || 'Lỗi cập nhật kinh nghiệm');
         }
     }
 );
@@ -202,7 +202,7 @@ export const deleteExperienceThunk = createAsyncThunk(
             await profileApiService.deleteExperience(id);
             return id;
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || 'Lỗi khi xóa kinh nghiệm');
+            return rejectWithValue(err.response?.data?.error || 'Lỗi xóa kinh nghiệm');
         }
     }
 );
@@ -215,7 +215,7 @@ export const addGalleryThunk = createAsyncThunk(
         try {
             return await profileApiService.addGalleryImage(data);
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || 'Lỗi khi thêm ảnh');
+            return rejectWithValue(err.response?.data?.error || 'Lỗi thêm ảnh');
         }
     }
 );
@@ -226,7 +226,7 @@ export const updateGalleryThunk = createAsyncThunk(
         try {
             return await profileApiService.updateGalleryImage(id, data);
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || 'Lỗi khi cập nhật ảnh');
+            return rejectWithValue(err.response?.data?.error || 'Lỗi cập nhật ảnh');
         }
     }
 );
@@ -238,7 +238,7 @@ export const deleteGalleryThunk = createAsyncThunk(
             await profileApiService.deleteGalleryImage(id);
             return id;
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || 'Lỗi khi xóa ảnh');
+            return rejectWithValue(err.response?.data?.error || 'Lỗi xóa ảnh');
         }
     }
 );
@@ -251,7 +251,7 @@ export const addFAQThunk = createAsyncThunk(
         try {
             return await profileApiService.addFAQ(data);
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || 'Lỗi khi thêm câu hỏi');
+            return rejectWithValue(err.response?.data?.error || 'Lỗi thêm câu hỏi');
         }
     }
 );
@@ -262,7 +262,7 @@ export const updateFAQThunk = createAsyncThunk(
         try {
             return await profileApiService.updateFAQ(id, data);
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || 'Lỗi khi cập nhật câu hỏi');
+            return rejectWithValue(err.response?.data?.error || 'Lỗi cập nhật câu hỏi');
         }
     }
 );
@@ -274,7 +274,7 @@ export const deleteFAQThunk = createAsyncThunk(
             await profileApiService.deleteFAQ(id);
             return id;
         } catch (err: any) {
-            return rejectWithValue(err.response?.data?.error || 'Lỗi khi xóa câu hỏi');
+            return rejectWithValue(err.response?.data?.error || 'Lỗi xóa câu hỏi');
         }
     }
 );
@@ -364,7 +364,7 @@ const profileSlice = createSlice({
             .addCase(fetchPublicProfile.rejected, (state, action) => {
                 state.loading = false;
                 const payload = action.payload;
-                state.error = typeof payload === 'string' ? payload : (payload as any)?.message || 'Profile không tồn tại';
+                state.error = typeof payload === 'string' ? payload : (payload as any)?.message || 'Hồ sơ không tồn tại';
             });
 
         // ── updateProfile ────────────────────────────────────────────────────
@@ -373,7 +373,7 @@ const profileSlice = createSlice({
             .addCase(updateProfile.fulfilled, (state, action) => {
                 state.saving = false;
                 state.myProfile = action.payload;
-                state.successMsg = 'Đã cập nhật profile thành công!';
+                state.successMsg = 'Cập nhật hồ sơ thành công!';
             })
             .addCase(updateProfile.rejected, (state, action) => {
                 state.saving = false;
@@ -384,48 +384,48 @@ const profileSlice = createSlice({
         builder
             .addCase(addExperienceThunk.fulfilled, (state, action) => {
                 state.experience.unshift(action.payload);
-                state.successMsg = 'Đã thêm kinh nghiệm!';
+                state.successMsg = 'Thêm kinh nghiệm thành công!';
             })
             .addCase(updateExperienceThunk.fulfilled, (state, action) => {
                 const idx = state.experience.findIndex(e => e.id === action.payload.id);
                 if (idx !== -1) state.experience[idx] = action.payload;
-                state.successMsg = 'Đã cập nhật kinh nghiệm!';
+                state.successMsg = 'Cập nhật kinh nghiệm thành công!';
             })
             .addCase(deleteExperienceThunk.fulfilled, (state, action) => {
                 state.experience = state.experience.filter(e => e.id !== action.payload);
-                state.successMsg = 'Đã xóa kinh nghiệm!';
+                state.successMsg = 'Xóa kinh nghiệm thành công!';
             });
 
         // ── Gallery CRUD ─────────────────────────────────────────────────────
         builder
             .addCase(addGalleryThunk.fulfilled, (state, action) => {
                 state.gallery.push(action.payload);
-                state.successMsg = 'Đã thêm ảnh!';
+                state.successMsg = 'Thêm ảnh thành công!';
             })
             .addCase(updateGalleryThunk.fulfilled, (state, action) => {
                 const idx = state.gallery.findIndex(g => g.id === action.payload.id);
                 if (idx !== -1) state.gallery[idx] = action.payload;
-                state.successMsg = 'Đã cập nhật ảnh!';
+                state.successMsg = 'Cập nhật ảnh thành công!';
             })
             .addCase(deleteGalleryThunk.fulfilled, (state, action) => {
                 state.gallery = state.gallery.filter(g => g.id !== action.payload);
-                state.successMsg = 'Đã xóa ảnh!';
+                state.successMsg = 'Xóa ảnh thành công!';
             });
 
         // ── FAQ CRUD ─────────────────────────────────────────────────────────
         builder
             .addCase(addFAQThunk.fulfilled, (state, action) => {
                 state.faq.push(action.payload);
-                state.successMsg = 'Đã thêm câu hỏi!';
+                state.successMsg = 'Thêm câu hỏi thành công!';
             })
             .addCase(updateFAQThunk.fulfilled, (state, action) => {
                 const idx = state.faq.findIndex(f => f.id === action.payload.id);
                 if (idx !== -1) state.faq[idx] = action.payload;
-                state.successMsg = 'Đã cập nhật câu hỏi!';
+                state.successMsg = 'Cập nhật câu hỏi thành công!';
             })
             .addCase(deleteFAQThunk.fulfilled, (state, action) => {
                 state.faq = state.faq.filter(f => f.id !== action.payload);
-                state.successMsg = 'Đã xóa câu hỏi!';
+                state.successMsg = 'Xóa câu hỏi thành công!';
             });
     },
 });

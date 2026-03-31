@@ -120,7 +120,7 @@ const GymDetailHero: React.FC<GymDetailHeroProps> = ({
                                     type="button"
                                     onClick={() => setHeroSlideIndex((i) => (i - 1 + gallery.length) % gallery.length)}
                                     className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[color:var(--mk-line)] bg-white/90 text-[color:var(--mk-text)] transition hover:border-[color:var(--mk-accent)]/45"
-                                    aria-label="Ảnh trước"
+                                    aria-label="Trước"
                                 >
                                     <ChevronLeft className="h-5 w-5" aria-hidden />
                                 </button>

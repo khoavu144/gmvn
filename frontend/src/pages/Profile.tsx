@@ -116,7 +116,7 @@ export default function Profile() {
             </Helmet>
 
             <div className="min-h-screen bg-[linear-gradient(180deg,#fafaf9_0%,#f5f5f4_100%)] flex flex-col pb-nav lg:pb-0">
-                <div className="relative min-h-[300px] w-full overflow-hidden border-b border-gray-200 bg-stone-100 sm:min-h-[350px]">
+                <div className="relative min-h-[300px] w-full overflow-hidden border-b border-gray-200 bg-gray-100 sm:min-h-[350px]">
                     {/* Background Image / Pattern */}
                     {myProfile?.cover_image_url ? (
                         <div className="absolute inset-0">
@@ -147,7 +147,7 @@ export default function Profile() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     className="relative group shrink-0"
                                 >
-                                    <div className="absolute inset-0 rounded-lg bg-stone-300/50 blur-xl opacity-80 transition-opacity duration-500" />
+                                    <div className="absolute inset-0 rounded-lg bg-gray-300/50 blur-xl opacity-80 transition-opacity duration-500" />
                                     <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-lg overflow-hidden border-[6px] border-white shadow-md bg-white">
                                         <img
                                             src={user?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || 'U')}&background=000&color=fff&size=200`}

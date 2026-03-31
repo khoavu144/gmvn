@@ -446,17 +446,21 @@ const GymDetailPage: React.FC = () => {
                     <div
                         className={`gym-detail-subnav rounded-lg border border-[color:var(--mk-line)] px-3 py-2 ${reducedEffects ? 'bg-[rgba(255,251,244,0.96)]' : 'bg-[rgba(255,251,244,0.82)] backdrop-blur-xl'}`}
                     >
-                        <div className="flex items-center gap-2 overflow-x-auto">
-                            {visibleSections.map((section) => (
-                                <button
-                                    key={section.id}
-                                    type="button"
-                                    onClick={() => navigateToSection(section.id)}
-                                    className={`shrink-0 rounded-lg px-4 py-2 text-[0.72rem] font-bold uppercase tracking-[0.16em] transition ${activeSection === section.id ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)] hover:bg-white/70'}`}
-                                >
-                                    {section.label}
-                                </button>
-                            ))}
+                        <div className="relative">
+                            <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                                {visibleSections.map((section) => (
+                                    <button
+                                        key={section.id}
+                                        type="button"
+                                        onClick={() => navigateToSection(section.id)}
+                                        className={`shrink-0 rounded-lg px-4 py-2 text-[0.72rem] font-bold uppercase tracking-[0.16em] transition ${activeSection === section.id ? 'bg-[color:var(--mk-text)] text-white' : 'text-[color:var(--mk-text-soft)] hover:bg-white/70'}`}
+                                    >
+                                        {section.label}
+                                    </button>
+                                ))}
+                            </div>
+                            {/* Scroll fade indicators */}
+                            <div className="pointer-events-none absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-[rgba(255,251,244,0.9)] to-transparent" aria-hidden />
                         </div>
                     </div>
                 </div>

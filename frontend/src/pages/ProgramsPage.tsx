@@ -174,7 +174,7 @@ export default function ProgramsPage() {
             setShowForm(false);
             setEditingId(null);
             loadPrograms();
-            toast.success('Lưu gói tập thành công');
+            toast.success('Lưu chương trình thành công');
         } catch (err: any) {
             toast.error(err.response?.data?.error || 'Lỗi khi lưu');
         } finally { setSaving(false); }
@@ -184,7 +184,7 @@ export default function ProgramsPage() {
         try {
             await apiClient.post(`/programs/${id}/publish`);
             loadPrograms();
-            toast.success('Đã đăng gói tập ra cộng đồng');
+            toast.success('Xuất bản thành công');
         } catch (err: any) { toast.error(err.response?.data?.error || 'Lỗi khi publish'); }
     };
 
@@ -221,7 +221,7 @@ export default function ProgramsPage() {
                             <p className="page-kicker">Program Workspace</p>
                             <h1 className="page-title">Quản lý Gói tập</h1>
                             <p className="page-description">
-                                Tạo, chỉnh sửa và công bố các gói tập với bố cục nhất quán theo phong cách homepage của hệ thống.
+                                Tạo, chỉnh sửa và xuất bản chương trình tập luyện.
                             </p>
                         </div>
                         {!showForm && (
@@ -236,7 +236,7 @@ export default function ProgramsPage() {
                 {showForm && (
                     <div className="card mb-8 border-black shadow-sm overflow-visible">
                         <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
-                            <h2 className="text-xl font-bold text-black m-0">{editingId ? 'Chỉnh sửa gói tập' : 'Tạo gói tập mới'}</h2>
+                            <h2 className="text-xl font-bold text-black m-0">{editingId ? 'Chỉnh sửa' : 'Tạo chương trình mới'}</h2>
                             <button onClick={() => setShowForm(false)} className="text-gray-500 hover:text-black text-sm font-medium">Đóng</button>
                         </div>
 
@@ -248,8 +248,8 @@ export default function ProgramsPage() {
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                                         <div className="sm:col-span-2">
-                                            <label className="form-label">Tên gói tập *</label>
-                                            <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="form-input" placeholder="VD: 12 tuần Transform toàn diện" />
+                                            <label className="form-label">Tên chương trình *</label>
+                                            <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="form-input" placeholder="VD: 12 tuần tập toàn thân" />
                                         </div>
                                         <div>
                                             <label className="form-label">Hình thức huấn luyện</label>
@@ -280,24 +280,24 @@ export default function ProgramsPage() {
                                                 <button type="button" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="btn-secondary text-sm">
                                                     {isUploading ? 'Đang tải lên...' : 'Tải lên từ thiết bị'}
                                                 </button>
-                                                <p className="text-xs text-gray-500 mt-2">Nên dùng ảnh chụp Form khách hàng thực tế hoặc không gian phòng tập.</p>
+                                                <p className="text-xs text-gray-500 mt-2">Sử dụng ảnh thực tế của phòng tập.</p>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="form-label">Mô tả tổng quan</label>
-                                        <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="form-input" placeholder="Hãy viết vài dòng hấp dẫn về chương trình này..." />
+                                        <label className="form-label">Mô tả</label>
+                                        <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} className="form-input" placeholder="Mô tả ngắn về chương trình..." />
                                     </div>
                                 </div>
                             </section>
 
                             {/* Details */}
                             <section>
-                                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">2. Đối tượng & Chi tiết</h3>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">2. Đối tượng & thông tin</h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div>
-                                        <label className="form-label">Mục tiêu hình thể</label>
+                                        <label className="form-label">Mục tiêu</label>
                                         <Suspense fallback={<InputFallback />}>
                                             <Select
                                                 isMulti
@@ -338,12 +338,12 @@ export default function ProgramsPage() {
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
                                     <div>
-                                        <label className="form-label">Checklist Quyền lợi đi kèm</label>
+                                        <label className="form-label">Quyền lợi bao gồm</label>
                                         <Suspense fallback={<InputFallback />}>
                                             <Select
                                                 isMulti
                                                 options={featureOptions}
-                                                placeholder="Chọn các quyền lợi..."
+                                                placeholder="Chọn quyền lợi..."
                                                 value={featureOptions.filter(o => form.included_features.includes(o.value))}
                                                 onChange={(selected) => {
                                                     const values = Array.isArray(selected)
@@ -375,7 +375,7 @@ export default function ProgramsPage() {
 
                             {/* Pricing */}
                             <section>
-                                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">3. Cấu trúc giá</h3>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4">3. Giá cả</h3>
                                 <div className="bg-gray-50 p-4 border border-gray-200 rounded-md">
                                     <div className="flex gap-4 mb-4 border-b border-gray-200 pb-4">
                                         {pricingTypeOptions.map(opt => (
@@ -419,7 +419,7 @@ export default function ProgramsPage() {
                                 <button onClick={() => { setShowForm(false); setEditingId(null); }} className="btn-secondary px-6 py-2.5">Thoát</button>
                                 <button onClick={handleSubmit} disabled={saving || !form.name.trim()}
                                     className="btn-primary px-8 py-2.5 text-sm">
-                                    {saving ? 'Đang lưu...' : (editingId ? 'Cập nhật thay đổi' : 'Tạo gói tập ngay')}
+                                    {saving ? 'Đang lưu...' : (editingId ? 'Lưu thay đổi' : 'Tạo ngay')}
                                 </button>
                             </div>
                         </div>

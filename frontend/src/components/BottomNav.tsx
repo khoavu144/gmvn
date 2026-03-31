@@ -74,8 +74,8 @@ export default function BottomNav() {
                                 isActive && 'active'
                             )}
                         >
-                            <Icon className="w-5 h-5" />
-                            <span className="text-[11px] font-medium">{item.label}</span>
+                            <Icon className={cn('w-5 h-5', isActive ? 'stroke-[2.5]' : 'stroke-[1.75]')} />
+                            <span className={cn('text-xs', isActive ? 'font-bold' : 'font-medium')}>{item.label}</span>
                         </Link>
                     );
                 })}

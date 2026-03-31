@@ -74,7 +74,7 @@ export default function CoachResultsShowcase({
                                 src={getOptimizedUrl(lead.before_url, 600)}
                                 srcSet={getSrcSet(lead.before_url)}
                                 sizes="50vw"
-                                alt="Ảnh trước"
+                                alt="Trước"
                                 className="w-full aspect-[4/5] object-cover"
                                 loading="lazy"
                                 decoding="async"
@@ -122,7 +122,7 @@ export default function CoachResultsShowcase({
                                 <div className="grid grid-cols-2 gap-px bg-[color:var(--mk-paper)]">
                                     <img
                                         src={getOptimizedUrl(photo.before_url, 300)}
-                                        alt="Ảnh trước"
+                                        alt="Trước"
                                         className="w-full aspect-square object-cover"
                                         loading="lazy"
                                     />

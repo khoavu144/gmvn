@@ -100,7 +100,7 @@ export default function AdminContentMarketplacePanel() {
             await apiClient.delete(`/news/admin/${id}`);
             await loadNews();
         } catch {
-            alert('Xóa thất bại.');
+            alert('Xóa không thành công.');
         }
     };
 
@@ -118,7 +118,7 @@ export default function AdminContentMarketplacePanel() {
             });
             await loadMod();
         } catch {
-            alert('Kiểm duyệt thất bại.');
+            alert('Lỗi duyệt bài.');
         } finally {
             setBusyProduct(null);
         }
@@ -139,8 +139,8 @@ export default function AdminContentMarketplacePanel() {
                 <p className="text-xs text-gray-500 mb-3">Tổng: {newsMeta.total}</p>
                 {news.length === 0 && !newsErr ? (
                     <div className={adminEmptyStateClassName}>
-                        <p className="font-medium text-gray-800">Chưa có bài tin nào</p>
-                        <p className="mt-1 text-xs text-gray-500">Chạy crawl hoặc tạo bài để danh sách hiện ở đây.</p>
+                        <p className="font-medium text-gray-800">Chưa có bài viết</p>
+                        <p className="mt-1 text-xs text-gray-500">Chạy crawl để cập nhật tin.</p>
                     </div>
                 ) : (
                 <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">

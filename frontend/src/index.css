@@ -464,27 +464,13 @@ body {
       0 0 0 4px var(--ui-focus-ring);
   }
 
+  /* ui-btn-* — aliases for btn-* (consolidated button system) */
   .ui-btn-primary {
-    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors;
-    background: #111827;
-    color: #f9fafb;
-  }
-
-  .ui-btn-primary:hover {
-    background: #0f172a;
+    @apply btn-primary;
   }
 
   .ui-btn-secondary {
-    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors;
-    border: 1px solid var(--ui-border-soft);
-    background: var(--ui-surface-raised);
-    color: var(--ui-text-secondary);
-  }
-
-  .ui-btn-secondary:hover {
-    border-color: var(--ui-border-strong);
-    color: var(--ui-text-primary);
-    background: var(--ui-surface-muted);
+    @apply btn-secondary;
   }
 
   .ui-chip {
@@ -890,9 +876,9 @@ body {
 
   .marketplace-empty strong {
     display: block;
-    font-size: clamp(2.4rem, 5vw, 4.2rem);
-    line-height: 0.9;
-    letter-spacing: -0.06em;
+    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
     color: color-mix(in oklab, var(--mk-accent) 24%, var(--mk-text) 76%);
   }
 
@@ -903,7 +889,7 @@ body {
   }
 
   .marketplace-section-kicker {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     font-weight: 600;

@@ -41,12 +41,12 @@ const AdminReviewManagement: React.FC = () => {
                 fetchReviews();
             }
         } catch {
-            toast.error('Lỗi khi cập nhật');
+            toast.error('Lỗi cập nhật');
         }
     };
 
     const handleDelete = async (id: string) => {
-        if (!window.confirm('Bạn có chắc chắn muốn xóa đánh giá này vĩnh viễn?')) return;
+        if (!window.confirm('Bạn có chắc chắn muốn xóa đánh giá này?')) return;
         try {
             // Mock delete API call
             const res = await gymService.toggleReviewVisibility(id); // fallback if delete uses same endpoint or we fake it
@@ -55,7 +55,7 @@ const AdminReviewManagement: React.FC = () => {
                 setReviews(prev => prev.filter(r => r.id !== id));
             }
         } catch {
-            toast.error('Lỗi khi xóa');
+            toast.error('Lỗi xóa');
         }
     };
 
@@ -66,8 +66,8 @@ const AdminReviewManagement: React.FC = () => {
     if (reviews.length === 0) {
         return (
             <div className={adminEmptyStateClassName}>
-                <p className="font-medium text-gray-800">Chưa có đánh giá nào</p>
-                <p className="mt-1 text-xs text-gray-500">Khi có review từ người dùng, bạn quản lý tại đây.</p>
+                <p className="font-medium text-gray-800">Không có đánh giá</p>
+                <p className="mt-1 text-xs text-gray-500">Quản lý đánh giá khách của bạn.</p>
             </div>
         );
     }

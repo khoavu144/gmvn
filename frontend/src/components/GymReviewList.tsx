@@ -42,7 +42,7 @@ const GymReviewList: React.FC<GymReviewListProps> = ({ gymId, refreshTick = 0 })
     }
 
     if (reviews.length === 0) {
-        return <div className="text-gray-500 italic text-sm py-8 text-center border border-dashed border-white/20 rounded-lg bg-white/5">Chưa có đánh giá nào cho phòng tập này. Hãy là người đầu tiên!</div>;
+        return <div className="text-gray-500 italic text-sm py-8 text-center border border-dashed border-white/20 rounded-lg bg-white/5">Không có đánh giá cho phòng tập này. Hãy là người đầu tiên!</div>;
     }
 
     return (

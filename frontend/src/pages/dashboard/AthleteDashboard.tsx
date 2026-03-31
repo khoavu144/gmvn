@@ -49,24 +49,24 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
 
     return (
         <div className="space-y-8">
-            <div className="group relative overflow-hidden rounded-lg bg-zinc-900 p-8 text-white shadow-md md:p-10">
-                <div className="absolute inset-0 z-10 bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-zinc-900/40" />
+            <div className="group relative overflow-hidden rounded-lg bg-gray-900 p-8 text-white shadow-md md:p-10">
+                <div className="absolute inset-0 z-10 bg-gradient-to-r from-gray-900 via-gray-900/90 to-gray-900/40" />
                 <div className="relative z-20 max-w-2xl">
-                    <span className="mb-4 inline-block rounded-sm bg-white px-3 py-1 text-[10px] font-bold tracking-wide text-zinc-900">
+                    <span className="mb-4 inline-block rounded-sm bg-white px-3 py-1 text-xs font-bold tracking-wide text-gray-900">
                         {hero.kicker}
                     </span>
                     <h2 className="mb-3 text-3xl font-black tracking-tight md:text-4xl">{hero.title}</h2>
-                    <p className="mb-8 max-w-md text-sm leading-relaxed text-zinc-400">{hero.body}</p>
+                    <p className="mb-8 max-w-md text-sm leading-relaxed text-gray-400">{hero.body}</p>
                     <div className="flex flex-wrap gap-3">
                         <Link
                             to={hero.primary.to}
-                            className="inline-block rounded-sm bg-white px-6 py-3 text-sm font-bold text-zinc-900 hover:bg-zinc-100"
+                            className="inline-block rounded-sm bg-white px-6 py-3 text-sm font-bold text-gray-900 hover:bg-gray-100"
                         >
                             {hero.primary.label}
                         </Link>
                         <Link
                             to={hero.secondary.to}
-                            className="inline-block rounded-sm border border-zinc-600 px-6 py-3 text-sm font-bold text-white hover:border-white"
+                            className="inline-block rounded-sm border border-gray-600 px-6 py-3 text-sm font-bold text-white hover:border-white"
                         >
                             {hero.secondary.label}
                         </Link>

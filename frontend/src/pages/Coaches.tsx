@@ -703,11 +703,11 @@ export default function Coaches() {
                             </div>
                         ) : data?.trainers.length === 0 ? (
                             <div className="marketplace-panel marketplace-empty mx-auto max-w-lg text-center">
-                                <p className="text-base font-semibold text-gray-900">Chưa có hồ sơ phù hợp.</p>
+                                <p className="text-base font-semibold text-gray-900">Không tìm thấy hồ sơ.</p>
                                 <p className="mt-2 text-sm leading-relaxed text-gray-500">
                                     {hasActiveFilters
-                                        ? 'Thử nới lỏng bộ lọc hoặc quay lại danh sách mặc định — đôi khi chỉ cần bỏ một điều kiện là đủ lựa chọn mới xuất hiện.'
-                                        : 'Danh sách đang trống hoặc chưa có hồ sơ công khai trong mục này. Bạn có thể tạo hồ sơ của riêng mình hoặc quay lại sau.'}
+                                        ? 'Bỏ một bộ lọc để xem thêm kết quả.'
+                                        : 'Danh sách trống hoặc chưa có hồ sơ. Bạn có thể tạo hồ sơ hoặc quay lại sau.'}
                                 </p>
                                 <div className="mt-6 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
                                     {hasActiveFilters ? (

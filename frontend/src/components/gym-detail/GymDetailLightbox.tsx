@@ -66,7 +66,7 @@ const GymDetailLightbox: React.FC<GymDetailLightboxProps> = ({
                             setLightboxIdx((current) => current === null ? 0 : (current - 1 + gallery.length) % gallery.length);
                         }}
                         className="absolute left-4 rounded-lg border border-white/15 bg-white/5 px-4 py-3 text-xl font-bold text-white transition motion-reduce:transition-none hover:bg-white/12 focus:outline-none focus:ring-2 focus:ring-white/50"
-                        aria-label="Ảnh trước"
+                        aria-label="Trước"
                     >
                         ‹
                     </button>

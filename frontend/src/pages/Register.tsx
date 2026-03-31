@@ -85,12 +85,14 @@ export default function Register() {
             if (result.user.user_type === 'gym_owner') {
                 navigate('/gym-owner/register');
             } else {
-                navigate('/verify-email');
+                navigate('/verify-email', { state: { registered: true, name: form.full_name } });
             }
         } catch (err: any) {
             setError(extractApiErrorMessage(err, 'Registration failed. Please try again.'));
             dispatch(setLoading(false));
-            setStep(1); // Go back to step 1 on error
+            setStep(1);
+            // Clear sensitive fields when going back to step 1 after error
+            setForm(prev => ({ ...prev, password: '', confirmPassword: '' }));
         } finally {
             setLoadingState(false);
         }
@@ -235,7 +237,10 @@ export default function Register() {
                             {loading && <div className="text-center text-sm font-medium text-gray-500 mt-4 animate-pulse">Đang xử lý...</div>}
 
                             <button 
-                                onClick={() => setStep(1)} 
+                                onClick={() => {
+                                    setStep(1);
+                                    setForm(prev => ({ ...prev, password: '', confirmPassword: '' }));
+                                }} 
                                 disabled={loading}
                                 className="mt-6 text-sm text-gray-500 font-medium hover:text-black w-full text-center flex items-center justify-center gap-1"
                             >

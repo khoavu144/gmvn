@@ -91,8 +91,8 @@ export default function AdminUsersPanel() {
                 <AdminLoadingBlock />
             ) : err ? null : users.length === 0 ? (
                 <div className={adminEmptyStateClassName}>
-                    <p className="font-medium text-gray-800">Không có người dùng khớp bộ lọc</p>
-                    <p className="mt-1 text-xs text-gray-500">Thử bỏ tìm kiếm hoặc chọn vai trò khác.</p>
+                    <p className="font-medium text-gray-800">Không tìm thấy người dùng</p>
+                    <p className="mt-1 text-xs text-gray-500">Bỏ tìm kiếm hoặc chọn vai trò khác.</p>
                 </div>
             ) : (
                 <>

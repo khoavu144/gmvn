@@ -62,7 +62,7 @@ export default function CoachOffersFlagship({ programs, subscribing, onSubscribe
     const visibleOthers = showAll ? others : others.slice(0, 2);
 
     return (
-        <section id="programs" className="py-12 sm:py-16 bg-[#fafafa] scroll-mt-20">
+        <section id="programs" className="py-12 sm:py-16 bg-gray-50 scroll-mt-20">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)] mb-2">
                     Gói tập luyện

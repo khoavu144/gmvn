@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import apiClient from '../services/api';
 import { trackEvent } from '../lib/analytics';
@@ -15,6 +15,8 @@ export default function VerifyEmail() {
     const [loading, setLoading] = useState(false);
     const [resendIn, setResendIn] = useState(0);
     const navigate = useNavigate();
+    const location = useLocation();
+    const registeredName = (location.state as { registered?: boolean; name?: string } | null)?.name;
 
     useEffect(() => {
         if (resendIn <= 0) return;
@@ -82,6 +84,11 @@ export default function VerifyEmail() {
 
             <div className="auth-shell__grid">
                 <section className="auth-shell__intro">
+                    {registeredName && (
+                        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                            <span className="font-semibold">Đăng ký thành công!</span> Đăng ký thành công. Hãy nhập mã xác thực từ email.
+                        </div>
+                    )}
                     <p className="page-kicker">Bước kích hoạt tài khoản</p>
                     <h1 className="page-title max-w-xl">
                         Xác nhận email để mở khóa bước hoàn thiện hồ sơ.
