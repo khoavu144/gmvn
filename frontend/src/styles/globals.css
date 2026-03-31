@@ -34,6 +34,8 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     font-feature-settings: 'kern' 1, 'liga' 1;
+    /* Ensure no OS dark mode bleeds into native controls */
+    color-scheme: light;
   }
 
   body {
@@ -42,6 +44,8 @@
     color: theme('colors.gray.900');
     line-height: 1.6;
     font-size: 14px;
+    /* Reinforce light color scheme */
+    color-scheme: light;
   }
 
   h1, h2, h3, h4, h5, h6 {

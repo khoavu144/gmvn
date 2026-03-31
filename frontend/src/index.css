@@ -24,6 +24,8 @@
 }
 
 :root {
+  /* Lock to light mode — prevents OS dark mode from affecting native controls */
+  color-scheme: light;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   line-height: 1.6;
   font-weight: 400;
