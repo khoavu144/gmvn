@@ -16,11 +16,11 @@ export function Badge({ children, variant = 'default', size = 'md', className }:
             className={cn(
                 'badge',
                 // Variants
-                variant === 'default' && 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-                variant === 'success' && 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                variant === 'warning' && 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-                variant === 'error' && 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-                variant === 'info' && 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                variant === 'default' && 'bg-gray-100 text-gray-700',
+                variant === 'success' && 'bg-green-100 text-green-700',
+                variant === 'warning' && 'bg-amber-100 text-amber-700',
+                variant === 'error' && 'bg-red-100 text-red-700',
+                variant === 'info' && 'bg-blue-100 text-blue-700',
                 // Sizes
                 size === 'sm' && 'px-1.5 py-0.5 text-[10px]',
                 size === 'md' && 'px-2 py-0.5 text-[11px]',
@@ -38,7 +38,7 @@ export function VerifiedBadge({ className }: { className?: string }) {
         <span
             className={cn(
                 'inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-semibold rounded',
-                'bg-black text-white dark:bg-white dark:text-black',
+                'bg-black text-white',
                 className
             )}
         >
@@ -70,7 +70,7 @@ export function StatusBadge({
                     status === 'busy' && 'bg-amber-500'
                 )}
             />
-            {label && <span className="text-gray-600 dark:text-gray-400">{label}</span>}
+            {label && <span className="text-gray-600">{label}</span>}
         </span>
     );
 }

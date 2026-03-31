@@ -21,7 +21,7 @@ export function Skeleton({ className }: SkeletonProps) {
 // Pre-built skeleton cho CoachListItem (Q8 — horizontal layout)
 export function CoachListItemSkeleton() {
     return (
-        <div className="flex items-start gap-4 p-4 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-start gap-4 p-4 border-b border-gray-200">
             {/* Avatar */}
             <Skeleton className="w-16 h-16 rounded-lg flex-shrink-0" />
 

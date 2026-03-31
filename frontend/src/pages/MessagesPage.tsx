@@ -201,10 +201,9 @@ export default function MessagesPage() {
                 <meta name="robots" content="noindex,nofollow" />
             </Helmet>
             <div className="page-container gv-pad-y-sm">
-                <section className="page-header">
+                <section className="mb-6">
                     <p className="page-kicker">Trao đổi trực tiếp</p>
                     <h1 className="page-title">Tin nhắn</h1>
-                    <p className="page-description">Một bề mặt hội thoại gọn, rõ và thống nhất với dashboard để trao đổi cùng Coach, athlete hoặc đối tác.</p>
                 </section>
 
                 <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm md:grid md:min-h-[calc(100vh-18rem)] md:grid-cols-[20rem_minmax(0,1fr)]">
@@ -267,7 +266,7 @@ export default function MessagesPage() {
                         </div>
                     </div>
 
-                    <div className={`flex-1 flex-col bg-white w-full absolute inset-0 md:static ${!activePartner ? 'hidden md:flex' : 'flex'}`}>
+                    <div className={`flex flex-col bg-white w-full md:flex-1 ${!activePartner ? 'hidden md:flex' : 'fixed inset-0 md:static z-50 md:z-auto'}`}>
                         {activePartner ? (
                             <>
                                 <div className="flex items-center gap-3 border-b border-gray-200 bg-white px-4 py-4 sm:px-5">

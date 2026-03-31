@@ -64,11 +64,11 @@ export default function Login() {
                 <title>Đăng nhập — GYMERVIET</title>
                 <meta name="description" content="Đăng nhập tài khoản GYMERVIET để quản lý hồ sơ, kết nối Coach và theo dõi tiến trình tập luyện." />
             </Helmet>
-            <div className="page-container max-w-md py-16 sm:py-20">
+            <div className="page-container max-w-md gv-pad-y">
                 <div className="text-center page-header">
                     <p className="page-kicker">Chào mừng trở lại</p>
                     <h1 className="page-title text-center">Đăng nhập</h1>
-                    <p className="page-description mx-auto text-center">Truy cập vào tài khoản GYMERVIET của bạn với giao diện thống nhất theo homepage.</p>
+                    <p className="page-description mx-auto text-center">Tiếp tục hành trình tập luyện của bạn.</p>
                 </div>
 
                 {/* Card */}

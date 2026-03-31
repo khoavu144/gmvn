@@ -200,7 +200,7 @@ export default function OnboardingPage() {
                 </section>
 
                 <section className="auth-shell__panel surface-panel">
-                    <div className="page-header">
+                    <div className="mb-6">
                         <p className="page-kicker">Onboarding</p>
                         <h2 className="page-title text-2xl sm:text-3xl">{panelTitle}</h2>
                         <p className="page-description">{panelDescription}</p>

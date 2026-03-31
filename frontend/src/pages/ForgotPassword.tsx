@@ -30,11 +30,11 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="page-shell">
+    <div className="auth-shell">
       <Helmet>
         <title>Quên mật khẩu — GYMERVIET</title>
       </Helmet>
-      <div className="page-container max-w-md py-16 sm:py-20">
+      <div className="page-container max-w-md gv-pad-y">
         <div className="text-center page-header">
           <h1 className="page-title text-center">Quên mật khẩu</h1>
           <p className="page-description mx-auto text-center">

@@ -67,7 +67,7 @@ export default function WorkoutsPage() {
                 <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
                     <span className="font-semibold">Beta</span> — Video bài tập sẽ được thêm vào sớm.
                 </div>
-                <section className="page-header">
+                <section className="mb-6">
                     <button onClick={() => navigate('/dashboard')} className="back-link mb-3">← Về Dashboard</button>
                     <p className="page-kicker">Workout Tracker</p>
                     <h1 className="page-title">Lịch tập của tôi</h1>
@@ -77,7 +77,7 @@ export default function WorkoutsPage() {
                 </section>
 
                 {subs.length === 0 ? (
-                    <div className="empty-state border-dashed border-gray-200 bg-gray-50 mt-4 rounded-lg max-w-2xl mx-auto">
+                    <div className="marketplace-empty mt-4 max-w-2xl mx-auto border border-dashed border-gray-200 rounded-lg">
                         <div className="text-4xl mb-4">🎯</div>
                         <h3 className="text-lg font-bold text-gray-900 mb-2">Chưa có lộ trình tập luyện</h3>
                         <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
@@ -143,7 +143,7 @@ export default function WorkoutsPage() {
                                 ))}
                             </div>
                         ) : workouts.length === 0 ? (
-                            <div className="empty-state border-dashed text-sm text-gray-500">
+                            <div className="marketplace-empty border border-dashed border-gray-200 rounded-lg">
                                 <div className="empty-state-number">{selectedWeek}</div>
                                 <p className="text-sm font-medium text-gray-600">Tuần {selectedWeek} chưa có lịch tập.</p>
                             </div>

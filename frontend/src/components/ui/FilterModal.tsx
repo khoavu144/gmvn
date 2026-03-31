@@ -107,26 +107,27 @@ export function FilterModal({
                 aria-modal="true"
                 className={cn(
                     'fixed inset-x-0 bottom-0 z-modal lg:hidden',
-                    'bg-white dark:bg-gray-900 rounded-t-2xl',
+                    'bg-white rounded-t-2xl',
                     'max-h-[85vh] overflow-hidden flex flex-col',
                     'animate-in slide-in-from-bottom duration-200'
                 )}
             >
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
                     <div className="flex items-center gap-2">
-                        <SlidersHorizontal className="w-5 h-5 text-gray-600 dark:text-gray-500" />
-                        <h3 className="font-semibold text-gray-900 dark:text-white">{title}</h3>
+                        <SlidersHorizontal className="w-5 h-5 text-gray-600" />
+                        <h3 className="font-semibold text-gray-900">{title}
                         {totalSelected > 0 && (
-                            <span className="px-2 py-0.5 text-xs font-medium bg-black dark:bg-white text-white dark:text-black rounded-full">
+                            <span className="px-2 py-0.5 text-xs font-medium bg-black text-white rounded-full ml-2">
                                 {totalSelected}
                             </span>
                         )}
+                        </h3>
                     </div>
                     <button
                         type="button"
                         onClick={onClose}
-                        className="-mr-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center p-2 text-gray-500 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-200"
+                        className="-mr-2 inline-flex min-h-[44px] min-w-[44px] items-center justify-center p-2 text-gray-500 hover:text-gray-600"
                         aria-label="Đóng bộ lọc"
                     >
                         <X className="w-5 h-5" />
@@ -137,7 +138,7 @@ export function FilterModal({
                 <div className="flex-1 overflow-y-auto p-4 space-y-6">
                     {groups.map((group) => (
                         <div key={group.id}>
-                            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-500 mb-3">
+                            <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">
                                 {group.label}
                             </h4>
                             <div className="flex flex-wrap gap-2">
@@ -168,16 +169,16 @@ export function FilterModal({
                 </div>
 
                 {/* Footer */}
-                <div className="flex items-center gap-3 px-4 py-3 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+                <div className="flex items-center gap-3 px-4 py-3 border-t border-gray-200 bg-gray-50">
                     <button
                         onClick={handleReset}
-                        className="flex-1 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+                        className="flex-1 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
                     >
                         Đặt lại
                     </button>
                     <button
                         onClick={handleApply}
-                        className="flex-1 py-2.5 text-sm font-bold bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-50 transition-colors"
+                        className="flex-1 py-2.5 text-sm font-bold bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
                     >
                         Áp dụng{totalSelected > 0 && ` (${totalSelected})`}
                     </button>
@@ -201,14 +202,14 @@ export function FilterButton({
             className={cn(
                 'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                 count && count > 0
-                    ? 'bg-black dark:bg-white text-white dark:text-black'
-                    : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-black text-white'
+                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
             )}
         >
             <SlidersHorizontal className="w-4 h-4" />
             Bộ lọc
             {count && count > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 text-xs bg-white/20 dark:bg-black/20 rounded">
+                <span className="ml-1 px-1.5 py-0.5 text-xs bg-white/20 rounded">
                     {count}
                 </span>
             )}

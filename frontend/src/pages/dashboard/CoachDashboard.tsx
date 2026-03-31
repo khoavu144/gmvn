@@ -78,14 +78,14 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                                     <button
                                         type="button"
                                         onClick={() => void handleAccept(inv.id)}
-                                        className="min-h-[44px] min-w-[100px] rounded-sm bg-gray-900 px-4 py-2 text-sm font-bold text-white hover:bg-gray-800"
+                                        className="btn-primary min-w-[100px] px-4 text-sm"
                                     >
                                         Chấp nhận
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => void handleDecline(inv.id)}
-                                        className="min-h-[44px] rounded-sm px-4 py-2 text-sm font-bold text-gray-700 hover:text-red-600"
+                                        className="btn-secondary px-4 text-sm"
                                     >
                                         Từ chối
                                     </button>

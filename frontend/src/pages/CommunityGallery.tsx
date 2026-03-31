@@ -54,7 +54,7 @@ export default function CommunityGallery() {
     };
 
     return (
-        <div className="page-shell bg-[linear-gradient(180deg,#fafaf9_0%,#f5f5f4_100%)] text-gray-900 selection:bg-black selection:text-white">
+        <div className="marketplace-shell text-gray-900 selection:bg-black selection:text-white">
             <Helmet>
                 <title>The Wall — GYMERVIET Community</title>
                 <meta name="description" content="Chiêm ngưỡng hành trình, kết quả và những khoảnh khắc đẹp nhất của cộng đồng thể hình GYMERVIET." />

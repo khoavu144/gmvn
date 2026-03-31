@@ -36,7 +36,7 @@ export function PillTabs<T extends string>({
                                     className={cn(
                                         'ml-1 text-xs',
                                         isActive
-                                            ? 'text-white/70 dark:text-black/60'
+                                            ? 'text-white/70'
                                             : 'text-gray-500'
                                     )}
                                 >
@@ -68,7 +68,7 @@ export function SegmentedControl<T extends string>({
     return (
         <div
             className={cn(
-                'inline-flex p-1 rounded-lg bg-gray-50 dark:bg-gray-800',
+                'inline-flex p-1 rounded-lg bg-gray-50',
                 className
             )}
         >
@@ -81,8 +81,8 @@ export function SegmentedControl<T extends string>({
                         className={cn(
                             'px-3 py-1.5 text-sm font-medium rounded transition-colors',
                             isActive
-                                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                                : 'text-gray-600 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'
+                                ? 'bg-white text-gray-900 shadow-sm'
+                                : 'text-gray-600 hover:text-gray-900'
                         )}
                     >
                         {segment.label}

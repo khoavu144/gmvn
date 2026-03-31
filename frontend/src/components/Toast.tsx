@@ -28,8 +28,8 @@ export function useToast() {
                 'border transition-colors duration-150',
                 'animate-in slide-in-from-top-2 fade-in',
                 message.type === 'success'
-                    ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white'
-                    : 'bg-white text-red-600 border-red-200 dark:bg-red-950 dark:text-red-400 dark:border-red-800'
+                    ? 'bg-black text-white border-black'
+                    : 'bg-white text-red-600 border-red-200'
             )}
         >
             {message.type === 'success' ? (
@@ -44,8 +44,8 @@ export function useToast() {
                 className={cn(
                     'ml-2 p-2 rounded transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center',
                     message.type === 'success'
-                        ? 'hover:bg-white/20 dark:hover:bg-black/20'
-                        : 'hover:bg-red-100 dark:hover:bg-red-900'
+                        ? 'hover:bg-white/20'
+                        : 'hover:bg-red-100'
                 )}
             >
                 <X className="w-3.5 h-3.5" />

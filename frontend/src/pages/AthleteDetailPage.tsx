@@ -303,7 +303,7 @@ export default function AthleteDetailPage() {
   const packagesForPricing: TrainerPackage[] = packages;
 
   return (
-    <div className="coach-profile-page coach-profile-page--athlete ui-detail-shell ui-detail-shell--profile">
+    <div className="coach-profile-page coach-profile-page--athlete ui-detail-shell ui-detail-shell--profile pb-nav lg:pb-0">
       <Helmet>
         <title>{seoTitle}</title>
         <meta name="description" content={seoDescription} />

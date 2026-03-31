@@ -120,23 +120,23 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                 ref={modalRef}
                 role="dialog" 
                 aria-modal="true"
-                className="bg-white dark:bg-gray-900 rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-800"
+                className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-gray-200"
             >
 
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">{title}</h3>
+                <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                    <h3 className="text-lg font-bold text-gray-900">{title}</h3>
                     <button
                         onClick={onClose}
                         aria-label="Đóng hộp thoại cắt ảnh"
-                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-colors"
+                        className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors"
                     >
                         <i className="fi fi-rr-cross"></i>
                     </button>
                 </div>
 
                 {/* Body */}
-                <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-gray-50 dark:bg-black/50">
+                <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-gray-50">
                     <ReactCrop
                         crop={crop}
                         onChange={(_, percentCrop) => setCrop(percentCrop)}
@@ -155,16 +155,16 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 bg-white dark:bg-gray-900">
+                <div className="p-4 border-t border-gray-100 flex justify-end gap-3 bg-white">
                     <button
                         onClick={onClose}
-                        className="px-5 py-2.5 rounded-lg font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 dark:text-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700 transition"
+                        className="px-5 py-2.5 rounded-lg font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition"
                     >
                         Hủy
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-5 py-2.5 rounded-lg font-medium text-white bg-black hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition"
+                        className="px-5 py-2.5 rounded-lg font-medium text-white bg-black hover:bg-gray-800 transition">
                     >
                         Tiếp tục
                     </button>

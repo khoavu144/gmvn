@@ -501,7 +501,7 @@ const Gyms: React.FC = () => {
                 </section>
 
                 {/* ── Main content ─────────────────────────────────────────────────── */}
-                <section className="marketplace-container mt-4 md:mt-6 space-y-6 md:space-y-8">
+                <section className="marketplace-container gv-section-gap space-y-6 md:space-y-8">
                     {isLoading ? (
                         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                             {Array.from({ length: 6 }).map((_, idx) => (
@@ -670,7 +670,7 @@ const Gyms: React.FC = () => {
 
                 {/* ── Editorial tip block ──────────────────────────────────────────── */}
                 {!isLoading && gyms.length > 0 && (
-                    <section className="marketplace-container mt-6 md:mt-8">
+                    <section className="marketplace-container gv-section-gap">
                         <div className="marketplace-panel p-6 sm:p-8">
                             <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
                                 <div className="space-y-3">

@@ -442,7 +442,7 @@ const GymDetailPage: React.FC = () => {
                     />
                 </div>
 
-                <div className="marketplace-container mt-4 md:mt-6">
+                <div className="marketplace-container gv-pad-y-sm">
                     <div
                         className={`gym-detail-subnav rounded-lg border border-[color:var(--mk-line)] px-3 py-2 ${reducedEffects ? 'bg-[rgba(255,251,244,0.96)]' : 'bg-[rgba(255,251,244,0.82)] backdrop-blur-xl'}`}
                     >
@@ -465,7 +465,7 @@ const GymDetailPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="marketplace-container mt-4 md:mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.45fr)]">
+                <div className="marketplace-container gv-pad-y-sm grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.45fr)]">
                     <div className="flex flex-col gap-8">
                         <section ref={setRef('overview')} id="overview" className="gym-detail-section marketplace-panel gv-panel-pad">
                                 <GymSectionHeading

@@ -378,7 +378,7 @@ export default function CoachDetailPage() {
     }
 
     return (
-        <div className="coach-profile-page ui-detail-shell ui-detail-shell--profile">
+        <div className="coach-profile-page ui-detail-shell ui-detail-shell--profile pb-nav lg:pb-0">
             <Helmet>
                 <title>{seoTitle}</title>
                 <meta name="description" content={seoDescription} />

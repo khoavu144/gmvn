@@ -104,10 +104,10 @@ export default function Register() {
                 <title>Đăng ký — GYMERVIET</title>
                 <meta name="description" content="Tạo tài khoản GYMERVIET miễn phí. Bắt đầu hành trình tập luyện với huấn luyện viên và phòng tập hàng đầu Việt Nam." />
             </Helmet>
-            <div className="page-container max-w-md py-16 sm:py-20">
+            <div className="page-container max-w-md gv-pad-y">
                 <div className="text-center page-header mb-8">
                     <p className="page-kicker">Gia nhập Gymerviet</p>
-                    <h1 className="page-title text-center text-3xl font-black mb-2">{step === 1 ? 'Tạo tài khoản' : 'Mục tiêu của bạn là gì?'}</h1>
+                    <h1 className="page-title text-center">{step === 1 ? 'Tạo tài khoản' : 'Mục tiêu của bạn là gì?'}</h1>
                     <p className="page-description mx-auto text-center">
                         {step === 1 ? 'Bắt đầu hành trình tập luyện cùng cộng đồng GYMERVIET.' : 'Chọn vai trò để cá nhân hoá trải nghiệm của bạn.'}
                     </p>

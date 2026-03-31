@@ -201,7 +201,7 @@ export function GalleryGrid({
                 <button
                     key={image.id}
                     onClick={() => onImageClick(index)}
-                    className="aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 hover:opacity-90 transition-opacity"
+                    className="aspect-square overflow-hidden rounded-lg bg-gray-100 hover:opacity-90 transition-opacity"
                 >
                     <img
                         src={image.src}

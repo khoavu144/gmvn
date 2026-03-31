@@ -256,7 +256,7 @@ export default function NewsPage() {
                     </div>
                 </section>
 
-                <section className="marketplace-container mt-6 space-y-6">
+                <section className="marketplace-container gv-section-gap space-y-6">
                     {loading && (
                         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                             {Array.from({ length: 6 }).map((_, index) => (
@@ -311,7 +311,7 @@ export default function NewsPage() {
                 </section>
 
                 {hasArticles && safeTotalPages > 1 && (
-                    <section className="marketplace-container mt-8">
+                    <section className="marketplace-container gv-section-gap">
                         <div className="marketplace-panel gv-panel-pad-sm flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <div>
                                 <div className="marketplace-section-kicker">Phân trang</div>
