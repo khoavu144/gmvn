@@ -67,6 +67,12 @@ class SubscriptionService {
         const parts = contentStr.match(/GV\s+([A-Z0-9]+)\s+([A-Z0-9]+)/);
         if (!parts) return { success: true };
 
+        // ── Idempotency check: skip if this Sepay transaction was already processed ──
+        // This prevents duplicate subscriptions when SePay retries the webhook.
+        const sepaytxnId = String(id);
+        const alreadyProcessed = await this.subRepo.findOneBy({ sepay_transaction_id: sepaytxnId });
+        if (alreadyProcessed) return { success: true };
+
         const userIdPrefix = parts[1].toLowerCase();
         const programIdPrefix = parts[2].toLowerCase();
 
@@ -92,64 +98,70 @@ class SubscriptionService {
             return { success: true };
         }
 
-        // Check if subscription already exists
-        const existing = await this.subRepo.findOneBy({
-            user_id: userId,
-            program_id: programId,
-            status: 'active',
-        });
-
-        if (existing) return { success: true }; // Already subbed
-
+        const grossAmount = Number(transferAmount);
         const pricingType = rawProgram.pricing_type ?? 'monthly';
         const subscriptionType = pricingType === 'lump_sum' || pricingType === 'per_session'
             ? 'one_time'
             : 'monthly';
 
-        const sub = this.subRepo.create({
-            user_id: userId,
-            trainer_id: trainerId,
-            program_id: programId,
-            subscription_type: subscriptionType,
-            price_paid: Number(transferAmount),
-            sepay_transaction_id: String(id),
-            status: 'active',
-            started_at: new Date(),
-            next_billing_date: subscriptionType === 'monthly'
-                ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                : null,
+        // ── Atomic transaction: all financial writes succeed or all fail ──
+        // Prevents inconsistent state if the process crashes mid-way.
+        const newSub = await AppDataSource.transaction(async (manager) => {
+            const subRepo = manager.getRepository(Subscription);
+            const programRepo = manager.getRepository(Program);
+            const ftRepo = manager.getRepository(FinancialTransaction);
+            const tierRepo = manager.getRepository(RevenueTier);
+
+            // Re-check inside transaction to handle concurrent webhooks (race condition guard)
+            const existing = await subRepo.findOneBy({ user_id: userId, program_id: programId, status: 'active' });
+            if (existing) return null;
+
+            // 1. Increment client count
+            await programRepo.increment({ id: programId }, 'current_clients', 1);
+
+            // 2. Create subscription record
+            const sub = subRepo.create({
+                user_id: userId,
+                trainer_id: trainerId,
+                program_id: programId,
+                subscription_type: subscriptionType,
+                price_paid: grossAmount,
+                sepay_transaction_id: sepaytxnId,
+                status: 'active',
+                started_at: new Date(),
+                next_billing_date: subscriptionType === 'monthly'
+                    ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+                    : null,
+            });
+            const savedSub = await subRepo.save(sub);
+
+            // 3. Create financial transaction record (tiered split)
+            const tier = await tierRepo.findOneBy({ creator_id: trainerId });
+            const splitPercentage = tier ? tier.split_percentage : 95;
+            const platformFee = grossAmount * ((100 - splitPercentage) / 100);
+            const creatorAmount = grossAmount - platformFee;
+
+            await ftRepo.save(
+                ftRepo.create({
+                    program_id: programId,
+                    creator_id: trainerId,
+                    buyer_id: userId,
+                    gross_amount: grossAmount,
+                    split_percentage: splitPercentage,
+                    platform_fee: platformFee,
+                    stripe_fee: 0,
+                    creator_amount: creatorAmount,
+                    status: 'completed',
+                    subscription_id: savedSub.id,
+                })
+            );
+
+            return savedSub;
         });
 
-        await this.programRepo.increment({ id: programId }, 'current_clients', 1);
-        await this.subRepo.save(sub);
+        if (!newSub) return { success: true }; // Concurrent webhook already processed
 
-        // --- Handle Financial Transaction and Tiered Split ---
-        // Get creator's revenue tier (default 95%)
-        let tier = await this.tierRepo.findOneBy({ creator_id: trainerId });
-        const splitPercentage = tier ? tier.split_percentage : 95;
-
-        const grossAmount = Number(transferAmount);
-        const stripeFee = 0; // Sepay doesn't use Stripe, but keeping field for future. Can estimate platform fee instead.
-        const platformFeePercentage = 100 - splitPercentage;
-        const platformFee = grossAmount * (platformFeePercentage / 100);
-        const creatorAmount = grossAmount - platformFee - stripeFee;
-
-        await this.ftRepo.save(
-            this.ftRepo.create({
-                program_id: programId,
-                creator_id: trainerId,
-                buyer_id: userId,
-                gross_amount: grossAmount,
-                split_percentage: splitPercentage,
-                platform_fee: platformFee,
-                stripe_fee: stripeFee,
-                creator_amount: creatorAmount,
-                status: 'completed',
-                subscription_id: sub.id,
-            })
-        );
-
-        // P1-3: Notify trainer about new subscription
+        // ── Notify trainer (outside transaction — non-critical side effect) ──
         try {
             const notif = await notificationService.create(
                 trainerId,
@@ -158,7 +170,7 @@ class SubscriptionService {
                 'Bạn có một học viên mới đăng ký chương trình',
                 '/dashboard'
             );
-            
+
             const io = getIo();
             if (io) {
                 io.to(trainerId).emit('notification:new', notif);

@@ -16,8 +16,16 @@ class UserService {
             throw new Error('User not found');
         }
 
-        // Merge input into user entity
-        Object.assign(user, input);
+        // Explicit field allowlist — prevents mass-assignment if service is
+        // called outside the validated route (defence in depth).
+        if (input.full_name          !== undefined) user.full_name          = input.full_name;
+        if (input.avatar_url         !== undefined) user.avatar_url         = input.avatar_url;
+        if (input.bio                !== undefined) user.bio                = input.bio;
+        if (input.height_cm          !== undefined) user.height_cm          = input.height_cm;
+        if (input.current_weight_kg  !== undefined) user.current_weight_kg  = input.current_weight_kg as any;
+        if (input.experience_level   !== undefined) user.experience_level   = input.experience_level;
+        if (input.specialties        !== undefined) user.specialties        = input.specialties;
+        if (input.base_price_monthly !== undefined) user.base_price_monthly = input.base_price_monthly as any;
 
         await this.repo.save(user);
 

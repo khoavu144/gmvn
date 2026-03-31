@@ -47,12 +47,14 @@ export const generateSitemap = async (_req: Request, res: Response): Promise<voi
             urls.push(xmlUrl(`${BASE_URL}${page.path}`, today, page.changefreq, page.priority));
         }
 
-        // Dynamic: Trainer / Coach profiles
+        // Dynamic: Trainer / Coach profiles (capped to prevent unbounded memory on cache miss)
         const trainers = await AppDataSource
             .getRepository(User)
             .createQueryBuilder('u')
             .select(['u.id', 'u.updated_at', 'u.slug'])
             .where("u.user_type = 'trainer'")
+            .orderBy('u.updated_at', 'DESC')
+            .take(5000)
             .getMany();
 
         for (const t of trainers) {
@@ -69,6 +71,8 @@ export const generateSitemap = async (_req: Request, res: Response): Promise<voi
             .getRepository(GymCenter)
             .createQueryBuilder('g')
             .select(['g.id', 'g.updated_at', 'g.slug'])
+            .orderBy('g.updated_at', 'DESC')
+            .take(5000)
             .getMany();
 
         for (const g of gyms) {
@@ -86,6 +90,8 @@ export const generateSitemap = async (_req: Request, res: Response): Promise<voi
             .createQueryBuilder('u')
             .select(['u.id', 'u.updated_at', 'u.slug'])
             .where("u.user_type = 'athlete'")
+            .orderBy('u.updated_at', 'DESC')
+            .take(5000)
             .getMany();
 
         for (const a of athletes) {

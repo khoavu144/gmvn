@@ -140,29 +140,32 @@ export const gymService = {
             .replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
             + '-' + Date.now();
 
-        const center = gymCenterRepo.create({
-            owner_id: ownerId,
-            name: data.name,
-            slug,
-            description: data.description,
-            tagline: data.tagline,
-            is_verified: false,
-            is_active: true,
-        });
-        const savedCenter = await gymCenterRepo.save(center);
+        // ── Atomic transaction: if branch creation fails the center is rolled back ──
+        return AppDataSource.transaction(async (manager) => {
+            const center = manager.getRepository(GymCenter).create({
+                owner_id: ownerId,
+                name: data.name,
+                slug,
+                description: data.description,
+                tagline: data.tagline,
+                is_verified: false,
+                is_active: true,
+            });
+            const savedCenter = await manager.getRepository(GymCenter).save(center);
 
-        const branch = branchRepo.create({
-            gym_center_id: savedCenter.id,
-            branch_name: data.branchName || data.name,
-            address: data.address,
-            city: data.city,
-            district: data.district,
-            phone: data.phone,
-            is_active: true,
-        });
-        await branchRepo.save(branch);
+            const branch = manager.getRepository(GymBranch).create({
+                gym_center_id: savedCenter.id,
+                branch_name: data.branchName || data.name,
+                address: data.address,
+                city: data.city,
+                district: data.district,
+                phone: data.phone,
+                is_active: true,
+            });
+            await manager.getRepository(GymBranch).save(branch);
 
-        return savedCenter;
+            return savedCenter;
+        });
     },
 
     async getOwnerGyms(ownerId: string) {
