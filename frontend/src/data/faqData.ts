@@ -86,14 +86,40 @@ export const faqData: FAQCategory[] = [
             },
         ],
     },
+    {
+        title: 'Sản phẩm & Marketplace',
+        icon: '🛍️',
+        items: [
+            {
+                q: 'Sản phẩm trong marketplace được kiểm định như thế nào?',
+                a: 'Tất cả sản phẩm trên GYMERVIET Marketplace đều được xét duyệt bởi đội chuyên gia của chúng tôi. Chúng tôi kiểm tra tính xác thực, chất lượng nội dung và cam kết của người bán. Chỉ những sản phẩm đạt tiêu chuẩn mới được phép bán.',
+            },
+            {
+                q: 'Làm sao để biết sản phẩm phù hợp với mục tiêu của tôi?',
+                a: 'Mỗi sản phẩm đều có gắn tag mục tiêu tập luyện (giảm cân, tăng cơ, tăng sức mạnh, v.v.) và mô tả chi tiết. Bạn có thể dùng bộ lọc "Mục tiêu" để tìm sản phẩm phù hợp. Ngoài ra, đọc đánh giá của những người dùng khác để hiểu rõ hơn.',
+            },
+            {
+                q: 'Có thể kết hợp sản phẩm marketplace với gói tập từ Coach không?',
+                a: 'Hoàn toàn có! Nhiều Coach sẽ đề xuất các sản phẩm từ marketplace để hỗ trợ gói tập của họ. Bạn có thể mua sản phẩm độc lập hoặc theo gợi ý của Coach. Cả hai thực hiện song song, không ảnh hưởng lẫn nhau.',
+            },
+            {
+                q: 'Chính sách hoàn tiền / hủy đơn hàng cho sản phẩm như thế nào?',
+                a: 'Bạn có thể hủy đơn hàng trong vòng 1 giờ sau khi thanh toán, sẽ được hoàn tiền 100%. Sau 1 giờ, có thể liên hệ người bán để yêu cầu hủy (tùy chính sách của từng người bán). Nếu sản phẩm không đúng cam kết, yêu cầu hoàn tiền trong vòng 14 ngày.',
+            },
+            {
+                q: 'Có giới hạn về số lượng sản phẩm tôi có thể mua không?',
+                a: 'Không có giới hạn. Bạn có thể mua bao nhiêu sản phẩm tùy thích. Mỗi lần mua được xem là giao dịch riêng. Nếu mua số lượng lớn (từ 5 sản phẩm trở lên), liên hệ hỗ trợ để được tư vấn chiết khấu tập thể.',
+            },
+        ],
+    },
 ];
 
 /** Curated subset for Home — same copy as full FAQ (single source via faqData). */
 export const HOME_FAQ_PREVIEW_ITEMS: FAQItem[] = [
     faqData[1].items[2],
-    faqData[1].items[1],
+    faqData[4].items[0],
     faqData[2].items[0],
+    faqData[1].items[1],
+    faqData[4].items[2],
     faqData[0].items[2],
-    faqData[0].items[0],
-    faqData[3].items[2],
 ];
