@@ -42,15 +42,6 @@ const AUDIENCE_PILLARS = [
     },
 ] as const;
 
-
-function coachLink(coach: FeaturedTrainer): string {
-    if (coach.user_type === 'athlete') {
-        return coach.slug ? `/athlete/${coach.slug}` : `/athletes/${coach.id}`;
-    }
-
-    return coach.slug ? `/coach/${coach.slug}` : `/coaches/${coach.id}`;
-}
-
 export default function Home() {
     const [coaches, setCoaches] = useState<FeaturedTrainer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
