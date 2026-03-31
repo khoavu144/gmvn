@@ -164,7 +164,7 @@ export const ImageCropperModal: React.FC<ImageCropperModalProps> = ({
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-5 py-2.5 rounded-lg font-medium text-white bg-black hover:bg-gray-800 transition">
+                        className="px-5 py-2.5 rounded-lg font-medium text-white bg-black hover:bg-gray-800 transition"
                     >
                         Tiếp tục
                     </button>
