@@ -24,13 +24,13 @@ const BILLING_LABELS: Record<string, string> = {
 };
 
 const VENUE_LABELS: Record<string, string> = {
-  gym: 'Gym',
-  fitness_club: 'Fitness Club',
-  yoga_studio: 'Yoga Studio',
-  pilates_studio: 'Pilates Studio',
-  boutique_studio: 'Boutique Studio',
-  recovery_venue: 'Recovery & Wellness',
-  crossfit_box: 'CrossFit Box',
+  gym: 'Phòng gym',
+  fitness_club: 'Câu lạc bộ thể hình',
+  yoga_studio: 'Studio yoga',
+  pilates_studio: 'Studio pilates',
+  boutique_studio: 'Studio chuyên biệt',
+  recovery_venue: 'Phục hồi & chăm sóc',
+  crossfit_box: 'Phòng CrossFit',
   martial_arts: 'Võ thuật',
 };
 
@@ -47,7 +47,7 @@ function getPrimaryVenueLabel(gym: GymCenter) {
   if (primaryTerm?.label) return primaryTerm.label;
   if (gym.primary_venue_type_slug)
     return VENUE_LABELS[gym.primary_venue_type_slug] || gym.primary_venue_type_slug;
-  return 'Active Space';
+  return 'Không gian tập luyện';
 }
 
 function getThumbnailUrl(gym: GymCenter) {
@@ -229,7 +229,7 @@ const GymCard: React.FC<GymCardProps> = ({
 
             {gym.is_verified && (
               <span className="inline-flex shrink-0 items-center gap-1 rounded bg-white px-2 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-black">
-                ✓{!isCompact && <span className="hidden sm:inline"> Verified</span>}
+                ✓{!isCompact && <span className="hidden sm:inline"> Đã xác minh</span>}
               </span>
             )}
           </div>

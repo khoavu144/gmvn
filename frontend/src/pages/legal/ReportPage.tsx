@@ -14,9 +14,9 @@ type ViolationType =
 const violationTypes: { value: ViolationType; label: string; desc: string }[] = [
     { value: 'fake_info', label: 'Thông tin giả mạo', desc: 'Chứng chỉ, kinh nghiệm hoặc thông tin cá nhân không trung thực' },
     { value: 'harassment', label: 'Quấy rối / Đe dọa', desc: 'Ngôn ngữ thô tục, đe dọa, hoặc hành vi gây khó chịu trong tin nhắn' },
-    { value: 'scam', label: 'Gian lận / Lừa đảo', desc: 'Yêu cầu thanh toán ngoài hệ thống, không cung cấp dịch vụ sau khi nhận tiền' },
+    { value: 'scam', label: 'Gian lận / Lừa đảo', desc: 'Cam kết sai, yêu cầu chuyển khoản đáng ngờ hoặc không cung cấp dịch vụ sau khi nhận tiền' },
     { value: 'inappropriate_content', label: 'Nội dung không phù hợp', desc: 'Ảnh hoặc mô tả vi phạm Tiêu chuẩn Cộng đồng' },
-    { value: 'fake_payment', label: 'Gian lận thanh toán', desc: 'Giao dịch đáng ngờ, chuyển khoản sai nội dung cố ý' },
+    { value: 'fake_payment', label: 'Gian lận thanh toán', desc: 'Ảnh chụp chuyển khoản giả, xác nhận thanh toán sai sự thật hoặc giao dịch đáng ngờ' },
     { value: 'spam', label: 'Spam / Quảng cáo', desc: 'Gửi tin nhắn hàng loạt, quảng cáo ngoài mục đích fitness' },
     { value: 'security', label: 'Lỗ hổng bảo mật', desc: 'Phát hiện lỗi kỹ thuật hoặc lỗ hổng bảo mật trên nền tảng' },
     { value: 'other', label: 'Khác', desc: 'Vi phạm không thuộc các nhóm trên' },

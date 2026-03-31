@@ -17,13 +17,13 @@ export default function DashboardSettingsTab({ form, onChange, onSave, saving }:
         <div className="animate-fade-in">
             <div className="mb-10">
                 <h1 className="text-3xl font-black uppercase tracking-tight mb-2">Hồ sơ Thương hiệu</h1>
-                <p className="text-gray-500">Cập nhật thông tin hệ thống Gym Center và bộ nhận diện</p>
+                <p className="text-gray-500">Cập nhật thông tin hệ thống phòng tập và bộ nhận diện</p>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
                 <div className="md:col-span-2 space-y-6 bg-white border border-gray-200 p-6 rounded-lg shadow-sm">
                     <h3 className="text-lg font-black uppercase tracking-tight border-b border-gray-200 pb-3">Thông tin cơ bản</h3>
                     <div>
-                        <label className="form-label block mb-2 font-bold text-xs uppercase text-gray-500 tracking-widest">Tên Gym Center *</label>
+                        <label className="form-label block mb-2 font-bold text-xs uppercase text-gray-500 tracking-widest">Tên phòng tập *</label>
                         <input
                             type="text"
                             className="form-input w-full"
@@ -71,7 +71,7 @@ export default function DashboardSettingsTab({ form, onChange, onSave, saving }:
                         </div>
                     </div>
                     <div className="bg-gray-50 border border-gray-200 p-6 rounded-lg">
-                        <h3 className="text-sm font-black uppercase tracking-tight mb-2">Public Profile</h3>
+                        <h3 className="text-sm font-black uppercase tracking-tight mb-2">Hồ sơ công khai</h3>
                         <p className="text-xs text-gray-500 mb-4 leading-relaxed">Hồ sơ sẽ hiển thị tới công chúng sau khi được admin GYMERVIET phê duyệt.</p>
                         <div className="flex items-center justify-between bg-white px-4 py-3 rounded-lg border border-gray-200 shadow-sm">
                             <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Trạng thái</span>

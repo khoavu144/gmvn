@@ -89,6 +89,7 @@ const GymDetailPage = lazyWithChunkRetry(() => import('./pages/GymDetailPage'), 
 const GymRegisterPage = lazyWithChunkRetry(() => import('./pages/GymRegisterPage'), 'gym-register');
 const GymOwnerDashboard = lazyWithChunkRetry(() => import('./pages/GymOwnerDashboard'), 'gym-owner-dashboard');
 const CommunityGallery = lazyWithChunkRetry(() => import('./pages/CommunityGallery'), 'community-gallery');
+const PricingPage = lazyWithChunkRetry(() => import('./pages/PricingPage'), 'pricing');
 const MarketplacePage = lazyWithChunkRetry(() => import('./pages/MarketplacePage'), 'marketplace');
 const ProductDetailPage = lazyWithChunkRetry(() => import('./pages/ProductDetailPage'), 'product-detail');
 const SellerMarketplaceListPage = lazyWithChunkRetry(() => import('./pages/seller/SellerMarketplaceListPage'), 'seller-marketplace');
@@ -226,6 +227,21 @@ function RouteDiagnostics() {
       objective: routePresentation.businessObjective,
       path: `${location.pathname}${location.search}`,
     });
+
+    if (location.hash) {
+      const targetId = decodeURIComponent(location.hash.slice(1));
+      requestAnimationFrame(() => {
+        const target = document.getElementById(targetId);
+        if (target) {
+          target.scrollIntoView({ block: 'start' });
+        }
+      });
+      return;
+    }
+
+    if (navigationType !== 'POP') {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }
   }, [
     location.pathname,
     location.search,
@@ -345,7 +361,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/pricing',
-        element: <Navigate to="/faq" replace />,
+        element: lazyRoute(<PricingPage />),
       },
 
       // Gym Module Routes

@@ -34,7 +34,7 @@ export const fetchCommunityGallery = createAsyncThunk(
             const response = await communityGalleryApiService.getGallery({ page, limit: 12, category });
             return { ...response, reset };
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch gallery');
+            return rejectWithValue(error.response?.data?.message || 'Không thể tải thư viện cộng đồng');
         }
     }
 );
@@ -45,7 +45,7 @@ export const fetchCommunityGalleryStats = createAsyncThunk(
         try {
             return await communityGalleryApiService.getStats();
         } catch {
-            return rejectWithValue('Failed to fetch stats');
+            return rejectWithValue('Không thể tải số liệu thư viện cộng đồng');
         }
     }
 );

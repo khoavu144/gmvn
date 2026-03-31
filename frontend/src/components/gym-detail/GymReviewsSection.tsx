@@ -50,11 +50,11 @@ const GymReviewsSection = React.memo(function GymReviewsSection({ gymId, branchI
                     </p>
                 </div>
 
-                <div className="mb-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+                <div className="mb-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
                     {DIMENSION_LABELS.map((item) => (
-                        <div key={item.label} className="rounded-lg border border-white/10 bg-white/6 px-4 py-4">
+                        <div key={item.label} className="rounded-lg border border-white/10 bg-white/6 px-4 py-4 text-center">
                             <div className="text-[0.64rem] font-bold uppercase tracking-[0.18em] text-white/55">{item.label}</div>
-                            <div className="mt-2 text-lg font-bold tracking-[-0.04em] text-white">{getDimensionValue(item)}</div>
+                            <div className="mt-3 text-lg font-bold tracking-[-0.04em] text-white">{getDimensionValue(item)}</div>
                         </div>
                     ))}
                 </div>
@@ -69,7 +69,7 @@ const GymReviewsSection = React.memo(function GymReviewsSection({ gymId, branchI
 
                 {branchId && !canReview && (
                     <div className="mt-8 rounded-lg border border-white/10 bg-white/5 px-5 py-4 text-sm text-white/68">
-                        Bạn cần có gói tập hoặc từng tương tác tư vấn với cơ sở này để để lại một review hợp lệ trên marketplace.
+                        Bạn cần đang tham gia chương trình hoặc từng tương tác tư vấn với cơ sở này để để lại một review hợp lệ trên marketplace.
                     </div>
                 )}
             </section>

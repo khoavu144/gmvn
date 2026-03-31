@@ -65,27 +65,50 @@ export const toggleAdminBilling = asyncHandler(async (_req: Request, res: Respon
 });
 
 export const listAllPlatformSubs = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const page = parseInt(String(req.query.page ?? '1'), 10);
-    const limit = parseInt(String(req.query.limit ?? '50'), 10);
-    const result = await platformSubscriptionService.listAll(page, limit);
-    res.json({ success: true, ...result });
+    const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10) || 50));
+    res.json({
+        success: true,
+        deprecated: true,
+        billing_enabled: false,
+        items: [],
+        pagination: { page, limit, total: 0, pages: 0 },
+        message: DISABLED_REASON,
+    });
 });
 
 export const listCheckoutIntents = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10) || 50));
-    const result = await platformSubscriptionService.listCheckoutIntents(page, limit);
-    res.json({ success: true, ...result });
+    res.json({
+        success: true,
+        deprecated: true,
+        billing_enabled: false,
+        items: [],
+        pagination: { page, limit, total: 0, pages: 0 },
+        message: DISABLED_REASON,
+    });
 });
 
 export const listWebhookEvents = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const page = Math.max(1, parseInt(String(req.query.page ?? '1'), 10) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit ?? '50'), 10) || 50));
-    const result = await platformSubscriptionService.listWebhookEvents(page, limit);
-    res.json({ success: true, ...result });
+    res.json({
+        success: true,
+        deprecated: true,
+        billing_enabled: false,
+        items: [],
+        pagination: { page, limit, total: 0, pages: 0 },
+        message: DISABLED_REASON,
+    });
 });
 
 export const reconcileBilling = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
-    const result = await platformSubscriptionService.reconcileCheckoutIntents();
-    res.json({ success: true, ...result });
+    res.json({
+        success: true,
+        deprecated: true,
+        billing_enabled: false,
+        processed: 0,
+        message: DISABLED_REASON,
+    });
 });

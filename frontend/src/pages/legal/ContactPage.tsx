@@ -5,10 +5,10 @@ type ContactTopic = 'general' | 'payment' | 'account' | 'security' | 'trainer' |
 
 const topics: { value: ContactTopic; label: string }[] = [
     { value: 'general', label: 'Câu hỏi chung về nền tảng' },
-    { value: 'payment', label: 'Vấn đề thanh toán / hoàn tiền' },
+    { value: 'payment', label: 'Vấn đề kết nối / thỏa thuận với huấn luyện viên' },
     { value: 'account', label: 'Vấn đề tài khoản' },
     { value: 'security', label: 'Báo cáo lỗ hổng bảo mật' },
-    { value: 'trainer', label: 'Đăng ký / xác minh HLV' },
+    { value: 'trainer', label: 'Đăng ký / xác minh huấn luyện viên' },
     { value: 'other', label: 'Khác' },
 ];
 

@@ -208,20 +208,34 @@ export default function AthleteDetailPage() {
     return out;
   }, [profile?.social_links]);
 
-  const handleMessage = useCallback(() => {
+  const handleMessage = useCallback((programId?: string) => {
     if (!profile?.trainer_id) return;
     if (!user) {
       navigate('/login');
       return;
     }
-    navigate(`/messages?to=${profile.trainer_id}`);
-  }, [profile, user, navigate]);
+    const params = new URLSearchParams({
+      to: profile.trainer_id,
+      name: athlete?.full_name || 'Vận động viên',
+      profile_path: profile.slug ? `/athlete/${profile.slug}` : `/athletes/${profile.trainer_id}`,
+    });
+
+    if (programId) {
+      const packageName = packages.find((item) => item.id === programId)?.name || 'chương trình';
+      params.set('draft', `Xin chào, tôi muốn trao đổi về ${packageName} trên hồ sơ của bạn. Vui lòng cho tôi biết cách tham gia và các bước tiếp theo.`);
+      params.set('context_type', 'program');
+      params.set('context_id', programId);
+      params.set('context_label', packageName);
+    }
+
+    navigate(`/messages?${params.toString()}`);
+  }, [athlete?.full_name, navigate, packages, profile?.slug, profile?.trainer_id, user]);
 
   const portfolioLink = useMemo(() => {
     if (athleteExperiences.length || athleteAchievements.length) {
       return { id: 'achievements', label: 'Xem thành tích' };
     }
-    if (packages.length) return { id: 'services', label: 'Xem gói dịch vụ' };
+    if (packages.length) return { id: 'services', label: 'Xem chương trình' };
     if (gallery.length) return { id: 'gallery', label: 'Xem ảnh' };
     if (progressForShowcase.length) return { id: 'progress', label: 'Xem hành trình' };
     return { id: 'contact', label: 'Liên hệ' };
@@ -451,7 +465,7 @@ export default function AthleteDetailPage() {
                 subscribing={null}
                 onSubscribe={() => { }}
                 contactOnly
-                onContact={handleMessage}
+                onContact={(programId) => handleMessage(programId)}
                 emptyCopy="Chưa có gói công khai. Nhắn tin để trao đổi về lịch và mức phí phù hợp."
               />
             </div>

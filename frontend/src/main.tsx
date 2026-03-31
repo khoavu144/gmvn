@@ -41,6 +41,11 @@ const prewarmInitialRouteChunk = () => {
     return
   }
 
+  if (path.startsWith('/pricing')) {
+    void import('./pages/PricingPage')
+    return
+  }
+
   if (path.startsWith('/gallery')) {
     void import('./pages/CommunityGallery')
   }

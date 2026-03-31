@@ -19,10 +19,10 @@ export default function CoachTestimonialsWall({ testimonials }: Props) {
                         Phản hồi từ học viên
                     </div>
                     <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black mb-4">
-                        Họ nói gì về Coach
+                        Họ nói gì về huấn luyện viên
                     </h2>
                     <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-5 text-sm leading-7 text-gray-600 max-w-2xl">
-                        Chưa có đánh giá công khai. Sau khi tập cùng Coach, bạn có thể để lại phản hồi để giúp người khác quyết định.
+                        Chưa có đánh giá công khai. Sau khi tập cùng huấn luyện viên, bạn có thể để lại phản hồi để giúp người khác quyết định.
                     </p>
                 </div>
             </section>
@@ -39,7 +39,7 @@ export default function CoachTestimonialsWall({ testimonials }: Props) {
                     Phản hồi từ học viên
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black mb-8">
-                    Họ nói gì về Coach
+                    Họ nói gì về huấn luyện viên
                 </h2>
 
                 {/* Hero testimonials */}

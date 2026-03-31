@@ -8,6 +8,10 @@ import {
 } from 'typeorm';
 import { User } from './User';
 
+/**
+ * @deprecated Legacy revenue tier entity — kept for existing data compatibility.
+ * No longer used since platform fee collection was removed.
+ */
 @Entity('revenue_tiers')
 export class RevenueTier {
     @PrimaryGeneratedColumn('uuid')

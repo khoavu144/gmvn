@@ -35,7 +35,7 @@ export default function CoachTrustRibbon({
     }
 
     if (programCount > 0) {
-        proofs.push({ icon: '📋', label: 'Gói tập', value: `${programCount} chương trình` });
+        proofs.push({ icon: '📋', label: 'Chương trình', value: `${programCount} chương trình` });
     }
 
     if (beforeAfterCount > 0) {

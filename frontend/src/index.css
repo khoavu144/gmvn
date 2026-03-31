@@ -21,6 +21,12 @@
   [tabindex]:not([tabindex="-1"]) {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2;
   }
+
+  /* Text selection on dark backgrounds */
+  *::selection {
+    background-color: rgba(255, 255, 255, 0.25);
+    color: inherit;
+  }
 }
 
 :root {

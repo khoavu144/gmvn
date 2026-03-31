@@ -5,6 +5,14 @@ import { messageService } from '../services/messageService';
 import { notificationService } from '../services/notificationService';
 import type { Notification } from '../entities/Notification';
 
+type MessageSendPayload = {
+    receiver_id: string;
+    content: string;
+    context_type?: 'program' | 'product' | 'gym' | 'profile';
+    context_id?: string;
+    context_label?: string;
+};
+
 let io: Server;
 
 /**
@@ -72,12 +80,16 @@ export const initSocket = (httpServer: HttpServer) => {
         }
 
         // Handle sending a message
-        socket.on('message:send', async (data: { receiver_id: string; content: string }) => {
+        socket.on('message:send', async (data: MessageSendPayload) => {
             try {
-                const { receiver_id, content } = data;
+                const { receiver_id, content, context_type, context_id, context_label } = data;
                 if (!receiver_id || !content) return;
 
-                const message = await messageService.sendMessage(user.user_id, receiver_id, content);
+                const message = await messageService.sendMessage(user.user_id, receiver_id, content, {
+                    context_type,
+                    context_id,
+                    context_label,
+                });
 
                 // Emit to sender (confirm)
                 socket.emit('message:sent', { success: true, message });
@@ -89,6 +101,9 @@ export const initSocket = (httpServer: HttpServer) => {
                         sender_id: user.user_id,
                         receiver_id,
                         content,
+                        context_type: message.context_type,
+                        context_id: message.context_id,
+                        context_label: message.context_label,
                         created_at: message.created_at,
                         is_read: false,
                     },

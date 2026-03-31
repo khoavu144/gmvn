@@ -21,7 +21,7 @@ export default function PrivacyPage() {
                         'Ảnh đại diện, ảnh bìa khi cập nhật profile.',
                         'Thông tin sức khỏe (chiều cao, cân nặng) nếu bạn chọn điền — hoàn toàn tùy chọn.',
                         'Nội dung tin nhắn trong hệ thống chat.',
-                        'Thông tin thanh toán (số tài khoản ngân hàng không được lưu trữ — xử lý qua SePay).',
+                        'Thông tin hồ sơ và mô tả dịch vụ bạn chủ động công khai trên nền tảng.',
                     ]} />
                     <p className="mt-4"><strong className="font-semibold text-black">Thông tin thu thập tự động:</strong></p>
                     <LegalList items={[
@@ -34,8 +34,8 @@ export default function PrivacyPage() {
                 <LegalSection title="2. Cách chúng tôi sử dụng thông tin">
                     <LegalList items={[
                         'Cung cấp và duy trì dịch vụ GYMERVIET.',
-                        'Hiển thị profile công khai nếu bạn kích hoạt tùy chọn này.',
-                        'Xử lý giao dịch và xác nhận thanh toán.',
+                        'Hiển thị hồ sơ công khai nếu bạn kích hoạt tùy chọn này.',
+                        'Kết nối các bên, lưu vết hội thoại và hỗ trợ moderation/safety khi cần.',
                         'Gửi thông báo liên quan đến tài khoản (không gửi spam marketing).',
                         'Cải thiện chất lượng dịch vụ thông qua dữ liệu tổng hợp ẩn danh.',
                     ]} />
@@ -47,8 +47,7 @@ export default function PrivacyPage() {
                     </LegalCallout>
                     <p className="mt-4">Thông tin chỉ được chia sẻ trong các trường hợp:</p>
                     <LegalList items={[
-                        'Với Coach hoặc học viên khi bạn chủ động thiết lập mối quan hệ tập luyện.',
-                        'Với SePay (đối tác xử lý thanh toán) — chỉ thông tin cần thiết để xác nhận giao dịch.',
+                        'Với huấn luyện viên hoặc học viên khi bạn chủ động thiết lập mối quan hệ tập luyện.',
                         'Với Supabase (lưu trữ file ảnh) — chỉ các file bạn chủ động upload.',
                         'Theo yêu cầu của pháp luật Việt Nam khi có lệnh từ cơ quan có thẩm quyền.',
                     ]} />
@@ -66,9 +65,9 @@ export default function PrivacyPage() {
                 <LegalSection title="5. Quyền của bạn">
                     <LegalList items={[
                         'Quyền truy cập: Xem toàn bộ dữ liệu chúng tôi lưu trữ về bạn.',
-                        'Quyền chỉnh sửa: Cập nhật thông tin cá nhân bất cứ lúc nào trong Profile.',
+                        'Quyền chỉnh sửa: Cập nhật thông tin cá nhân bất cứ lúc nào trong Hồ sơ.',
                         'Quyền xóa: Yêu cầu xóa tài khoản và toàn bộ dữ liệu liên quan.',
-                        'Quyền hạn chế: Tắt chế độ "profile public" để ẩn khỏi kết quả tìm kiếm.',
+                        'Quyền hạn chế: Tắt chế độ "hồ sơ công khai" để ẩn khỏi kết quả tìm kiếm.',
                         'Quyền xuất dữ liệu: Yêu cầu xuất dữ liệu cá nhân dưới dạng JSON/CSV.',
                     ]} />
                     <p className="mt-4">
@@ -82,7 +81,7 @@ export default function PrivacyPage() {
                 <LegalSection title="6. Cookie">
                     <p>
                         GYMERVIET chỉ sử dụng <strong>localStorage</strong> để lưu token xác thực.
-                        Chúng tôi không sử dụng cookie theo dõi (tracking cookies) hay cookie quảng cáo.
+                        Chúng tôi không sử dụng cookie theo dõi hay cookie quảng cáo.
                     </p>
                 </LegalSection>
 

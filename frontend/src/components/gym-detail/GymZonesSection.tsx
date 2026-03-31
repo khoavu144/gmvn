@@ -29,7 +29,7 @@ const GymZonesSection = React.memo(function GymZonesSection({ branchZones, setRe
                                     <div className="text-[0.68rem] font-bold uppercase tracking-[0.18em] text-gray-500">{zone.zone_type.replace(/_/g, ' ')}</div>
                                     <h3 className="mt-1.5 text-base font-bold tracking-[-0.03em] text-gray-900">{zone.name}</h3>
                                 </div>
-                                {zone.is_signature_zone && <span className="marketplace-badge marketplace-badge--accent">Signature</span>}
+                                {zone.is_signature_zone && <span className="marketplace-badge marketplace-badge--accent">Nổi bật</span>}
                             </div>
 
                             {zone.description && (

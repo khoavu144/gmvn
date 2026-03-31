@@ -38,7 +38,7 @@ export function pickSalesRegionFromAttributes(attrs: Record<string, unknown> | n
 function salesAreaFallbackCopy(product: Product): string {
     switch (product.product_type) {
         case 'digital':
-            return 'Sản phẩm số được giao trực tuyến sau thanh toán và không cần vận chuyển vật lý.';
+            return 'Sản phẩm số được gửi trực tuyến sau khi người bán xác nhận và không cần vận chuyển vật lý.';
         case 'service':
             return 'Dịch vụ được triển khai theo lịch hẹn với người bán; cần xác nhận trước khu vực và hình thức làm việc.';
         default:
@@ -97,7 +97,7 @@ export function buildOverviewFacts(product: Product, variants: Product['variants
     }
 
     facts.push(
-        { label: 'Nhận hàng', value: 'Trực tuyến sau thanh toán' },
+        { label: 'Nhận hàng', value: 'Trực tuyến sau khi người bán xác nhận' },
         { label: 'Quyền truy cập', value: 'Sử dụng lâu dài trên tài khoản' }
     );
     if (product.preview_content) {
@@ -113,7 +113,7 @@ export function buildFulfillmentPanel(product: Product, variants: Product['varia
     if (trainingPackage) {
         return {
             title: 'Cách nhận chương trình',
-            description: 'Nhận lộ trình online ngay sau thanh toán.',
+            description: 'Nhận lộ trình online sau khi thống nhất với người bán.',
             points: [
                 `${trainingPackage.duration_weeks} tuần nội dung`,
                 trainingPackage.includes_video ? 'Có video hướng dẫn' : 'Nội dung gọn, dễ theo dõi',
@@ -129,9 +129,9 @@ export function buildFulfillmentPanel(product: Product, variants: Product['varia
             title: 'Giao nhận & truy cập',
             description: 'Nhận trực tiếp trên nền tảng, không cần ship.',
             points: [
-                product.digital_file_url ? 'Tải tệp sau thanh toán' : 'Nhận tài nguyên số sau thanh toán',
+                product.digital_file_url ? 'Tải tệp sau khi người bán xác nhận' : 'Nhận tài nguyên số sau khi người bán xác nhận',
                 'Không cần xác nhận địa chỉ',
-                product.preview_content ? 'Có nội dung xem trước' : 'Mở toàn bộ sau thanh toán',
+                product.preview_content ? 'Có nội dung xem trước' : 'Mở toàn bộ sau khi người bán xác nhận',
             ],
             note: 'Bản đồ không cần thiết với sản phẩm số.',
             showMap: false,
@@ -145,7 +145,7 @@ export function buildFulfillmentPanel(product: Product, variants: Product['varia
             points: [
                 variants.length > 0 ? `${variants.length} gói đang mở` : 'Gói dịch vụ cấu hình theo nhu cầu',
                 'Xác nhận lịch với người bán',
-                'Chốt rõ khu vực hoặc hình thức trước khi thanh toán',
+                'Chốt rõ khu vực hoặc hình thức trước khi đi tới bước giao dịch trực tiếp',
             ],
             note: 'Service ưu tiên mô tả text-first thay vì bản đồ chung.',
             showMap: false,
@@ -175,5 +175,5 @@ export function buildBuyLead(product: Product) {
     if (product.product_type === 'service') {
         return 'Phù hợp khi bạn cần chốt nhanh hình thức làm việc và lịch hẹn.';
     }
-    return 'Xem tồn kho và phạm vi giao trước khi thêm vào giỏ.';
+    return 'Xem tồn kho và phạm vi giao — liên hệ người bán để đặt hàng.';
 }

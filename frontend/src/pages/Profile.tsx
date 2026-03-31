@@ -84,18 +84,18 @@ export default function Profile() {
     const proTabs: { key: ActiveTab; label: string; icon: any }[] = user.user_type === 'athlete' ? [
         { key: 'personal', label: 'Cá nhân', icon: UserIcon },
         { key: 'interests', label: PROFILE_INTERESTS_TAB_LABEL, icon: Tags },
-        { key: 'coach_profile', label: 'Hồ sơ VĐV (Public)', icon: Layout },
+        { key: 'coach_profile', label: 'Hồ sơ VĐV (công khai)', icon: Layout },
         { key: 'experience', label: 'Thành tích/Giải đấu', icon: Award },
-        { key: 'gallery', label: 'Gallery', icon: ImageIcon },
-        { key: 'faq', label: 'FAQ', icon: MessageCircle },
+        { key: 'gallery', label: 'Thư viện ảnh', icon: ImageIcon },
+        { key: 'faq', label: 'Hỏi đáp', icon: MessageCircle },
         { key: 'progress_photos', label: 'Quá trình thay đổi', icon: Camera }
     ] : [
         { key: 'personal', label: 'Cá nhân', icon: UserIcon },
         { key: 'interests', label: PROFILE_INTERESTS_TAB_LABEL, icon: Tags },
-        { key: 'coach_profile', label: 'Hồ sơ Coach (Public)', icon: Layout },
+        { key: 'coach_profile', label: 'Hồ sơ huấn luyện viên (công khai)', icon: Layout },
         { key: 'experience', label: 'Kinh nghiệm', icon: Award },
-        { key: 'gallery', label: 'Gallery', icon: ImageIcon },
-        { key: 'faq', label: 'FAQ', icon: MessageCircle },
+        { key: 'gallery', label: 'Thư viện ảnh', icon: ImageIcon },
+        { key: 'faq', label: 'Hỏi đáp', icon: MessageCircle },
     ];
 
     const normalTabs: { key: ActiveTab; label: string; icon: any }[] = [
@@ -157,7 +157,7 @@ export default function Profile() {
                                         />
                                     </div>
                                     {((user?.user_type === 'trainer' || user?.user_type === 'athlete') && user?.is_verified) && (
-                                        <div className="absolute bottom-2 right-2 rounded-lg border-4 border-white bg-emerald-600 p-1.5 text-white shadow-md" title="Verified Professional">
+                                        <div className="absolute bottom-2 right-2 rounded-lg border-4 border-white bg-emerald-600 p-1.5 text-white shadow-md" title="Đã xác minh">
                                             <CheckCircle className="w-5 h-5 fill-current" />
                                         </div>
                                     )}
@@ -173,7 +173,7 @@ export default function Profile() {
                                         <div className="flex flex-wrap items-center gap-3 mb-2">
                                             <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-gray-900">{user?.full_name}</h1>
                                             <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-gray-600 shadow-sm sm:text-xs">
-                                                {user?.user_type === 'trainer' ? 'Coach profile' : user?.user_type === 'athlete' ? 'Athlete profile' : 'Member profile'}
+                                                {user?.user_type === 'trainer' ? 'Hồ sơ huấn luyện viên' : user?.user_type === 'athlete' ? 'Hồ sơ VĐV' : 'Thành viên'}
                                             </span>
                                         </div>
                                         <p className="max-w-2xl text-sm font-medium leading-relaxed text-gray-600 sm:text-lg">
@@ -254,7 +254,7 @@ export default function Profile() {
                     <div className="flex flex-col lg:flex-row gap-8 items-start">
 
                         {/* LEFT COLUMN: Profile Card Sidebar */}
-                        <div className="w-full lg:w-[320px] shrink-0 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden sticky top-[120px]">
+                        <div className="w-full lg:w-[320px] shrink-0 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden lg:sticky lg:top-[120px]">
                             {/* Cover Image Area */}
                             <div className="h-32 bg-gray-900 relative">
                                 {myProfile?.cover_image_url ? (
@@ -285,7 +285,7 @@ export default function Profile() {
                                         decoding="async"
                                     />
                                     {((user.user_type === 'trainer' || user.user_type === 'athlete') && user.is_verified) && (
-                                        <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-1 rounded-full border-2 border-white shadow-sm" title="Verified">
+                                        <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-1 rounded-full border-2 border-white shadow-sm" title="Đã xác minh">
                                             <CheckCircle className="w-4 h-4" />
                                         </div>
                                     )}

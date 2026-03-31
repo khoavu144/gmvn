@@ -102,7 +102,7 @@ export default function SellerMarketplaceListPage() {
                     </p>
                     <h1 className="page-title">Cửa hàng của bạn</h1>
                     <p className="page-description max-w-2xl">
-                        Đăng ký bán, theo dõi listing và chỉnh sửa sản phẩm. Marketplace seller hiện không còn bị chặn bởi membership quota nội bộ.
+                        Đăng ký bán, theo dõi danh sách và chỉnh sửa sản phẩm. Gian hàng hiện không còn bị giới hạn bởi hạn mức nội bộ.
                     </p>
                     <div className="mt-6 flex flex-wrap gap-3">
                         <Link

@@ -65,11 +65,11 @@ export default function WorkoutsPage() {
             {ToastComponent}
             <div className="page-container gv-pad-y">
                 <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                    <span className="font-semibold">Beta</span> — Video bài tập sẽ được thêm vào sớm.
+                    <span className="font-semibold">Thử nghiệm</span> — Video bài tập sẽ được thêm vào sớm.
                 </div>
                 <section className="mb-6">
-                    <button onClick={() => navigate('/dashboard')} className="back-link mb-3">← Về Dashboard</button>
-                    <p className="page-kicker">Workout Tracker</p>
+                    <button onClick={() => navigate('/dashboard')} className="back-link mb-3">← Về bảng điều khiển</button>
+                    <p className="page-kicker">Theo dõi tập luyện</p>
                     <h1 className="page-title">Lịch tập của tôi</h1>
                     <p className="page-description">
                         Theo dõi các chương trình đang hoạt động, xem bài tập theo tuần và đánh dấu từng buổi đã hoàn thành.
@@ -81,10 +81,10 @@ export default function WorkoutsPage() {
                         <div className="text-4xl mb-4">🎯</div>
                         <h3 className="text-lg font-bold text-gray-900 mb-2">Chưa có lộ trình tập luyện</h3>
                         <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
-                            Sau khi đăng ký học với Coach, các bài tập sẽ hiện ở đây.
+                            Sau khi đăng ký học với huấn luyện viên, các bài tập sẽ hiện ở đây.
                         </p>
                         <button onClick={() => navigate('/coaches')} className="btn-primary px-6 text-sm">
-                            Khám phá Coach
+                            Khám phá huấn luyện viên
                         </button>
                     </div>
                 ) : (
@@ -193,7 +193,7 @@ export default function WorkoutsPage() {
                                                                     {ex.reps_min && <span>{ex.reps_min}{ex.reps_max && ex.reps_max !== ex.reps_min ? `-${ex.reps_max}` : ''} reps</span>}
                                                                     {ex.rest_seconds && <span>{ex.rest_seconds}s nghỉ</span>}
                                                                     {ex.video_url && (
-                                                                        <a href={ex.video_url} target="_blank" rel="noopener noreferrer" className="font-bold text-gray-400 hover:text-black underline underline-offset-2">▶ Xem demo</a>
+                                                                        <a href={ex.video_url} target="_blank" rel="noopener noreferrer" className="font-bold text-gray-400 hover:text-black underline underline-offset-2">▶ Xem hướng dẫn</a>
                                                                     )}
                                                                 </div>
                                                             </div>

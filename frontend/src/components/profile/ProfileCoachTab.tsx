@@ -146,7 +146,7 @@ export function ProfileCoachTab({ myProfile, saving, error: profileError, succes
             const url = await uploadService.uploadImage(croppedBlob, 'covers', originalName);
             setProfileValue('cover_image_url', url, { shouldValidate: true, shouldDirty: true });
         } catch {
-            toast.error('Upload ảnh thất bại! Vui lòng thử lại.');
+            toast.error('Tải ảnh thất bại! Vui lòng thử lại.');
         } finally {
             setIsUploading(false);
             setSelectedImageFile(null);

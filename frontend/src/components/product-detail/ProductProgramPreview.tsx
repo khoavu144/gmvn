@@ -42,8 +42,8 @@ export function ProductProgramPreview({ previewWeeks }: ProductProgramPreviewPro
                                                 <thead>
                                                     <tr>
                                                         <th>Bài tập</th>
-                                                        <th>Sets</th>
-                                                        <th>Reps</th>
+                                                        <th>Hiệp</th>
+                                                        <th>Số lần</th>
                                                         <th>Nghỉ</th>
                                                     </tr>
                                                 </thead>

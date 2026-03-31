@@ -14,7 +14,7 @@ interface ProfilePricingSectionProps {
   onSubscribe: (programId: string) => void;
   /** Athlete / no checkout: CTA opens contact flow */
   contactOnly?: boolean;
-  onContact?: () => void;
+  onContact?: (programId?: string) => void;
   emptyCopy?: string;
 }
 
@@ -24,7 +24,7 @@ export default function ProfilePricingSection({
   onSubscribe,
   contactOnly = false,
   onContact,
-  emptyCopy = 'Coach chưa công bố gói công khai trên hồ sơ. Hãy nhắn tin để được tư vấn mức giá và lịch phù hợp với bạn.',
+  emptyCopy = 'Huấn luyện viên chưa công bố gói dịch vụ công khai trên hồ sơ. Hãy nhắn tin để trao đổi mức giá và lịch phù hợp với bạn.',
 }: ProfilePricingSectionProps) {
   return (
     <section className="profile-pricing-section">
@@ -70,14 +70,14 @@ export default function ProfilePricingSection({
               <button
                 type="button"
                 onClick={() => {
-                  if (contactOnly) onContact?.();
+                  if (contactOnly) onContact?.(pkg.id);
                   else if (pkg.id) onSubscribe(pkg.id);
                 }}
-                disabled={!contactOnly && !!subscribing}
+                disabled={contactOnly ? subscribing === pkg.id : !!subscribing}
                 className={`profile-pricing-btn${pkg.is_popular ? ' profile-pricing-btn--popular' : ''}`}
                 aria-label={contactOnly ? `Liên hệ về gói ${pkg.name}` : `Chọn gói ${pkg.name}`}
               >
-                {contactOnly ? 'Liên hệ' : (subscribing === pkg.id ? 'Đang mở thanh toán...' : 'Chọn gói này')}
+                {contactOnly ? (subscribing === pkg.id ? 'Đang mở hội thoại...' : 'Nhắn để trao đổi') : (subscribing === pkg.id ? 'Đang mở thanh toán...' : 'Chọn gói này')}
               </button>
             </div>
           ))}

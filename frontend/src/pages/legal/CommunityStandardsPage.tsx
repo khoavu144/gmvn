@@ -17,19 +17,19 @@ export default function CommunityStandardsPage() {
             <div className="mt-8 space-y-0">
 
                 <LegalSection title="1. Tôn trọng lẫn nhau">
-                    <p>Chúng tôi kỳ vọng mọi thành viên — Coach và học viên — đều giao tiếp với thái độ lịch sự và chuyên nghiệp.</p>
+                    <p>Chúng tôi kỳ vọng mọi thành viên — huấn luyện viên và học viên — đều giao tiếp với thái độ lịch sự và chuyên nghiệp.</p>
                     <LegalList items={[
-                        'Không sử dụng ngôn ngữ thô tục, xúc phạm, kỳ thị trong tin nhắn hoặc mô tả profile.',
+                        'Không sử dụng ngôn ngữ thô tục, xúc phạm, kỳ thị trong tin nhắn hoặc mô tả hồ sơ.',
                         'Không quấy rối, đe dọa, hoặc gây áp lực cho người dùng khác.',
                         'Không phân biệt đối xử dựa trên giới tính, dân tộc, tôn giáo, vóc dáng cơ thể.',
-                        'Phản hồi tin nhắn trong thời gian hợp lý — đặc biệt với Coach đã nhận học viên.',
+                        'Phản hồi tin nhắn trong thời gian hợp lý — đặc biệt với huấn luyện viên đang nhận học viên.',
                     ]} />
                 </LegalSection>
 
                 <LegalSection title="2. Thông tin trung thực">
-                    <p>Sự tin tưởng là nền tảng của nền tảng này. Chúng tôi yêu cầu thông tin chính xác từ tất cả người dùng.</p>
+                    <p>Niềm tin là nền móng của cộng đồng này. Chúng tôi yêu cầu thông tin chính xác từ tất cả người dùng.</p>
                     <LegalList items={[
-                        'Coach phải cung cấp thông tin chứng chỉ, kinh nghiệm và thành tích thực tế, có thể xác minh.',
+                        'Huấn luyện viên phải cung cấp thông tin chứng chỉ, kinh nghiệm và thành tích thực tế, có thể xác minh.',
                         'Không đặt giá gói tập sai lệch hoặc mô tả dịch vụ không đúng sự thật.',
                         'Học viên không được giả mạo thông tin cá nhân hoặc tạo tài khoản trùng lặp để lách quy định.',
                         'Ảnh đại diện và ảnh bìa phải là ảnh thực tế của bản thân/hoạt động — không dùng ảnh người khác.',
@@ -37,22 +37,22 @@ export default function CommunityStandardsPage() {
                 </LegalSection>
 
                 <LegalSection title="3. Nội dung phù hợp">
-                    <p>GYMERVIET là nền tảng fitness chuyên nghiệp. Nội dung đăng tải phải phù hợp với mục đích này.</p>
+                    <p>GYMERVIET là nền tảng tập luyện chuyên nghiệp. Nội dung đăng tải phải phù hợp với mục đích này.</p>
                     <LegalList items={[
                         'Không đăng nội dung khiêu dâm, bạo lực, hoặc gây sốc trong gallery hoặc mô tả.',
-                        'Không quảng cáo các sản phẩm, dịch vụ không liên quan đến fitness và sức khỏe.',
+                        'Không quảng cáo các sản phẩm, dịch vụ không liên quan đến tập luyện và sức khỏe.',
                         'Không spam tin nhắn hàng loạt hoặc liên hệ người dùng khác ngoài mục đích tập luyện.',
                         'Không đăng liên kết độc hại, phần mềm độc hại, hoặc lừa đảo qua tin nhắn.',
                     ]} />
                 </LegalSection>
 
-                <LegalSection title="4. Giao dịch tài chính">
-                    <p>Mọi giao dịch thanh toán phải diễn ra qua hệ thống của GYMERVIET để đảm bảo quyền lợi cả hai bên.</p>
+                <LegalSection title="4. Thỏa thuận tài chính & trách nhiệm rõ ràng">
+                    <p>GYMERVIET không đứng giữa để giữ tiền hay đảm bảo giao dịch. Vì vậy, mọi thỏa thuận tài chính cần được làm rõ trung thực và chuyên nghiệp.</p>
                     <LegalList items={[
-                        'Không yêu cầu học viên thanh toán ngoài hệ thống (tiền mặt, chuyển khoản riêng không qua app).',
-                        'Coach không được hủy gói tập đơn phương sau khi học viên đã thanh toán.',
-                        'Không hoàn tiền ngoài chính sách — xem chi tiết tại trang Chính sách thanh toán.',
-                        'Báo cáo ngay nếu phát hiện giao dịch bất thường hoặc nghi ngờ gian lận.',
+                        'Không được mạo danh GYMERVIET như một bên bảo lãnh, giữ tiền hộ hoặc xác nhận thanh toán hộ.',
+                        'Không được gửi bằng chứng thanh toán giả, ép thanh toán mập mờ hoặc cố tình che giấu điều kiện dịch vụ.',
+                        'Huấn luyện viên cần làm rõ phạm vi gói tập, lịch dời/hủy và cách làm việc trước khi nhận tiền trực tiếp.',
+                        'Báo cáo ngay nếu phát hiện dấu hiệu lừa đảo, giả mạo hoặc hành vi tài chính bất thường.',
                     ]} />
                 </LegalSection>
 

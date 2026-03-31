@@ -4,7 +4,6 @@ import { MoreThanOrEqual } from 'typeorm';
 import { Subscription } from '../entities/Subscription';
 import { User } from '../entities/User';
 import { GymCenter } from '../entities/GymCenter';
-import { FinancialTransaction } from '../entities/FinancialTransaction';
 import { WorkoutLog } from '../entities/WorkoutLog';
 import { subscriptionService } from '../services/subscriptionService';
 import { messageService } from '../services/messageService';
@@ -18,8 +17,7 @@ export const getOverview = async (req: Request, res: Response) => {
     try {
         const trainerId = req.user!.user_id;
 
-        // Active clients count + revenue
-        const { active_clients, monthly_revenue } = await subscriptionService.getTrainerStats(trainerId);
+        const { active_clients, new_clients_30d } = await subscriptionService.getTrainerStats(trainerId);
 
         // Unread messages
         const unread_messages = await messageService.getUnreadCount(trainerId);
@@ -31,7 +29,7 @@ export const getOverview = async (req: Request, res: Response) => {
             success: true,
             overview: {
                 active_clients,
-                monthly_revenue,
+                new_clients_30d,
                 unread_messages,
                 total_programs: programs.length,
                 published_programs: programs.filter(p => p.is_published).length,
@@ -63,7 +61,7 @@ export const getClients = async (req: Request, res: Response) => {
             },
             started_at: sub.started_at,
             status: sub.status,
-            next_billing_date: sub.next_billing_date,
+            source: sub.source || 'legacy',
         }));
 
         res.json({ success: true, clients });
@@ -83,23 +81,22 @@ export const getPayments = async (req: Request, res: Response) => {
             take: 20,
         });
 
-        const allRevenue = subscriptions.reduce((sum, s) => sum + (Number(s.price_paid) || 0), 0);
-        const activeRevenue = subscriptions
-            .filter(s => s.status === 'active')
-            .reduce((sum, s) => sum + (Number(s.price_paid) || 0), 0);
+        const activeCount = subscriptions.filter(s => s.status === 'active').length;
 
         res.json({
             success: true,
             payments: {
-                total_revenue: allRevenue * 0.8, // 80% after platform fee
-                active_monthly: activeRevenue * 0.8,
+                total_revenue: 0,
+                active_monthly: 0,
+                active_relationships: activeCount,
                 transactions: subscriptions.map(s => ({
                     id: s.id,
                     user_name: s.user?.full_name,
                     program_name: s.program?.name,
-                    amount: (Number(s.price_paid) || 0) * 0.8,
+                    amount: 0,
                     status: s.status,
                     date: s.created_at,
+                    source: s.source || 'legacy',
                 })),
             },
         });
@@ -114,7 +111,7 @@ export const getAthleteOverview = async (req: Request, res: Response) => {
     try {
         const userId = req.user!.user_id;
 
-        // Active subscription count (real)
+        // Active coaching relationships
         const subRepo = AppDataSource.getRepository(Subscription);
         const activeSubscriptions = await subRepo.count({
             where: { user_id: userId, status: 'active' }
@@ -144,7 +141,7 @@ export const getAthleteOverview = async (req: Request, res: Response) => {
         res.json({
             success: true,
             overview: {
-                active_subscriptions: activeSubscriptions,
+                active_relationships: activeSubscriptions,
                 week_sessions: weekSessions,
                 unread_notifications: unreadNotifications,
             },
@@ -156,26 +153,32 @@ export const getAthleteOverview = async (req: Request, res: Response) => {
 
 export const getAdminStats = async (req: Request, res: Response) => {
     try {
-        // Get system KPIs: users, trainers, gyms, revenue
         const userRepo = AppDataSource.getRepository(User);
         const gymRepo = AppDataSource.getRepository(GymCenter);
-        const financialRepo = AppDataSource.getRepository(FinancialTransaction);
-
-        const totalUsers = await userRepo.count();
-        const totalTrainers = await userRepo.count({ where: { user_type: 'trainer' } });
-        const totalGyms = await gymRepo.count();
+        const subscriptionRepo = AppDataSource.getRepository(Subscription);
         
-        // Get revenue for current month
         const startOfMonth = new Date();
         startOfMonth.setDate(1);
         startOfMonth.setHours(0, 0, 0, 0);
-        
-        const monthlyRevenue = await financialRepo
-            .createQueryBuilder('transaction')
-            .select('SUM(transaction.amount)', 'total')
-            .where('transaction.created_at >= :startOfMonth', { startOfMonth })
-            .andWhere('transaction.status = :status', { status: 'completed' })
-            .getRawOne() || { total: 0 };
+
+        const [usersResult, trainersResult, gymsResult, newSubscriptionsResult] = await Promise.allSettled([
+            userRepo.count(),
+            userRepo.count({ where: { user_type: 'trainer' } }),
+            gymRepo.count(),
+            subscriptionRepo.count({
+                where: {
+                    created_at: MoreThanOrEqual(startOfMonth),
+                    status: 'active',
+                },
+            }),
+        ]);
+
+        const totalUsers = usersResult.status === 'fulfilled' ? usersResult.value : 0;
+        const totalTrainers = trainersResult.status === 'fulfilled' ? trainersResult.value : 0;
+        const totalGyms = gymsResult.status === 'fulfilled' ? gymsResult.value : 0;
+        const newSubscriptions30d = newSubscriptionsResult.status === 'fulfilled'
+            ? Number(newSubscriptionsResult.value ?? 0)
+            : 0;
 
         res.json({
             success: true,
@@ -183,7 +186,7 @@ export const getAdminStats = async (req: Request, res: Response) => {
                 total_users: totalUsers,
                 total_trainers: totalTrainers,
                 total_gyms: totalGyms,
-                monthly_revenue: monthlyRevenue.total || 0,
+                new_connections_30d: newSubscriptions30d,
             },
         });
     } catch (err: any) {

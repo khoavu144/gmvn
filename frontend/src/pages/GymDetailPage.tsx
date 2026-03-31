@@ -337,7 +337,7 @@ const GymDetailPage: React.FC = () => {
                         <h1 className="text-3xl font-bold tracking-[-0.05em] text-[color:var(--mk-text)]">Không tìm thấy venue này.</h1>
                         <p className="marketplace-lead">Liên kết có thể đã thay đổi hoặc venue hiện không còn hiển thị trên marketplace.</p>
                     </div>
-                    <Link to="/gyms" className="marketplace-chip is-active">Quay lại marketplace</Link>
+                    <Link to="/gyms" className="marketplace-chip is-active">Quay lại danh sách</Link>
                 </div>
             </div>
         );
@@ -416,7 +416,7 @@ const GymDetailPage: React.FC = () => {
             <div className="marketplace-shell gym-detail-page ui-detail-shell ui-detail-shell--marketplace min-h-screen">
                 <div className="marketplace-container gv-pad-y-sm">
                     <div className="mb-5 flex items-center justify-between gap-4">
-                        <Link to="/gyms" className="back-link">← Quay lại marketplace</Link>
+                        <Link to="/gyms" className="back-link">← Quay lại danh sách phòng tập</Link>
                         <div className="hidden items-center gap-2 md:flex">
                             {branchStatusBadges.slice(0, 3).map((badge) => (
                                 <span key={badge} className="marketplace-badge marketplace-badge--neutral">{badge}</span>
@@ -465,7 +465,7 @@ const GymDetailPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="marketplace-container gv-pad-y-sm grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.45fr)]">
+                <div className="marketplace-container gv-pad-y-sm grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.45fr)] pb-20 lg:pb-0">
                     <div className="flex flex-col gap-8">
                         <section ref={setRef('overview')} id="overview" className="gym-detail-section marketplace-panel gv-panel-pad">
                                 <GymSectionHeading
@@ -514,7 +514,7 @@ const GymDetailPage: React.FC = () => {
                                         <OverviewMetaRow label="Phản hồi" value={gym.response_sla_text || leadAction.helper || '—'} />
                                         {gym.website_url ? (
                                             <div className="flex flex-row items-baseline justify-between gap-3 py-2">
-                                                <span className="shrink-0 text-[0.66rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Website</span>
+                                                <span className="shrink-0 text-[0.66rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">Trang web</span>
                                                 <a
                                                     href={gym.website_url.startsWith('http') ? gym.website_url : `https://${gym.website_url}`}
                                                     target="_blank"

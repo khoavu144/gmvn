@@ -30,7 +30,7 @@ interface NewsApiResponse {
 const CATEGORY_MAP: Record<string, string> = {
     all: 'Tất cả',
     'strength-training': 'Sức mạnh',
-    fitness: 'Thể dục - Fitness',
+    fitness: 'Thể dục',
     health: 'Sức khỏe',
     nutrition: 'Dinh dưỡng',
     recovery: 'Phục hồi',
@@ -44,7 +44,7 @@ const CATEGORY_NOTES: Record<string, string> = {
     health: 'Những góc nhìn thực tế về sức khỏe, lối sống và khả năng duy trì phong độ dài hạn.',
     nutrition: 'Dinh dưỡng thể thao, thói quen ăn uống và cách tối ưu năng lượng cho người tập.',
     recovery: 'Phục hồi, ngủ nghỉ, giảm tải và các tín hiệu cần lưu ý trước khi quá tải kéo dài.',
-    general: 'Những chủ đề giao thoa giữa tập luyện, cộng đồng và các thay đổi trong ngành fitness.',
+    general: 'Những chủ đề giao thoa giữa tập luyện, cộng đồng và các thay đổi trong ngành tập luyện.',
 };
 
 function NewsCard({ article }: { article: NewsArticle }) {
@@ -164,13 +164,13 @@ export default function NewsPage() {
     return (
         <>
             <Helmet>
-                <title>Tin Tức Thể Hình — GYMERVIET</title>
+                <title>Tin tức tập luyện — GYMERVIET</title>
                 <meta
                     name="description"
-                    content="Cập nhật kiến thức tập luyện, dinh dưỡng, phục hồi và xu hướng fitness mới nhất từ cộng đồng thể hình GYMERVIET."
+                    content="Cập nhật kiến thức tập luyện, dinh dưỡng, phục hồi và xu hướng mới nhất từ cộng đồng GYMERVIET."
                 />
                 <link rel="canonical" href={`${canonicalBase}/news`} />
-                <meta property="og:title" content="Tin Tức Thể Hình — GYMERVIET" />
+                <meta property="og:title" content="Tin tức tập luyện — GYMERVIET" />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content={`${canonicalBase}/news`} />
                 <meta property="og:image" content={SITE_OG_IMAGE} />
@@ -184,7 +184,7 @@ export default function NewsPage() {
                     <div className="marketplace-container">
                         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)] lg:items-end">
                             <div className="space-y-5">
-                                <span className="marketplace-eyebrow">Knowledge hub</span>
+                                <span className="marketplace-eyebrow">Kho tri thức</span>
                                 <h1 className="marketplace-title max-w-4xl text-balance">
                                     Kiến thức và tin tức thể hình được biên tập để người tập ra quyết định tốt hơn.
                                 </h1>
@@ -281,7 +281,7 @@ export default function NewsPage() {
                     )}
 
                     {!loading && !error && !hasArticles && (
-                        <div className="marketplace-panel">
+                        <div className="marketplace-panel pb-8">
                             <EmptyState
                                 numberIcon={0}
                                 title="Chưa có bài viết trong chủ đề này"
@@ -292,7 +292,7 @@ export default function NewsPage() {
                                     Xem tất cả chủ đề
                                 </button>
                                 <Link to="/coaches" className="btn-secondary px-5 py-2.5 text-sm font-bold">
-                                    Khám phá Coach
+                                    Khám phá huấn luyện viên
                                 </Link>
                                 <Link to="/gyms" className="btn-secondary px-5 py-2.5 text-sm font-bold">
                                     Tìm phòng tập

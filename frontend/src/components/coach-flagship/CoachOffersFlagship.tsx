@@ -42,13 +42,13 @@ export default function CoachOffersFlagship({ programs, subscribing, onSubscribe
             <section id="programs" className="py-12 sm:py-16 scroll-mt-20">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6">
                     <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)] mb-2">
-                        Gói tập luyện
+                        Chương trình
                     </div>
                     <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black mb-6">
                         Chương trình huấn luyện
                     </h2>
                     <div className="bg-[color:var(--mk-paper)] border-2 border-dashed border-[color:var(--mk-line)] rounded-lg py-16 text-center">
-                        <div className="text-[color:var(--mk-muted)] text-sm font-medium mb-3">Chưa có gói tập khả dụng</div>
+                        <div className="text-[color:var(--mk-muted)] text-sm font-medium mb-3">Chưa có chương trình khả dụng</div>
                         <div className="text-xs text-[color:var(--mk-muted)]">Liên hệ trực tiếp để được tư vấn chương trình phù hợp</div>
                     </div>
                 </div>
@@ -65,7 +65,7 @@ export default function CoachOffersFlagship({ programs, subscribing, onSubscribe
         <section id="programs" className="py-12 sm:py-16 bg-gray-50 scroll-mt-20">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
                 <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[color:var(--mk-muted)] mb-2">
-                    Gói tập luyện
+                    Chương trình
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-black mb-8">
                     Chọn chương trình phù hợp
@@ -112,10 +112,10 @@ export default function CoachOffersFlagship({ programs, subscribing, onSubscribe
                                 disabled={subscribing === featured.id}
                                 className="btn-primary flex-1 sm:flex-none sm:px-10 py-3 text-sm font-bold uppercase tracking-wider"
                             >
-                                {subscribing === featured.id ? 'Đang xử lý...' : 'Đăng ký ngay'}
+                                {subscribing === featured.id ? 'Đang mở hội thoại...' : 'Nhắn để trao đổi'}
                             </button>
                             <span className="text-xs text-[color:var(--mk-muted)] text-center sm:text-left">
-                                Thanh toán an toàn qua chuyển khoản ngân hàng
+                                Thống nhất cách tham gia trực tiếp với Coach
                             </span>
                         </div>
                     </div>
@@ -155,7 +155,7 @@ export default function CoachOffersFlagship({ programs, subscribing, onSubscribe
                                             disabled={subscribing === prog.id}
                                             className="btn-secondary px-5 text-xs font-bold uppercase"
                                         >
-                                            {subscribing === prog.id ? '...' : 'Đăng ký'}
+                                            {subscribing === prog.id ? '...' : 'Trao đổi'}
                                         </button>
                                     </div>
                                 </div>
@@ -169,7 +169,7 @@ export default function CoachOffersFlagship({ programs, subscribing, onSubscribe
                         onClick={() => setShowAll(true)}
                         className="mt-4 text-sm font-semibold text-[color:var(--mk-muted)] hover:text-black transition-colors mx-auto block"
                     >
-                        Xem thêm {others.length - 2} gói tập →
+                        Xem thêm {others.length - 2} chương trình →
                     </button>
                 )}
             </div>

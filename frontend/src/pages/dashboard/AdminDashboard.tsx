@@ -4,12 +4,11 @@ import { useSearchParams } from 'react-router-dom';
 import {
     Users,
     User,
+    UserPlus,
     Building2,
-    Activity,
     Newspaper,
     Star,
     Award,
-    Banknote,
     Images,
 } from 'lucide-react';
 import apiClient from '../../services/api';
@@ -33,7 +32,7 @@ type AdminStats = {
     total_users: number;
     total_trainers: number;
     total_gyms: number;
-    monthly_revenue: number;
+    new_connections_30d: number;
 };
 
 const AdminDashboard: React.FC = () => {
@@ -80,22 +79,22 @@ const AdminDashboard: React.FC = () => {
             return [
                 { label: 'Người dùng', value: statsLoad === 'loading' ? '…' : '—', icon: <Users className="h-5 w-5 text-blue-600" /> },
                 { label: 'Huấn luyện viên', value: statsLoad === 'loading' ? '…' : '—', icon: <User className="h-5 w-5 text-amber-600" /> },
-                { label: 'Gym center', value: statsLoad === 'loading' ? '…' : '—', icon: <Building2 className="h-5 w-5 text-green-600" /> },
+                { label: 'Phòng tập', value: statsLoad === 'loading' ? '…' : '—', icon: <Building2 className="h-5 w-5 text-green-600" /> },
                 {
-                    label: 'Doanh thu tháng',
+                    label: 'Kết nối mới 30 ngày',
                     value: statsLoad === 'loading' ? '…' : '—',
-                    icon: <Banknote className="h-5 w-5 text-emerald-700" />,
+                    icon: <UserPlus className="h-5 w-5 text-emerald-700" />,
                 },
             ];
         }
         return [
             { label: 'Người dùng', value: fmt(adminStats.total_users), icon: <Users className="h-5 w-5 text-blue-600" /> },
             { label: 'Huấn luyện viên', value: fmt(adminStats.total_trainers), icon: <User className="h-5 w-5 text-amber-600" /> },
-            { label: 'Gym center', value: fmt(adminStats.total_gyms), icon: <Building2 className="h-5 w-5 text-green-600" /> },
+            { label: 'Phòng tập', value: fmt(adminStats.total_gyms), icon: <Building2 className="h-5 w-5 text-green-600" /> },
             {
-                label: 'Doanh thu tháng',
-                value: `${fmt(adminStats.monthly_revenue)}đ`,
-                icon: <Banknote className="h-5 w-5 text-emerald-700" />,
+                label: 'Kết nối mới 30 ngày',
+                value: fmt(adminStats.new_connections_30d),
+                icon: <UserPlus className="h-5 w-5 text-emerald-700" />,
             },
         ];
     }, [adminStats, statsLoad, fmt]);
@@ -137,21 +136,15 @@ const AdminDashboard: React.FC = () => {
                     </div>
 
                     <div className="mb-8 rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm leading-7 text-emerald-900">
-                        <div className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Free-first mode</div>
+                        <div className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Chế độ miễn phí toàn nền tảng</div>
                         <p className="mt-2">
-                            Thu phí nền tảng đã bị vô hiệu hóa. Coach, athlete và gym owner dùng full tính năng nền tảng miễn phí; panel vận hành hiện chỉ còn theo dõi health, outbox và duyệt hành động rủi ro cao.
+                            Huấn luyện viên, vận động viên và chủ phòng tập hiện dùng đầy đủ tính năng nền tảng miễn phí. Admin không còn theo dõi doanh thu nền tảng; trọng tâm đã chuyển sang chất lượng dữ liệu, moderation và sức khỏe hệ thống.
                         </p>
                     </div>
 
                     <h3 className="text-h3 mb-4 border-b border-gray-200 pb-2">Truy cập nhanh</h3>
                     <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {[
-                            {
-                                tab: 'ops' as const,
-                                icon: <Activity className="h-5 w-5" />,
-                                title: 'Vận hành',
-                                desc: 'Sức khỏe hệ thống, audit và email outbox',
-                            },
                             {
                                 tab: 'users' as const,
                                 icon: <Users className="h-5 w-5" />,
@@ -179,14 +172,14 @@ const AdminDashboard: React.FC = () => {
                             {
                                 tab: 'gallery' as const,
                                 icon: <Images className="h-5 w-5" />,
-                                title: 'Gallery cộng đồng',
-                                desc: 'Quản lý ảnh và nội dung gallery',
+                                title: 'Thư viện cộng đồng',
+                                desc: 'Quản lý ảnh và nội dung thư viện',
                             },
                             {
                                 tab: 'coach-apps' as const,
                                 icon: <Award className="h-5 w-5" />,
-                                title: 'Đơn làm coach',
-                                desc: 'Đơn nâng cấp Athlete → Coach',
+                                title: 'Đơn làm huấn luyện viên',
+                                desc: 'Đơn nâng cấp vận động viên thành huấn luyện viên',
                             },
                         ].map((card) => (
                             <QuickActionCard

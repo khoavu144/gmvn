@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const stats = [
     { value: '2024', label: 'Năm thành lập' },
-    { value: '500+', label: 'Coach' },
+    { value: '500+', label: 'Huấn luyện viên' },
     { value: '5.000+', label: 'Học viên' },
     { value: '50+', label: 'Tỉnh thành' },
 ];
@@ -11,15 +11,15 @@ const stats = [
 const values = [
     {
         title: 'Minh bạch',
-        desc: 'Mọi giao dịch, đánh giá và thông tin Coach đều hiển thị rõ ràng. Không có phí ẩn.',
+        desc: 'Mọi giao dịch, đánh giá và thông tin huấn luyện viên đều hiển thị rõ ràng. Không có phí ẩn.',
     },
     {
         title: 'Chất lượng',
-        desc: 'Chỉ Coach đã được xác minh hồ sơ và chứng chỉ mới được đánh dấu "Verified".',
+        desc: 'Chỉ huấn luyện viên đã được xác minh hồ sơ và chứng chỉ mới được đánh dấu "Xác minh".',
     },
     {
         title: 'Kết nối thực',
-        desc: 'Nhắn tin trực tiếp, không qua trung gian. Coach và học viên tự quyết định hành trình.',
+        desc: 'Nhắn tin trực tiếp, không qua trung gian. Huấn luyện viên và học viên tự quyết định hành trình.',
     },
     {
         title: 'Dữ liệu của bạn',
@@ -31,7 +31,7 @@ export default function AboutPage() {
     return (
         <LegalPageLayout
             title="Về GYMERVIET"
-            subtitle="Nền tảng kết nối Gymer và Coach hàng đầu Việt Nam — được xây dựng bởi người tập, cho người tập."
+            subtitle="Nền tảng kết nối người tập và huấn luyện viên trên toàn quốc — được xây dựng bởi người tập, cho người tập."
             breadcrumbs={[{ label: 'Về chúng tôi' }]}
             maxWidth="xl"
         >
@@ -47,12 +47,12 @@ export default function AboutPage() {
 
             <LegalSection title="Câu chuyện">
                 <p>
-                    GYMERVIET ra đời từ một vấn đề đơn giản: người tập gym không biết tìm Coach uy tín ở đâu,
-                    còn Coach thì không có công cụ chuyên nghiệp để quản lý học viên và xây dựng thương hiệu cá nhân.
+                    GYMERVIET ra đời từ một vấn đề đơn giản: người tập gym không biết tìm huấn luyện viên uy tín ở đâu,
+                    còn huấn luyện viên thì không có công cụ chuyên nghiệp để quản lý học viên và xây dựng thương hiệu cá nhân.
                 </p>
                 <p>
-                    Thay vì một marketplace đông đúc thiếu tin cậy, chúng tôi xây dựng một nền tảng nơi
-                    mỗi Coach có trang profile riêng như một portfolio chuyên nghiệp, và mỗi học viên
+                    Thay vì một nơi đăng tin đông đúc thiếu tin cậy, chúng tôi xây dựng một nền tảng nơi
+                    mỗi huấn luyện viên có trang hồ sơ riêng như một hồ sơ chuyên nghiệp, và mỗi học viên
                     có đầy đủ công cụ để theo dõi hành trình của mình.
                 </p>
             </LegalSection>
@@ -71,9 +71,9 @@ export default function AboutPage() {
             <LegalSection title="Cách hoạt động">
                 <div className="space-y-4">
                     {[
-                        { step: '01', title: 'Đăng ký miễn phí', desc: 'Tạo tài khoản với vai trò Học viên, Vận động viên, hoặc Coach.' },
-                        { step: '02', title: 'Khám phá & Kết nối', desc: 'Duyệt danh sách Coach theo chuyên môn, khu vực, mức giá. Nhắn tin trực tiếp để tư vấn.' },
-                        { step: '03', title: 'Đăng ký gói tập', desc: 'Chọn gói phù hợp, thanh toán qua chuyển khoản (QR Code tự động). Nhận xác nhận tức thì.' },
+                        { step: '01', title: 'Đăng ký miễn phí', desc: 'Tạo tài khoản với vai trò Học viên, Vận động viên hoặc huấn luyện viên.' },
+                        { step: '02', title: 'Khám phá & Kết nối', desc: 'Duyệt danh sách huấn luyện viên theo chuyên môn, khu vực, mức giá. Nhắn tin trực tiếp để tư vấn.' },
+                        { step: '03', title: 'Liên hệ & Thỏa thuận', desc: 'Nhắn tin trực tiếp với huấn luyện viên, thống nhất chương trình, lịch tập và cách thanh toán phù hợp.' },
                         { step: '04', title: 'Tập luyện & Theo dõi', desc: 'Nhận lịch tập cá nhân hóa, hoàn thành buổi tập, ghi nhật ký tiến trình.' },
                     ].map((item) => (
                         <div key={item.step} className="flex gap-4 p-4 border border-gray-200 rounded-xs bg-white">

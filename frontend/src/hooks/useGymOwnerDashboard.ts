@@ -23,9 +23,9 @@ export function useGymOwnerDashboard() {
     // BUG-005: Stats state
     const [stats, setStats] = useState<{ total_views: number; total_trainers: number; avg_rating: number; total_reviews: number; total_branches: number; rating_distribution?: Record<number, number> } | null>(null);
 
-    // Invite Coach state
+    // Invite trainer state
     const [showInviteModal, setShowInviteModal] = useState(false);
-    const [inviteForm, setInviteForm] = useState({ email: '', role: 'Coach' });
+    const [inviteForm, setInviteForm] = useState({ email: '', role: 'Huấn luyện viên' });
 
     // BUG-006: Settings state
     const [settingsForm, setSettingsForm] = useState({ name: '', description: '' });

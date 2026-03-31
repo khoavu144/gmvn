@@ -58,18 +58,18 @@ const featureOptions = [
 ];
 
 const goalOptions = [
-    { value: 'Giảm mỡ', label: 'Giảm mỡ (Fat Loss)' },
-    { value: 'Tăng cơ', label: 'Tăng cơ (Hypertrophy)' },
-    { value: 'Tăng sức mạnh', label: 'Tăng sức mạnh (Powerlifting)' },
-    { value: 'Phục hồi chấn thương', label: 'Phục hồi chấn thương (Rehab)' },
-    { value: 'Chuẩn bị thi đấu', label: 'Chuẩn bị thi đấu (Prep)' },
+    { value: 'Giảm mỡ', label: 'Giảm mỡ' },
+    { value: 'Tăng cơ', label: 'Tăng cơ' },
+    { value: 'Tăng sức mạnh', label: 'Tăng sức mạnh' },
+    { value: 'Phục hồi chấn thương', label: 'Phục hồi chấn thương' },
+    { value: 'Chuẩn bị thi đấu', label: 'Chuẩn bị thi đấu' },
 ];
 
 const formatOptions = [
-    { id: 'online', title: 'Online Coaching', desc: 'Coach từ xa hoàn toàn' },
+    { id: 'online', title: 'Huấn luyện online', desc: 'Huấn luyện viên theo dõi từ xa hoàn toàn' },
     { id: 'offline_1on1', title: 'Offline 1 kèm 1', desc: 'Huấn luyện trực tiếp tại phòng' },
-    { id: 'offline_group', title: 'Offline Nhóm', desc: 'Huấn luyện nhóm nhỏ' },
-    { id: 'hybrid', title: 'Hybrid', desc: 'Kết hợp trực tiếp và từ xa' },
+    { id: 'offline_group', title: 'Offline theo nhóm', desc: 'Huấn luyện nhóm nhỏ' },
+    { id: 'hybrid', title: 'Kết hợp', desc: 'Kết hợp trực tiếp và từ xa' },
 ];
 
 const pricingTypeOptions = [
@@ -112,7 +112,7 @@ export default function ProgramsPage() {
             setPrograms(res.data.programs || []);
         } catch (err: unknown) {
             logger.error(err);
-            setError('Không thể tải danh sách gói tập.');
+            setError('Không thể tải danh sách chương trình.');
         } finally { setLoading(false); }
     }, [user?.id]);
 
@@ -137,7 +137,7 @@ export default function ProgramsPage() {
             const url = await uploadService.uploadImage(croppedBlob, 'programs', originalName);
             setForm(prev => ({ ...prev, cover_image_url: url }));
         } catch {
-            toast.error('Upload ảnh thất bại! Vui lòng thử lại.');
+            toast.error('Tải ảnh thất bại! Vui lòng thử lại.');
         } finally {
             setIsUploading(false);
             setSelectedImageFile(null);
@@ -208,7 +208,7 @@ export default function ProgramsPage() {
         setShowForm(true);
     };
 
-    const formatLabel: Record<string, string> = { online: 'Online', offline_1on1: '1-kèm-1', offline_group: 'Tập nhóm', hybrid: 'Hybrid' };
+    const formatLabel: Record<string, string> = { online: 'Trực tuyến', offline_1on1: '1 kèm 1', offline_group: 'Nhóm', hybrid: 'Kết hợp' };
 
     return (
         <div className="page-shell">
@@ -217,16 +217,16 @@ export default function ProgramsPage() {
                 <section className="page-header">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div>
-                            <button onClick={() => navigate('/dashboard')} className="back-link mb-3">← Về Dashboard</button>
-                            <p className="page-kicker">Program Workspace</p>
-                            <h1 className="page-title">Quản lý Gói tập</h1>
+                            <button onClick={() => navigate('/dashboard')} className="back-link mb-3">← Về bảng điều khiển</button>
+                            <p className="page-kicker">Không gian chương trình</p>
+                            <h1 className="page-title">Quản lý chương trình</h1>
                             <p className="page-description">
                                 Tạo, chỉnh sửa và xuất bản chương trình tập luyện.
                             </p>
                         </div>
                         {!showForm && (
                             <button onClick={() => { setShowForm(true); setEditingId(null); setForm(defaultForm); }} className="btn-primary self-start sm:self-auto">
-                                + Tạo gói mới
+                                + Tạo chương trình mới
                             </button>
                         )}
                     </div>
@@ -236,7 +236,7 @@ export default function ProgramsPage() {
                 {showForm && (
                     <div className="card mb-8 border-black shadow-sm overflow-visible">
                         <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
-                            <h2 className="text-xl font-bold text-black m-0">{editingId ? 'Chỉnh sửa' : 'Tạo chương trình mới'}</h2>
+                            <h2 className="text-xl font-bold text-black m-0">{editingId ? 'Chỉnh sửa chương trình' : 'Tạo chương trình mới'}</h2>
                             <button onClick={() => setShowForm(false)} className="text-gray-500 hover:text-black text-sm font-medium">Đóng</button>
                         </div>
 
@@ -316,7 +316,7 @@ export default function ProgramsPage() {
                                         </Suspense>
                                     </div>
                                     <div>
-                                        <label className="form-label">Yêu cầu đầu vào (Prerequisites)</label>
+                                        <label className="form-label">Yêu cầu đầu vào</label>
                                         <Suspense fallback={<InputFallback />}>
                                             <CreatableSelect
                                                 isClearable
@@ -458,15 +458,15 @@ export default function ProgramsPage() {
                             </div>
                         ) : programs.length === 0 ? (
                             <div className="card text-center py-16 border-dashed">
-                                <p className="text-gray-500 text-sm">Bạn chưa thiết lập gói huấn luyện nào.</p>
-                                <button onClick={() => { setShowForm(true); setEditingId(null); setForm(defaultForm); }} className="mt-4 text-black font-semibold underline text-sm">Tạo gói đầu tiên ngay</button>
+                                <p className="text-gray-500 text-sm">Bạn chưa thiết lập chương trình huấn luyện nào.</p>
+                                <button onClick={() => { setShowForm(true); setEditingId(null); setForm(defaultForm); }} className="mt-4 text-black font-semibold underline text-sm">Tạo chương trình đầu tiên</button>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 gap-6">
                                 {programs.map(prog => {
                                     const priceText = prog.pricing_type === 'monthly' ? `${Number(prog.price_monthly).toLocaleString('vi-VN')} ₫/th`
-                                        : prog.pricing_type === 'lump_sum' ? `${Number(prog.price_one_time).toLocaleString('vi-VN')} ₫/Khoá`
-                                            : `${Number(prog.price_per_session).toLocaleString('vi-VN')} ₫/Buổi`;
+                                        : prog.pricing_type === 'lump_sum' ? `${Number(prog.price_one_time).toLocaleString('vi-VN')} ₫/khóa`
+                                            : `${Number(prog.price_per_session).toLocaleString('vi-VN')} ₫/buổi`;
 
                                     return (
                                         <div key={prog.id} className="card overflow-hidden !p-0 flex flex-col sm:flex-row">
@@ -481,11 +481,11 @@ export default function ProgramsPage() {
                                                 )}
                                                 <div className="absolute top-2 left-2 flex gap-1">
                                                     <span className="bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded-xs uppercase">
-                                                        {formatLabel[prog.training_format] || 'Online'}
+                                                        {formatLabel[prog.training_format] || 'Trực tuyến'}
                                                     </span>
                                                     {prog.is_published && (
                                                         <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-xs uppercase">
-                                                            Public
+                                                            Công khai
                                                         </span>
                                                     )}
                                                 </div>
@@ -507,14 +507,14 @@ export default function ProgramsPage() {
                                                         <span className="text-[10px] bg-gray-50 text-gray-600 px-2 py-1 rounded-xs font-medium">+{prog.included_features.length} quyền lợi</span>
                                                     ) : null}
                                                     <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-1 rounded-xs font-medium ml-auto">
-                                                        {prog.current_clients}/{prog.max_clients} slots
+                                                        {prog.current_clients}/{prog.max_clients} suất
                                                     </span>
                                                 </div>
 
                                                 <div className="flex gap-2 justify-end mt-4 pt-4 border-t border-gray-200">
-                                                    <button onClick={() => handleEdit(prog)} className="text-sm font-medium text-gray-600 hover:text-black px-3 py-1.5 hover:bg-gray-50 transition rounded-xs">Sửa gói</button>
+                                                    <button onClick={() => handleEdit(prog)} className="text-sm font-medium text-gray-600 hover:text-black px-3 py-1.5 hover:bg-gray-50 transition rounded-xs">Sửa</button>
                                                     {!prog.is_published && (
-                                                        <button onClick={() => handlePublish(prog.id)} className="text-sm font-bold text-white bg-black hover:bg-gray-800 px-4 py-1.5 transition rounded-xs shadow-sm">Phát hành</button>
+                                                        <button onClick={() => handlePublish(prog.id)} className="text-sm font-bold text-white bg-black hover:bg-gray-800 px-4 py-1.5 transition rounded-xs shadow-sm">Xuất bản</button>
                                                     )}
                                                 </div>
                                             </div>
@@ -533,7 +533,7 @@ export default function ProgramsPage() {
                         imageFile={selectedImageFile}
                         onCropComplete={handleCropComplete}
                         aspectRatio={16 / 9}
-                        title="Cắt ảnh bìa (Gói tập)"
+                        title="Cắt ảnh bìa chương trình"
                     />
                 </Suspense>
 

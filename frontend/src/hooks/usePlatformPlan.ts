@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import apiClient from '../services/api';
 import type { PlanLimits } from './usePlatformPlan.types';
 
-export type PlatformPlan = 'free' | 'coach_pro' | 'coach_elite' | 'athlete_premium' | 'gym_business';
+export type PlatformPlan = 'free';
 
 interface PlatformPlanState {
     plan: PlatformPlan;
@@ -22,7 +22,7 @@ const DEFAULT_LIMITS: PlanLimits = {
     badge: true,
     customShareCard: true,
     unlimitedProgressPhotos: true,
-    fullSubscriptionHistory: true,
+    fullRelationshipHistory: true,
     coachComparison: true,
 };
 
@@ -40,15 +40,20 @@ export function usePlatformPlan(): PlatformPlanState {
         try {
             const res = await apiClient.get('/platform/plan/me');
             setState({
-                plan: res.data.plan,
+                plan: 'free',
                 expires_at: res.data.expires_at,
-                limits: res.data.limits,
-                billing_enabled: res.data.billing_enabled,
+                limits: res.data.limits ?? DEFAULT_LIMITS,
+                billing_enabled: false,
                 isLoading: false,
                 error: null,
             });
         } catch {
-            setState((prev) => ({ ...prev, isLoading: false }));
+            setState((prev) => ({
+                ...prev,
+                plan: 'free',
+                billing_enabled: false,
+                isLoading: false,
+            }));
         }
     }, []);
 

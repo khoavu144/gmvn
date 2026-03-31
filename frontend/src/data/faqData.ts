@@ -15,7 +15,7 @@ export const faqData: FAQCategory[] = [
         icon: '👤',
         items: [
             {
-                q: 'Tôi có thể đổi loại tài khoản từ Gymer sang Coach không?',
+                q: 'Tôi có thể đổi loại tài khoản từ người tập sang huấn luyện viên không?',
                 a: 'Hiện tại chưa hỗ trợ đổi loại tài khoản trực tiếp. Bạn cần liên hệ đội hỗ trợ qua trang Liên hệ để được chuyển đổi thủ công.',
             },
             {
@@ -29,42 +29,42 @@ export const faqData: FAQCategory[] = [
         ],
     },
     {
-        title: 'Thanh toán & Gói tập',
+        title: 'Đăng ký & làm việc với huấn luyện viên',
         icon: '💳',
         items: [
             {
-                q: 'Tôi đã chuyển khoản nhưng gói tập chưa được kích hoạt?',
-                a: 'Hệ thống xử lý thanh toán trong 1–5 phút. Nếu sau 10 phút vẫn chưa kích hoạt, hãy bấm "Tôi đã chuyển khoản" để kiểm tra lại. Nếu vẫn không được, liên hệ hỗ trợ kèm ảnh chụp màn hình giao dịch.',
+                q: 'Tôi đã nhắn tin về chương trình nhưng huấn luyện viên chưa phản hồi?',
+                a: 'Hãy chờ thêm trong khung thời gian hợp lý và nhắn lại trong hội thoại nếu cần. Nếu huấn luyện viên đã hiển thị trạng thái nhận học viên nhưng bỏ mặc nhiều lượt liên hệ, bạn có thể báo cáo để đội ngũ kiểm tra chất lượng hồ sơ.',
             },
             {
                 q: 'Có được hoàn tiền không?',
-                a: 'Chúng tôi hỗ trợ hoàn tiền trong vòng 7 ngày kể từ ngày kích hoạt nếu gói tập chưa bắt đầu hoặc Coach không cung cấp dịch vụ đúng cam kết. Xem chi tiết tại trang Chính sách thanh toán.',
+                a: 'GYMERVIET không đứng giữa để giữ tiền, xác minh hay hoàn tiền cho các giao dịch trực tiếp giữa hai bên. Trước khi chuyển khoản, bạn nên thống nhất rõ phạm vi, lịch tập, điều kiện hủy và cách xử lý phát sinh ngay trong hội thoại.',
             },
             {
                 q: 'Phí nền tảng là bao nhiêu?',
-                a: 'GYMERVIET thu 5% từ mỗi giao dịch thành công. Ví dụ: gói 1.000.000đ — học viên trả 1.000.000đ, Coach nhận 950.000đ.',
+                a: 'Hiện tại GYMERVIET không thu phí nền tảng và không thu phí sàn đối với huấn luyện viên. Nền tảng tập trung vào hồ sơ, khám phá và kết nối; phần thỏa thuận tài chính là trách nhiệm trực tiếp giữa các bên.',
             },
             {
-                q: 'Tôi có thể hủy gói tập đang active không?',
-                a: 'Bạn có thể hủy bất cứ lúc nào trong mục "Gói tập của tôi". Phần phí còn lại (theo tỉ lệ ngày còn lại) sẽ được hoàn trả theo chính sách hoàn tiền.',
+                q: 'Tôi có thể kết thúc chương trình đang theo dõi không?',
+                a: 'Bạn có thể dừng theo dõi hoặc kết thúc trạng thái chương trình trong ứng dụng khi không còn tiếp tục làm việc cùng huấn luyện viên. Việc hoàn tiền, chuyển buổi hay bù lịch là thỏa thuận trực tiếp giữa bạn và huấn luyện viên, không do GYMERVIET quyết định thay.',
             },
         ],
     },
     {
-        title: 'Dành cho Coach',
+        title: 'Dành cho huấn luyện viên',
         icon: '🏋️',
         items: [
             {
-                q: 'Badge "Verified" là gì và làm thế nào để được xác minh?',
-                a: 'Badge Verified có nghĩa đội GYMERVIET đã xem chứng chỉ và kinh nghiệm của bạn. Gửi hồ sơ qua trang Liên hệ để được xét duyệt.',
+                q: 'Dấu "Xác minh" là gì và làm thế nào để được xác minh?',
+                a: 'Dấu "Xác minh" cho biết đội GYMERVIET đã xem chứng chỉ và kinh nghiệm của bạn. Gửi hồ sơ qua trang Liên hệ để được xét duyệt.',
             },
             {
-                q: 'Tôi có thể tạo bao nhiêu gói tập?',
-                a: 'Hiện tại không giới hạn số gói tập. Tuy nhiên, chúng tôi khuyến nghị tập trung 2–4 gói chất lượng cao thay vì nhiều gói chồng chéo.',
+                q: 'Tôi có thể tạo bao nhiêu chương trình?',
+                a: 'Hiện tại không giới hạn số chương trình. Tuy nhiên, chúng tôi khuyến nghị tập trung 2–4 chương trình chất lượng cao thay vì nhiều chương trình chồng chéo.',
             },
             {
                 q: 'Khi nào tiền từ giao dịch được chuyển về tài khoản của tôi?',
-                a: 'Do thanh toán qua chuyển khoản trực tiếp, tiền vào tài khoản ngân hàng của bạn ngay khi học viên chuyển. GYMERVIET thu phí nền tảng sau theo chu kỳ hàng tháng.',
+                a: 'GYMERVIET không giữ tiền và không thu phí sàn. Nếu bạn chọn nhận thanh toán trực tiếp từ học viên, hãy tự thống nhất rõ điều kiện tham gia, chính sách dời/hủy và cách xác nhận đã nhận tiền trước khi bắt đầu dịch vụ.',
             },
         ],
     },
@@ -73,16 +73,16 @@ export const faqData: FAQCategory[] = [
         icon: '⚙️',
         items: [
             {
-                q: 'Chat realtime không hoạt động?',
+                q: 'Chat thời gian thực không hoạt động?',
                 a: 'Tính năng chat dùng WebSocket. Kiểm tra: (1) Kết nối internet ổn định; (2) Thử tải lại trang; (3) Tắt VPN nếu đang dùng. Nếu vẫn lỗi, liên hệ hỗ trợ.',
             },
             {
-                q: 'Tôi upload ảnh nhưng không thấy thay đổi?',
+                q: 'Tôi tải ảnh lên nhưng không thấy thay đổi?',
                 a: 'Ảnh được lưu trên Supabase Storage. Nếu sau 30 giây ảnh chưa hiển thị, thử tải lại trang. Đảm bảo file không vượt quá 5MB và đúng định dạng (JPG, PNG, WEBP).',
             },
             {
                 q: 'Ứng dụng có phiên bản mobile không?',
-                a: 'Hiện tại GYMERVIET là web app tối ưu cho mobile browser. Phiên bản app iOS/Android đang trong kế hoạch phát triển.',
+                a: 'Hiện tại GYMERVIET là ứng dụng web tối ưu cho trình duyệt di động. Phiên bản iOS/Android đang trong kế hoạch phát triển.',
             },
         ],
     },
@@ -99,16 +99,12 @@ export const faqData: FAQCategory[] = [
                 a: 'Mỗi sản phẩm đều có gắn tag mục tiêu tập luyện (giảm cân, tăng cơ, tăng sức mạnh, v.v.) và mô tả chi tiết. Bạn có thể dùng bộ lọc "Mục tiêu" để tìm sản phẩm phù hợp. Ngoài ra, đọc đánh giá của những người dùng khác để hiểu rõ hơn.',
             },
             {
-                q: 'Có thể kết hợp sản phẩm marketplace với gói tập từ Coach không?',
-                a: 'Hoàn toàn có! Nhiều Coach sẽ đề xuất các sản phẩm từ marketplace để hỗ trợ gói tập của họ. Bạn có thể mua sản phẩm độc lập hoặc theo gợi ý của Coach. Cả hai thực hiện song song, không ảnh hưởng lẫn nhau.',
+                q: 'Có thể kết hợp sản phẩm marketplace với chương trình từ huấn luyện viên không?',
+                a: 'Hoàn toàn có! Nhiều huấn luyện viên sẽ đề xuất các sản phẩm từ marketplace để hỗ trợ chương trình của họ. Bạn có thể xem sản phẩm độc lập hoặc theo gợi ý của huấn luyện viên.',
             },
             {
-                q: 'Chính sách hoàn tiền / hủy đơn hàng cho sản phẩm như thế nào?',
-                a: 'Bạn có thể hủy đơn hàng trong vòng 1 giờ sau khi thanh toán, sẽ được hoàn tiền 100%. Sau 1 giờ, có thể liên hệ người bán để yêu cầu hủy (tùy chính sách của từng người bán). Nếu sản phẩm không đúng cam kết, yêu cầu hoàn tiền trong vòng 14 ngày.',
-            },
-            {
-                q: 'Có giới hạn về số lượng sản phẩm tôi có thể mua không?',
-                a: 'Không có giới hạn. Bạn có thể mua bao nhiêu sản phẩm tùy thích. Mỗi lần mua được xem là giao dịch riêng. Nếu mua số lượng lớn (từ 5 sản phẩm trở lên), liên hệ hỗ trợ để được tư vấn chiết khấu tập thể.',
+                q: 'Việc mua bán sản phẩm diễn ra như thế nào?',
+                a: 'GYMERVIET là nơi hiển thị và khám phá sản phẩm. Khi muốn mua, bạn liên hệ trực tiếp với người bán qua thông tin trên trang sản phẩm. Mọi giao dịch là thỏa thuận trực tiếp giữa hai bên, GYMERVIET không đứng giữa xử lý thanh toán hay đảm bảo hoàn tiền.',
             },
         ],
     },

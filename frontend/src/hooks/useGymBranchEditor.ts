@@ -178,7 +178,7 @@ export const useGymBranchEditor = ({ branch, onUpdate }: UseGymBranchEditorProps
             setInviteRole('Huấn luyện viên');
             onUpdate();
         } catch {
-            toast.error('Lỗi mời Coach');
+            toast.error('Lỗi mời huấn luyện viên');
         } finally {
             setLoading(false);
         }
@@ -187,8 +187,8 @@ export const useGymBranchEditor = ({ branch, onUpdate }: UseGymBranchEditorProps
     const handleRemoveTrainer = async (linkId: string) => {
         setConfirmConfig({
             isOpen: true,
-            title: 'Gỡ Coach khỏi chi nhánh',
-            description: 'Coach này sẽ không còn hiển thị như một thành viên của chi nhánh này nữa.',
+            title: 'Gỡ huấn luyện viên khỏi chi nhánh',
+            description: 'Huấn luyện viên này sẽ không còn hiển thị như một thành viên của chi nhánh này nữa.',
             isDestructive: true,
             onConfirm: async () => {
                 setConfirmConfig(prev => ({ ...prev, isOpen: false }));
@@ -197,7 +197,7 @@ export const useGymBranchEditor = ({ branch, onUpdate }: UseGymBranchEditorProps
                     await gymService.removeTrainer(branch.id, linkId);
                     onUpdate();
                 } catch {
-                    toast.error('Lỗi gỡ Coach');
+                    toast.error('Lỗi gỡ huấn luyện viên');
                 } finally {
                     setLoading(false);
                 }
@@ -212,7 +212,7 @@ export const useGymBranchEditor = ({ branch, onUpdate }: UseGymBranchEditorProps
             const results = await userService.searchCoaches(searchQuery);
             setSearchResults(results);
         } catch {
-            toast.error('Lỗi tìm kiếm Coach');
+            toast.error('Lỗi tìm kiếm huấn luyện viên');
         } finally {
             setSearching(false);
         }

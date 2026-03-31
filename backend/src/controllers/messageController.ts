@@ -5,6 +5,8 @@ import { AppError } from '../utils/AppError';
 import { getSingleParam, requireRequestUserId } from '../utils/controllerUtils';
 import { messageService } from '../services/messageService';
 
+const MESSAGE_CONTEXT_TYPES = ['program', 'product', 'gym', 'profile'] as const;
+
 const sendMessageSchema = z.object({
     receiver_id: z.string().uuid('Invalid receiver ID'),
     content: z
@@ -12,6 +14,24 @@ const sendMessageSchema = z.object({
         .trim()
         .min(1, 'Nội dung tin nhắn không được để trống')
         .max(2000, 'Nội dung tin nhắn vượt quá giới hạn 2000 ký tự'),
+    context_type: z.enum(MESSAGE_CONTEXT_TYPES).optional(),
+    context_id: z.string().uuid('Ngữ cảnh liên kết không hợp lệ').optional(),
+    context_label: z
+        .string()
+        .trim()
+        .max(255, 'Nhãn ngữ cảnh vượt quá giới hạn 255 ký tự')
+        .optional(),
+}).superRefine((value, ctx) => {
+    const hasContextType = Boolean(value.context_type);
+    const hasContextId = Boolean(value.context_id);
+
+    if (hasContextType !== hasContextId) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [hasContextType ? 'context_id' : 'context_type'],
+            message: 'Ngữ cảnh tin nhắn phải có đủ loại và mã liên kết',
+        });
+    }
 });
 
 export const getConversations = asyncHandler(async (req: Request, res: Response) => {
@@ -42,7 +62,11 @@ export const sendMessage = asyncHandler(async (req: Request, res: Response) => {
         );
     }
 
-    const { receiver_id, content } = parseResult.data;
-    const message = await messageService.sendMessage(userId, receiver_id, content);
+    const { receiver_id, content, context_type, context_id, context_label } = parseResult.data;
+    const message = await messageService.sendMessage(userId, receiver_id, content, {
+        context_type,
+        context_id,
+        context_label,
+    });
     res.status(201).json({ success: true, message });
 });

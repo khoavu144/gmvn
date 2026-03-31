@@ -4,7 +4,6 @@ import { adminService } from '../services/adminService';
 import { listGoogleFormImportLogs } from '../services/googleFormIngestService';
 import { systemHealthService } from '../services/systemHealthService';
 import { ProgramReport } from '../entities/ProgramReport';
-import { FinancialTransaction } from '../entities/FinancialTransaction';
 import { User } from '../entities/User';
 import { UserProfileSection } from '../entities/UserProfileSection';
 import { GymCenter } from '../entities/GymCenter';
@@ -54,12 +53,12 @@ export const getReports = asyncHandler(async (_req: Request, res: Response) => {
 });
 
 export const getFinancialTransactions = asyncHandler(async (_req: Request, res: Response) => {
-    const repo = AppDataSource.getRepository(FinancialTransaction);
-    const transactions = await repo.find({
-        order: { transaction_date: 'DESC' },
-        relations: ['program', 'creator', 'buyer'],
+    res.json({
+        success: true,
+        deprecated: true,
+        transactions: [],
+        message: 'Bề mặt giao dịch nhạy cảm đã bị loại khỏi phạm vi vận hành của admin.',
     });
-    res.json({ success: true, transactions });
 });
 
 export const getSystemHealth = asyncHandler(async (_req: Request, res: Response) => {

@@ -48,22 +48,22 @@ export const ADMIN_TAB_LABELS: Record<AdminTab, string> = {
     content: 'Tin tức & sản phẩm',
     gyms: 'Duyệt gym',
     reviews: 'Đánh giá gym',
-    gallery: 'Gallery cộng đồng',
-    'coach-apps': 'Đơn làm coach',
+    gallery: 'Thư viện cộng đồng',
+    'coach-apps': 'Đơn làm huấn luyện viên',
 };
 
 /** Longer title for context bar + SEO-ish headings */
 export const ADMIN_SECTION_HEADINGS: Record<AdminTab, { title: string; subtitle?: string }> = {
     overview: { title: 'Tổng quan hệ thống' },
-    ops: { title: 'Vận hành & giám sát', subtitle: 'Sức khỏe API, audit, giao dịch, gói platform' },
+    ops: { title: 'Vận hành & giám sát', subtitle: 'Sức khỏe API, audit, outbox và duyệt hành động rủi ro cao' },
     users: { title: 'Người dùng', subtitle: 'Danh sách và tìm kiếm tài khoản' },
     content: { title: 'Tin tức & marketplace', subtitle: 'Bài viết admin và kiểm duyệt sản phẩm' },
     gyms: { title: 'Phê duyệt gym', subtitle: 'Hồ sơ gym owner chờ duyệt' },
     reviews: { title: 'Đánh giá gym', subtitle: 'Kiểm duyệt review vi phạm' },
-    gallery: { title: 'Gallery cộng đồng', subtitle: 'Quản lý nội dung gallery' },
+    gallery: { title: 'Thư viện cộng đồng', subtitle: 'Quản lý nội dung thư viện' },
     'coach-apps': {
-        title: 'Đơn đăng ký làm coach',
-        subtitle: 'Duyệt hoặc từ chối đơn nâng cấp Athlete → Coach',
+        title: 'Đơn đăng ký làm huấn luyện viên',
+        subtitle: 'Duyệt hoặc từ chối đơn nâng cấp vận động viên thành huấn luyện viên',
     },
 };
 

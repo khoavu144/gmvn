@@ -3,65 +3,56 @@ import LegalPageLayout, { LegalSection, LegalList, LegalCallout } from '../../co
 export default function PaymentPolicyPage() {
     return (
         <LegalPageLayout
-            title="Chính sách Thanh toán & Hoàn tiền"
+            title="Nguyên tắc Thanh toán & Thỏa thuận trực tiếp"
             lastUpdated="01/01/2026"
-            breadcrumbs={[{ label: 'Dành cho Coach' }, { label: 'Chính sách thanh toán' }]}
+            breadcrumbs={[{ label: 'Dành cho huấn luyện viên' }, { label: 'Chính sách thanh toán' }]}
         >
-            <LegalSection title="1. Phương thức thanh toán">
+            <LegalSection title="1. Phạm vi của GYMERVIET">
                 <p>
-                    GYMERVIET sử dụng hệ thống thanh toán qua <strong className="font-semibold text-black">chuyển khoản ngân hàng tự động</strong>
-                    {' '}tích hợp với SePay. Hệ thống hỗ trợ tất cả ngân hàng Việt Nam qua VietQR.
+                    GYMERVIET là nền tảng hồ sơ, khám phá và kết nối. Ứng dụng <strong className="font-semibold text-black">không xử lý thanh toán, không giữ tiền trung gian
+                    và không xác minh giao dịch nhạy cảm thay cho các bên</strong>.
                 </p>
                 <LegalList items={[
-                    'Học viên quét QR Code hoặc chuyển khoản thủ công với nội dung cố định.',
-                    'SePay xác nhận giao dịch trong 1–5 phút sau khi nhận tiền.',
-                    'Hệ thống tự động kích hoạt gói tập sau khi xác nhận.',
-                    'Không hỗ trợ thanh toán bằng thẻ tín dụng trong phiên bản hiện tại.',
+                    'Học viên và huấn luyện viên tự trao đổi về giá, lịch, phạm vi dịch vụ và cách thanh toán phù hợp.',
+                    'Bạn nên thống nhất mọi điều kiện quan trọng ngay trong hội thoại trước khi chuyển khoản hoặc bắt đầu dịch vụ.',
+                    'Nếu cần, ứng dụng có thể được dùng để lưu lại bối cảnh trao đổi, nhưng không thay thế hợp đồng hay cam kết tài chính giữa hai bên.',
+                    'Không có phí nền tảng bắt buộc và không có phí sàn đối với huấn luyện viên.',
                 ]} />
             </LegalSection>
 
-            <LegalSection title="2. Phí nền tảng">
+            <LegalSection title="2. Trách nhiệm của mỗi bên">
                 <LegalCallout type="info">
-                    GYMERVIET thu <strong>5% phí nền tảng</strong> từ mỗi giao dịch thành công.
-                    Coach nhận <strong>95%</strong> giá trị gói tập.
+                    GYMERVIET không tự động hoàn tiền, không giữ hộ tiền và không đảm bảo kết quả của một thỏa thuận tài chính trực tiếp.
                 </LegalCallout>
                 <p className="mt-4">
-                    Phí nền tảng bao gồm: xử lý thanh toán, lưu trữ dữ liệu, hỗ trợ kỹ thuật,
-                    và chi phí vận hành nền tảng. Không có phí ẩn nào khác.
+                    Trách nhiệm của huấn luyện viên là mô tả rõ gói tập, điều kiện tham gia, lịch trình và nguyên tắc dời/hủy.
+                    Trách nhiệm của học viên là xác nhận lại mọi điều khoản quan trọng trước khi đồng ý tham gia.
                 </p>
             </LegalSection>
 
-            <LegalSection title="3. Chính sách hoàn tiền">
-                <p className="font-semibold text-black mb-3">Trường hợp được hoàn tiền 100%:</p>
+            <LegalSection title="3. Nguyên tắc khi có thay đổi hoặc tranh chấp">
+                <p className="font-semibold text-black mb-3">GYMERVIET có thể hỗ trợ ở các trường hợp sau:</p>
                 <LegalList items={[
-                    'Hủy trong vòng 24 giờ sau khi kích hoạt và chưa có buổi tập nào.',
-                    'Coach không phản hồi trong vòng 3 ngày sau khi gói tập được kích hoạt.',
-                    'Gói tập bị gián đoạn do lỗi kỹ thuật từ phía GYMERVIET.',
-                    'Coach bị khóa tài khoản do vi phạm Tiêu chuẩn Cộng đồng.',
+                    'Hồ sơ sử dụng thông tin sai sự thật, giả mạo chứng chỉ hoặc lừa đảo.',
+                    'Một bên có hành vi quấy rối, đe dọa hoặc vi phạm Tiêu chuẩn cộng đồng.',
+                    'Có tranh chấp về nội dung trao đổi đã diễn ra trên ứng dụng và bạn cần đội ngũ xem xét thêm về an toàn và kiểm duyệt.',
                 ]} />
 
-                <p className="font-semibold text-black mt-5 mb-3">Trường hợp được hoàn tiền theo tỉ lệ:</p>
+                <p className="font-semibold text-black mt-5 mb-3">GYMERVIET không tự đứng ra quyết định:</p>
                 <LegalList items={[
-                    'Hủy sau ngày đầu tiên: Hoàn (số tuần chưa bắt đầu / tổng số tuần) × 95% giá trị gói.',
-                    'Coach không hoàn thành cam kết: Xem xét từng trường hợp, tối đa 95% giá trị còn lại.',
-                ]} />
-
-                <p className="font-semibold text-black mt-5 mb-3">Trường hợp KHÔNG được hoàn tiền:</p>
-                <LegalList items={[
-                    'Đã sử dụng hết gói tập.',
-                    'Hủy sau 30 ngày kể từ ngày kích hoạt.',
-                    'Vi phạm Tiêu chuẩn Cộng đồng dẫn đến khóa tài khoản.',
-                    'Thanh toán nhầm nội dung chuyển khoản (không đúng mã giao dịch).',
+                    'Hoàn tiền bao nhiêu, khi nào hoàn và hoàn bằng cách nào cho các khoản chuyển trực tiếp.',
+                    'Một bên có phải tiếp tục dịch vụ hay không nếu điều này không được thống nhất rõ từ trước.',
+                    'Bất kỳ cam kết tài chính nào diễn ra ngoài phạm vi lưu vết và moderation của nền tảng.',
                 ]} />
             </LegalSection>
 
-            <LegalSection title="4. Quy trình yêu cầu hoàn tiền">
+            <LegalSection title="4. Cách làm việc an toàn được khuyến nghị">
                 <div className="space-y-3">
                     {[
-                        'Gửi yêu cầu qua trang Liên hệ, chọn chủ đề "Vấn đề thanh toán / hoàn tiền".',
-                        'Cung cấp: ID giao dịch, email tài khoản, lý do hoàn tiền, và ảnh chụp màn hình liên quan.',
-                        'Đội ngũ xem xét trong 3–5 ngày làm việc.',
-                        'Tiền được hoàn về tài khoản ngân hàng gốc trong 5–10 ngày làm việc sau khi duyệt.',
+                        'Xác nhận rõ phạm vi gói tập, lịch bắt đầu, lịch dời/hủy và cách thanh toán ngay trong hội thoại.',
+                        'Chỉ chuyển khoản sau khi bạn hiểu rõ huấn luyện viên là ai, gói tập gồm những gì và trách nhiệm mỗi bên.',
+                        'Giữ lại bằng chứng trao đổi và giao dịch của riêng bạn khi làm việc trực tiếp.',
+                        'Nếu phát hiện hồ sơ giả mạo hoặc hành vi bất thường, dùng trang Báo cáo để đội ngũ xử lý về an toàn và tin cậy.',
                     ].map((step, i) => (
                         <div key={i} className="flex items-start gap-3 text-sm text-gray-600">
                             <span className="flex-shrink-0 w-5 h-5 rounded-full border border-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">{i + 1}</span>
@@ -71,11 +62,11 @@ export default function PaymentPolicyPage() {
                 </div>
             </LegalSection>
 
-            <LegalSection title="5. Tranh chấp thanh toán">
+            <LegalSection title="5. Liên hệ hỗ trợ">
                 <p>
-                    Nếu không đồng ý với quyết định hoàn tiền, bạn có thể gửi khiếu nại lên cấp cao hơn
-                    qua email <a href="mailto:disputes@gymerviet.com" className="font-medium text-black underline underline-offset-2">disputes@gymerviet.com</a>.
-                    Chúng tôi cam kết phản hồi trong 5 ngày làm việc.
+                    Nếu bạn cần đội ngũ xem xét một vấn đề về safety, giả mạo hồ sơ, nội dung vi phạm hoặc hành vi gây mất an toàn,
+                    hãy liên hệ qua email <a href="mailto:disputes@gymerviet.com" className="font-medium text-black underline underline-offset-2">disputes@gymerviet.com</a>.
+                    Chúng tôi sẽ phản hồi trong 5 ngày làm việc cho các trường hợp thuộc phạm vi moderation của nền tảng.
                 </p>
             </LegalSection>
         </LegalPageLayout>

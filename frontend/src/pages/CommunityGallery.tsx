@@ -56,7 +56,7 @@ export default function CommunityGallery() {
     return (
         <div className="marketplace-shell text-gray-900 selection:bg-black selection:text-white">
             <Helmet>
-                <title>The Wall — GYMERVIET Community</title>
+                <title>Cộng đồng — GYMERVIET</title>
                 <meta name="description" content="Chiêm ngưỡng hành trình, kết quả và những khoảnh khắc đẹp nhất của cộng đồng thể hình GYMERVIET." />
             </Helmet>
 
@@ -64,7 +64,7 @@ export default function CommunityGallery() {
             <div className="relative overflow-hidden border-b border-gray-200 bg-[radial-gradient(circle_at_top_right,_rgba(24,24,27,0.06),_transparent_42%),linear-gradient(180deg,#fafaf9_0%,#f1efe9_100%)] pt-16 pb-12 lg:pt-24 lg:pb-16">
                 <div className="page-container relative z-10 text-left">
                     <div className="inline-flex rounded-full border border-gray-200 bg-white px-3 py-1 text-[0.68rem] font-bold uppercase tracking-[0.18em] text-gray-500 shadow-sm">
-                        Gymerviet Community
+                        Cộng đồng Gymerviet
                     </div>
                     <h1 className="mt-6 max-w-4xl text-4xl font-black tracking-[-0.05em] text-gray-900 sm:text-5xl lg:text-6xl">
                         Những khoảnh khắc cộng đồng đang tập luyện, chuyển hóa và sống kỷ luật mỗi ngày.
@@ -121,7 +121,7 @@ export default function CommunityGallery() {
                             <Camera className="h-8 w-8 text-gray-500" />
                         </div>
                         <h3 className="mb-2 text-2xl font-bold text-gray-900">Chưa có bức ảnh nào</h3>
-                        <p className="text-gray-500">Gallery sẽ sáng lên khi cộng đồng đóng góp thêm hình ảnh thật.</p>
+                        <p className="text-gray-500">Thư viện sẽ sáng lên khi cộng đồng đóng góp thêm hình ảnh thật.</p>
                     </div>
                 ) : (
                     <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 sm:gap-6 space-y-4 sm:space-y-6">

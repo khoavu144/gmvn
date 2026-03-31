@@ -1,254 +1,206 @@
 /**
- * Unit tests: subscriptionService.handleSepayWebhook
+ * Unit tests for the relationship-oriented subscription service.
  *
- * Critical-path coverage for:
- *  1. Happy path - subscription + client count + financial transaction created atomically
- *  2. Idempotency - duplicate webhook with same Sepay transaction ID is ignored
- *  3. Race condition guard - active subscription check inside transaction prevents double-signup
- *  4. Insufficient amount - webhook ignored when transferAmount < programAmount
- *  5. Non-GV transfer content - webhook ignored
- *  6. Outbound transfer (transferType !== 'in') - webhook ignored
- *  7. Unknown user or program prefix - webhook ignored
- *  8. Financial split calculation correctness
+ * The filename is kept for local compatibility, but these assertions
+ * reflect the current free-platform model.
  */
 
-import { subscriptionService } from '../services/subscriptionService';
 import { AppDataSource } from '../config/database';
-
-// ── Database mock ─────────────────────────────────────────────────────────────
+import { notificationService } from '../services/notificationService';
+import { subscriptionService } from '../services/subscriptionService';
 
 jest.mock('../config/database', () => ({
     AppDataSource: {
-        isInitialized: true,
-        query: jest.fn(),
-        transaction: jest.fn(),
         getRepository: jest.fn(),
     },
 }));
 
-// Silence notification side-effects — non-critical path in webhook handler
 jest.mock('../services/notificationService', () => ({
-    notificationService: { create: jest.fn().mockResolvedValue({}) },
+    notificationService: {
+        create: jest.fn().mockResolvedValue({ id: 'notif-1' }),
+    },
 }));
-jest.mock('../socket', () => ({ getIo: jest.fn().mockReturnValue(null) }));
 
-// ── Repo factories ────────────────────────────────────────────────────────────
+jest.mock('../socket', () => ({
+    getIo: jest.fn().mockReturnValue(null),
+}));
 
 const mockSubRepo = {
     findOneBy: jest.fn(),
+    find: jest.fn(),
     create: jest.fn(),
     save: jest.fn(),
+    count: jest.fn(),
+    createQueryBuilder: jest.fn(),
 };
-const mockProgramRepo = { increment: jest.fn() };
-const mockFtRepo = {
-    create: jest.fn(),
-    save: jest.fn(),
+
+const mockProgramRepo = {
+    findOneBy: jest.fn(),
+    increment: jest.fn(),
+    decrement: jest.fn(),
 };
-const mockTierRepo = { findOneBy: jest.fn() };
 
 function repoForEntity(entity: any) {
     const name = (entity?.name ?? '') as string;
-    if (name === 'Subscription')        return mockSubRepo;
-    if (name === 'Program')             return mockProgramRepo;
-    if (name === 'FinancialTransaction') return mockFtRepo;
-    if (name === 'RevenueTier')         return mockTierRepo;
+    if (name === 'Subscription') return mockSubRepo;
+    if (name === 'Program') return mockProgramRepo;
     return {};
 }
 
-// ── Tests ─────────────────────────────────────────────────────────────────────
+describe('subscriptionService relationship flows', () => {
+    const activeProgram = {
+        id: 'program-1',
+        trainer_id: 'trainer-1',
+        is_published: true,
+    };
 
-describe('subscriptionService.handleSepayWebhook', () => {
-    const basePayload = {
-        id: 12345,
-        transferType: 'in',
-        content: 'GV ABCD1234 EFGH5678',
-        transferAmount: 500000,
+    const qb = {
+        where: jest.fn(),
+        andWhere: jest.fn(),
+        getCount: jest.fn(),
     };
 
     beforeEach(() => {
         jest.clearAllMocks();
 
-        // getRepository used outside transaction (idempotency check)
         (AppDataSource.getRepository as jest.Mock).mockImplementation(repoForEntity);
 
-        // prefix lookups
-        (AppDataSource.query as jest.Mock).mockImplementation((sql: string) => {
-            if (sql.includes('FROM users'))
-                return Promise.resolve([{ id: 'user-uuid-1234' }]);
-            if (sql.includes('FROM programs'))
-                return Promise.resolve([{
-                    id: 'prog-uuid-5678',
-                    trainer_id: 'trainer-uuid-9999',
-                    price_monthly: 500000,
-                    price_one_time: null,
-                    price_per_session: null,
-                    pricing_type: 'monthly',
-                }]);
-            return Promise.resolve([]);
-        });
+        qb.where.mockReturnValue(qb);
+        qb.andWhere.mockReturnValue(qb);
+        qb.getCount.mockResolvedValue(2);
 
-        // Default: no prior record (idempotency / existing-sub checks both return null)
-        mockSubRepo.findOneBy.mockResolvedValue(null);
-        mockSubRepo.create.mockImplementation((d: any) => d);
-        mockSubRepo.save.mockResolvedValue({ id: 'sub-new', ...{} });
-
+        mockProgramRepo.findOneBy.mockResolvedValue(activeProgram);
         mockProgramRepo.increment.mockResolvedValue(undefined);
+        mockProgramRepo.decrement.mockResolvedValue(undefined);
 
-        mockFtRepo.create.mockImplementation((d: any) => d);
-        mockFtRepo.save.mockResolvedValue({ id: 'ft-new' });
+        mockSubRepo.findOneBy.mockResolvedValue(null);
+        mockSubRepo.find.mockResolvedValue([]);
+        mockSubRepo.create.mockImplementation((payload: any) => payload);
+        mockSubRepo.save.mockImplementation(async (payload: any) => ({ id: 'sub-1', ...payload }));
+        mockSubRepo.count.mockResolvedValue(4);
+        mockSubRepo.createQueryBuilder.mockReturnValue(qb);
 
-        mockTierRepo.findOneBy.mockResolvedValue(null); // default 95 % split
+        (notificationService.create as jest.Mock).mockResolvedValue({ id: 'notif-1' });
+    });
 
-        // Inline-execute the transaction callback using same mock repos
-        (AppDataSource.transaction as jest.Mock).mockImplementation(
-            async (cb: (m: any) => Promise<any>) =>
-                cb({ getRepository: repoForEntity }),
+    it('creates an active relationship and increments current clients', async () => {
+        const result = await subscriptionService.createRelationship('user-1', 'trainer-1', 'program-1');
+
+        expect(mockSubRepo.create).toHaveBeenCalledWith(expect.objectContaining({
+            user_id: 'user-1',
+            trainer_id: 'trainer-1',
+            program_id: 'program-1',
+            subscription_type: 'one_time',
+            status: 'active',
+            source: 'message',
+            notes: null,
+            started_at: expect.any(Date),
+        }));
+        expect(mockProgramRepo.increment).toHaveBeenCalledWith({ id: 'program-1' }, 'current_clients', 1);
+        expect(notificationService.create).toHaveBeenCalledWith(
+            'trainer-1',
+            'system',
+            'Học viên mới',
+            'Bạn có một học viên mới tham gia chương trình',
+            '/dashboard'
         );
+        expect(result).toMatchObject({ id: 'sub-1', status: 'active' });
     });
 
-    // ── Happy path ──────────────────────────────────────────────────────────
-
-    it('creates subscription, increments clients, and saves financial transaction', async () => {
-        const result = await subscriptionService.handleSepayWebhook(basePayload);
-
-        expect(result).toEqual({ success: true });
-        expect(AppDataSource.transaction).toHaveBeenCalledTimes(1);
-        expect(mockProgramRepo.increment).toHaveBeenCalledWith(
-            { id: 'prog-uuid-5678' }, 'current_clients', 1,
+    it('supports direct handoff source with notes', async () => {
+        await subscriptionService.createRelationship(
+            'user-1',
+            'trainer-1',
+            'program-1',
+            'direct',
+            'Đã chốt lịch qua điện thoại'
         );
-        expect(mockSubRepo.save).toHaveBeenCalledTimes(1);
-        expect(mockFtRepo.save).toHaveBeenCalledTimes(1);
+
+        expect(mockSubRepo.create).toHaveBeenCalledWith(expect.objectContaining({
+            source: 'direct',
+            notes: 'Đã chốt lịch qua điện thoại',
+        }));
     });
 
-    // ── Financial split ─────────────────────────────────────────────────────
+    it('rejects when the program does not exist or is unpublished', async () => {
+        mockProgramRepo.findOneBy.mockResolvedValue(null);
 
-    it('sets correct financial split: default 95 % trainer / 5 % platform', async () => {
-        await subscriptionService.handleSepayWebhook(basePayload);
+        await expect(
+            subscriptionService.createRelationship('user-1', 'trainer-1', 'program-1')
+        ).rejects.toThrow('Chương trình không tồn tại hoặc chưa được xuất bản');
 
-        const ftArg = mockFtRepo.create.mock.calls[0][0];
-        expect(ftArg.split_percentage).toBe(95);
-        expect(ftArg.platform_fee).toBeCloseTo(25000);   // 5 % of 500 000
-        expect(ftArg.creator_amount).toBeCloseTo(475000);// 95 % of 500 000
+        expect(mockSubRepo.findOneBy).not.toHaveBeenCalled();
     });
 
-    it('uses custom revenue tier split when one exists for the trainer', async () => {
-        mockTierRepo.findOneBy.mockResolvedValue({ creator_id: 'trainer-uuid-9999', split_percentage: 90 });
+    it('rejects when an active relationship already exists for the same program', async () => {
+        mockSubRepo.findOneBy.mockResolvedValue({ id: 'sub-existing', status: 'active' });
 
-        await subscriptionService.handleSepayWebhook(basePayload);
+        await expect(
+            subscriptionService.createRelationship('user-1', 'trainer-1', 'program-1')
+        ).rejects.toThrow('Bạn đã có quan hệ huấn luyện cho chương trình này');
 
-        const ftArg = mockFtRepo.create.mock.calls[0][0];
-        expect(ftArg.split_percentage).toBe(90);
-        expect(ftArg.creator_amount).toBeCloseTo(450000);
-    });
-
-    // ── Idempotency ─────────────────────────────────────────────────────────
-
-    it('ignores duplicate webhook — same sepay_transaction_id already in DB', async () => {
-        // Outer (pre-transaction) idempotency check finds record
-        mockSubRepo.findOneBy.mockResolvedValueOnce({ id: 'existing-sub' });
-
-        const result = await subscriptionService.handleSepayWebhook(basePayload);
-
-        expect(result).toEqual({ success: true });
-        expect(AppDataSource.transaction).not.toHaveBeenCalled();
-    });
-
-    // ── Race condition ───────────────────────────────────────────────────────
-
-    it('skips creation when a concurrent webhook already created the subscription (race guard inside txn)', async () => {
-        mockSubRepo.findOneBy
-            .mockResolvedValueOnce(null)               // outer idempotency: no prior record
-            .mockResolvedValueOnce({ id: 'race-sub' }); // inside txn: already created
-
-        const result = await subscriptionService.handleSepayWebhook(basePayload);
-
-        expect(result).toEqual({ success: true });
         expect(mockSubRepo.save).not.toHaveBeenCalled();
-        expect(mockFtRepo.save).not.toHaveBeenCalled();
+        expect(mockProgramRepo.increment).not.toHaveBeenCalled();
     });
 
-    // ── Amount validation ───────────────────────────────────────────────────
+    it('returns the user relationships in reverse chronological order', async () => {
+        const rows = [{ id: 'sub-2' }, { id: 'sub-1' }];
+        mockSubRepo.find.mockResolvedValue(rows);
 
-    it('ignores webhook when transferAmount < required program price', async () => {
-        const result = await subscriptionService.handleSepayWebhook({
-            ...basePayload,
-            transferAmount: 100000,
+        const result = await subscriptionService.getUserSubscriptions('user-1');
+
+        expect(mockSubRepo.find).toHaveBeenCalledWith({
+            where: { user_id: 'user-1' },
+            relations: ['program', 'trainer'],
+            order: { created_at: 'DESC' },
+        });
+        expect(result).toEqual(rows);
+    });
+
+    it('cancels an active relationship and decrements current clients', async () => {
+        const activeRelationship = {
+            id: 'sub-1',
+            user_id: 'user-1',
+            program_id: 'program-1',
+            status: 'active',
+            ended_at: null,
+        };
+        mockSubRepo.findOneBy.mockResolvedValue(activeRelationship);
+
+        const result = await subscriptionService.cancelSubscription('user-1', 'sub-1');
+
+        expect(mockProgramRepo.decrement).toHaveBeenCalledWith({ id: 'program-1' }, 'current_clients', 1);
+        expect(result).toMatchObject({ status: 'cancelled', ended_at: expect.any(Date) });
+    });
+
+    it('rejects cancellation when the relationship does not exist', async () => {
+        mockSubRepo.findOneBy.mockResolvedValue(null);
+
+        await expect(subscriptionService.cancelSubscription('user-1', 'sub-404')).rejects.toThrow('Không tìm thấy quan hệ huấn luyện');
+    });
+
+    it('rejects cancellation when the relationship is already cancelled', async () => {
+        mockSubRepo.findOneBy.mockResolvedValue({
+            id: 'sub-1',
+            user_id: 'user-1',
+            program_id: 'program-1',
+            status: 'cancelled',
         });
 
-        expect(result).toEqual({ success: true });
-        expect(AppDataSource.transaction).not.toHaveBeenCalled();
+        await expect(subscriptionService.cancelSubscription('user-1', 'sub-1')).rejects.toThrow('Quan hệ huấn luyện này đã được kết thúc');
     });
 
-    it('accepts webhook when transferAmount === required program price', async () => {
-        const result = await subscriptionService.handleSepayWebhook({
-            ...basePayload,
-            transferAmount: 500000,
+    it('returns relationship-oriented trainer stats', async () => {
+        const result = await subscriptionService.getTrainerStats('trainer-1');
+
+        expect(mockSubRepo.count).toHaveBeenCalledWith({
+            where: { trainer_id: 'trainer-1', status: 'active' },
         });
-
-        expect(result).toEqual({ success: true });
-        expect(AppDataSource.transaction).toHaveBeenCalledTimes(1);
-    });
-
-    // ── Content filtering ───────────────────────────────────────────────────
-
-    it('ignores outbound transfers (transferType !== "in")', async () => {
-        const result = await subscriptionService.handleSepayWebhook({ ...basePayload, transferType: 'out' });
-
-        expect(result).toEqual({ success: true });
-        expect(AppDataSource.query).not.toHaveBeenCalled();
-    });
-
-    it('ignores transfers with empty content', async () => {
-        const result = await subscriptionService.handleSepayWebhook({ ...basePayload, content: '' });
-
-        expect(result).toEqual({ success: true });
-        expect(AppDataSource.query).not.toHaveBeenCalled();
-    });
-
-    it('ignores transfers whose content does not contain "GV "', async () => {
-        const result = await subscriptionService.handleSepayWebhook({
-            ...basePayload,
-            content: 'RANDOM PAYMENT REF 12345',
+        expect(mockSubRepo.createQueryBuilder).toHaveBeenCalledWith('subscription');
+        expect(result).toEqual({
+            active_clients: 4,
+            new_clients_30d: 2,
         });
-
-        expect(result).toEqual({ success: true });
-        expect(AppDataSource.query).not.toHaveBeenCalled();
-    });
-
-    it('ignores transfers with malformed GV prefix (only one token after GV)', async () => {
-        const result = await subscriptionService.handleSepayWebhook({
-            ...basePayload,
-            content: 'GV ONLYONE',
-        });
-
-        expect(result).toEqual({ success: true });
-        expect(AppDataSource.query).not.toHaveBeenCalled();
-    });
-
-    // ── Unknown entities ────────────────────────────────────────────────────
-
-    it('ignores when no user matches the UUID prefix', async () => {
-        (AppDataSource.query as jest.Mock).mockImplementation((sql: string) => {
-            if (sql.includes('FROM users')) return Promise.resolve([]);
-            return Promise.resolve([{ id: 'prog-uuid-5678', pricing_type: 'monthly', price_monthly: 500000 }]);
-        });
-
-        const result = await subscriptionService.handleSepayWebhook(basePayload);
-
-        expect(result).toEqual({ success: true });
-        expect(AppDataSource.transaction).not.toHaveBeenCalled();
-    });
-
-    it('ignores when no program matches the UUID prefix', async () => {
-        (AppDataSource.query as jest.Mock).mockImplementation((sql: string) => {
-            if (sql.includes('FROM programs')) return Promise.resolve([]);
-            return Promise.resolve([{ id: 'user-uuid-1234' }]);
-        });
-
-        const result = await subscriptionService.handleSepayWebhook(basePayload);
-
-        expect(result).toEqual({ success: true });
-        expect(AppDataSource.transaction).not.toHaveBeenCalled();
     });
 });
 

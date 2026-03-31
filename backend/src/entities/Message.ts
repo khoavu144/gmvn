@@ -8,6 +8,8 @@ import {
 } from 'typeorm';
 import { User } from './User';
 
+export type MessageContextType = 'program' | 'product' | 'gym' | 'profile';
+
 @Entity('messages')
 export class Message {
     @PrimaryGeneratedColumn('uuid')
@@ -29,6 +31,15 @@ export class Message {
 
     @Column({ type: 'text' })
     content!: string;
+
+    @Column({ type: 'varchar', length: 30, nullable: true })
+    context_type!: MessageContextType | null;
+
+    @Column({ type: 'uuid', nullable: true })
+    context_id!: string | null;
+
+    @Column({ type: 'varchar', length: 255, nullable: true })
+    context_label!: string | null;
 
     @Column({ type: 'boolean', default: false })
     is_read!: boolean;

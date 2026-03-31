@@ -55,14 +55,6 @@ const EnvSchema = z.object({
         }
     }
 
-    if (!value.SEPAY_WEBHOOK_SECRET && !value.SEPAY_WEBHOOK_TOKEN) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['SEPAY_WEBHOOK_SECRET'],
-            message: 'SEPAY_WEBHOOK_SECRET or SEPAY_WEBHOOK_TOKEN is required in production',
-        });
-    }
-
     if (value.SEPAY_WEBHOOK_SECRET && /^https?:\/\//i.test(value.SEPAY_WEBHOOK_SECRET.trim())) {
         ctx.addIssue({
             code: z.ZodIssueCode.custom,

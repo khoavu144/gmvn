@@ -28,7 +28,7 @@ export default function CoachResultsShowcase({
 }: Props) {
     const eEyebrow = emptyEyebrow ?? eyebrow;
     const eTitle = emptyTitle ?? title;
-    const eDesc = emptyDescription ?? 'Chưa có ảnh trước/sau công khai trên hồ sơ. Bạn có thể nhắn tin Coach để xem thêm minh chứng phù hợp chính sách riêng tư.';
+    const eDesc = emptyDescription ?? 'Chưa có ảnh trước/sau công khai trên hồ sơ. Bạn có thể nhắn tin cho huấn luyện viên để xem thêm minh chứng phù hợp chính sách riêng tư.';
 
     if (photos.length === 0) {
         return (

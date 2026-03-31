@@ -33,8 +33,8 @@ export default function BottomNav() {
     // Public items (always visible)
     const publicItems = [
         { to: '/', icon: Home, label: 'Trang chủ' },
-        { to: '/coaches', icon: User, label: 'Coach' },
-        { to: '/gyms', icon: Dumbbell, label: 'Gym' },
+        { to: '/coaches', icon: User, label: 'HLV' },
+        { to: '/gyms', icon: Dumbbell, label: 'Phòng tập' },
     ];
 
     // Auth items
@@ -60,7 +60,7 @@ export default function BottomNav() {
                 reducedEffects ? 'bg-white' : 'bg-white/95 backdrop-blur-md'
             )}
         >
-            <div className="flex items-center justify-around h-full max-w-page mx-auto">
+            <div className="flex items-center justify-evenly h-full max-w-page mx-auto">
                 {items.map((item) => {
                     const isActive = location.pathname === item.to;
                     const Icon = item.icon;
@@ -69,6 +69,7 @@ export default function BottomNav() {
                         <Link
                             key={item.to}
                             to={item.to}
+                            aria-current={isActive ? 'page' : undefined}
                             className={cn(
                                 'bottom-nav-item',
                                 isActive && 'active'

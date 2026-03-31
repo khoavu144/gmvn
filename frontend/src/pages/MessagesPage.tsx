@@ -13,20 +13,46 @@ interface Message {
     sender_id: string;
     receiver_id: string;
     content: string;
+    context_type?: 'program' | 'product' | 'gym' | 'profile' | null;
+    context_id?: string | null;
+    context_label?: string | null;
     created_at: string;
     is_read: boolean;
 }
 
+type MessageContext = {
+    context_type: 'program' | 'product' | 'gym' | 'profile';
+    context_id: string;
+    context_label: string | null;
+};
+
 interface Conversation {
     partner_id: string;
     partner: { id: string; full_name: string; avatar_url: string | null } | null;
-    last_message: { content: string; created_at: string; is_read: boolean } | null;
+    last_message: {
+        content: string;
+        context_type?: 'program' | 'product' | 'gym' | 'profile' | null;
+        context_label?: string | null;
+        created_at: string;
+        is_read: boolean;
+    } | null;
     unread_count: number;
+}
+
+function isMessageContextType(value: string | null): value is MessageContext['context_type'] {
+    return value === 'program' || value === 'product' || value === 'gym' || value === 'profile';
 }
 
 export default function MessagesPage() {
     const { user, accessToken } = useSelector((state: RootState) => state.auth);
     const [searchParams] = useSearchParams();
+    const partnerTargetFromQuery = searchParams.get('to');
+    const draftFromQuery = searchParams.get('draft');
+    const partnerNameFromQuery = searchParams.get('name');
+    const profilePathFromQuery = searchParams.get('profile_path');
+    const contextTypeFromQuery = searchParams.get('context_type');
+    const contextIdFromQuery = searchParams.get('context_id');
+    const contextLabelFromQuery = searchParams.get('context_label');
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [activePartner, setActivePartner] = useState<string | null>(null);
@@ -34,6 +60,26 @@ export default function MessagesPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const buildInitialContext = (): MessageContext | null => {
+        if (!contextIdFromQuery || !isMessageContextType(contextTypeFromQuery)) {
+            return null;
+        }
+
+        return {
+            context_type: contextTypeFromQuery,
+            context_id: contextIdFromQuery,
+            context_label: contextLabelFromQuery?.trim() || null,
+        };
+    };
+    const [pendingContext, setPendingContext] = useState<MessageContext | null>(() => buildInitialContext());
+
+    const buildPartnerPlaceholder = (partnerId: string) => ({
+        id: partnerId,
+        full_name: partnerId === partnerTargetFromQuery
+            ? (partnerNameFromQuery?.trim() || 'Đối tác')
+            : 'Đối tác',
+        avatar_url: null,
+    });
 
     // Keep activePartner in a ref to avoid stale closure without reconnecting socket on every switch
     const activePartnerRef = useRef(activePartner);
@@ -63,6 +109,8 @@ export default function MessagesPage() {
                     ...nextConversation,
                     last_message: {
                         content: incomingMessage.content,
+                        context_type: incomingMessage.context_type,
+                        context_label: incomingMessage.context_label,
                         created_at: incomingMessage.created_at,
                         is_read: incomingMessage.is_read,
                     },
@@ -92,6 +140,7 @@ export default function MessagesPage() {
 
         return () => {
             socketService.offMessageReceive();
+            socketService.offMessageSent();
             socketService.disconnect();
         };
     }, [accessToken, user?.id]);
@@ -101,10 +150,9 @@ export default function MessagesPage() {
 
     // Load initial partner from URL param
     useEffect(() => {
-        const to = searchParams.get('to');
-        if (to) {
-            setActivePartner(to);
-            loadMessages(to);
+        if (partnerTargetFromQuery) {
+            setActivePartner(partnerTargetFromQuery);
+            loadMessages(partnerTargetFromQuery);
             return;
         }
 
@@ -113,7 +161,36 @@ export default function MessagesPage() {
             setActivePartner(firstPartnerId);
             loadMessages(firstPartnerId);
         }
-    }, [searchParams, conversations, activePartner]);
+    }, [partnerTargetFromQuery, conversations, activePartner]);
+
+    useEffect(() => {
+        if (!draftFromQuery) return;
+        setNewMessage((prev) => (prev.trim().length > 0 ? prev : draftFromQuery));
+    }, [draftFromQuery]);
+
+    useEffect(() => {
+        if (!partnerTargetFromQuery) return;
+
+        setConversations((prev) => {
+            if (prev.some((conversation) => conversation.partner_id === partnerTargetFromQuery)) {
+                return prev;
+            }
+
+            return [
+                {
+                    partner_id: partnerTargetFromQuery,
+                    partner: buildPartnerPlaceholder(partnerTargetFromQuery),
+                    last_message: null,
+                    unread_count: 0,
+                },
+                ...prev,
+            ];
+        });
+    }, [partnerTargetFromQuery, partnerNameFromQuery]);
+
+    useEffect(() => {
+        setPendingContext(buildInitialContext());
+    }, [contextTypeFromQuery, contextIdFromQuery, contextLabelFromQuery]);
 
     // Scroll to bottom on new messages
     useEffect(() => {
@@ -124,7 +201,21 @@ export default function MessagesPage() {
         try {
             setError(null);
             const res = await apiClient.get('/messages/conversations');
-            setConversations(res.data.conversations || []);
+            const nextConversations = res.data.conversations || [];
+            if (partnerTargetFromQuery && !nextConversations.some((conversation: Conversation) => conversation.partner_id === partnerTargetFromQuery)) {
+                setConversations([
+                    {
+                        partner_id: partnerTargetFromQuery,
+                        partner: buildPartnerPlaceholder(partnerTargetFromQuery),
+                        last_message: null,
+                        unread_count: 0,
+                    },
+                    ...nextConversations,
+                ]);
+                return;
+            }
+
+            setConversations(nextConversations);
         } catch (err: any) {
             logger.error(err);
             setError('Lỗi tải danh sách tin nhắn.');
@@ -145,6 +236,9 @@ export default function MessagesPage() {
 
     const selectConversation = (partnerId: string) => {
         setActivePartner(partnerId);
+        if (partnerId !== partnerTargetFromQuery) {
+            setPendingContext(null);
+        }
         setConversations(prev => prev.map(conv => (
             conv.partner_id === partnerId
                 ? { ...conv, unread_count: 0 }
@@ -157,16 +251,22 @@ export default function MessagesPage() {
         if (!newMessage.trim() || !activePartner || !user?.id) return;
 
         const content = newMessage.trim();
+        const contextPayload = pendingContext && activePartner === partnerTargetFromQuery
+            ? pendingContext
+            : null;
         const optimisticMessage: Message = {
             id: `temp-${Date.now()}`,
             sender_id: user.id,
             receiver_id: activePartner,
             content,
+            context_type: contextPayload?.context_type ?? null,
+            context_id: contextPayload?.context_id ?? null,
+            context_label: contextPayload?.context_label ?? null,
             created_at: new Date().toISOString(),
             is_read: false,
         };
 
-        socketService.sendMessage(activePartner, content);
+        socketService.sendMessage(activePartner, content, contextPayload ?? undefined);
         setMessages(prev => [...prev, optimisticMessage]);
         setConversations(prev => {
             const existing = prev.find(conv => conv.partner_id === activePartner);
@@ -179,8 +279,11 @@ export default function MessagesPage() {
 
             const updated: Conversation = {
                 ...nextConversation,
+                partner: nextConversation.partner ?? buildPartnerPlaceholder(activePartner),
                 last_message: {
                     content,
+                    context_type: contextPayload?.context_type ?? null,
+                    context_label: contextPayload?.context_label ?? null,
                     created_at: optimisticMessage.created_at,
                     is_read: false,
                 },
@@ -190,9 +293,28 @@ export default function MessagesPage() {
             return [updated, ...prev.filter(conv => conv.partner_id !== activePartner)];
         });
         setNewMessage('');
+        if (contextPayload) {
+            setPendingContext(null);
+        }
     };
 
     const activeConv = conversations.find(c => c.partner_id === activePartner);
+    const activePartnerName = activePartner === partnerTargetFromQuery && partnerNameFromQuery
+        ? partnerNameFromQuery
+        : activeConv?.partner?.full_name || partnerNameFromQuery || 'Đối tác';
+    const currentContextLabel = (() => {
+        if (pendingContext?.context_label) {
+            return pendingContext.context_label;
+        }
+
+        for (let index = messages.length - 1; index >= 0; index -= 1) {
+            if (messages[index].context_label) {
+                return messages[index].context_label;
+            }
+        }
+
+        return null;
+    })();
 
     return (
         <div className="page-shell-muted">
@@ -223,10 +345,10 @@ export default function MessagesPage() {
                                     <div className="mb-3 text-4xl">👋</div>
                                     <h3 className="mb-1 font-bold text-gray-900">Hộp thư trống</h3>
                                     <p className="mb-6 text-xs text-gray-500">
-                                        Tin nhắn từ Coach hoặc học viên sẽ hiện ở đây.
+                                        Tin nhắn từ huấn luyện viên, phòng tập, người bán hoặc đối tác sẽ hiện ở đây.
                                     </p>
-                                    <Link to="/coaches" className="btn-primary text-xs uppercase tracking-[0.14em]">
-                                        Tìm Coach ngay
+                                    <Link to="/" className="btn-primary text-xs uppercase tracking-[0.14em]">
+                                        Khám phá nền tảng
                                     </Link>
                                 </div>
                             ) : (
@@ -244,7 +366,7 @@ export default function MessagesPage() {
                                                 <div className="min-w-0 flex-1">
                                                     <div className="mb-0.5 flex items-center justify-between gap-3">
                                                         <span className={`truncate text-sm ${conv.unread_count > 0 ? 'font-bold text-black' : 'font-medium text-gray-900'}`}>
-                                                            {conv.partner?.full_name || 'Unknown'}
+                                                            {conv.partner?.full_name || 'Chưa rõ'}
                                                         </span>
                                                         {conv.unread_count > 0 && (
                                                             <span className="flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-black px-1 text-[10px] font-bold text-white">
@@ -252,6 +374,11 @@ export default function MessagesPage() {
                                                             </span>
                                                         )}
                                                     </div>
+                                                    {conv.last_message?.context_label && (
+                                                        <p className="truncate text-[11px] font-semibold text-gray-500">
+                                                            Về: {conv.last_message.context_label}
+                                                        </p>
+                                                    )}
                                                     {conv.last_message && (
                                                         <p className={`truncate text-xs ${conv.unread_count > 0 ? 'font-medium text-black' : 'text-gray-500'}`}>
                                                             {conv.last_message.content}
@@ -281,9 +408,16 @@ export default function MessagesPage() {
                                     </div>
                                     <div>
                                         <div className="page-kicker mb-1">Đang trao đổi</div>
-                                        <Link to={`/coaches/${activePartner}`} className="font-semibold text-black hover:underline underline-offset-2">
-                                            {activeConv?.partner?.full_name || 'Xem hồ sơ'}
-                                        </Link>
+                                        {profilePathFromQuery && activePartner === partnerTargetFromQuery ? (
+                                            <Link to={profilePathFromQuery} className="font-semibold text-black hover:underline underline-offset-2">
+                                                {activePartnerName}
+                                            </Link>
+                                        ) : (
+                                            <span className="font-semibold text-black">{activePartnerName}</span>
+                                        )}
+                                        {currentContextLabel && (
+                                            <p className="text-xs text-gray-500">Ngữ cảnh đang trao đổi: {currentContextLabel}</p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -303,7 +437,7 @@ export default function MessagesPage() {
                                         ) : messages.length === 0 ? (
                                             <div className="flex h-full items-center justify-center">
                                                 <div className="rounded-lg border border-dashed border-gray-200 bg-white px-6 py-5 text-center text-sm text-gray-500 shadow-sm">
-                                                    Gửi lời chào đầu tiên
+                                                    Chưa có tin nhắn nào trong hội thoại này. Hãy bắt đầu trao đổi.
                                                 </div>
                                             </div>
                                         ) : (
@@ -312,6 +446,11 @@ export default function MessagesPage() {
                                                 return (
                                                     <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                                                         <div className={`max-w-[75%] rounded-lg px-4 py-2.5 text-sm shadow-sm ${isMe ? 'rounded-tr-sm bg-black text-white' : 'rounded-tl-sm border border-gray-200 bg-white text-black'}`}>
+                                                            {msg.context_label && (
+                                                                <div className={`mb-1 text-[10px] font-bold uppercase tracking-[0.12em] ${isMe ? 'text-white/70' : 'text-gray-500'}`}>
+                                                                    Về: {msg.context_label}
+                                                                </div>
+                                                            )}
                                                             {msg.content}
                                                         </div>
                                                     </div>
@@ -328,7 +467,7 @@ export default function MessagesPage() {
                                             value={newMessage}
                                             onChange={e => setNewMessage(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                                            placeholder="Nhập tin nhắn..."
+                                            placeholder="Nhập nội dung trao đổi..."
                                             aria-label="Nhập tin nhắn để gửi"
                                             className="form-input rounded-full bg-gray-50 px-5 py-3 pr-24 focus:bg-white"
                                         />
@@ -350,7 +489,7 @@ export default function MessagesPage() {
                                     </div>
                                     <h2 className="text-lg font-bold text-black">Chọn một cuộc trò chuyện</h2>
                                     <p className="mt-2 max-w-sm text-sm text-gray-500">
-                                        Chọn hội thoại ở cột trái để bắt đầu nhắn tin với Coach hoặc học viên.
+                                        Chọn hội thoại ở cột trái để tiếp tục trao đổi theo đúng hồ sơ, sản phẩm hoặc chương trình liên quan.
                                     </p>
                                 </div>
                             </div>

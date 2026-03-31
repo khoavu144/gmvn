@@ -29,11 +29,11 @@ export const BranchCoachesTab: React.FC<BranchCoachesTabProps> = ({
     return (
         <div className="animate-fade-in space-y-8">
             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                <h3 className="text-sm font-black uppercase tracking-widest mb-4">Mời Coach tham gia</h3>
+                <h3 className="text-sm font-black uppercase tracking-widest mb-4">Mời huấn luyện viên tham gia</h3>
                 <div className="flex gap-2">
                     <input
                         type="text"
-                        placeholder="Nhập tên hoặc email Coach..."
+                        placeholder="Nhập tên hoặc email huấn luyện viên..."
                         className="form-input flex-1"
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
@@ -46,7 +46,7 @@ export const BranchCoachesTab: React.FC<BranchCoachesTabProps> = ({
                         <option value="Huấn luyện viên">Huấn luyện viên</option>
                         <option value="PT Chính">PT Chính</option>
                         <option value="PT Phụ">PT Phụ</option>
-                        <option value="Yoga Instructor">Yoga Instructor</option>
+                        <option value="Huấn luyện viên yoga">Huấn luyện viên yoga</option>
                     </select>
                     <button
                         onClick={handleSearchCoaches}
@@ -90,7 +90,7 @@ export const BranchCoachesTab: React.FC<BranchCoachesTabProps> = ({
                             <img
                                 src={link.trainer?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(link.trainer?.full_name || 'C')}&background=000&color=fff`}
                                 className="w-12 h-12 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all"
-                                alt="Coach"
+                                alt="Huấn luyện viên"
                             />
                             <div>
                                 <h4 className="text-sm font-black uppercase tracking-tight">{link.trainer?.full_name}</h4>
@@ -110,7 +110,7 @@ export const BranchCoachesTab: React.FC<BranchCoachesTabProps> = ({
                 ))}
                 {(!branch.trainer_links || branch.trainer_links.length === 0) && (
                     <div className="col-span-full py-10 text-center border-2 border-dashed border-gray-200 rounded-lg text-gray-500 text-xs font-bold uppercase">
-                        Chưa có Coach nào liên kết
+                        Chưa có huấn luyện viên nào liên kết
                     </div>
                 )}
             </div>

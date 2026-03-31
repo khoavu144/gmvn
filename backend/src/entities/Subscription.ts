@@ -13,6 +13,7 @@ import { Index } from 'typeorm';
 
 export type SubscriptionStatus = 'active' | 'paused' | 'cancelled';
 export type SubscriptionType = 'monthly' | 'one_time';
+export type SubscriptionSource = 'message' | 'direct' | 'legacy';
 
 @Entity('subscriptions')
 @Index('unique_active_subscription', ['user_id', 'program_id'], { unique: true, where: "status = 'active'" })
@@ -50,9 +51,11 @@ export class Subscription {
     })
     subscription_type!: SubscriptionType;
 
+    /** @deprecated Legacy payment field — kept for existing data compatibility */
     @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
     price_paid!: number | null;
 
+    /** @deprecated Legacy SePay field — kept for existing data compatibility */
     @Column({ type: 'varchar', length: 255, nullable: true })
     sepay_transaction_id!: string | null;
 
@@ -69,8 +72,17 @@ export class Subscription {
     @Column({ type: 'timestamp', nullable: true })
     ended_at!: Date | null;
 
+    /** @deprecated Legacy billing field — kept for existing data compatibility */
     @Column({ type: 'timestamp', nullable: true })
     next_billing_date!: Date | null;
+
+    /** How this relationship was initiated */
+    @Column({ type: 'varchar', length: 20, nullable: true, default: 'legacy' })
+    source!: SubscriptionSource;
+
+    /** Free-form note about the relationship agreement */
+    @Column({ type: 'text', nullable: true })
+    notes!: string | null;
 
     @CreateDateColumn()
     created_at!: Date;

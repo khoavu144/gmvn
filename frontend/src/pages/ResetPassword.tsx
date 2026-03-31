@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import apiClient from '../services/api';
 import { extractApiErrorMessage } from '../lib/apiErrors';
+import { Button } from '../components/ui/Button';
 
 export default function ResetPassword() {
   const [email, setEmail] = useState('');
@@ -37,70 +39,99 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            Tạo mật khẩu mới
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Nhập email, mã khôi phục và mật khẩu mới của bạn.
-          </p>
+    <div className="auth-shell">
+      <Helmet>
+        <title>Tạo mật khẩu mới — GYMERVIET</title>
+        <meta name="description" content="Đặt lại mật khẩu tài khoản GYMERVIET." />
+      </Helmet>
+      <div className="page-container max-w-md gv-pad-y">
+        <div className="text-center page-header">
+          <p className="page-kicker">Khôi phục tài khoản</p>
+          <h1 className="page-title text-center">Tạo mật khẩu mới</h1>
+          <p className="page-description mx-auto text-center">Nhập email, mã khôi phục và mật khẩu mới của bạn.</p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleReset}>
-          <div className="space-y-4 rounded-md shadow-sm">
+
+        <div className="card">
+          <form onSubmit={handleReset} className="space-y-4" aria-label="Biểu mẫu đặt lại mật khẩu">
+            {error && (
+              <div role="alert" aria-live="assertive" className="bg-red-50 border border-red-200 text-gray-900 px-4 py-3 rounded-xs text-sm">
+                {error}
+              </div>
+            )}
+            {success && (
+              <div role="status" aria-live="polite" className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-xs text-sm">
+                {success}
+              </div>
+            )}
+
             <div>
-              <label htmlFor="email" className="sr-only">Địa chỉ email</label>
+              <label htmlFor="email" className="form-label">Email</label>
               <input
                 id="email"
                 type="email"
+                aria-required="true"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="relative block w-full rounded-md border-0 py-3 px-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 mb-4"
-                placeholder="Địa chỉ email"
+                className="form-input"
+                placeholder="your@email.com"
               />
             </div>
+
             <div>
-              <label htmlFor="code" className="sr-only">Mã xác thực</label>
+              <label htmlFor="code" className="form-label">Mã xác thực</label>
               <input
                 id="code"
                 type="text"
+                aria-required="true"
                 required
                 maxLength={6}
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                className="relative block w-full rounded-md border-0 py-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6 text-center text-xl tracking-[0.3em] font-mono mb-4"
-                placeholder="Mã 000000"
+                className="form-input text-center text-xl tracking-[0.3em] font-mono"
+                placeholder="000000"
               />
             </div>
+
             <div>
-              <label htmlFor="new-password" className="sr-only">Mật khẩu mới</label>
+              <label htmlFor="new-password" className="form-label">Mật khẩu mới</label>
               <input
                 id="new-password"
                 type="password"
+                aria-required="true"
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="relative block w-full rounded-md border-0 py-3 px-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-500 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-black sm:text-sm sm:leading-6"
-                placeholder="Mật khẩu mới (tối thiểu 8 ký tự)"
+                className="form-input"
+                placeholder="Tối thiểu 8 ký tự"
               />
             </div>
-          </div>
 
-          {error && <div className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-md">{error}</div>}
-          {success && <div className="text-green-600 text-sm text-center bg-green-50 p-2 rounded-md">{success}</div>}
-
-          <div>
-            <button
+            <Button
               type="submit"
-              disabled={loading}
-              className="group relative flex w-full justify-center rounded-md bg-black px-3 py-3 text-sm font-semibold text-white hover:bg-gray-800 disabled:bg-gray-400"
+              variant="primary"
+              size="full"
+              loading={loading}
+              aria-busy={loading}
+              className="mt-2"
             >
               {loading ? 'Đang xử lý...' : 'Lưu mật khẩu mới'}
-            </button>
+            </Button>
+          </form>
+
+          <div className="mt-6 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">
+            Đã nhớ mật khẩu?{' '}
+            <Link to="/login" className="text-black font-medium hover:underline">
+              Đăng nhập
+            </Link>
           </div>
-        </form>
+        </div>
+
+        <div className="mt-8 text-center">
+          <Link to="/" className="back-link justify-center">
+            ← Quay lại trang chủ
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -57,9 +57,17 @@
 
 .marketplace-editorial-search {
   display: flex;
-  gap: .5rem;
+  flex-direction: column;
+  gap: .75rem;
   max-width: 560px;
   margin-top: 0.25rem;
+}
+
+@media (min-width: 640px) {
+  .marketplace-editorial-search {
+    flex-direction: row;
+    gap: .5rem;
+  }
 }
 
 .marketplace-editorial-search--filtered {

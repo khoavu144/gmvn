@@ -114,7 +114,7 @@ const GymRegisterPage: React.FC = () => {
     return (
         <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6">
             <div className="mb-8">
-                <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tight">Đăng ký Đối tác Gym Center</h1>
+                <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tight">Đăng ký đối tác phòng tập</h1>
                 <p className="text-gray-600 mt-2">Vui lòng cung cấp chính xác thông tin phòng tập để được kiểm duyệt nhanh nhất.</p>
             </div>
 
@@ -128,11 +128,11 @@ const GymRegisterPage: React.FC = () => {
                 <div className="space-y-6">
                     <h3 className="text-lg font-bold border-b border-gray-200 pb-2">Thông tin chung (Thương hiệu)</h3>
                     <div>
-                        <label className="form-label block mb-1">Tên Gym Center / Chuỗi hệ thống</label>
+                        <label className="form-label block mb-1">Tên phòng tập / Chuỗi hệ thống</label>
                         <input required type="text" name="name" value={form.name} onChange={handleChange} className="form-input w-full" placeholder="VD: California Fitness, CityGym..." />
                     </div>
                     <div>
-                        <label className="form-label block mb-1">Slogan / Tagline</label>
+                        <label className="form-label block mb-1">Khẩu hiệu</label>
                         <input type="text" name="tagline" value={form.tagline} onChange={handleChange} className="form-input w-full" placeholder="VD: Kiến tạo sức khoẻ người Việt" />
                     </div>
                     <div>

@@ -45,7 +45,7 @@ const GymBranchEditor: React.FC<GymBranchEditorProps> = ({ branch, onClose, onUp
                         { id: 'events', label: 'Sự kiện' },
                         { id: 'reviews', label: 'Đánh giá' },
                         { id: 'stats', label: 'Thống kê' },
-                        { id: 'coaches', label: 'Coach' }
+                        { id: 'coaches', label: 'Huấn luyện viên' }
                     ].map(tab => (
                         <button
                             key={tab.id}

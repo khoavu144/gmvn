@@ -107,7 +107,7 @@ export default function CoachHeroFlagship({
                                 href="#programs"
                                 className="h-12 px-7 border border-white/25 text-white font-bold text-sm tracking-wide rounded-sm hover:bg-white/5 hover:border-white/40 transition-all flex items-center"
                             >
-                                Xem gói tập
+                                Xem chương trình
                             </a>
                         </div>
 

@@ -40,7 +40,7 @@ const TYPE_DOT: Record<string, { active: boolean }> = {
 
 export default function ProfileExperienceSection({
   experiences, certifications, awards, yearsExperience,
-  emptyHint = 'Chưa có mốc kinh nghiệm hay chứng chỉ công khai. Nhắn tin Coach nếu bạn cần xác minh thêm về nền tảng chuyên môn.',
+  emptyHint = 'Chưa có mốc kinh nghiệm hay chứng chỉ công khai. Nhắn tin cho huấn luyện viên nếu bạn cần xác minh thêm về nền tảng chuyên môn.',
   introTitle = null,
   introSubtitle = null,
   timelineHeading = 'Cột mốc sự nghiệp',

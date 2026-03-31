@@ -158,17 +158,17 @@ export default function OnboardingPage() {
         <div className="auth-shell">
             <Helmet>
                 <title>Thiết lập hồ sơ — GYMERVIET</title>
-                <meta name="description" content="Hoàn thiện onboarding để bắt đầu dùng GYMERVIET với trải nghiệm phù hợp hơn." />
+                <meta name="description" content="Hoàn thiện thiết lập ban đầu để bắt đầu dùng GYMERVIET với trải nghiệm phù hợp hơn." />
             </Helmet>
 
             <div className="auth-shell__grid">
                 <section className="auth-shell__intro">
                     <p className="page-kicker">Kích hoạt trải nghiệm</p>
                     <h1 className="page-title max-w-xl">
-                        {isCoach ? 'Hoàn thiện vài tín hiệu để hồ sơ Coach bắt đầu có giá trị ngay.' : 'Thiết lập vài dữ kiện nền để app gợi ý lộ trình hợp lý hơn.'}
+                        {isCoach ? 'Hoàn thiện vài tín hiệu để hồ sơ huấn luyện viên bắt đầu có giá trị ngay.' : 'Thiết lập vài dữ kiện nền để ứng dụng gợi ý lộ trình hợp lý hơn.'}
                     </h1>
                     <p className="page-description max-w-xl">
-                        Mục tiêu là đưa bạn vào dashboard nhanh hơn, với trải nghiệm bớt nhiễu hơn.
+                        Mục tiêu là đưa bạn vào bảng điều khiển nhanh hơn, với trải nghiệm bớt nhiễu hơn.
                     </p>
 
                     <div className="auth-shell__summary surface-panel">
@@ -177,7 +177,7 @@ export default function OnboardingPage() {
                                 <span className="page-kicker">Tiến độ</span>
                                 <h2 className="section-title mt-1">Bước {step} / {totalSteps}</h2>
                             </div>
-                            <span className="page-pill">{isCoach ? 'Coach flow' : 'Member flow'}</span>
+                            <span className="page-pill">{isCoach ? 'Luồng huấn luyện viên' : 'Luồng thành viên'}</span>
                         </div>
 
                         <div
@@ -186,22 +186,22 @@ export default function OnboardingPage() {
                             aria-valuemin={1}
                             aria-valuemax={totalSteps}
                             aria-valuenow={step}
-                            aria-label="Tiến độ onboarding"
+                            aria-label="Tiến độ thiết lập ban đầu"
                         >
                             <div className="h-full bg-gray-900 transition-all duration-500" style={{ width: `${(step / totalSteps) * 100}%` }} />
                         </div>
 
                         <ul className="auth-shell__points">
                             <li>Có thể bổ sung sâu hơn trong hồ sơ sau.</li>
-                            <li>Chỉ hỏi phần ảnh hưởng trực tiếp tới gợi ý và trust.</li>
-                            <li>Thiết kế để hoàn thành nhanh trên mobile.</li>
+                            <li>Chỉ hỏi phần ảnh hưởng trực tiếp tới gợi ý và độ tin cậy.</li>
+                            <li>Thiết kế để hoàn thành nhanh trên điện thoại.</li>
                         </ul>
                     </div>
                 </section>
 
                 <section className="auth-shell__panel surface-panel">
                     <div className="mb-6">
-                        <p className="page-kicker">Onboarding</p>
+                        <p className="page-kicker">Thiết lập ban đầu</p>
                         <h2 className="page-title text-2xl sm:text-3xl">{panelTitle}</h2>
                         <p className="page-description">{panelDescription}</p>
                     </div>
@@ -302,7 +302,7 @@ export default function OnboardingPage() {
                                     Quay lại
                                 </button>
                                 <button type="button" onClick={handleSubmit} disabled={loading} className="btn-primary sm:flex-[1.2]">
-                                    {loading ? 'Đang hoàn tất…' : 'Hoàn tất onboarding'}
+                                    {loading ? 'Đang hoàn tất…' : 'Hoàn tất thiết lập'}
                                 </button>
                             </div>
                         </div>

@@ -18,7 +18,7 @@ const CoachGymBadge: React.FC<CoachGymBadgeProps> = ({ gymId, gymName, branchNam
                 <div>
                     <h4 className="font-bold text-black text-sm group-hover:underline">{gymName}</h4>
                     <p className="text-xs text-gray-500 mt-0.5">
-                        {role || 'Coach'} {branchName && `• ${branchName}`}
+                        {role || 'Huấn luyện viên'} {branchName && `• ${branchName}`}
                     </p>
                 </div>
             </div>

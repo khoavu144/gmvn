@@ -5,13 +5,13 @@ export default function GuidelinesPage() {
     return (
         <LegalPageLayout
             title="Hướng dẫn sử dụng"
-            subtitle="Hướng dẫn từng bước để khai thác tối đa nền tảng GYMERVIET — dành cho cả học viên và Coach."
+            subtitle="Hướng dẫn từng bước để khai thác tối đa nền tảng GYMERVIET — dành cho cả học viên và huấn luyện viên."
             breadcrumbs={[{ label: 'Hướng dẫn sử dụng' }]}
             maxWidth="xl"
         >
             {/* Tab-like navigation */}
             <div className="flex gap-2 mb-10 border-b border-gray-200 pb-0 overflow-x-auto">
-                {['Tổng quan', 'Dành cho học viên', 'Dành cho Coach'].map((tab, i) => (
+                {['Tổng quan', 'Dành cho học viên', 'Dành cho huấn luyện viên'].map((tab, i) => (
                     <a
                         key={tab}
                         href={`#section-${i}`}
@@ -28,9 +28,9 @@ export default function GuidelinesPage() {
                     <p>GYMERVIET kết nối 3 nhóm người dùng chính:</p>
                     <div className="grid sm:grid-cols-3 gap-4 mt-3">
                         {[
-                            { role: 'Người tập (User)', desc: 'Tìm kiếm và đăng ký gói tập với Coach. Theo dõi lịch tập, nhắn tin với Coach.', color: 'border-gray-200' },
-                            { role: 'Vận động viên (Athlete)', desc: 'Như người tập nhưng có thêm portfolio chuyên nghiệp và có thể tạo gói tập của mình.', color: 'border-gray-200' },
-                            { role: 'Coach chuyên nghiệp', desc: 'Tạo và bán gói tập, quản lý học viên, xây dựng hồ sơ public chuyên nghiệp.', color: 'border-black' },
+                            { role: 'Người tập', desc: 'Tìm kiếm huấn luyện viên, nhắn tin trao đổi trực tiếp. Theo dõi lịch tập và tiến trình.', color: 'border-gray-200' },
+                            { role: 'Vận động viên', desc: 'Như người tập nhưng có thêm hồ sơ chuyên nghiệp và có thể tạo chương trình của riêng mình.', color: 'border-gray-200' },
+                            { role: 'Huấn luyện viên chuyên nghiệp', desc: 'Tạo chương trình tập, quản lý học viên, xây dựng hồ sơ công khai chuyên nghiệp.', color: 'border-black' },
                         ].map((r) => (
                             <div key={r.role} className={`card border ${r.color}`}>
                                 <h4 className="font-bold text-sm text-black mb-2">{r.role}</h4>
@@ -46,25 +46,25 @@ export default function GuidelinesPage() {
                 <LegalSection title="Dành cho học viên — Bắt đầu tập luyện">
                     <p className="font-medium text-black">Bước 1: Đăng ký tài khoản</p>
                     <LegalList items={[
-                        'Vào trang Đăng ký, chọn loại tài khoản "Người tập luyện (Gymer)".',
+                        'Vào trang Đăng ký, chọn loại tài khoản "Người tập luyện".',
                         'Điền email, mật khẩu (tối thiểu 8 ký tự), và họ tên.',
                         'Đăng nhập ngay sau khi đăng ký thành công.',
                     ]} />
 
-                    <p className="font-medium text-black mt-5">Bước 2: Tìm Coach</p>
+                    <p className="font-medium text-black mt-5">Bước 2: Tìm huấn luyện viên</p>
                     <LegalList items={[
-                        'Vào mục "Khám phá Coach" để duyệt danh sách Coach.',
+                        'Vào mục "Khám phá huấn luyện viên" để duyệt danh sách huấn luyện viên.',
                         'Dùng thanh tìm kiếm để lọc theo tên, chuyên môn (yoga, giảm cân, tăng cơ...).',
-                        'Bấm vào card Coach để xem profile đầy đủ, gói tập và đánh giá.',
+                        'Bấm vào card huấn luyện viên để xem hồ sơ đầy đủ, chương trình và đánh giá.',
                         'Dùng nút "Nhắn tin" để hỏi thăm trước khi đăng ký.',
                     ]} />
 
-                    <p className="font-medium text-black mt-5">Bước 3: Đăng ký gói tập</p>
+                    <p className="font-medium text-black mt-5">Bước 3: Liên hệ & Thỏa thuận</p>
                     <LegalList items={[
-                        'Chọn gói tập phù hợp → bấm "Đăng ký".',
-                        'Hệ thống hiển thị QR Code chuyển khoản với nội dung cố định.',
-                        'Chuyển khoản đúng số tiền và nội dung. Hệ thống xác nhận trong 1–5 phút.',
-                        'Sau khi xác nhận, lịch tập xuất hiện trong mục "Lịch tập của tôi".',
+                        'Xem chương trình huấn luyện viên đăng tải, chọn chương trình phù hợp.',
+                        'Nhắn tin trực tiếp với huấn luyện viên để trao đổi chi tiết.',
+                        'Thống nhất lịch tập, chi phí và cách thanh toán trực tiếp với huấn luyện viên.',
+                        'Sau khi thỏa thuận xong, huấn luyện viên sẽ thiết lập lịch tập cho bạn.',
                     ]} />
 
                     <p className="font-medium text-black mt-5">Bước 4: Theo dõi tiến trình</p>
@@ -78,30 +78,30 @@ export default function GuidelinesPage() {
 
             {/* Section 2: For Coaches */}
             <div id="section-2">
-                <LegalSection title="Dành cho Coach — Xây dựng profile & bán gói tập">
+                <LegalSection title="Dành cho huấn luyện viên — Xây dựng hồ sơ & chương trình">
                     <p className="font-medium text-black">Bước 1: Hoàn thiện hồ sơ cá nhân</p>
                     <LegalList items={[
-                        'Profile → tab "Cá nhân": thêm ảnh đại diện, giới thiệu bản thân, chuyên môn.',
-                        'Profile → tab "Hồ sơ (Public)": thiết lập slug URL, ảnh bìa, headline chuyên nghiệp.',
+                        'Hồ sơ → tab "Cá nhân": thêm ảnh đại diện, giới thiệu bản thân, chuyên môn.',
+                        'Hồ sơ → tab "Hồ sơ (công khai)": thiết lập slug URL, ảnh bìa, tiêu đề giới thiệu chuyên nghiệp.',
                         'Thêm kinh nghiệm làm việc/học vấn/chứng chỉ ở tab "Kinh nghiệm".',
-                        'Upload ảnh buổi tập, transformation vào tab "Gallery".',
+                        'Tải ảnh buổi tập và kết quả thay đổi vào tab "Thư viện ảnh".',
                         'Thêm FAQ để học viên tiềm năng hiểu rõ dịch vụ của bạn.',
                     ]} />
 
-                    <p className="font-medium text-black mt-5">Bước 2: Tạo gói tập</p>
+                    <p className="font-medium text-black mt-5">Bước 2: Tạo chương trình</p>
                     <LegalList items={[
-                        'Vào Dashboard → "Quản lý Gói tập" → "+ Tạo gói mới".',
-                        'Điền đầy đủ: tên, mô tả, hình thức (online/offline/hybrid), mục tiêu.',
+                        'Vào Dashboard → "Quản lý chương trình" → "+ Tạo chương trình mới".',
+                        'Điền đầy đủ: tên, mô tả, hình thức (trực tuyến/trực tiếp/kết hợp), mục tiêu.',
                         'Chọn cấu trúc giá: hàng tháng / trọn khóa / theo buổi.',
-                        'Upload ảnh bìa minh họa cho gói tập (tỉ lệ 16:9).',
-                        'Bấm "Phát hành" khi sẵn sàng — gói sẽ hiển thị trong trang profile của bạn.',
+                        'Tải ảnh bìa minh họa cho chương trình (tỉ lệ 16:9).',
+                        'Bấm "Xuất bản" khi sẵn sàng — chương trình sẽ hiển thị trong hồ sơ của bạn.',
                     ]} />
 
                     <p className="font-medium text-black mt-5">Bước 3: Quản lý học viên</p>
                     <LegalList items={[
-                        'Dashboard → "Học viên" để xem danh sách học viên đang active.',
+                        'Dashboard → "Học viên" để xem danh sách học viên đang hoạt động.',
                         'Tin nhắn để liên lạc trực tiếp với từng học viên.',
-                        'Dashboard → "Doanh thu" để theo dõi thu nhập (sau khi trừ phí nền tảng 5%).',
+                        'Dashboard → xem số học viên đang hoạt động, lượng kết nối mới và trạng thái hồ sơ công khai để theo dõi đà phát triển của bạn.',
                     ]} />
                 </LegalSection>
             </div>

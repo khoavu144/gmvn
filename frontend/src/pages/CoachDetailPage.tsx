@@ -1,6 +1,6 @@
 import { truncateMetaDescription } from "../utils/seo";
 
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { logger } from '../lib/logger';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
@@ -129,7 +129,6 @@ export default function CoachDetailPage() {
     const { trainerId, slug } = useParams<{ trainerId?: string; slug?: string }>();
     const navigate = useNavigate();
     const { user } = useSelector((state: RootState) => state.auth);
-    const paymentCloseRef = useRef<HTMLButtonElement>(null);
 
     const [trainer, setTrainer] = useState<Trainer | null>(null);
     const [programs, setPrograms] = useState<Program[]>([]);
@@ -146,12 +145,6 @@ export default function CoachDetailPage() {
     >([]);
     const [loading, setLoading] = useState(true);
     const [subscribing, setSubscribing] = useState<string | null>(null);
-    const [pendingPayment, setPendingPayment] = useState<{
-        amount: number;
-        transfer_content: string;
-        program_id: string;
-    } | null>(null);
-    const [checkingStatus, setCheckingStatus] = useState(false);
 
     useEffect(() => {
         const load = async () => {
@@ -218,6 +211,27 @@ export default function CoachDetailPage() {
         void load();
     }, [trainerId, slug, navigate]);
 
+    const buildConversationQuery = useCallback((extra: Record<string, string> = {}) => {
+        if (!trainer?.id) {
+            return null;
+        }
+
+        const params = new URLSearchParams({
+            to: trainer.id,
+            name: trainer.full_name || 'Huấn luyện viên',
+        });
+
+        params.set('profile_path', trainer.slug ? `/coach/${trainer.slug}` : `/coaches/${trainer.id}`);
+
+        Object.entries(extra).forEach(([key, value]) => {
+            if (value) {
+                params.set(key, value);
+            }
+        });
+
+        return params.toString();
+    }, [trainer?.full_name, trainer?.id, trainer?.slug]);
+
     const handleSubscribe = async (programId: string) => {
         if (!user) {
             navigate('/login');
@@ -226,49 +240,24 @@ export default function CoachDetailPage() {
 
         setSubscribing(programId);
         try {
-            const res = await apiClient.post('/subscriptions', { program_id: programId });
-            if (res.data.success) {
-                setPendingPayment({
-                    amount: res.data.amount,
-                    transfer_content: res.data.transfer_content,
-                    program_id: programId,
-                });
+            const programMeta = programs.find((item) => item.id === programId);
+            const packageMeta = profilePackagesData.find((item) => item.id === programId);
+            const packageName = String(packageMeta?.name || programMeta?.name || 'chương trình');
+            const draft = `Xin chào, tôi muốn trao đổi về ${packageName} trên hồ sơ của bạn. Vui lòng cho tôi biết cách tham gia và các bước tiếp theo.`;
+            const query = buildConversationQuery({
+                draft,
+                context_type: 'program',
+                context_id: programId,
+                context_label: packageName,
+            });
+            if (!query) {
+                throw new Error('missing-trainer');
             }
-        } catch (err: any) {
-            toast.error(err.response?.data?.error || 'Đã có lỗi xảy ra');
+            navigate(`/messages?${query}`);
+        } catch {
+            toast.error('Không thể mở hội thoại lúc này. Vui lòng thử lại.');
         } finally {
             setSubscribing(null);
-        }
-    };
-
-    // FIX: Escape key closes payment modal
-    useEffect(() => {
-        if (!pendingPayment) return;
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setPendingPayment(null);
-        };
-        document.addEventListener('keydown', handleKeyDown);
-        // FIX: move focus into modal when opened
-        paymentCloseRef.current?.focus();
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [pendingPayment]);
-
-    const handleCheckPayment = async () => {
-        if (!pendingPayment) return;
-
-        setCheckingStatus(true);
-        try {
-            const res = await apiClient.get(`/subscriptions/status?program_id=${pendingPayment.program_id}`);
-            if (res.data.isActive) {
-                toast.success('Thanh toán thành công! Gói tập đã được kích hoạt.');
-                setPendingPayment(null);
-            } else {
-                toast.error('Chưa nhận được thanh toán. Vui lòng đợi vài phút hoặc thử lại.');
-            }
-        } catch (err: any) {
-            toast.error(err.response?.data?.error || 'Không thể kiểm tra trạng thái.');
-        } finally {
-            setCheckingStatus(false);
         }
     };
 
@@ -277,8 +266,13 @@ export default function CoachDetailPage() {
             navigate('/login');
             return;
         }
-        navigate(`/messages?to=${trainer?.id}`);
-    }, [user, navigate, trainer?.id]);
+        const query = buildConversationQuery();
+        if (!query) {
+            toast.error('Không thể mở hội thoại lúc này. Vui lòng thử lại.');
+            return;
+        }
+        navigate(`/messages?${query}`);
+    }, [user, navigate, buildConversationQuery, toast]);
 
     const scrollToPackages = useCallback(() => {
         const el = document.getElementById('section-packages');
@@ -292,7 +286,7 @@ export default function CoachDetailPage() {
         }
         const pkgCount = profilePackagesData.length > 0 ? profilePackagesData.length : programs.length;
         const accepting = trainerProfile?.is_accepting_clients !== false;
-        if (!accepting) return { text: 'Nhắn tin cho Coach', action: handleMessage };
+        if (!accepting) return { text: 'Nhắn tin cho huấn luyện viên', action: handleMessage };
         if (pkgCount === 0) return { text: 'Nhắn tin để tư vấn', action: handleMessage };
         return { text: 'Xem gói tập', action: scrollToPackages };
     }, [
@@ -314,7 +308,7 @@ export default function CoachDetailPage() {
     const shareUrl = shareIdentifier ? buildProfileShareUrl('coach', shareIdentifier) : canonicalUrl;
 
     const seoTitle = useMemo(() => {
-        if (!trainer?.full_name) return 'Coach Detail | GYMERVIET';
+        if (!trainer?.full_name) return 'Hồ sơ huấn luyện viên | GYMERVIET';
         return `${trainer.full_name} — Huấn luyện viên GYMERVIET`;
     }, [trainer?.full_name]);
 
@@ -417,7 +411,7 @@ export default function CoachDetailPage() {
                     '@type': 'BreadcrumbList',
                     itemListElement: [
                         { '@type': 'ListItem', position: 1, name: 'Trang chủ', item: SITE_ORIGIN },
-                        { '@type': 'ListItem', position: 2, name: 'Coach', item: absoluteUrl('/coaches') },
+                        { '@type': 'ListItem', position: 2, name: 'Huấn luyện viên', item: absoluteUrl('/coaches') },
                         { '@type': 'ListItem', position: 3, name: trainer.full_name },
                     ],
                 })}</script>
@@ -470,7 +464,7 @@ export default function CoachDetailPage() {
                 />
 
                 {/* Scrollable main content */}
-                <div className="coach-profile-main">
+                <div className="coach-profile-main pb-20 lg:pb-0">
 
                     {/* §1 Hero / About */}
                     <div id="section-about" className="profile-section-anchor">
@@ -521,6 +515,13 @@ export default function CoachDetailPage() {
                             packages={profilePackages}
                             subscribing={subscribing}
                             onSubscribe={handleSubscribe}
+                            contactOnly
+                            onContact={(programId) => {
+                                if (programId) {
+                                    void handleSubscribe(programId);
+                                }
+                            }}
+                            emptyCopy="Huấn luyện viên chưa công bố chương trình công khai. Hãy nhắn tin trực tiếp để trao đổi về lịch tập, mức phí và cách tham gia phù hợp với bạn."
                         />
                     </div>
 
@@ -545,50 +546,6 @@ export default function CoachDetailPage() {
 
                 </div>
             </div>
-
-            {/* Payment Modal — FIX: proper dialog semantics + focus management */}
-            {pendingPayment && (
-                <div
-                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-                    role="dialog"
-                    aria-modal="true"
-                    aria-labelledby="payment-dialog-title"
-                >
-                    <div className="bg-white rounded-lg p-6 sm:p-8 max-w-sm w-full space-y-6 shadow-md">
-                        <div className="flex justify-between items-center border-b border-gray-200 pb-4">
-                            <h3 id="payment-dialog-title" className="text-xl font-extrabold">Thanh Toán</h3>
-                            <button
-                                ref={paymentCloseRef}
-                                type="button"
-                                onClick={() => setPendingPayment(null)}
-                                className="rounded-md p-1 text-gray-500 hover:text-black text-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2"
-                                aria-label="Đóng hộp thoại thanh toán"
-                            >✕</button>
-                        </div>
-                        <div className="text-center space-y-4">
-                            <p className="text-sm text-gray-600">Chuyển khoản với nội dung chính xác bên dưới.</p>
-                            <img
-                                src={`https://img.vietqr.io/image/970436-${import.meta.env.VITE_PLATFORM_BANK_ACCOUNT || '0987654321'}-compact2.png?amount=${pendingPayment.amount}&addInfo=${encodeURIComponent(pendingPayment.transfer_content)}&accountName=GYMERVIET`}
-                                alt="Mã QR VietQR chuyển khoản thanh toán gói tập"
-                                className="mx-auto border border-gray-200 rounded-lg w-48 h-48 object-contain"
-                            />
-                            <div className="bg-gray-50 p-4 rounded-lg text-left text-sm space-y-2 font-mono">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-500">Số tiền:</span>
-                                    <span className="font-bold text-black">{pendingPayment.amount.toLocaleString('vi-VN')} VND</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-500">Nội dung:</span>
-                                    <span className="font-bold text-black border-b border-black">{pendingPayment.transfer_content}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <button onClick={handleCheckPayment} disabled={checkingStatus} className="btn-primary w-full py-3">
-                            {checkingStatus ? 'Đang kiểm tra...' : 'Tôi đã chuyển khoản'}
-                        </button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

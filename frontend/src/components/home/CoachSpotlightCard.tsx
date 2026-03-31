@@ -59,7 +59,7 @@ export function CoachSpotlightCard({
             <div className="space-y-3 border-b border-gray-200 pb-4">
                 <div className="marketplace-section-kicker">Thành viên nổi bật</div>
                 <h2 className="marketplace-section-title">
-                    Coach tháng này — cùng khám phá.
+                    Một hồ sơ đáng xem — cùng khám phá.
                 </h2>
             </div>
 
@@ -102,7 +102,7 @@ export function CoachSpotlightCard({
 
                         {/* Specialty */}
                         <p className="mt-1 text-sm font-medium text-blue-600 truncate">
-                            {coach.specialties?.[0] || 'Coach / vận động viên'}
+                            {coach.specialties?.[0] || 'Huấn luyện viên / vận động viên'}
                         </p>
 
                         {/* Price */}
@@ -124,7 +124,7 @@ export function CoachSpotlightCard({
                 {/* Counter and CTA Buttons */}
                 <div className="space-y-3 border-t border-gray-200 pt-4">
                     <div className="text-xs font-medium text-gray-600 text-center">
-                        <span className="font-bold text-gray-900">{currentIndex + 1}</span> / {totalCount} Coach
+                        <span className="font-bold text-gray-900">{currentIndex + 1}</span> / {totalCount} hồ sơ
                     </div>
 
                     <div className="flex gap-2">
@@ -142,7 +142,7 @@ export function CoachSpotlightCard({
                             <button
                                 onClick={handleNextCoach}
                                 className="btn-secondary px-4 py-2.5 text-sm font-bold rounded-lg transition-all hover:scale-105"
-                                aria-label="Coach tiếp theo"
+                                aria-label="Hồ sơ tiếp theo"
                             >
                                 Tiếp →
                             </button>

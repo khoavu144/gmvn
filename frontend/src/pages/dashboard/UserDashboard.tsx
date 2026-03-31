@@ -64,7 +64,7 @@ const UserDashboard: React.FC = () => {
             to: '/coaches',
             icon: <Users className="h-5 w-5" />,
             title: 'Huấn luyện viên',
-            desc: 'Xem coach trên nền tảng',
+            desc: 'Xem huấn luyện viên trên nền tảng',
         },
         {
             to: '/messages',
@@ -170,7 +170,7 @@ const UserDashboard: React.FC = () => {
                 <div className="group flex items-start gap-4 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:border-gray-300">
                     <Circle className="mt-0.5 h-6 w-6 shrink-0 text-gray-300 group-hover:text-gray-400" aria-hidden />
                     <div className="flex-1">
-                        <h3 className="font-bold text-gray-900">Nâng cấp Athlete hoặc Coach</h3>
+                        <h3 className="font-bold text-gray-900">Chuyển sang vận động viên hoặc huấn luyện viên</h3>
                         <p className="mt-1 text-sm text-gray-600">
                             Theo dõi tiến độ tập luyện hoặc nhận học viên khi bạn là huấn luyện viên.
                         </p>

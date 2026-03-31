@@ -124,14 +124,14 @@ export function HomeProfileSpotlight({ profiles, resolveHref, onPrefetch }: Prop
                 <p className="marketplace-section-kicker mb-2">Khám phá hồ sơ</p>
                 <p className="text-sm leading-6 text-gray-600">
                     {slides.length === 1
-                        ? 'Chỉ có một hồ sơ có ảnh. Mở danh sách Coach để xem thêm.'
-                        : 'Chưa có đủ hồ sơ có ảnh để xem nhanh. Khám phá Coach trên GYMERVIET.'}
+                        ? 'Chỉ có một hồ sơ có ảnh. Mở danh sách huấn luyện viên để xem thêm.'
+                        : 'Chưa có đủ hồ sơ có ảnh để xem nhanh. Khám phá huấn luyện viên trên GYMERVIET.'}
                 </p>
                 <Link
                     to="/coaches"
                     className="btn-primary mt-4 inline-flex w-fit px-5 py-2.5 text-xs font-bold uppercase tracking-[0.14em]"
                 >
-                    Xem danh sách Coach
+                    Xem danh sách huấn luyện viên
                 </Link>
             </div>
         );

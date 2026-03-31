@@ -21,38 +21,38 @@ const SORT_OPTIONS: Array<{ value: SortValue; label: string }> = [
 
 const NEED_CHIPS = [
     { key: 'beginner', label: 'Người mới bắt đầu' },
-    { key: 'women_focused', label: 'Women-friendly' },
-    { key: 'athlete', label: 'Tập cho athlete' },
-    { key: 'premium', label: 'Premium spaces' },
+    { key: 'women_focused', label: 'Thân thiện nữ giới' },
+    { key: 'athlete', label: 'Dành cho vận động viên' },
+    { key: 'premium', label: 'Không gian cao cấp' },
 ];
 
 const QUICK_VENUES = [
     { key: '', label: 'Tất cả không gian' },
-    { key: 'gym', label: 'Gym' },
-    { key: 'fitness_club', label: 'Fitness Club' },
-    { key: 'yoga_studio', label: 'Yoga Studio' },
-    { key: 'pilates_studio', label: 'Pilates Studio' },
-    { key: 'boutique_studio', label: 'Boutique Studio' },
-    { key: 'recovery_venue', label: 'Recovery' },
+    { key: 'gym', label: 'Phòng gym' },
+    { key: 'fitness_club', label: 'Câu lạc bộ thể hình' },
+    { key: 'yoga_studio', label: 'Studio yoga' },
+    { key: 'pilates_studio', label: 'Studio pilates' },
+    { key: 'boutique_studio', label: 'Studio chuyên biệt' },
+    { key: 'recovery_venue', label: 'Phục hồi' },
 ];
 
 /** The three editorial categories we always show */
 const EDITORIAL_CATEGORIES = [
     {
         slug: 'fitness_club',
-        label: 'Fitness Club',
+        label: 'Câu lạc bộ thể hình',
         desc: 'Không gian tập đầy đủ thiết bị cho người muốn ghé đều, tắm rửa và biến việc tập thành thói quen lành mạnh.',
         accent: 'from-[#1a1a1a] to-[#3a2e22]',
     },
     {
         slug: 'pilates_studio',
-        label: 'Pilates Studio',
+        label: 'Studio pilates',
         desc: 'Reformer rộng rãi, giáo viên sửa form sát, không khí nhỏ gọn và chuyên biệt — không bị xô bồ.',
         accent: 'from-[#1e2a1e] to-[#2d4a2d]',
     },
     {
         slug: 'yoga_studio',
-        label: 'Yoga Studio',
+        label: 'Studio yoga',
         desc: 'Phòng yoga thiết kế cho cảm giác tĩnh lặng — ánh sáng tự nhiên, sàn gỗ, lớp nhỏ.',
         accent: 'from-[#1e1a2a] to-[#2e2845]',
     },
@@ -299,7 +299,7 @@ const Gyms: React.FC = () => {
                     <div className="marketplace-container">
                         <div className="marketplace-hero-grid">
                             <div className="space-y-3 md:space-y-4 max-w-3xl">
-                                <span className="marketplace-eyebrow">Editorial marketplace</span>
+                                <span className="marketplace-eyebrow">Danh mục biên tập</span>
                                 <div className="space-y-3 md:space-y-4">
                                     <h1 className="marketplace-title max-w-[20ch] sm:max-w-none">
                                         Chọn nơi tập bằng không gian, cảm giác và quyết định đúng.

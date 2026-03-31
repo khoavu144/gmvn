@@ -7,6 +7,12 @@ import { logger } from '../lib/logger';
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001');
 const SOCKET_URL = API_URL.replace(/\/api\/v1\/?$/, '') || '/';
 
+type MessageContextPayload = {
+    context_type?: 'program' | 'product' | 'gym' | 'profile';
+    context_id?: string;
+    context_label?: string | null;
+};
+
 class SocketService {
     private socket: Socket | null = null;
 
@@ -36,8 +42,18 @@ class SocketService {
         }
     }
 
-    sendMessage(receiver_id: string, content: string) {
-        this.socket?.emit('message:send', { receiver_id, content });
+    sendMessage(receiver_id: string, content: string, context?: MessageContextPayload) {
+        this.socket?.emit('message:send', {
+            receiver_id,
+            content,
+            ...(context?.context_type && context?.context_id
+                ? {
+                    context_type: context.context_type,
+                    context_id: context.context_id,
+                    context_label: context.context_label ?? undefined,
+                }
+                : {}),
+        });
     }
 
     onMessageReceive(callback: (data: any) => void) {
@@ -50,6 +66,10 @@ class SocketService {
 
     offMessageReceive() {
         this.socket?.off('message:receive');
+    }
+
+    offMessageSent() {
+        this.socket?.off('message:sent');
     }
 
     isConnected() {

@@ -11,6 +11,6 @@ export interface PlanLimits {
     badge: boolean;
     customShareCard: boolean;
     unlimitedProgressPhotos: boolean;
-    fullSubscriptionHistory: boolean;
+    fullRelationshipHistory: boolean;
     coachComparison: boolean;
 }

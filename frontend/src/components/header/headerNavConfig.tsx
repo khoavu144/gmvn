@@ -21,8 +21,8 @@ export const PUBLIC_NAV: NavGroup[] = [
         label: 'Khám Phá',
         icon: <Dumbbell className="w-4 h-4" />,
         children: [
-            { to: '/gyms', label: 'Phòng Tập', description: 'Tìm gym center phù hợp gần bạn', icon: <Dumbbell className="w-4 h-4" /> },
-            { to: '/coaches', label: 'Huấn Luyện Viên', description: 'Kết nối với coach chuyên nghiệp', icon: <Users className="w-4 h-4" /> },
+            { to: '/gyms', label: 'Phòng Tập', description: 'Tìm phòng tập phù hợp gần bạn', icon: <Dumbbell className="w-4 h-4" /> },
+            { to: '/coaches', label: 'Huấn Luyện Viên', description: 'Kết nối với huấn luyện viên chuyên nghiệp', icon: <Users className="w-4 h-4" /> },
         ],
     },
     {

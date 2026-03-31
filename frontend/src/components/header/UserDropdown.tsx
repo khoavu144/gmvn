@@ -33,10 +33,10 @@ export function UserDropdown({ user, onLogout, isActive, onToggle }: {
 
     const dashboardLink = user.user_type === 'gym_owner' ? '/gym-owner' : '/dashboard';
     const roleLabel: Record<string, string> = {
-        trainer: 'Coach',
+        trainer: 'Huấn luyện viên',
         athlete: 'Vận động viên',
         gym_owner: 'Chủ phòng tập',
-        admin: 'Admin',
+        admin: 'Quản trị viên',
         user: 'Thành viên',
     };
 
@@ -75,11 +75,11 @@ export function UserDropdown({ user, onLogout, isActive, onToggle }: {
                     <div className="py-1">
                         <Link to={dashboardLink} onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-black transition-colors">
                             <LayoutDashboard className="w-4 h-4 text-gray-500" />
-                            {user.user_type === 'gym_owner' ? 'Quản lý Phòng Tập' : 'Dashboard'}
+                            {user.user_type === 'gym_owner' ? 'Quản lý phòng tập' : 'Bảng điều khiển'}
                         </Link>
                         <Link to="/profile" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-black transition-colors">
                             <UserCog className="w-4 h-4 text-gray-500" />
-                            Cài đặt Hồ sơ
+                            Cài đặt hồ sơ
                         </Link>
                         <Link to="/messages" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-black transition-colors">
                             <MessageSquare className="w-4 h-4 text-gray-500" />
@@ -94,13 +94,13 @@ export function UserDropdown({ user, onLogout, isActive, onToggle }: {
                         {user.user_type === 'athlete' && (
                             <Link to="/workouts" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-black transition-colors">
                                 <Dumbbell className="w-4 h-4 text-gray-500" />
-                                Lịch Tập
+                                Lịch tập
                             </Link>
                         )}
                         {user.user_type === 'admin' && (
                             <Link to="/dashboard" onClick={onToggle} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-black transition-colors">
                                 <ShieldCheck className="w-4 h-4 text-gray-500" />
-                                Admin Panel
+                                Bảng quản trị
                             </Link>
                         )}
                     </div>

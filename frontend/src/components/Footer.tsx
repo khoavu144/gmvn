@@ -25,10 +25,10 @@ const footerLinks = [
         ],
     },
     {
-        title: 'Dành cho Coach',
+        title: 'Dành cho huấn luyện viên',
         links: [
-            { label: 'Bắt đầu làm Coach', to: '/coach-guide' },
-            { label: 'Chính sách thanh toán', to: '/payment-policy' },
+            { label: 'Bắt đầu làm huấn luyện viên', to: '/coach-guide' },
+            { label: 'Nguyên tắc thỏa thuận trực tiếp', to: '/payment-policy' },
         ],
     },
 ];

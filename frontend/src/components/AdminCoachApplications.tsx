@@ -48,7 +48,7 @@ export default function AdminCoachApplications() {
         setActionLoading(id);
         try {
             await apiClient.patch(`/coach-applications/${id}/approve`);
-            setFeedback({ id, msg: 'Đã duyệt — user_type chuyển thành trainer', ok: true });
+            setFeedback({ id, msg: 'Đã duyệt — tài khoản được chuyển thành huấn luyện viên', ok: true });
             setApplications(prev => prev.filter(a => a.id !== id));
         } catch (err: any) {
             setFeedback({ id, msg: err?.response?.data?.error ?? 'Lỗi khi duyệt', ok: false });
@@ -154,7 +154,7 @@ export default function AdminCoachApplications() {
                                 opacity: actionLoading === app.id ? 0.6 : 1,
                             }}
                         >
-                            {actionLoading === app.id ? 'Đang xử lý...' : '✓ Duyệt — Nâng lên Coach'}
+                            {actionLoading === app.id ? 'Đang xử lý...' : '✓ Duyệt — Nâng thành huấn luyện viên'}
                         </button>
 
                         {rejectId === app.id ? (

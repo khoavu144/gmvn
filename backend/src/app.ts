@@ -57,7 +57,7 @@ app.use(helmet({
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com"],
             imgSrc: ["'self'", "data:", "https:"],
-            connectSrc: ["'self'", "https://api.vietqr.io", "https://my.sepay.vn"],
+            connectSrc: ["'self'"],
         }
     }
 }));
@@ -90,7 +90,7 @@ const apiLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     skip: () => isDev && process.env.SKIP_RATE_LIMIT === 'true',
-    message: { error: 'Too many requests from this IP, please try again after a minute' }
+    message: { error: 'Quá nhiều yêu cầu từ địa chỉ IP này. Vui lòng thử lại sau 1 phút.' }
 });
 
 // Apply the rate limiting middleware to API calls only

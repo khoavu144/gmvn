@@ -27,7 +27,7 @@ export default function CoachClosingCta({ coachName, onMessage }: Props) {
                         href="#programs"
                         className="h-14 px-10 border border-[color:var(--mk-line)] text-black font-bold text-sm uppercase tracking-wider rounded-sm hover:border-black transition-all flex items-center"
                     >
-                        Xem gói tập
+                        Xem chương trình
                     </a>
                 </div>
             </div>

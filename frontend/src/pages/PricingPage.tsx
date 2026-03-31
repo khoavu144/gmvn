@@ -6,52 +6,52 @@ import { trackEvent } from '../lib/analytics';
 import { SITE_OG_IMAGE, SITE_ORIGIN, SITE_TWITTER_HANDLE } from '../lib/site';
 
 const HERO_BADGES = [
-    'Mọi user dùng full tính năng nền tảng miễn phí',
-    'Không còn paywall cho program, chi nhánh hay listing marketplace',
-    'Flow thanh toán với Coach / Gym vẫn giữ nguyên',
+    'Mọi người dùng full tính năng nền tảng miễn phí',
+    'Không giới hạn chương trình, chi nhánh hay bài đăng',
+    'Kết nối với huấn luyện viên / phòng tập theo cơ chế thỏa thuận trực tiếp',
 ] as const;
 
 const FREE_CAPABILITIES = [
     {
-        title: 'Coach dùng full nền tảng',
-        body: 'Tạo chương trình, mở rộng tệp học viên và vận hành hồ sơ mà không bị chặn bởi gói platform.',
+        title: 'Huấn luyện viên dùng full nền tảng',
+        body: 'Tạo chương trình, mở rộng tệp học viên và vận hành hồ sơ mà không bị giới hạn.',
     },
     {
-        title: 'Gym owner không còn quota paywall',
-        body: 'Tạo và quản lý chi nhánh mà không cần mở khóa Gym Business.',
+        title: 'Chủ phòng tập không giới hạn chi nhánh',
+        body: 'Tạo và quản lý chi nhánh tự do mà không cần mở khóa gói nào.',
     },
     {
-        title: 'Marketplace seller không còn membership quota',
-        body: 'Đăng nhiều listing hơn mà không bị chặn ở mốc bài đăng thứ hai.',
+        title: 'Người bán không giới hạn bài đăng',
+        body: 'Đăng sản phẩm và dịch vụ không bị giới hạn số lượng bài.',
     },
 ] as const;
 
 const WHAT_STAYS = [
-    'Thanh toán học viên -> Coach cho gói tập vẫn hoạt động như cũ.',
-    'Gym pricing, coach pricing và dữ liệu commerce vẫn được giữ nguyên.',
-    'Trang này giờ chỉ còn vai trò công bố chính sách free-access của nền tảng.',
+    'Giá dịch vụ huấn luyện viên, giá phòng tập và thông tin ưu đãi vẫn hiển thị công khai để người dùng so sánh.',
+    'Sau khi kết nối, các bên tự thống nhất cách tham gia hoặc giao dịch ngoài phạm vi kiểm soát của ứng dụng.',
+    'Trang này công bố chính sách miễn phí và ranh giới trách nhiệm của nền tảng.',
 ] as const;
 
 const ROLE_SECTIONS = [
     {
-        title: 'Coach',
+        title: 'Huấn luyện viên',
         points: [
-            'Tạo và publish chương trình mà không còn giới hạn Free tier.',
-            'Dùng profile, dashboard và các công cụ tăng trưởng mà không cần upgrade platform.',
+            'Tạo và đăng chương trình không giới hạn.',
+            'Dùng hồ sơ, bảng điều khiển và các công cụ tăng trưởng đầy đủ.',
         ],
     },
     {
-        title: 'Athlete',
+        title: 'Vận động viên',
         points: [
-            'Tiếp tục khám phá Coach, theo dõi workouts và làm việc với coach như hiện tại.',
-            'Không còn concept gói nền tảng riêng cho athlete trên GYMERVIET.',
+            'Tiếp tục khám phá huấn luyện viên, theo dõi lịch tập và làm việc trực tiếp như hiện tại.',
+            'Không còn khái niệm gói nền tảng riêng cho vận động viên trên GYMERVIET.',
         ],
     },
     {
-        title: 'Gym Owner',
+        title: 'Chủ phòng tập',
         points: [
-            'Tạo thêm branch và vận hành hệ thống gym mà không bị chặn bởi gói trả phí nền tảng.',
-            'Tập trung vào vận hành, lead và nội dung thay vì mở khóa plan.',
+            'Tạo thêm chi nhánh và vận hành hệ thống gym mà không bị chặn bởi gói trả phí nền tảng.',
+            'Tập trung vào vận hành, lead và nội dung thay vì mở khóa gói.',
         ],
     },
 ] as const;
@@ -60,31 +60,31 @@ export default function PricingPage() {
     const user = useSelector((state: RootState) => state.auth.user);
     const canonicalBase = SITE_ORIGIN;
     const primaryHref = user ? '/dashboard' : '/register';
-    const primaryLabel = user ? 'Vào Dashboard' : 'Tạo tài khoản miễn phí';
+    const primaryLabel = user ? 'Vào bảng điều khiển' : 'Tạo tài khoản miễn phí';
 
     return (
         <main className="marketplace-shell min-h-screen">
             <Helmet>
-                <title>Miễn phí cho mọi user — GYMERVIET</title>
+                <title>Miễn phí cho mọi người — GYMERVIET</title>
                 <meta
                     name="description"
-                    content="GYMERVIET đã chuyển sang free-first: mọi user dùng full tính năng nền tảng miễn phí."
+                    content="GYMERVIET miễn phí cho mọi người dùng: đầy đủ tính năng, không giới hạn."
                 />
                 <link rel="canonical" href={`${canonicalBase}/pricing`} />
                 <meta property="og:type" content="website" />
-                <meta property="og:title" content="Miễn phí cho mọi user — GYMERVIET" />
+                <meta property="og:title" content="Miễn phí cho mọi người — GYMERVIET" />
                 <meta
                     property="og:description"
-                    content="Không còn paywall nền tảng. Coach, athlete và gym owner dùng full tính năng nền tảng miễn phí."
+                    content="Không giới hạn tính năng. Huấn luyện viên, vận động viên và chủ phòng tập dùng miễn phí."
                 />
                 <meta property="og:url" content={`${canonicalBase}/pricing`} />
                 <meta property="og:image" content={SITE_OG_IMAGE} />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta name="twitter:site" content={SITE_TWITTER_HANDLE} />
-                <meta name="twitter:title" content="Miễn phí cho mọi user — GYMERVIET" />
+                <meta name="twitter:title" content="Miễn phí cho mọi người — GYMERVIET" />
                 <meta
                     name="twitter:description"
-                    content="Không còn paywall nền tảng trên GYMERVIET."
+                    content="GYMERVIET miễn phí cho mọi người."
                 />
                 <meta name="twitter:image" content={SITE_OG_IMAGE} />
             </Helmet>
@@ -93,12 +93,12 @@ export default function PricingPage() {
                 <div className="marketplace-container">
                     <div className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)] lg:items-end">
                         <div className="space-y-5">
-                            <span className="marketplace-eyebrow">Free-first platform</span>
+                            <span className="marketplace-eyebrow">Nền tảng miễn phí</span>
                             <h1 className="marketplace-title max-w-4xl text-balance">
-                                GYMERVIET hiện mở full tính năng nền tảng miễn phí cho mọi user.
+                                GYMERVIET mở toàn bộ tính năng miễn phí cho mọi người dùng.
                             </h1>
                             <p className="marketplace-lead max-w-2xl">
-                                Không còn paywall cho program, branch hay marketplace listing. Trải nghiệm nền tảng giờ tập trung vào sử dụng thực tế thay vì mở khóa plan.
+                                Không giới hạn chương trình, chi nhánh hay bài đăng. Trải nghiệm nền tảng tập trung vào khám phá, hồ sơ, liên hệ và vận hành thực tế.
                             </p>
 
                             <div className="flex flex-wrap gap-2">
@@ -130,19 +130,19 @@ export default function PricingPage() {
                                     })}
                                     className="btn-secondary px-6 text-sm font-bold uppercase tracking-[0.16em]"
                                 >
-                                    Khám phá Coach
+                                    Khám phá huấn luyện viên
                                 </Link>
                             </div>
                         </div>
 
                         <div className="marketplace-panel gv-panel-pad space-y-4">
                             <div className="marketplace-section-kicker">Trạng thái hiện tại</div>
-                            <h2 className="marketplace-section-title mt-2">Platform billing đã tắt vĩnh viễn</h2>
+                            <h2 className="marketplace-section-title mt-2">Không còn gói trả phí nền tảng</h2>
                             <p className="text-sm leading-7 text-gray-600">
-                                Các gói nền tảng cũ không còn được bán, không còn checkout SePay cho platform, và mọi quota membership/paywall nội bộ đã được gỡ khỏi luồng sử dụng chính.
+                                Các gói nền tảng cũ không còn được bán, và mọi giới hạn tính năng đã được gỡ khỏi luồng sử dụng chính.
                             </p>
                             <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-4 text-sm leading-7 text-emerald-900">
-                                Nếu bạn đang dùng GYMERVIET để tạo chương trình, quản lý gym hoặc đăng marketplace listing, bạn đã ở trạng thái full-access cho phần nền tảng.
+                                Nếu bạn đang dùng GYMERVIET để tạo chương trình, quản lý phòng tập hoặc đăng sản phẩm, bạn đã có đầy đủ quyền truy cập.
                             </div>
                         </div>
                     </div>
@@ -155,13 +155,13 @@ export default function PricingPage() {
                         <div className="marketplace-section-kicker">Điểm thay đổi chính</div>
                         <h2 className="marketplace-section-title">Những gì đã mở miễn phí</h2>
                         <p className="marketplace-lead max-w-3xl">
-                            Trọng tâm là bỏ toàn bộ friction của platform pricing, nhưng không đụng vào các giao dịch commerce thực sự giữa user với coach hoặc gym.
+                            Trọng tâm là bỏ toàn bộ rào cản, đồng thời giữ rõ ranh giới: ứng dụng hỗ trợ khám phá và kết nối, không đứng giữa các giao dịch giữa người dùng với huấn luyện viên hoặc phòng tập.
                         </p>
                     </div>
                     <div className="grid gap-4 lg:grid-cols-3">
                         {FREE_CAPABILITIES.map((item) => (
                             <article key={item.title} className="marketplace-panel gv-panel-pad">
-                                <div className="marketplace-section-kicker">Free access</div>
+                                <div className="marketplace-section-kicker">Miễn phí</div>
                                 <h3 className="mt-3 text-[1.35rem] font-bold tracking-[-0.04em] text-gray-900">{item.title}</h3>
                                 <p className="mt-3 text-sm leading-7 text-gray-600">{item.body}</p>
                             </article>
@@ -171,8 +171,8 @@ export default function PricingPage() {
 
                 <section className="space-y-5">
                     <div className="space-y-3">
-                        <div className="marketplace-section-kicker">Không thay đổi</div>
-                        <h2 className="marketplace-section-title">Commerce với Coach / Gym vẫn giữ nguyên</h2>
+                        <div className="marketplace-section-kicker">Lưu ý</div>
+                        <h2 className="marketplace-section-title">Ranh giới trách nhiệm</h2>
                     </div>
                     <div className="marketplace-panel gv-panel-pad">
                         <ul className="space-y-3">
@@ -189,7 +189,7 @@ export default function PricingPage() {
                 <section className="space-y-5">
                     <div className="space-y-3">
                         <div className="marketplace-section-kicker">Theo vai trò</div>
-                        <h2 className="marketplace-section-title">Free-first áp dụng như thế nào</h2>
+                        <h2 className="marketplace-section-title">Miễn phí áp dụng như thế nào</h2>
                     </div>
                     <div className="grid gap-4 lg:grid-cols-3">
                         {ROLE_SECTIONS.map((section) => (

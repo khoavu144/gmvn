@@ -1,8 +1,6 @@
 import { AppDataSource } from '../config/database';
 import { Subscription } from '../entities/Subscription';
 import { Program } from '../entities/Program';
-import { FinancialTransaction } from '../entities/FinancialTransaction';
-import { RevenueTier } from '../entities/RevenueTier';
 import { notificationService } from './notificationService';
 import { getIo } from '../socket';
 
@@ -15,171 +13,50 @@ class SubscriptionService {
         return AppDataSource.getRepository(Program);
     }
 
-    private get ftRepo() {
-        return AppDataSource.getRepository(FinancialTransaction);
-    }
+    /**
+     * Create a coaching relationship from a conversation/direct agreement.
+     * No payment processing — the coach and athlete handle payment externally.
+     */
+    async createRelationship(userId: string, trainerId: string, programId: string, source: 'message' | 'direct' = 'message', notes?: string) {
+        const program = await this.programRepo.findOneBy({ id: programId, trainer_id: trainerId, is_published: true });
+        if (!program) throw new Error('Chương trình không tồn tại hoặc chưa được xuất bản');
 
-    private get tierRepo() {
-        return AppDataSource.getRepository(RevenueTier);
-    }
+        // Check for existing active relationship
+        const existing = await this.subRepo.findOneBy({ user_id: userId, program_id: programId, status: 'active' });
+        if (existing) throw new Error('Bạn đã có quan hệ huấn luyện cho chương trình này');
 
-    async createCheckoutSession(userId: string, programId: string) {
-        const program = await this.programRepo.findOneBy({ id: programId, is_published: true });
-        if (!program) throw new Error('Program not found');
-        if (!program.trainer_id) throw new Error('Invalid program');
-
-        const amount = program.pricing_type === 'lump_sum'
-            ? Number(program.price_one_time)
-            : program.pricing_type === 'per_session'
-                ? Number(program.price_per_session)
-                : Number(program.price_monthly);
-
-        if (!Number.isFinite(amount) || amount <= 0) {
-            throw new Error('Program price is invalid');
-        }
-
-        // Syntax: GV userId programId
-        const transferContent = `GV ${userId.substring(0, 8)} ${programId.substring(0, 8)}`.toUpperCase();
-
-        return {
-            amount,
-            transfer_content: transferContent,
-            program: {
-                id: program.id,
-                name: program.name,
-                price_monthly: program.price_monthly,
-            },
-        };
-    }
-
-    async handleSepayWebhook(transactionData: any) {
-        // transactionData from Sepay typically looks like:
-        // { id, gateway, transactionDate, accountNumber, code, content, transferType, transferAmount, accumulated, subAccount, referenceCode }
-        const { content, transferAmount, id, transferType } = transactionData;
-
-        if (transferType !== 'in' || !content) return { success: true };
-
-        const contentStr = String(content).toUpperCase();
-
-        if (!contentStr.includes('GV ')) return { success: true }; // Not our transaction
-
-        // Extract ids from GV <user_id_prefix> <program_id_prefix>
-        const parts = contentStr.match(/GV\s+([A-Z0-9]+)\s+([A-Z0-9]+)/);
-        if (!parts) return { success: true };
-
-        // ── Idempotency check: skip if this Sepay transaction was already processed ──
-        // This prevents duplicate subscriptions when SePay retries the webhook.
-        const sepaytxnId = String(id);
-        const alreadyProcessed = await this.subRepo.findOneBy({ sepay_transaction_id: sepaytxnId });
-        if (alreadyProcessed) return { success: true };
-
-        const userIdPrefix = parts[1].toLowerCase();
-        const programIdPrefix = parts[2].toLowerCase();
-
-        // 1. Find user and program by prefix
-        const users = await AppDataSource.query(`SELECT id FROM users WHERE id::text LIKE $1`, [`${userIdPrefix}%`]);
-        const programs = await AppDataSource.query(`SELECT id, trainer_id, price_monthly, price_one_time, price_per_session, pricing_type FROM programs WHERE id::text LIKE $1`, [`${programIdPrefix}%`]);
-
-        if (!users.length || !programs.length) return { success: true };
-
-        const userId = users[0].id;
-        const programId = programs[0].id;
-        const trainerId = programs[0].trainer_id;
-        const rawProgram = programs[0];
-        const programAmount = rawProgram.pricing_type === 'lump_sum'
-            ? Number(rawProgram.price_one_time)
-            : rawProgram.pricing_type === 'per_session'
-                ? Number(rawProgram.price_per_session)
-                : Number(rawProgram.price_monthly);
-
-        // Tolerant verification for amount (>= programAmount)
-        if (Number(transferAmount) < programAmount) {
-            console.log(`Sepay: Amount ${transferAmount} is less than required ${programAmount}`);
-            return { success: true };
-        }
-
-        const grossAmount = Number(transferAmount);
-        const pricingType = rawProgram.pricing_type ?? 'monthly';
-        const subscriptionType = pricingType === 'lump_sum' || pricingType === 'per_session'
-            ? 'one_time'
-            : 'monthly';
-
-        // ── Atomic transaction: all financial writes succeed or all fail ──
-        // Prevents inconsistent state if the process crashes mid-way.
-        const newSub = await AppDataSource.transaction(async (manager) => {
-            const subRepo = manager.getRepository(Subscription);
-            const programRepo = manager.getRepository(Program);
-            const ftRepo = manager.getRepository(FinancialTransaction);
-            const tierRepo = manager.getRepository(RevenueTier);
-
-            // Re-check inside transaction to handle concurrent webhooks (race condition guard)
-            const existing = await subRepo.findOneBy({ user_id: userId, program_id: programId, status: 'active' });
-            if (existing) return null;
-
-            // 1. Increment client count
-            await programRepo.increment({ id: programId }, 'current_clients', 1);
-
-            // 2. Create subscription record
-            const sub = subRepo.create({
-                user_id: userId,
-                trainer_id: trainerId,
-                program_id: programId,
-                subscription_type: subscriptionType,
-                price_paid: grossAmount,
-                sepay_transaction_id: sepaytxnId,
-                status: 'active',
-                started_at: new Date(),
-                next_billing_date: subscriptionType === 'monthly'
-                    ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-                    : null,
-            });
-            const savedSub = await subRepo.save(sub);
-
-            // 3. Create financial transaction record (tiered split)
-            const tier = await tierRepo.findOneBy({ creator_id: trainerId });
-            const splitPercentage = tier ? tier.split_percentage : 95;
-            const platformFee = grossAmount * ((100 - splitPercentage) / 100);
-            const creatorAmount = grossAmount - platformFee;
-
-            await ftRepo.save(
-                ftRepo.create({
-                    program_id: programId,
-                    creator_id: trainerId,
-                    buyer_id: userId,
-                    gross_amount: grossAmount,
-                    split_percentage: splitPercentage,
-                    platform_fee: platformFee,
-                    stripe_fee: 0,
-                    creator_amount: creatorAmount,
-                    status: 'completed',
-                    subscription_id: savedSub.id,
-                })
-            );
-
-            return savedSub;
+        const sub = this.subRepo.create({
+            user_id: userId,
+            trainer_id: trainerId,
+            program_id: programId,
+            subscription_type: 'one_time',
+            status: 'active',
+            started_at: new Date(),
+            source,
+            notes: notes || null,
         });
 
-        if (!newSub) return { success: true }; // Concurrent webhook already processed
+        const saved = await this.subRepo.save(sub);
 
-        // ── Notify trainer (outside transaction — non-critical side effect) ──
+        // Increment program client count
+        await this.programRepo.increment({ id: programId }, 'current_clients', 1);
+
+        // Notify trainer
         try {
             const notif = await notificationService.create(
                 trainerId,
                 'system' as any,
                 'Học viên mới',
-                'Bạn có một học viên mới đăng ký chương trình',
+                'Bạn có một học viên mới tham gia chương trình',
                 '/dashboard'
             );
-
             const io = getIo();
-            if (io) {
-                io.to(trainerId).emit('notification:new', notif);
-            }
+            if (io) io.to(trainerId).emit('notification:new', notif);
         } catch (e) {
             console.error('Failed to notify trainer:', e);
         }
 
-        return { success: true };
+        return saved;
     }
 
     async getUserSubscriptions(userId: string) {
@@ -192,8 +69,8 @@ class SubscriptionService {
 
     async cancelSubscription(userId: string, subscriptionId: string) {
         const sub = await this.subRepo.findOneBy({ id: subscriptionId, user_id: userId });
-        if (!sub) throw new Error('Subscription not found');
-        if (sub.status === 'cancelled') throw new Error('Already cancelled');
+        if (!sub) throw new Error('Không tìm thấy quan hệ huấn luyện');
+        if (sub.status === 'cancelled') throw new Error('Quan hệ huấn luyện này đã được kết thúc');
 
         sub.status = 'cancelled';
         sub.ended_at = new Date();
@@ -209,19 +86,19 @@ class SubscriptionService {
             where: { trainer_id: trainerId, status: 'active' },
         });
 
-        // Use the new FinancialTransaction table to calculate exact revenue
-        const result = await this.ftRepo
-            .createQueryBuilder('ft')
-            .select('SUM(ft.creator_amount)', 'totalRevenue')
-            .where('ft.creator_id = :trainerId', { trainerId })
-            .andWhere('ft.status = :status', { status: 'completed' })
-            .getRawOne();
+        const recentThreshold = new Date();
+        recentThreshold.setDate(recentThreshold.getDate() - 30);
 
-        const trainerRevenue = result?.totalRevenue ? Number(result.totalRevenue) : 0;
+        const newClients30dQuery = await this.subRepo
+            .createQueryBuilder('subscription')
+            .where('subscription.trainer_id = :trainerId', { trainerId })
+            .andWhere('subscription.status = :status', { status: 'active' })
+            .andWhere('subscription.created_at >= :recentThreshold', { recentThreshold })
+            .getCount();
 
         return {
             active_clients: activeCount,
-            monthly_revenue: trainerRevenue,
+            new_clients_30d: newClients30dQuery,
         };
     }
 }

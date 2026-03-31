@@ -22,7 +22,7 @@ export default function UpgradeToCoachBanner() {
                 <span style={{ fontSize: '1.5rem' }}>⏳</span>
                 <div style={{ flex: 1 }}>
                     <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#1e293b', margin: '0 0 4px' }}>
-                        Đơn đăng ký Coach đang chờ duyệt
+                        Đơn đăng ký huấn luyện viên đang chờ duyệt
                     </p>
                     <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>
                         Đội ngũ GYMERVIET đang xem xét đơn của bạn. Thường trong vòng 1–3 ngày làm việc.
@@ -96,10 +96,10 @@ export default function UpgradeToCoachBanner() {
                         textTransform: 'uppercase', marginBottom: 10,
                     }}>Cơ hội mới</span>
                     <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', margin: '0 0 8px', lineHeight: 1.3 }}>
-                        Chia sẻ chuyên môn — Trở thành Coach GYMERVIET
+                        Chia sẻ chuyên môn — Trở thành huấn luyện viên trên GYMERVIET
                     </h3>
                     <p style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.6)', margin: 0, lineHeight: 1.55, maxWidth: 420 }}>
-                        Bạn có thành tích thi đấu hoặc kiến thức chuyên sâu? Đăng ký làm Coach để xây dựng hồ sơ, nhận học viên và tăng thu nhập.
+                        Bạn có thành tích thi đấu hoặc kiến thức chuyên sâu? Đăng ký làm huấn luyện viên để xây dựng hồ sơ, nhận học viên và tăng thu nhập.
                     </p>
                 </div>
                 <button
@@ -115,7 +115,7 @@ export default function UpgradeToCoachBanner() {
                     onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)'; }}
                 >
-                    🚀 Đăng ký làm Coach
+                    🚀 Đăng ký làm huấn luyện viên
                 </button>
             </div>
 

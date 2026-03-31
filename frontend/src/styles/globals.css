@@ -46,6 +46,15 @@
     font-size: 14px;
     /* Reinforce light color scheme */
     color-scheme: light;
+    /* Prevent browser forced dark mode (Brave, etc.) from affecting colors */
+    forced-color-adjust: none;
+  }
+
+  /* Prevent forced dark mode from affecting content */
+  @media (forced-colors: active) {
+    * {
+      forced-color-adjust: none;
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {

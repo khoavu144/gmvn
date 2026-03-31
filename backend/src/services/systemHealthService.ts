@@ -3,7 +3,6 @@ import { getEnv } from '../config/env';
 import redisClient from '../config/redis';
 import { emailService } from './emailService';
 import { refreshTokenStore } from './refreshTokenStore';
-import { hasSepayWebhookAuthConfig } from '../utils/sepayWebhookAuth';
 
 type CheckStatus = 'up' | 'down' | 'degraded' | 'skipped';
 
@@ -71,13 +70,12 @@ class SystemHealthService {
             },
         };
 
-        const billingConfigured = env.NODE_ENV !== 'production' || hasSepayWebhookAuthConfig();
         checks.billing = {
-            status: billingConfigured ? 'up' : 'down',
+            status: 'skipped',
             details: {
-                provider: 'sepay',
-                configured: billingConfigured,
-                auth_mode: env.SEPAY_WEBHOOK_SECRET ? 'secret' : (env.SEPAY_WEBHOOK_TOKEN ? 'url_token' : 'missing'),
+                enabled: false,
+                mode: 'compatibility_only',
+                message: 'Thu phí nền tảng đã bị vô hiệu hóa; các endpoint cũ chỉ còn để tương thích.',
             },
         };
 

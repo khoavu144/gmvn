@@ -20,7 +20,7 @@ export default function CoachMobileStickyCta({ coachName, onMessage }: Props) {
                     href="#programs"
                     className="h-10 px-4 border border-[color:var(--mk-line)] text-black text-xs font-bold uppercase tracking-wider rounded-sm flex items-center hover:bg-[color:var(--mk-paper)] transition-colors shrink-0"
                 >
-                    Gói tập
+                    Chương trình
                 </a>
                 <button
                     onClick={onMessage}

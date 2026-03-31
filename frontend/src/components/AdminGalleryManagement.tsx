@@ -61,7 +61,7 @@ export default function AdminGalleryManagement() {
         try {
             const res = await communityGalleryApiService.adminCreateItem(formItem);
             if (res.success) {
-                toast.success('Đã thêm hình ảnh vào Gallery');
+                toast.success('Đã thêm hình ảnh vào thư viện');
                 setFormItem({ ...formItem, image_url: '', caption: '' });
                 loadGallery(1);
             }
@@ -73,7 +73,7 @@ export default function AdminGalleryManagement() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!window.confirm('Bạn có chắc chắn muốn xoá ảnh này khỏi Gallery?')) return;
+        if (!window.confirm('Bạn có chắc chắn muốn xoá ảnh này khỏi thư viện?')) return;
         
         try {
             const res = await communityGalleryApiService.adminDeleteItem(id);
@@ -109,7 +109,7 @@ export default function AdminGalleryManagement() {
                 <form onSubmit={handleCreate} className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Image URL *</label>
+                            <label className="block text-xs font-bold text-gray-600 uppercase mb-1">URL hình ảnh *</label>
                             <input 
                                 type="url" 
                                 value={formItem.image_url}
@@ -119,7 +119,7 @@ export default function AdminGalleryManagement() {
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Caption / Trích dẫn</label>
+                            <label className="block text-xs font-bold text-gray-600 uppercase mb-1">Chú thích</label>
                             <input 
                                 type="text" 
                                 value={formItem.caption}
@@ -153,7 +153,7 @@ export default function AdminGalleryManagement() {
                                     onChange={e => setFormItem({...formItem, is_featured: e.target.checked})}
                                     className="w-4 h-4 rounded border-gray-200 text-black focus:ring-black"
                                 />
-                                <span className="text-sm font-semibold group-hover:text-black">Nổi bật (Featured)</span>
+                                <span className="text-sm font-semibold group-hover:text-black">Đánh dấu nổi bật</span>
                             </label>
 
                             <button 
@@ -205,18 +205,18 @@ export default function AdminGalleryManagement() {
                                     <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                                         <td className="px-4 py-3">
                                             <div className="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center relative group">
-                                                <img src={item.image_url} alt="Gallery item" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                                                <img src={item.image_url} alt="Ảnh thư viện" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                                                 {item.is_featured && <div className="absolute top-1 left-1 bg-yellow-500 text-white p-0.5 rounded-full"><Star size={10} className="fill-current"/></div>}
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <p className="font-semibold text-gray-900 line-clamp-2">{item.caption || <span className="text-gray-500 italic">Không có trích dẫn</span>}</p>
+                                            <p className="font-semibold text-gray-900 line-clamp-2">{item.caption || <span className="text-gray-500 italic">Không có chú thích</span>}</p>
                                             <p className="text-xs text-gray-500 uppercase mt-1">Danh mục: {item.category}</p>
                                             <p className="text-xs text-gray-500 mt-1">{new Date(item.created_at).toLocaleDateString('vi-VN')}</p>
                                         </td>
                                         <td className="px-4 py-3">
                                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-50 text-gray-600">
-                                                {item.source === 'admin_upload' ? 'Upload Trực Tiếp' : 'Từ Trainer'}
+                                                {item.source === 'admin_upload' ? 'Tải lên trực tiếp' : 'Từ huấn luyện viên'}
                                             </span>
                                             {item.linked_user && (
                                                 <div className="flex items-center gap-2 mt-2">

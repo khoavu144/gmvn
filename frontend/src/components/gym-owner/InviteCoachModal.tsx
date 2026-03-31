@@ -35,12 +35,12 @@ export default function InviteCoachModal({ gym, form, onChange, onClose, onSucce
     return (
         <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4" onClick={onClose}>
             <div className="bg-white rounded-lg p-6 w-full max-w-sm" onClick={e => e.stopPropagation()}>
-                <h3 className="text-xl font-black uppercase tracking-tight mb-4">Mời Coach Tham Gia</h3>
+                <h3 className="text-xl font-black uppercase tracking-tight mb-4">Mời huấn luyện viên tham gia</h3>
                 <p className="text-sm text-gray-500 mb-6">Gửi lời mời liên kết đến huấn luyện viên thông qua email.</p>
 
                 <div className="space-y-4 mb-6">
                     <div>
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-1">Email của Coach</label>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-1">Email huấn luyện viên</label>
                         <input
                             type="email"
                             className="form-input w-full"
@@ -56,8 +56,8 @@ export default function InviteCoachModal({ gym, form, onChange, onClose, onSucce
                             value={form.role}
                             onChange={e => onChange((prev) => ({ ...prev, role: e.target.value }))}
                         >
-                            <option value="Coach">Coach (Huấn luyện viên)</option>
-                            <option value="Head Coach">Head Coach (HLV Trưởng)</option>
+                            <option value="Coach">Huấn luyện viên</option>
+                            <option value="Head Coach">Huấn luyện viên trưởng</option>
                         </select>
                     </div>
                 </div>

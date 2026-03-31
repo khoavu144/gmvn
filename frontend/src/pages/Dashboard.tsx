@@ -47,7 +47,7 @@ export default function Dashboard() {
     if (!user) return null;
 
     const roleLabel: Record<string, string> = {
-        trainer: 'Coach', athlete: 'Athlete', gym_owner: 'Chủ Gym', admin: 'Admin', user: 'Người dùng',
+        trainer: 'Huấn luyện viên', athlete: 'Vận động viên', gym_owner: 'Chủ phòng tập', admin: 'Quản trị viên', user: 'Người dùng',
     };
 
     return (

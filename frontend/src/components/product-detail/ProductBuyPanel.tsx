@@ -29,10 +29,26 @@ export function ProductBuyPanel({
     const hasDiscount = comparePrice != null && comparePrice > displayPrice;
     const discountPct = hasDiscount ? Math.round(((comparePrice - displayPrice) / comparePrice) * 100) : 0;
     const trainingPackage = product.training_package ?? null;
+    const sellerConversationParams = (() => {
+        if (!product.seller?.id) {
+            return null;
+        }
+
+        const params = new URLSearchParams({
+            to: product.seller.id,
+            name: product.seller.full_name || 'Người bán',
+            draft: `Xin chào, tôi muốn hỏi thêm về sản phẩm ${product.title}.`,
+            context_type: 'product',
+            context_id: product.id,
+            context_label: product.title,
+        });
+
+        return params.toString();
+    })();
 
     const sellerChatTarget = product.seller?.id
         ? isAuthenticated
-            ? `/messages?to=${product.seller.id}`
+            ? `/messages?${sellerConversationParams}`
             : '/login'
         : '/marketplace';
 
@@ -130,7 +146,7 @@ export function ProductBuyPanel({
                 </div>
             ) : (
                 <div className="mpd-metrics-strip">
-                    <span className="mpd-metric">Tải ngay sau thanh toán</span>
+                    <span className="mpd-metric">Tải sau khi người bán xác nhận</span>
                     <span className="mpd-metric">Truy cập vĩnh viễn</span>
                 </div>
             )}
@@ -190,15 +206,15 @@ export function ProductBuyPanel({
             </div>
             <p className="text-xs leading-6 text-gray-500">
                 {product.seller?.id
-                    ? 'Checkout đang được hoàn thiện. Trong lúc này, bạn vẫn có thể mở hội thoại trực tiếp để hỏi biến thể, giao nhận hoặc lịch triển khai.'
-                    : 'Checkout đang được hoàn thiện, vì vậy luồng an toàn nhất hiện tại là quay lại danh sách sản phẩm.'}
+                    ? 'Liên hệ trực tiếp với người bán để hỏi về biến thể, giao nhận hoặc lịch triển khai. Giao dịch được thỏa thuận giữa hai bên.'
+                    : 'Quay lại danh sách sản phẩm để tìm sản phẩm phù hợp.'}
             </p>
 
             <ul className="mpd-trust">
                 {product.training_package && <li>Xem trước cấu trúc tuần tập ngay trên trang</li>}
-                {!product.training_package && product.product_type === 'digital' && <li>Tải ngay sau khi thanh toán</li>}
+                {!product.training_package && product.product_type === 'digital' && <li>Tải sau khi người bán xác nhận</li>}
                 {product.product_type === 'physical' && <li>Giao hàng toàn quốc</li>}
-                <li>Thanh toán an toàn</li>
+                <li>Trao đổi trực tiếp với người bán</li>
                 <li>Hỗ trợ 24/7</li>
             </ul>
         </div>

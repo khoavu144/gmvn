@@ -425,7 +425,7 @@ export default function Coaches() {
     return (
         <main className="marketplace-shell min-h-screen">
             <Helmet>
-                <title>{currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET</title>
+                <title>{currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá huấn luyện viên'} — GYMERVIET</title>
                 <meta
                     name="description"
                     content={
@@ -438,7 +438,7 @@ export default function Coaches() {
                 <meta property="og:type" content="website" />
                 <meta
                     property="og:title"
-                    content={`${currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'} — GYMERVIET`}
+                    content={`${currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá huấn luyện viên'} — GYMERVIET`}
                 />
                 <meta property="og:url" content={canonical} />
                 <meta property="og:image" content={SITE_OG_IMAGE} />
@@ -466,7 +466,7 @@ export default function Coaches() {
                                         : 'text-gray-500 hover:text-gray-900'
                                 }`}
                             >
-                                Coach
+                                Huấn luyện viên
                             </button>
                             <button
                                 type="button"
@@ -489,10 +489,10 @@ export default function Coaches() {
                         </div>
 
                         <p className="marketplace-section-kicker">
-                            {currentType === 'athlete' ? 'Danh mục Vận động viên' : 'Danh mục Coach'}
+                            {currentType === 'athlete' ? 'Danh mục Vận động viên' : 'Danh mục huấn luyện viên'}
                         </p>
                         <h1 className="marketplace-title mt-1 max-w-3xl text-balance">
-                            {currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá Coach'}
+                            {currentType === 'athlete' ? 'Khám phá Vận động viên' : 'Khám phá huấn luyện viên'}
                         </h1>
                         <p className="marketplace-lead mt-3 max-w-2xl">
                             {currentType === 'athlete'
@@ -543,7 +543,7 @@ export default function Coaches() {
                             {!isLoading && !isError ? totalCount.toLocaleString('vi-VN') : '—'}
                         </p>
                         <p className="mt-1 text-sm text-gray-500">
-                            {currentType === 'athlete' ? 'VĐV khớp bộ lọc' : 'Coach khớp bộ lọc'}
+                            {currentType === 'athlete' ? 'VĐV khớp bộ lọc' : 'Huấn luyện viên khớp bộ lọc'}
                         </p>
                         <div className="mt-4 flex flex-col gap-2 border-t border-gray-200 pt-4">
                             <Link
@@ -577,7 +577,7 @@ export default function Coaches() {
                             type="search"
                             className="form-input coaches-dir-control gv-search-control w-full pl-10"
                             placeholder="Tìm theo tên, chuyên môn hoặc từ khóa..."
-                            aria-label="Tìm kiếm Coach và VĐV"
+                            aria-label="Tìm kiếm huấn luyện viên và vận động viên"
                             value={qInput}
                             onChange={(e) => setQInput(e.target.value)}
                         />
@@ -725,7 +725,7 @@ export default function Coaches() {
                                             >
                                                 {currentType === 'athlete'
                                                     ? 'Về danh sách VĐV (mặc định)'
-                                                    : 'Về danh sách Coach (mặc định)'}
+                                                    : 'Về danh sách huấn luyện viên (mặc định)'}
                                             </Link>
                                         </>
                                     ) : (
@@ -736,7 +736,7 @@ export default function Coaches() {
                                             >
                                                 {currentType === 'athlete'
                                                     ? 'Về danh sách VĐV (mặc định)'
-                                                    : 'Về danh sách Coach (mặc định)'}
+                                                    : 'Về danh sách huấn luyện viên (mặc định)'}
                                             </Link>
                                             <Link to="/register" className="btn-primary px-5 py-2.5 text-center text-sm font-bold">
                                                 Tạo hồ sơ

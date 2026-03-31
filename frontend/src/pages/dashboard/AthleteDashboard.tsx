@@ -10,13 +10,14 @@ import DashboardPublicProfileBanner from '../../components/dashboard/DashboardPu
 
 export interface OverviewData {
     active_clients?: number;
-    monthly_revenue?: number;
+    new_clients_30d?: number;
     unread_messages?: number;
     total_programs?: number;
     published_programs?: number;
     week_sessions?: number;
-    active_subscriptions?: number;
+    active_relationships?: number;
     unread_notifications?: number;
+    new_connections_30d?: number;
 }
 
 const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
@@ -33,14 +34,14 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
                 title: `${weekSessions} buổi tập trong tuần`,
                 body: 'Tiếp tục theo dõi lịch và tiến độ trên GYMERVIET.',
                 primary: { to: '/workouts', label: 'Mở lịch tập' },
-                secondary: { to: '/coaches', label: 'Tìm thêm coach' },
+                secondary: { to: '/coaches', label: 'Tìm thêm huấn luyện viên' },
             };
         }
         return {
             kicker: 'Bắt đầu',
             title: 'Chưa có buổi tập tuần này',
-            body: 'Xem coach trên GYMERVIET và chọn người phù hợp để lên lịch cùng bạn.',
-            primary: { to: '/coaches', label: 'Tìm coach' },
+            body: 'Xem huấn luyện viên trên GYMERVIET và chọn người phù hợp để lên lịch cùng bạn.',
+            primary: { to: '/coaches', label: 'Tìm huấn luyện viên' },
             secondary: { to: '/workouts', label: 'Lịch tập của tôi' },
         };
     }, [hasWeekSessions, weekSessions]);
@@ -82,8 +83,8 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
                         icon: <ClipboardList className="h-5 w-5" />,
                     },
                     {
-                        label: 'Gói đang tham gia',
-                        value: String(overview.active_subscriptions ?? '0'),
+                        label: 'Chương trình tham gia',
+                        value: String(overview.active_relationships ?? '0'),
                         icon: <Star className="h-5 w-5" />,
                     },
                     {
@@ -101,7 +102,7 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
                 ))}
             </div>
 
-            <DashboardPublicProfileBanner label="Hồ sơ Athlete công khai" path={publicProfileUrl} />
+            <DashboardPublicProfileBanner label="Hồ sơ vận động viên công khai" path={publicProfileUrl} />
 
             <UpgradeToCoachBanner />
 
@@ -109,7 +110,7 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
                 <p className="page-kicker">Không gian luyện tập</p>
                 <h2 className="section-title">Lịch tập và hồ sơ vận động viên</h2>
                 <p className="page-description">
-                    Theo dõi lịch, hồ sơ và liên hệ coach — gọn gàng, không rối mắt.
+                    Theo dõi lịch, hồ sơ và liên hệ huấn luyện viên — gọn gàng, không rối mắt.
                 </p>
             </section>
 
@@ -132,19 +133,19 @@ const AthleteDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) =>
                         {
                             to: '/coaches',
                             icon: <Search className="h-5 w-5" />,
-                            title: 'Tìm coach',
+                            title: 'Tìm huấn luyện viên',
                             desc: 'Huấn luyện viên phù hợp',
                         },
                         {
                             to: publicProfileUrl,
                             icon: <Eye className="h-5 w-5" />,
-                            title: 'Xem profile công khai',
+                            title: 'Xem hồ sơ công khai',
                             desc: 'Kiểm tra cách người khác nhìn thấy bạn',
                         },
                         {
                             to: '/dashboard/marketplace',
                             icon: <Store className="h-5 w-5" />,
-                            title: 'Marketplace',
+                            title: 'Gian hàng',
                             desc: 'Quản lý bài đăng bán hàng',
                         },
                     ].map((card) => (

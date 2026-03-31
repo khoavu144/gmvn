@@ -115,9 +115,9 @@ export default function Header() {
                 {/* Right side */}
                 <div className="flex items-center gap-1 sm:gap-2">
                     <Link
-                        to="/cart"
+                        to="/marketplace"
                         className="relative p-2 text-gray-600 hover:text-black hover:bg-gray-50 rounded-full transition-colors"
-                        aria-label="Giỏ hàng"
+                        aria-label="Cửa hàng"
                     >
                         <ShoppingBag className="w-5 h-5" />
                     </Link>

@@ -4,7 +4,6 @@ import { AppError } from '../utils/AppError';
 import { asAppError, getSingleParam } from '../utils/controllerUtils';
 import { emailOutboxService } from '../services/emailOutboxService';
 import { authService } from '../services/authService';
-import { platformSubscriptionService } from '../services/platformSubscriptionService';
 import { systemHealthService } from '../services/systemHealthService';
 
 export const listEmailOutbox = asyncHandler(async (req: Request, res: Response) => {
@@ -43,19 +42,24 @@ export const getBillingOpsOverview = asyncHandler(async (req: Request, res: Resp
         ? Math.min(24 * 60, Math.max(5, windowMinutesRaw))
         : 60;
 
-    const [health, outbox, billing] = await Promise.all([
+    const [health, outbox] = await Promise.all([
         systemHealthService.getSnapshot(),
         emailOutboxService.getOpsSummary(),
-        platformSubscriptionService.getOpsOverview(windowMinutes),
     ]);
 
     res.json({
         success: true,
+        deprecated: true,
+        window_minutes: windowMinutes,
         summary: {
             health_status: health.status,
             health_checks: health.checks,
             outbox,
-            billing,
+            boundary: {
+                billing_enabled: false,
+                mode: 'connection_platform_only',
+                message: 'Admin không theo dõi hay điều phối giao dịch nhạy cảm giữa các bên.',
+            },
         },
     });
 });

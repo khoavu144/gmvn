@@ -16,7 +16,7 @@ export function getTaxonomyLabels(gym: GymCenter | null, type: GymTaxonomyTerm['
 
 export function getPrimaryVenueLabel(gym: GymCenter | null) {
     const primary = gym?.taxonomy_terms?.find((item) => item.is_primary && item.term)?.term;
-    return primary?.label || gym?.primary_venue_type_slug || 'Active Space';
+    return primary?.label || gym?.primary_venue_type_slug || 'Không gian tập luyện';
 }
 
 export function getFallbackGallery(gym: GymCenter | null, branchId?: string | null): GymGallery[] {
@@ -52,6 +52,24 @@ export function getTodayHours(branch: GymBranch | null) {
     return branch?.opening_hours?.[TODAY_KEY] as { open?: string; close?: string; is_closed?: boolean } | undefined;
 }
 
+function buildGymMessageHref(gym: GymCenter | null, branch: GymBranch | null, draft?: string | null) {
+    if (!gym?.owner_id) {
+        return '/messages';
+    }
+
+    const params = new URLSearchParams({
+        to: gym.owner_id,
+        name: gym.name,
+        profile_path: `/gyms/${gym.slug || gym.id}`,
+        context_type: 'gym',
+        context_id: gym.id,
+        context_label: branch?.branch_name || gym.name,
+        draft: draft || `Xin chào, tôi muốn được tư vấn về ${branch?.branch_name || gym.name} trên GYMERVIET.`,
+    });
+
+    return `/messages?${params.toString()}`;
+}
+
 export function resolveLeadRoute(gym: GymCenter | null, branch: GymBranch | null) {
     const routes = branch?.lead_routes || [];
     const preferred = routes.find((route) => route.inquiry_type === gym?.default_primary_cta)
@@ -61,7 +79,7 @@ export function resolveLeadRoute(gym: GymCenter | null, branch: GymBranch | null
 
     if (!preferred && !branch) {
         return {
-            href: '/messages',
+            href: buildGymMessageHref(gym, branch),
             label: 'Nhắn tư vấn',
             isExternal: false,
             helper: 'Tư vấn phù hợp mục tiêu và khu vực',
@@ -76,7 +94,7 @@ export function resolveLeadRoute(gym: GymCenter | null, branch: GymBranch | null
 
     if ((preferred?.primary_channel === 'whatsapp' || !preferred?.primary_channel) && whatsapp) {
         return {
-            href: buildWhatsappUrl(whatsapp, message) || '/messages',
+            href: buildWhatsappUrl(whatsapp, message) || buildGymMessageHref(gym, branch, message),
             label: 'Nhắn WhatsApp',
             isExternal: true,
             helper: 'Trao đổi trực tiếp với chi nhánh',
@@ -129,7 +147,7 @@ export function resolveLeadRoute(gym: GymCenter | null, branch: GymBranch | null
     }
 
     return {
-        href: '/messages',
+        href: buildGymMessageHref(gym, branch, message),
         label: 'Nhắn tư vấn',
         isExternal: false,
         helper: 'Tư vấn phù hợp mục tiêu tập luyện',
@@ -161,7 +179,7 @@ export function OverviewMetaRow({ label, value }: { label: string; value: string
     return (
         <div className="flex flex-row items-baseline justify-between gap-3 border-b border-[color:var(--mk-line)] py-2 last:border-b-0">
             <span className="shrink-0 text-[0.66rem] font-bold uppercase tracking-[0.18em] text-[color:var(--mk-muted)]">{label}</span>
-            <span className="min-w-0 truncate text-right text-sm font-semibold text-[color:var(--mk-text)]">{value}</span>
+            <span className="min-w-0 break-words text-right text-sm font-semibold text-[color:var(--mk-text)]">{value}</span>
         </div>
     );
 }

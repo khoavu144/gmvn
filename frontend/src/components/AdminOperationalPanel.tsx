@@ -40,14 +40,6 @@ type EmailOutboxRecord = {
     created_at: string;
 };
 
-type PlatformBillingStatus = {
-    success: boolean;
-    billing_enabled: boolean;
-    deprecated?: boolean;
-    mode?: string;
-    message?: string;
-};
-
 function apiErrorMessage(error: unknown, fallback: string) {
     if (!error || typeof error !== 'object' || !('response' in error)) {
         return fallback;
@@ -88,7 +80,6 @@ export default function AdminOperationalPanel() {
     const [health, setHealth] = useState<HealthResponse | null>(null);
     const [pending, setPending] = useState<AuditRow[]>([]);
     const [emailOutbox, setEmailOutbox] = useState<EmailOutboxRecord[]>([]);
-    const [platformBilling, setPlatformBilling] = useState<PlatformBillingStatus | null>(null);
     const [rejectReason, setRejectReason] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(true);
     const [busyId, setBusyId] = useState<string | null>(null);
@@ -98,7 +89,7 @@ export default function AdminOperationalPanel() {
         setLoading(true);
         setErr(null);
         try {
-            const [h, p, outbox, billing] = await Promise.all([
+            const [h, p, outbox] = await Promise.all([
                 apiClient.get('/admin/health'),
                 apiClient.get('/admin/pending-approvals'),
                 apiClient.get('/admin/email-outbox', {
@@ -107,13 +98,11 @@ export default function AdminOperationalPanel() {
                         limit: 20,
                     },
                 }),
-                apiClient.get('/platform/admin/billing'),
             ]);
 
             setHealth(h.data as HealthResponse);
             setPending((p.data.requests || []) as AuditRow[]);
             setEmailOutbox((outbox.data.items ?? []) as EmailOutboxRecord[]);
-            setPlatformBilling(billing.data as PlatformBillingStatus);
         } catch (error) {
             setErr(apiErrorMessage(error, 'Không tải được dữ liệu'));
         } finally {
@@ -165,7 +154,7 @@ export default function AdminOperationalPanel() {
             await apiClient.post(`/admin/email-outbox/${id}/retry`);
             await load();
         } catch (error) {
-            setErr(apiErrorMessage(error, 'Retry email thất bại.'));
+            setErr(apiErrorMessage(error, 'Gửi lại email thất bại.'));
         } finally {
             setBusyId(null);
         }
@@ -202,15 +191,15 @@ export default function AdminOperationalPanel() {
                                 </div>
                             </div>
                             <div className="rounded-lg border border-gray-200 p-4">
-                                <div className="text-xs font-bold uppercase text-gray-500">Users (DB)</div>
+                                <div className="text-xs font-bold uppercase text-gray-500">Người dùng (DB)</div>
                                 <div className="mt-1 font-bold">{health.db?.users ?? '—'}</div>
                             </div>
                             <div className="rounded-lg border border-gray-200 p-4">
-                                <div className="text-xs font-bold uppercase text-gray-500">Gyms (DB)</div>
+                                <div className="text-xs font-bold uppercase text-gray-500">Phòng tập (DB)</div>
                                 <div className="mt-1 font-bold">{health.db?.gyms ?? '—'}</div>
                             </div>
                             <div className="rounded-lg border border-gray-200 p-4">
-                                <div className="text-xs font-bold uppercase text-gray-500">Timestamp</div>
+                                <div className="text-xs font-bold uppercase text-gray-500">Mốc thời gian</div>
                                 <div className="mt-1 text-xs font-bold">{fmtDate(health.timestamp)}</div>
                             </div>
                         </div>
@@ -237,20 +226,20 @@ export default function AdminOperationalPanel() {
 
             <section>
                 <h3 className="mb-4 border-b border-gray-200 pb-2 text-lg font-black uppercase tracking-tight">
-                    Trạng thái monetization nền tảng
+                    Ranh giới trách nhiệm
                 </h3>
                 <div className="rounded-lg border border-gray-200 bg-gray-50 px-5 py-4 text-sm leading-7 text-gray-700">
                     <div className="flex flex-wrap items-center gap-3">
-                        <span className={`rounded border px-2 py-1 text-xs font-semibold ${statusTone(platformBilling?.billing_enabled ? 'up' : 'disabled')}`}>
-                            {platformBilling?.billing_enabled ? 'enabled' : 'disabled'}
+                        <span className={`rounded border px-2 py-1 text-xs font-semibold ${statusTone('disabled')}`}>
+                            Thu phí nền tảng đã tắt
                         </span>
-                        <span className="font-semibold text-gray-900">Free-first mode đang hoạt động</span>
+                        <span className="font-semibold text-gray-900">Admin không vận hành thanh toán nền tảng</span>
                     </div>
                     <p className="mt-3">
-                        Thu phí nền tảng đã bị vô hiệu hóa. Các panel checkout intent, webhook event và reconcile platform billing không còn là bề mặt vận hành chính.
+                        App hiện chỉ hỗ trợ khám phá, liên hệ, moderation và vận hành chất lượng. Giao dịch nhạy cảm giữa các bên không thuộc phạm vi admin theo dõi hoặc xử lý.
                     </p>
                     <p className="mt-2 text-xs text-gray-500">
-                        Coach / gym commerce vẫn được giữ ở các flow riêng, không điều khiển từ panel này.
+                        Vai trò admin ở đây chỉ còn theo dõi sức khỏe hệ thống, outbox, phê duyệt thủ công và xử lý các vấn đề trust hoặc safety.
                     </p>
                 </div>
             </section>
@@ -263,13 +252,13 @@ export default function AdminOperationalPanel() {
                     <table className="w-full text-left text-xs">
                         <thead className="bg-gray-50 uppercase text-gray-500">
                             <tr>
-                                <th className="p-2">Status</th>
-                                <th className="p-2">Type</th>
-                                <th className="p-2">Recipient</th>
-                                <th className="p-2">Attempts</th>
-                                <th className="p-2">Next attempt</th>
-                                <th className="p-2">Last error</th>
-                                <th className="p-2">Action</th>
+                                <th className="p-2">Trạng thái</th>
+                                <th className="p-2">Loại</th>
+                                <th className="p-2">Người nhận</th>
+                                <th className="p-2">Số lần thử</th>
+                                <th className="p-2">Lần thử kế</th>
+                                <th className="p-2">Lỗi gần nhất</th>
+                                <th className="p-2">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -292,7 +281,7 @@ export default function AdminOperationalPanel() {
                                             disabled={busyId === item.id}
                                             onClick={() => void retryOutbox(item.id)}
                                         >
-                                            Retry
+                                            Gửi lại
                                         </button>
                                     </td>
                                 </tr>

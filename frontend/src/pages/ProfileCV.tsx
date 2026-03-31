@@ -96,8 +96,8 @@ const NAV_SECTIONS = [
     { id: 'skills', label: 'Kỹ năng' },
     { id: 'experience', label: 'Kinh nghiệm' },
     { id: 'pricing', label: 'Gói tập' },
-    { id: 'gallery', label: 'Gallery' },
-    { id: 'faq', label: 'FAQ' },
+    { id: 'gallery', label: 'Thư viện ảnh' },
+    { id: 'faq', label: 'Hỏi đáp' },
 ];
 
 export default function ProfileCV() {
@@ -208,7 +208,7 @@ export default function ProfileCV() {
                 <div className="text-4xl font-black text-gray-200">404</div>
                 <p className="text-[color:var(--mk-text-soft)] font-medium">Hồ sơ không tồn tại hoặc chưa được công khai.</p>
                 <Link to="/coaches" className="text-sm font-medium text-black underline underline-offset-4 hover:text-[color:var(--mk-text-soft)] transition-colors">
-                    ← Xem danh sách Coach
+                    ← Xem danh sách huấn luyện viên
                 </Link>
             </div>
         );
@@ -219,7 +219,7 @@ export default function ProfileCV() {
     const primaryDetailLink = isAthleteProfile
         ? (profile.slug ? `/athlete/${profile.slug}` : `/athletes/${profile.trainer_id}`)
         : (profile.slug ? `/coach/${profile.slug}` : `/coaches/${profile.trainer_id}`);
-    const primaryCtaLabel = isAthleteProfile ? 'Xem hồ sơ athlete →' : 'Xem coach & gói tập →';
+    const primaryCtaLabel = isAthleteProfile ? 'Xem hồ sơ vận động viên →' : 'Xem huấn luyện viên & chương trình →';
 
     const isDark = profile.theme_color === 'dark';
     const bg = isDark ? 'bg-gray-950' : 'bg-[color:var(--mk-paper)]';
@@ -294,7 +294,7 @@ export default function ProfileCV() {
                                 to="/coaches"
                                 className={`text-xs font-medium ${muted} transition-colors whitespace-nowrap mr-3 shrink-0 ${isDark ? 'hover:text-white' : 'hover:text-black'}`}
                             >
-                                ← Coaches
+                                ← Huấn luyện viên
                             </Link>
                             <div className="w-px h-4 bg-[color:var(--mk-paper-strong)] shrink-0" />
                             {visibleSections.map(({ id, label }) => (
@@ -357,12 +357,12 @@ export default function ProfileCV() {
                                         <h1 className={`text-xl sm:text-2xl font-black ${text}`}>{trainer?.full_name}</h1>
                                         {trainer?.is_verified && (
                                             <span className={`text-[9px] font-black tracking-widest uppercase px-1.5 py-0.5 ${isDark ? 'bg-white text-black' : 'bg-black text-white'}`}>
-                                                VERIFIED
+                                                ĐÃ XÁC MINH
                                             </span>
                                         )}
                                         {profile.is_accepting_clients && (
                                             <span className={`text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 border ${isDark ? 'border-gray-600 text-[color:var(--mk-muted)]' : 'border-[color:var(--mk-line)] text-[color:var(--mk-text-soft)]'}`}>
-                                                AVAILABLE
+                                                ĐANG NHẬN HỌC VIÊN
                                             </span>
                                         )}
                                     </div>
@@ -445,7 +445,7 @@ export default function ProfileCV() {
                                                     <div className="flex flex-wrap items-baseline gap-2 mb-0.5">
                                                         <h3 className={`text-sm font-bold ${text}`}>{exp.title}</h3>
                                                         {exp.is_current && (
-                                                            <span className={`text-[9px] font-black tracking-widest px-1.5 py-0.5 ${isDark ? 'bg-white text-black' : 'bg-black text-white'}`}>NOW</span>
+                                                            <span className={`text-[9px] font-black tracking-widest px-1.5 py-0.5 ${isDark ? 'bg-white text-black' : 'bg-black text-white'}`}>HIỆN TẠI</span>
                                                         )}
                                                     </div>
                                                     <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-[color:var(--mk-text-soft)]'}`}>{exp.organization}</p>
@@ -566,7 +566,7 @@ export default function ProfileCV() {
                             {gallery.length > 0 && (
                                 <>
                                     <section ref={setRef('gallery')} id="gallery" className={`border ${card} p-5 sm:p-6`}>
-                                        <h2 className={sectionHdr}>Gallery</h2>
+                                        <h2 className={sectionHdr}>Thư viện ảnh</h2>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
                                             {gallery.map(img => (
                                                 <div key={img.id} className="group relative aspect-square overflow-hidden bg-[color:var(--mk-paper)]">

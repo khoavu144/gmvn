@@ -155,7 +155,7 @@ export default function GalleryLightbox({ items, currentIndex, onClose, onNaviga
                                 </div>
                                 <div>
                                     <h3 className="text-base font-bold">GYMERVIET Team</h3>
-                                    <p className="text-sm text-gray-500">Official Staff</p>
+                                    <p className="text-sm text-gray-500">Đội ngũ chính thức</p>
                                 </div>
                             </div>
                         </div>

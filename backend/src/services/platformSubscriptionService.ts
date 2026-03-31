@@ -13,7 +13,7 @@ export interface PlanLimits {
     badge: boolean;
     customShareCard: boolean;
     unlimitedProgressPhotos: boolean;
-    fullSubscriptionHistory: boolean;
+    fullRelationshipHistory: boolean;
     coachComparison: boolean;
 }
 
@@ -28,7 +28,7 @@ export const FULL_ACCESS_LIMITS: PlanLimits = Object.freeze({
     badge: true,
     customShareCard: true,
     unlimitedProgressPhotos: true,
-    fullSubscriptionHistory: true,
+    fullRelationshipHistory: true,
     coachComparison: true,
 });
 

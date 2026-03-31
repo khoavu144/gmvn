@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Users, DollarSign, MessageSquare, ClipboardList, Eye, User, Store, Bell } from 'lucide-react';
+import { Users, UserPlus, MessageSquare, ClipboardList, Eye, User, Store, Bell } from 'lucide-react';
 import type { RootState } from '../../store/store';
 import { gymService } from '../../services/gymService';
 import type { GymTrainerLink } from '../../types';
@@ -70,7 +70,7 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                                 <div>
                                     <p className="font-bold text-gray-900">{inv.gym_center?.name}</p>
                                     <p className="text-xs text-gray-600">
-                                        Vị trí: {inv.role_at_gym || 'Coach'} · Chi nhánh:{' '}
+                                        Vị trí: {inv.role_at_gym || 'Huấn luyện viên'} · Chi nhánh:{' '}
                                         {inv.branch?.branch_name ?? '—'}
                                     </p>
                                 </div>
@@ -101,8 +101,8 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                     { done: !!user?.avatar_url, label: 'Ảnh đại diện', link: '/profile' },
                     { done: !!(user?.bio && user.bio.trim().length > 10), label: 'Giới thiệu bản thân', link: '/profile' },
                     { done: !!(user?.specialties && user.specialties.length > 0), label: 'Chuyên môn', link: '/profile' },
-                    { done: (overview.total_programs ?? 0) > 0, label: 'Tạo gói tập đầu tiên', link: '/programs' },
-                    { done: (overview.published_programs ?? 0) > 0, label: 'Xuất bản ít nhất 1 gói', link: '/programs' },
+                    { done: (overview.total_programs ?? 0) > 0, label: 'Tạo chương trình đầu tiên', link: '/programs' },
+                    { done: (overview.published_programs ?? 0) > 0, label: 'Xuất bản ít nhất 1 chương trình', link: '/programs' },
                 ];
                 const done = checks.filter(c => c.done).length;
                 if (done === checks.length) return null;
@@ -134,11 +134,9 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                 {[
                     { label: 'Học viên', value: String(overview.active_clients ?? '—'), icon: <Users className="h-5 w-5" /> },
                     {
-                        label: 'Doanh thu tháng',
-                        value: overview.monthly_revenue
-                            ? `${Number(overview.monthly_revenue).toLocaleString('vi-VN')} đ`
-                            : '—',
-                        icon: <DollarSign className="h-5 w-5" />,
+                        label: 'Khách mới 30 ngày',
+                        value: String(overview.new_clients_30d ?? 0),
+                        icon: <UserPlus className="h-5 w-5" />,
                     },
                     { label: 'Tin nhắn', value: String(overview.unread_messages ?? 0), icon: <MessageSquare className="h-5 w-5" /> },
                     {
@@ -151,7 +149,7 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                 ))}
             </div>
 
-            <DashboardPublicProfileBanner label="Hồ sơ Coach công khai" path={publicProfileUrl} />
+            <DashboardPublicProfileBanner label="Hồ sơ huấn luyện viên công khai" path={publicProfileUrl} />
 
             <div>
                 <h3 className="text-h3 mb-4 border-b border-gray-200 pb-2">Lối tắt</h3>
@@ -160,7 +158,7 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                         {
                             to: '/programs',
                             icon: <ClipboardList className="h-5 w-5" />,
-                            title: 'Quản lý gói tập',
+                            title: 'Quản lý chương trình',
                             desc: 'Tạo và xuất bản chương trình',
                         },
                         {
@@ -178,13 +176,13 @@ const CoachDashboard: React.FC<{ overview: OverviewData }> = ({ overview }) => {
                         {
                             to: publicProfileUrl,
                             icon: <Eye className="h-5 w-5" />,
-                            title: 'Xem profile công khai',
+                            title: 'Xem hồ sơ công khai',
                             desc: 'Giao diện học viên nhìn thấy',
                         },
                         {
                             to: '/dashboard/marketplace',
                             icon: <Store className="h-5 w-5" />,
-                            title: 'Marketplace',
+                            title: 'Gian hàng',
                             desc: 'Quản lý bài đăng bán hàng',
                         },
                     ].map((card) => (

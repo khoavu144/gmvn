@@ -10,6 +10,11 @@ import { User } from './User';
 import { Program } from './Program';
 import { Subscription } from './Subscription';
 
+/**
+ * @deprecated Legacy payment entity — kept for existing data compatibility.
+ * No new records are created since payment processing was removed.
+ * Will be dropped in a future migration once data is archived.
+ */
 @Entity('financial_transactions')
 export class FinancialTransaction {
     @PrimaryGeneratedColumn('uuid')

@@ -21,7 +21,7 @@ export default function DashboardSidebar({ gym, activeTab, isSidebarOpen, onTabC
     const navItems: { tab: ActiveTab; icon: React.ReactNode; label: string }[] = [
         { tab: 'overview', icon: <CalendarDays className="w-4 h-4" />, label: 'Tổng quan' },
         { tab: 'branches', icon: <Building2 className="w-4 h-4" />, label: 'Chi nhánh' },
-        { tab: 'trainers', icon: <Users className="w-4 h-4" />, label: 'Coach liên kết' },
+        { tab: 'trainers', icon: <Users className="w-4 h-4" />, label: 'Huấn luyện viên liên kết' },
         { tab: 'settings', icon: <Settings className="w-4 h-4" />, label: 'Cài đặt' },
     ];
 
@@ -30,7 +30,7 @@ export default function DashboardSidebar({ gym, activeTab, isSidebarOpen, onTabC
             <div className="p-6 border-b border-gray-200 flex justify-between items-center bg-white md:bg-gray-50">
                 <div className="min-w-0 pr-4">
                     <h2 className="font-black truncate uppercase tracking-tight" title={gym.name}>{gym.name}</h2>
-                    <p className="text-xs text-gray-500 uppercase tracking-widest mt-1">Gym Center</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-widest mt-1">Phòng tập</p>
                 </div>
                 <button onClick={onClose} className="md:hidden p-2 text-gray-500 hover:text-black hover:bg-gray-50 rounded-lg transition-colors">
                     <X className="w-5 h-5" />
@@ -51,7 +51,7 @@ export default function DashboardSidebar({ gym, activeTab, isSidebarOpen, onTabC
                     onClick={onClose}
                     className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-bold text-sm tracking-wider uppercase transition-colors text-gray-600 hover:bg-gray-100"
                 >
-                    <Store className="w-4 h-4" /> Marketplace seller
+                    <Store className="w-4 h-4" /> Gian hàng marketplace
                 </Link>
             </nav>
         </div>

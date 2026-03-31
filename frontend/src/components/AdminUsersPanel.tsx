@@ -76,11 +76,11 @@ export default function AdminUsersPanel() {
                         }}
                     >
                         <option value="">Tất cả</option>
-                        <option value="user">user</option>
-                        <option value="athlete">athlete</option>
-                        <option value="trainer">trainer</option>
-                        <option value="gym_owner">gym_owner</option>
-                        <option value="admin">admin</option>
+                        <option value="user">Người dùng</option>
+                        <option value="athlete">Vận động viên</option>
+                        <option value="trainer">Huấn luyện viên</option>
+                        <option value="gym_owner">Chủ phòng tập</option>
+                        <option value="admin">Quản trị viên</option>
                     </select>
                 </div>
                 <button type="submit" className="btn-primary">Tìm</button>
@@ -103,8 +103,8 @@ export default function AdminUsersPanel() {
                                     <th className="p-3">Tên</th>
                                     <th className="p-3">Email</th>
                                     <th className="p-3">Vai trò</th>
-                                    <th className="p-3">Tạo lúc</th>
-                                    <th className="p-3">ID</th>
+                                    <th className="p-3">Thời điểm tạo</th>
+                                    <th className="p-3">Mã</th>
                                 </tr>
                             </thead>
                             <tbody>

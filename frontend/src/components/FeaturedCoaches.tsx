@@ -15,7 +15,7 @@ type FeaturedTrainer = Trainer & {
 export default function FeaturedCoaches() {
     const [coaches, setCoaches] = useState<FeaturedTrainer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const { prefetchCoach } = usePrefetchProfile();
+    const { prefetchCoach, prefetchAthlete } = usePrefetchProfile();
 
     useEffect(() => {
         apiClient.get('/users/trainers')
@@ -67,8 +67,8 @@ export default function FeaturedCoaches() {
                                     key={`${coach.id}-${index}`}
                                     to={detailLink}
                                     className="group relative block overflow-hidden rounded-lg bg-gray-900 border border-white/10 hover:border-white/30 transition-all duration-500"
-                                    onMouseEnter={() => prefetchCoach(identifier)}
-                                    onTouchStart={() => prefetchCoach(identifier)}
+                                    onMouseEnter={() => (coach.user_type === 'athlete' ? prefetchAthlete(identifier) : prefetchCoach(identifier))}
+                                    onTouchStart={() => (coach.user_type === 'athlete' ? prefetchAthlete(identifier) : prefetchCoach(identifier))}
                                 >
                                     <div className="absolute inset-0">
                                         {coach.avatar_url ? (

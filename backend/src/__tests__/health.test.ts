@@ -38,6 +38,10 @@ describe('GET /api/v1/health', () => {
         expect(response.body).toHaveProperty('status', 'OK');
         expect(response.body).toHaveProperty('timestamp');
         expect(response.body).toHaveProperty('checks');
+        expect(response.body.checks.billing).toMatchObject({
+            status: 'skipped',
+            details: expect.objectContaining({ enabled: false }),
+        });
     });
 
     it('should return live status', async () => {

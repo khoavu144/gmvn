@@ -41,7 +41,7 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
 
             <img
                 src={item.image_url}
-                alt={item.caption || "Community Gallery Image"}
+                alt={item.caption || 'Hình thư viện cộng đồng'}
                 loading="lazy"
                 onLoad={() => setIsLoaded(true)}
                 className={`w-full h-auto object-cover transition-[transform,opacity,filter] duration-700 ease-in-out group-hover:scale-105 group-hover:opacity-90 ${
@@ -56,7 +56,7 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
             {item.is_featured && (
                 <div className="absolute top-4 right-4 bg-yellow-500/20 text-yellow-500 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-[transform,opacity] duration-300 transform translate-y-2 group-hover:translate-y-0">
                     <Star size={10} className="fill-current" />
-                    Featured
+                    Nổi bật
                 </div>
             )}
 
@@ -93,7 +93,7 @@ export default function GalleryCard({ item, onClick }: GalleryCardProps) {
                                     {item.linked_user.user_type === 'trainer' && <CheckCircle2 size={12} className="text-blue-400 flex-shrink-0" />}
                                 </div>
                                 <p className="text-xs text-gray-500 uppercase tracking-widest mt-0.5">
-                                    {item.linked_user.user_type === 'trainer' ? 'Coach' : 'Athlete'}
+                                    {item.linked_user.user_type === 'trainer' ? 'HLV' : 'VĐV'}
                                 </p>
                             </Link>
                         </div>

@@ -1,16 +1,37 @@
 import { Request, Response } from 'express';
 import { subscriptionService } from '../services/subscriptionService';
-import { AppError } from '../utils/AppError';
-import { verifySepayWebhookAuth } from '../utils/sepayWebhookAuth';
 
 export const createCheckout = async (req: Request, res: Response) => {
     try {
-        const userId = req.user!.user_id;
         const { program_id } = req.body;
-        if (!program_id) return res.status(400).json({ error: 'program_id is required' });
+        if (!program_id) return res.status(400).json({ error: 'Thiếu mã chương trình.' });
 
-        const session = await subscriptionService.createCheckoutSession(userId, program_id);
-        res.json({ success: true, ...session });
+        res.status(410).json({
+            success: false,
+            deprecated: true,
+            error: 'Luồng thanh toán trong app đã ngừng. Hãy liên hệ trực tiếp với Coach để được hướng dẫn tham gia.',
+        });
+    } catch (err: any) {
+        res.status(400).json({ error: err.message });
+    }
+};
+
+export const createRelationship = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user!.user_id;
+        const { program_id, trainer_id, source, notes } = req.body;
+        if (!program_id || !trainer_id) {
+            return res.status(400).json({ error: 'Thiếu mã chương trình hoặc mã huấn luyện viên.' });
+        }
+
+        const subscription = await subscriptionService.createRelationship(
+            userId,
+            trainer_id,
+            program_id,
+            source || 'message',
+            notes,
+        );
+        res.json({ success: true, subscription });
     } catch (err: any) {
         res.status(400).json({ error: err.message });
     }
@@ -53,21 +74,14 @@ export const cancelSubscription = async (req: Request, res: Response) => {
 
 export const sepayWebhook = async (req: Request, res: Response) => {
     try {
-        verifySepayWebhookAuth(req);
-
-        await subscriptionService.handleSepayWebhook(req.body);
-        res.json({ success: true });
+        void req.body;
+        res.json({
+            success: true,
+            ignored: true,
+            deprecated: true,
+            reason: 'subscription_payment_flow_disabled',
+        });
     } catch (err: any) {
-        if (err instanceof AppError) {
-            return res.status(err.statusCode).json({
-                success: false,
-                error: {
-                    message: err.message,
-                    code: err.code,
-                },
-            });
-        }
-
         res.status(500).json({
             success: false,
             error: {

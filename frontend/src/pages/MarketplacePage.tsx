@@ -70,7 +70,7 @@ export const ProductCard = React.memo(function ProductCard({
                     </div>
                 )}
                 {product.product_type === 'digital' && !isRail && (
-                    <span className="marketplace-badge marketplace-badge--digital">Digital</span>
+                    <span className="marketplace-badge marketplace-badge--digital">Sản phẩm số</span>
                 )}
                 {discountPct > 0 && (
                     <span className="marketplace-badge marketplace-badge--discount">-{discountPct}%</span>
@@ -353,14 +353,14 @@ export default function MarketplacePage() {
         ? categories.find((category) => category.slug === activeCategory)?.label ?? 'Sản phẩm'
         : '';
 
-    const pageKicker = showHero ? 'Browse marketplace' : activeCategory ? 'Lọc theo danh mục' : 'Lọc theo từ khóa';
+    const pageKicker = showHero ? 'Khám phá sản phẩm' : activeCategory ? 'Lọc theo danh mục' : 'Lọc theo từ khóa';
     const pageTitle = showHero
-        ? 'Sản phẩm cho hành trình fitness'
+        ? 'Sản phẩm cho hành trình tập luyện'
         : activeCategory
             ? activeCategoryLabel
             : `Kết quả cho "${activeSearch}"`;
     const pageDescription = showHero
-        ? 'Gói tập, gear và supplements được gom để bạn duyệt nhanh.'
+        ? 'Gói tập, phụ kiện và thực phẩm bổ sung được gom để bạn duyệt nhanh.'
         : 'Danh sách theo bộ lọc.';
 
     useEffect(() => {
@@ -386,7 +386,7 @@ export default function MarketplacePage() {
         <>
             <Helmet>
                 <title>Marketplace | GYMERVIET</title>
-                <meta name="description" content="Duyệt sản phẩm fitness từ coach, gym và seller uy tín." />
+                <meta name="description" content="Duyệt sản phẩm tập luyện từ huấn luyện viên, phòng gym và người bán uy tín." />
             </Helmet>
 
             <div className="marketplace-page">
@@ -419,15 +419,28 @@ export default function MarketplacePage() {
                                 {showHero && (
                                     <div className="marketplace-quick-faq" aria-label="Hỏi nhanh">
                                         <p className="marketplace-section-kicker">Hỏi nhanh marketplace</p>
-                                        <p className="marketplace-quick-faq-text">Ưu tiên gói có mục tiêu rõ</p>
+                                        <ul className="marketplace-quick-faq-list" role="list">
+                                            <li className="marketplace-quick-faq-item">
+                                                <strong>💪 Gói nào phù hợp tôi?</strong>
+                                                <p>Chọn gói rõ mục tiêu: giảm cân, tăng cơ hay tăng sức bền. Xem hướng dẫn chi tiết từ huấn luyện viên.</p>
+                                            </li>
+                                            <li className="marketplace-quick-faq-item">
+                                                <strong>✅ Tôi mua hàng như thế nào?</strong>
+                                                <p>Liên hệ trực tiếp người bán qua thông tin trên trang sản phẩm. Mọi giao dịch là thỏa thuận giữa hai bên.</p>
+                                            </li>
+                                            <li className="marketplace-quick-faq-item">
+                                                <strong>🎬 Gói kỹ thuật & thiết bị là gì?</strong>
+                                                <p>Các tài liệu dạy bạn tập đúng kỹ thuật và tối ưu hóa với thiết bị hiện có.</p>
+                                            </li>
+                                        </ul>
                                     </div>
                                 )}
                             </section>
 
                             {showHero && spotlightProduct && (
-                                <aside className="marketplace-merch-spotlight" aria-label="Spotlight">
+                                <aside className="marketplace-merch-spotlight" aria-label="Nổi bật">
                                     <div className="marketplace-merch-spotlight-copy">
-                                        <p className="marketplace-section-kicker">Spotlight tuần này</p>
+                                        <p className="marketplace-section-kicker">Nổi bật tuần này</p>
                                         <h2 className="marketplace-section-title">Một lựa chọn nổi bật</h2>
                                         <p className="marketplace-lead">
                                             Mở nhanh rồi xem danh sách chính.
@@ -483,7 +496,7 @@ export default function MarketplacePage() {
                                 )}
                             </div>
                             <div className="marketplace-sort">
-                                <label htmlFor="marketplace-sort-select" className="sr-only">Sort</label>
+                                <label htmlFor="marketplace-sort-select" className="sr-only">Sắp xếp</label>
                                 <select
                                     id="marketplace-sort-select"
                                     value={activeSort}
@@ -506,7 +519,7 @@ export default function MarketplacePage() {
                             <div className="marketplace-section-head marketplace-section-head--split">
                                 <div>
                                     <p className="marketplace-section-kicker">Gợi ý nhanh</p>
-                                    <h2 className="marketplace-section-title">Một lane mở rộng lựa chọn</h2>
+                                    <h2 className="marketplace-section-title">Một dải gợi ý để mở rộng lựa chọn</h2>
                                 </div>
                                 <Link to="/marketplace?sort=newest" className="marketplace-typo-cta">
                                     Xem hàng mới

@@ -19,6 +19,16 @@ type Product = {
     seller?: { full_name?: string; user_id?: string };
 };
 
+const NEWS_STATUS_LABELS: Record<string, string> = {
+    draft: 'Bản nháp',
+    published: 'Đã đăng',
+    archived: 'Đã lưu trữ',
+};
+
+function formatNewsStatus(status: string) {
+    return NEWS_STATUS_LABELS[status] ?? status;
+}
+
 export default function AdminContentMarketplacePanel() {
     const [news, setNews] = useState<NewsArticle[]>([]);
     const [newsMeta, setNewsMeta] = useState({ page: 1, total: 0 });
@@ -68,9 +78,9 @@ export default function AdminContentMarketplacePanel() {
         setCrawling(true);
         try {
             await apiClient.post('/news/admin/crawl');
-            alert('Đã kích hoạt crawl (chạy nền).');
+            alert('Đã kích hoạt quét tin ở chế độ chạy nền.');
         } catch {
-            alert('Không gọi được crawl.');
+            alert('Không thể gọi tiến trình quét tin.');
         } finally {
             setCrawling(false);
         }
@@ -81,7 +91,7 @@ export default function AdminContentMarketplacePanel() {
             await apiClient.patch(`/news/admin/${id}/publish`);
             await loadNews();
         } catch {
-            alert('Publish thất bại.');
+            alert('Xuất bản thất bại.');
         }
     };
 
@@ -90,7 +100,7 @@ export default function AdminContentMarketplacePanel() {
             await apiClient.patch(`/news/admin/${id}/archive`);
             await loadNews();
         } catch {
-            alert('Archive thất bại.');
+            alert('Lưu trữ thất bại.');
         }
     };
 
@@ -133,7 +143,7 @@ export default function AdminContentMarketplacePanel() {
                 <div className="flex flex-wrap justify-between items-center gap-3 border-b border-gray-200 pb-2 mb-4">
                     <h3 className="text-lg font-black uppercase tracking-tight">Tin tức (admin)</h3>
                     <button type="button" disabled={crawling} onClick={() => void triggerCrawl()} className="btn-secondary text-xs">
-                        {crawling ? 'Đang gửi…' : 'Chạy crawl tin'}
+                        {crawling ? 'Đang gửi…' : 'Quét tin mới'}
                     </button>
                 </div>
                 <p className="text-xs text-gray-500 mb-3">Tổng: {newsMeta.total}</p>
@@ -160,7 +170,7 @@ export default function AdminContentMarketplacePanel() {
                                         <div className="font-medium truncate">{a.title}</div>
                                         <div className="text-xs text-gray-500 font-mono">{a.slug}</div>
                                     </td>
-                                    <td className="p-3">{a.status}</td>
+                                    <td className="p-3">{formatNewsStatus(a.status)}</td>
                                     <td className="p-3">{a.category ?? '—'}</td>
                                     <td className="p-3">
                                         <div className="flex flex-wrap gap-2">
@@ -204,7 +214,7 @@ export default function AdminContentMarketplacePanel() {
 
             <section>
                 <h3 className="text-lg font-black uppercase tracking-tight border-b border-gray-200 pb-2 mb-4">
-                    Marketplace — chờ kiểm duyệt
+                    Sản phẩm đang chờ kiểm duyệt
                 </h3>
                 <p className="text-xs text-gray-500 mb-3">Tổng chờ: {modTotal}</p>
                 {products.length === 0 ? (

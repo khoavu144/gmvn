@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCredentials, setLoading } from '../store/slices/authSlice';
@@ -11,8 +11,17 @@ import { extractApiErrorMessage } from '../lib/apiErrors';
 
 export default function Register() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const dispatch = useDispatch();
     const { isAuthenticated, user: authUser, isLoading: authLoading } = useSelector((state: RootState) => state.auth);
+
+    const requestedRole = useMemo(() => {
+        const value = searchParams.get('role');
+        if (value === 'user' || value === 'athlete' || value === 'trainer' || value === 'gym_owner') {
+            return value;
+        }
+        return null;
+    }, [searchParams]);
 
     useEffect(() => {
         if (isAuthenticated && authUser && !authLoading) {
@@ -57,6 +66,12 @@ export default function Register() {
             setError('Mật khẩu xác nhận không khớp');
             return;
         }
+
+        if (requestedRole) {
+            void handleSelectRoleAndSubmit(requestedRole);
+            return;
+        }
+
         setStep(2);
     };
 
@@ -109,7 +124,11 @@ export default function Register() {
                     <p className="page-kicker">Gia nhập Gymerviet</p>
                     <h1 className="page-title text-center">{step === 1 ? 'Tạo tài khoản' : 'Mục tiêu của bạn là gì?'}</h1>
                     <p className="page-description mx-auto text-center">
-                        {step === 1 ? 'Bắt đầu hành trình tập luyện cùng cộng đồng GYMERVIET.' : 'Chọn vai trò để cá nhân hoá trải nghiệm của bạn.'}
+                        {step === 1
+                            ? requestedRole === 'gym_owner'
+                                ? 'Tạo tài khoản đối tác để bắt đầu hồ sơ gym và gửi thông tin xác minh.'
+                                : 'Bắt đầu hành trình tập luyện cùng cộng đồng GYMERVIET.'
+                            : 'Chọn vai trò để cá nhân hoá trải nghiệm của bạn.'}
                     </p>
                 </div>
 
@@ -118,6 +137,12 @@ export default function Register() {
                     {error && (
                         <div role="alert" aria-live="assertive" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm mb-4 font-medium">
                             {error}
+                        </div>
+                    )}
+
+                    {requestedRole === 'gym_owner' && step === 1 && (
+                        <div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+                            Bạn đang bắt đầu với vai trò <span className="font-semibold text-gray-900">Chủ phòng tập</span>. Sau khi tạo tài khoản, bạn sẽ được chuyển tới bước gửi hồ sơ gym đầu tiên.
                         </div>
                     )}
                     
@@ -193,7 +218,7 @@ export default function Register() {
                             </div>
 
                             <Button type="submit" variant="primary" size="lg" className="w-full mt-6" disabled={loading}>
-                                Tiếp tục →
+                                {requestedRole === 'gym_owner' ? 'Tạo tài khoản đối tác →' : 'Tiếp tục →'}
                             </Button>
                         </form>
                     ) : (
@@ -206,7 +231,7 @@ export default function Register() {
                                 <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🏋️</div>
                                 <div>
                                     <div className="font-bold text-gray-900">Tôi muốn tập luyện</div>
-                                    <div className="text-xs text-gray-500 font-medium">Tìm coach, phòng tập và kết nối cộng đồng</div>
+                                    <div className="text-xs text-gray-500 font-medium">Tìm huấn luyện viên, phòng tập và kết nối cộng đồng</div>
                                 </div>
                             </button>
 
@@ -217,7 +242,7 @@ export default function Register() {
                             >
                                 <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🎯</div>
                                 <div>
-                                    <div className="font-bold text-gray-900">Tôi là Coach / HLV</div>
+                                    <div className="font-bold text-gray-900">Tôi là huấn luyện viên</div>
                                     <div className="text-xs text-gray-500 font-medium">Tạo hồ sơ chuyên nghiệp và quản lý học viên</div>
                                 </div>
                             </button>
@@ -229,8 +254,8 @@ export default function Register() {
                             >
                                 <div className="text-3xl grayscale group-hover:grayscale-0 transition-all" aria-hidden="true">🏢</div>
                                 <div>
-                                    <div className="font-bold text-gray-900">Tôi quản lý Gym</div>
-                                    <div className="text-xs text-gray-500 font-medium">Đưa Gym lên bản đồ và quản lý nhân sự</div>
+                                    <div className="font-bold text-gray-900">Tôi quản lý phòng tập</div>
+                                    <div className="text-xs text-gray-500 font-medium">Đưa phòng tập lên bản đồ và quản lý nhân sự</div>
                                 </div>
                             </button>
 

@@ -1,17 +1,27 @@
 import { AppDataSource } from '../config/database';
-import { Message } from '../entities/Message';
+import { Message, type MessageContextType } from '../entities/Message';
 import { User } from '../entities/User';
+
+type SendMessageContext = {
+    context_type?: MessageContextType | null;
+    context_id?: string | null;
+    context_label?: string | null;
+};
 
 class MessageService {
     private get repo() {
         return AppDataSource.getRepository(Message);
     }
 
-    async sendMessage(senderId: string, receiverId: string, content: string) {
+    async sendMessage(senderId: string, receiverId: string, content: string, context: SendMessageContext = {}) {
+        const hasContext = Boolean(context.context_type && context.context_id);
         const message = this.repo.create({
             sender_id: senderId,
             receiver_id: receiverId,
             content,
+            context_type: hasContext ? context.context_type ?? null : null,
+            context_id: hasContext ? context.context_id ?? null : null,
+            context_label: hasContext ? context.context_label?.trim() || null : null,
         });
         return this.repo.save(message);
     }
@@ -25,7 +35,7 @@ class MessageService {
                     WHEN sender_id = $1 THEN receiver_id
                     ELSE sender_id
                 END AS partner_id,
-                id, content, created_at, is_read, sender_id, receiver_id
+                id, content, context_type, context_label, created_at, is_read, sender_id, receiver_id
             FROM messages
             WHERE sender_id = $1 OR receiver_id = $1
             ORDER BY partner_id, created_at DESC
@@ -64,6 +74,8 @@ class MessageService {
                     : null,
                 last_message: {
                     content: msg.content,
+                    context_type: msg.context_type,
+                    context_label: msg.context_label,
                     created_at: msg.created_at,
                     is_read: msg.is_read,
                 },
