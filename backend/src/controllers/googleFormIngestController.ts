@@ -5,6 +5,7 @@ import {
     verifyRequestTimestamp,
     type GoogleFormIngestBody,
 } from '../services/googleFormIngestService';
+import { getErrorMessage, normalizeApiMessage } from '../utils/controllerUtils';
 
 const MAX_SKEW_MS = 5 * 60 * 1000;
 
@@ -14,25 +15,25 @@ function isRecord(v: unknown): v is Record<string, unknown> {
 
 export async function postGoogleFormIngest(req: Request, res: Response): Promise<void> {
     if (!process.env.GOOGLE_FORM_WEBHOOK_SECRET) {
-        res.status(503).json({ success: false, error: 'Google Form ingest is not configured' });
+        res.status(503).json({ success: false, error: 'Chưa cấu hình webhook Google Form' });
         return;
     }
 
     const rawBody = (req as any).rawBody as Buffer | undefined;
     if (!rawBody || !Buffer.isBuffer(rawBody)) {
-        res.status(400).json({ success: false, error: 'Missing raw body' });
+        res.status(400).json({ success: false, error: 'Thiếu nội dung raw body' });
         return;
     }
 
     const sig = req.headers['x-gymerviet-signature'] as string | undefined;
     if (!verifyGoogleFormSignature(rawBody, sig)) {
-        res.status(401).json({ success: false, error: 'Invalid signature' });
+        res.status(401).json({ success: false, error: 'Chữ ký không hợp lệ' });
         return;
     }
 
     const ts = req.headers['x-gymerviet-timestamp'] as string | undefined;
     if (!verifyRequestTimestamp(ts, MAX_SKEW_MS)) {
-        res.status(401).json({ success: false, error: 'Stale or invalid timestamp' });
+        res.status(401).json({ success: false, error: 'Mốc thời gian không hợp lệ hoặc đã hết hạn' });
         return;
     }
 
@@ -40,12 +41,12 @@ export async function postGoogleFormIngest(req: Request, res: Response): Promise
     try {
         parsed = JSON.parse(rawBody.toString('utf8'));
     } catch {
-        res.status(400).json({ success: false, error: 'Invalid JSON' });
+        res.status(400).json({ success: false, error: 'Dữ liệu JSON không hợp lệ' });
         return;
     }
 
     if (!isRecord(parsed)) {
-        res.status(400).json({ success: false, error: 'Body must be an object' });
+        res.status(400).json({ success: false, error: 'Nội dung gửi lên phải là một đối tượng dữ liệu' });
         return;
     }
 
@@ -68,7 +69,7 @@ export async function postGoogleFormIngest(req: Request, res: Response): Promise
     };
 
     if (!body.responseId) {
-        res.status(400).json({ success: false, error: 'responseId required' });
+        res.status(400).json({ success: false, error: 'Thiếu responseId' });
         return;
     }
 
@@ -79,14 +80,14 @@ export async function postGoogleFormIngest(req: Request, res: Response): Promise
         res.status(status).json({
             success: result.outcome !== 'failed',
             outcome: result.outcome,
-            message: result.message,
+            message: result.message ? normalizeApiMessage(result.message) : undefined,
             userId: result.userId,
             termCount: result.termCount,
         });
     } catch (e) {
         res.status(500).json({
             success: false,
-            error: e instanceof Error ? e.message : 'Server error',
+            error: getErrorMessage(e, 'Lỗi hệ thống, vui lòng thử lại sau'),
         });
     }
 }

@@ -51,7 +51,7 @@ describe('Permission Matrix: canCreateProgram', () => {
         expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
             success: false,
             error: expect.objectContaining({
-                message: expect.stringContaining('must be a trainer or a verified athlete')
+                message: expect.stringContaining('huấn luyện viên hoặc vận động viên đã xác minh')
             })
         }));
         expect(next).not.toHaveBeenCalled();

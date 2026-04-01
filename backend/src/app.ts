@@ -77,7 +77,7 @@ app.use(cors({
         if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            callback(new Error('Nguồn truy cập không được phép bởi CORS'));
         }
     },
     credentials: true,

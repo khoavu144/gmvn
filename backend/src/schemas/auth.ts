@@ -2,39 +2,39 @@ import { z } from 'zod';
 import { Request, Response, NextFunction } from 'express';
 
 export const RegisterSchema = z.object({
-    email: z.string().email('Invalid email'),
-    password: z.string().min(8, 'Password must be at least 8 characters'),
-    full_name: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Email không hợp lệ'),
+    password: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
+    full_name: z.string().min(2, 'Họ tên phải có ít nhất 2 ký tự'),
     user_type: z.enum(['user', 'athlete', 'trainer', 'gym_owner']),
 });
 
 export const LoginSchema = z.object({
-    email: z.string().email('Invalid email'),
-    password: z.string().min(1, 'Password is required'),
+    email: z.string().email('Email không hợp lệ'),
+    password: z.string().min(1, 'Vui lòng nhập mật khẩu'),
 });
 
 export const RefreshTokenSchema = z.object({
-    refresh_token: z.string().min(1, 'Refresh token is required'),
+    refresh_token: z.string().min(1, 'Thiếu refresh token'),
 });
 
 export const LogoutSchema = z.object({
-    refresh_token: z.string().min(1, 'Refresh token is required').optional(),
+    refresh_token: z.string().min(1, 'Thiếu refresh token').optional(),
 });
 
 export const SendVerificationSchema = z.object({}); // Just requires auth token
 
 export const VerifyEmailSchema = z.object({
-    token: z.string().length(6, 'Invalid verification code'),
+    token: z.string().length(6, 'Mã xác thực không hợp lệ'),
 });
 
 export const ForgotPasswordSchema = z.object({
-    email: z.string().email('Invalid email'),
+    email: z.string().email('Email không hợp lệ'),
 });
 
 export const ResetPasswordSchema = z.object({
-    email: z.string().email('Invalid email'),
-    token: z.string().length(6, 'Invalid reset code'),
-    new_password: z.string().min(8, 'Password must be at least 8 characters'),
+    email: z.string().email('Email không hợp lệ'),
+    token: z.string().length(6, 'Mã đặt lại mật khẩu không hợp lệ'),
+    new_password: z.string().min(8, 'Mật khẩu phải có ít nhất 8 ký tự'),
 });
 
 // Generic validation middleware
@@ -48,7 +48,7 @@ export const validateRequest = (schema: z.ZodSchema) => {
             return res.status(400).json({
                 success: false,
                 error: {
-                    message: 'Validation failed',
+                    message: 'Dữ liệu gửi lên không hợp lệ',
                     code: 'VALIDATION_ERROR',
                     details: error.issues ?? error.errors ?? [],
                 },

@@ -36,7 +36,7 @@ describe('Auth Middlewares', () => {
             expect(mockResponse.json).toHaveBeenCalledWith({
                 success: false,
                 error: {
-                    message: 'No token provided',
+                    message: 'Bạn chưa gửi token đăng nhập',
                     code: 'AUTH_NO_TOKEN',
                 },
                 requestId: 'req-test',
@@ -56,7 +56,7 @@ describe('Auth Middlewares', () => {
             expect(mockResponse.json).toHaveBeenCalledWith({
                 success: false,
                 error: {
-                    message: 'Invalid or expired token',
+                    message: 'Token đăng nhập không hợp lệ hoặc đã hết hạn',
                     code: 'AUTH_INVALID_TOKEN',
                 },
                 requestId: 'req-test',

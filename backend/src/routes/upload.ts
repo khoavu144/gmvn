@@ -17,7 +17,7 @@ const upload = multer({
         if (allowedMimeTypes.includes(file.mimetype)) {
             cb(null, true);
         } else {
-            cb(new Error('Invalid file type: only JPEG, PNG, and WebP are allowed'));
+            cb(new Error('Chỉ hỗ trợ ảnh JPEG, PNG hoặc WebP.'));
         }
     }
 });

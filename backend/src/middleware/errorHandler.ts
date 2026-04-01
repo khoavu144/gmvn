@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/AppError';
 import { logger } from '../utils/logger';
 import { sentryService } from '../services/sentryService';
+import { normalizeApiMessage } from '../utils/controllerUtils';
 
 export const errorHandler = (
     err: Error,
@@ -33,7 +34,7 @@ export const errorHandler = (
         return res.status(err.statusCode).json({
             success: false,
             error: {
-                message: err.message,
+                message: normalizeApiMessage(err.message),
                 code: err.code || err.name || 'API_ERROR',
                 ...(err.details !== undefined ? { details: err.details } : {}),
             },
@@ -50,8 +51,8 @@ export const errorHandler = (
         success: false,
         error: {
             message: process.env.NODE_ENV === 'production'
-                ? 'Internal server error'
-                : err.message,
+                ? 'Lỗi hệ thống, vui lòng thử lại sau'
+                : normalizeApiMessage(err.message),
             code: 'INTERNAL_SERVER_ERROR',
             ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
         },
@@ -60,5 +61,5 @@ export const errorHandler = (
 };
 
 export const notFoundHandler = (req: Request, res: Response, next: NextFunction) => {
-    next(new AppError(`Route ${req.method} ${req.path} not found`, 404));
+    next(new AppError(`Không tìm thấy đường dẫn ${req.method} ${req.path}`, 404));
 };

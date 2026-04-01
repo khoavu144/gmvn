@@ -11,7 +11,7 @@ export const gymOwnerOnly: RequestHandler = async (req, res, next) => {
     const userType = req.user?.user_type;
 
     if (!userId || userType !== 'gym_owner') {
-        next(new AppError('Chỉ Gym Owner mới có quyền thực hiện thao tác này', 403, 'GYM_OWNER_REQUIRED'));
+        next(new AppError('Chỉ chủ phòng gym mới có quyền thực hiện thao tác này', 403, 'GYM_OWNER_REQUIRED'));
         return;
     }
 
@@ -21,13 +21,13 @@ export const gymOwnerOnly: RequestHandler = async (req, res, next) => {
         const user = await userRepo.findOne({ where: { id: userId } });
 
         if (!user) {
-            next(new AppError('User không tồn tại', 401, 'USER_NOT_FOUND'));
+            next(new AppError('Không tìm thấy người dùng', 401, 'USER_NOT_FOUND'));
             return;
         }
 
         if (user.gym_owner_status !== 'approved') {
             next(new AppError(
-                'Tài khoản Gym Owner chưa được duyệt',
+                'Tài khoản chủ phòng gym chưa được duyệt',
                 403,
                 'GYM_OWNER_NOT_APPROVED',
                 { gym_owner_status: user.gym_owner_status },
@@ -37,6 +37,6 @@ export const gymOwnerOnly: RequestHandler = async (req, res, next) => {
 
         next();
     } catch (error) {
-        next(new AppError('Internal server error', 500, 'GYM_OWNER_GUARD_ERROR'));
+        next(new AppError('Lỗi hệ thống, vui lòng thử lại sau', 500, 'GYM_OWNER_GUARD_ERROR'));
     }
 };

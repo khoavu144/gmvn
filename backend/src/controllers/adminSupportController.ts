@@ -20,7 +20,7 @@ export const retryEmailOutboxRecord = asyncHandler(async (req: Request, res: Res
     const id = getSingleParam(req.params.id);
     const record = await emailOutboxService.retryRecord(id);
     if (!record) {
-        throw new AppError('Không tìm thấy email outbox record', 404, 'EMAIL_OUTBOX_NOT_FOUND');
+        throw new AppError('Không tìm thấy bản ghi email outbox', 404, 'EMAIL_OUTBOX_NOT_FOUND');
     }
 
     res.json({ success: true, record });

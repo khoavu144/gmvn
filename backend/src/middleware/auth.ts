@@ -35,7 +35,7 @@ export const authenticate: RequestHandler = async (req, res, next) => {
     const token = authHeader?.split(' ')[1]; // Bearer {token}
 
     if (!token) {
-        sendError(req, res, 401, 'No token provided', 'AUTH_NO_TOKEN');
+        sendError(req, res, 401, 'Bạn chưa gửi token đăng nhập', 'AUTH_NO_TOKEN');
         return;
     }
 
@@ -47,7 +47,7 @@ export const authenticate: RequestHandler = async (req, res, next) => {
         const user = await userRepo.findOne({ where: { id: payload.user_id } });
         
         if (!user) {
-            sendError(req, res, 401, 'User not found', 'AUTH_USER_NOT_FOUND');
+            sendError(req, res, 401, 'Không tìm thấy người dùng', 'AUTH_USER_NOT_FOUND');
             return;
         }
         
@@ -59,7 +59,7 @@ export const authenticate: RequestHandler = async (req, res, next) => {
         req.user = payload;
         next();
     } catch {
-        sendError(req, res, 401, 'Invalid or expired token', 'AUTH_INVALID_TOKEN');
+        sendError(req, res, 401, 'Token đăng nhập không hợp lệ hoặc đã hết hạn', 'AUTH_INVALID_TOKEN');
         return;
     }
 };
@@ -84,7 +84,7 @@ export const optionalAuthenticate: RequestHandler = (req, _res, next) => {
 
 export const proOnly: RequestHandler = (req, res, next) => {
     if (req.user?.user_type !== 'trainer' && req.user?.user_type !== 'athlete') {
-        sendError(req, res, 403, 'Only trainers or professional athletes can perform this action', 'AUTH_PRO_ONLY');
+        sendError(req, res, 403, 'Chỉ huấn luyện viên hoặc vận động viên chuyên nghiệp mới có thể thực hiện thao tác này', 'AUTH_PRO_ONLY');
         return;
     }
     next();
@@ -92,7 +92,7 @@ export const proOnly: RequestHandler = (req, res, next) => {
 
 export const adminOnly: RequestHandler = (req, res, next) => {
     if (req.user?.user_type !== 'admin') {
-        sendError(req, res, 403, 'Admin access only', 'AUTH_ADMIN_ONLY');
+        sendError(req, res, 403, 'Chỉ quản trị viên mới có quyền truy cập', 'AUTH_ADMIN_ONLY');
         return;
     }
     next();
@@ -103,7 +103,7 @@ export const requireAdmin = adminOnly;
 
 export const athleteOnly: RequestHandler = (req, res, next) => {
     if (req.user?.user_type !== 'athlete') {
-        sendError(req, res, 403, 'Only athletes can perform this action', 'AUTH_ATHLETE_ONLY');
+        sendError(req, res, 403, 'Chỉ vận động viên mới có thể thực hiện thao tác này', 'AUTH_ATHLETE_ONLY');
         return;
     }
     next();
@@ -111,7 +111,7 @@ export const athleteOnly: RequestHandler = (req, res, next) => {
 
 export const adminAndTrainerOnly: RequestHandler = (req, res, next) => {
     if (req.user?.user_type !== 'admin' && req.user?.user_type !== 'trainer') {
-        sendError(req, res, 403, 'Only admins or trainers can perform this action', 'AUTH_ADMIN_OR_TRAINER_ONLY');
+        sendError(req, res, 403, 'Chỉ quản trị viên hoặc huấn luyện viên mới có thể thực hiện thao tác này', 'AUTH_ADMIN_OR_TRAINER_ONLY');
         return;
     }
     next();
@@ -119,7 +119,7 @@ export const adminAndTrainerOnly: RequestHandler = (req, res, next) => {
 
 export const athleteOrUser: RequestHandler = (req, res, next) => {
     if (req.user?.user_type !== 'athlete' && req.user?.user_type !== 'user') {
-        sendError(req, res, 403, 'Only athletes or users can perform this action', 'AUTH_ATHLETE_OR_USER_ONLY');
+        sendError(req, res, 403, 'Chỉ vận động viên hoặc người dùng mới có thể thực hiện thao tác này', 'AUTH_ATHLETE_OR_USER_ONLY');
         return;
     }
     next();
@@ -127,7 +127,7 @@ export const athleteOrUser: RequestHandler = (req, res, next) => {
 
 export const trainerOnly: RequestHandler = (req, res, next) => {
     if (req.user?.user_type !== 'trainer') {
-        sendError(req, res, 403, 'Only trainers can perform this action', 'AUTH_TRAINER_ONLY');
+        sendError(req, res, 403, 'Chỉ huấn luyện viên mới có thể thực hiện thao tác này', 'AUTH_TRAINER_ONLY');
         return;
     }
     next();
@@ -154,5 +154,5 @@ export const canCreateProgram: RequestHandler = async (req, res, next) => {
         }
     }
 
-    sendError(req, res, 403, 'You must be a trainer or a verified athlete to perform this action', 'AUTH_PROGRAM_CREATION_FORBIDDEN');
+    sendError(req, res, 403, 'Bạn phải là huấn luyện viên hoặc vận động viên đã xác minh để thực hiện thao tác này', 'AUTH_PROGRAM_CREATION_FORBIDDEN');
 };

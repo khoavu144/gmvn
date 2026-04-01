@@ -54,7 +54,7 @@ describe('Auth API /api/v1/auth', () => {
 
             expect(response.status).toBe(409);
             expect(response.body.success).toBe(false);
-            expect(response.body.error.message).toBe('Email already registered');
+            expect(response.body.error.message).toBe('Email đã được đăng ký');
             expect(response.body.error.code).toBe('EMAIL_ALREADY_REGISTERED');
         });
 
@@ -65,7 +65,7 @@ describe('Auth API /api/v1/auth', () => {
 
             expect(response.status).toBe(400);
             expect(response.body.success).toBe(false);
-            expect(response.body.error.message).toBe('Validation failed');
+            expect(response.body.error.message).toBe('Dữ liệu gửi lên không hợp lệ');
             expect(response.body.error.code).toBe('VALIDATION_ERROR');
             expect(Array.isArray(response.body.error.details)).toBe(true);
         });
@@ -103,7 +103,7 @@ describe('Auth API /api/v1/auth', () => {
 
             expect(response.status).toBe(401);
             expect(response.body.success).toBe(false);
-            expect(response.body.error.message).toBe('Invalid email or password');
+            expect(response.body.error.message).toBe('Email hoặc mật khẩu không đúng');
             expect(response.body.error.code).toBe('INVALID_CREDENTIALS');
         });
     });

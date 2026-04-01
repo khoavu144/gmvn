@@ -79,18 +79,18 @@ export const verifySepayWebhookAuth = (req: Request): void => {
         if (signature) {
             const rawBody = (req as any).rawBody;
             if (!rawBody) {
-                throw new AppError('Missing raw body', 400, 'WEBHOOK_RAW_BODY_MISSING');
+                throw new AppError('Thiếu dữ liệu gốc của webhook', 400, 'WEBHOOK_RAW_BODY_MISSING');
             }
 
             const digest = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
             if (!safeCompare(signature, digest)) {
-                throw new AppError('Invalid signature', 401, 'WEBHOOK_INVALID_SIGNATURE');
+                throw new AppError('Chữ ký webhook không hợp lệ', 401, 'WEBHOOK_INVALID_SIGNATURE');
             }
             return;
         }
 
         if (!authorization || !safeCompare(authorization, secret)) {
-            throw new AppError('Unauthorized', 401, 'WEBHOOK_UNAUTHORIZED');
+            throw new AppError('Không có quyền truy cập webhook', 401, 'WEBHOOK_UNAUTHORIZED');
         }
         return;
     }
@@ -98,14 +98,14 @@ export const verifySepayWebhookAuth = (req: Request): void => {
     if (fallbackToken) {
         const providedToken = getTokenFromRequest(req);
         if (!providedToken || !safeCompare(providedToken, fallbackToken)) {
-            throw new AppError('Unauthorized', 401, 'WEBHOOK_UNAUTHORIZED');
+            throw new AppError('Không có quyền truy cập webhook', 401, 'WEBHOOK_UNAUTHORIZED');
         }
         return;
     }
 
     if (env.NODE_ENV === 'production') {
         throw new AppError(
-            'Webhook auth is not configured',
+            'Webhook chưa được cấu hình xác thực',
             503,
             'WEBHOOK_AUTH_NOT_CONFIGURED',
         );

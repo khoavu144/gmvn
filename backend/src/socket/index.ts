@@ -42,7 +42,7 @@ export const initSocket = (httpServer: HttpServer) => {
                 if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
                     callback(null, true);
                 } else {
-                    callback(new Error('Not allowed by CORS'));
+                    callback(new Error('Nguồn truy cập không được phép bởi CORS'));
                 }
             },
             methods: ['GET', 'POST'],
@@ -54,14 +54,14 @@ export const initSocket = (httpServer: HttpServer) => {
     io.use((socket: Socket, next) => {
         const token = socket.handshake.auth?.token;
         if (!token) {
-            return next(new Error('Authentication error: no token'));
+            return next(new Error('Lỗi xác thực: thiếu token'));
         }
         try {
             const payload = verifyAccessToken(token);
             (socket as any).user = payload;
             next();
         } catch {
-            next(new Error('Authentication error: invalid token'));
+            next(new Error('Lỗi xác thực: token không hợp lệ'));
         }
     });
 

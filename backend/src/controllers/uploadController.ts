@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import { uploadFileToSupabase } from '../services/storageService';
+import { getErrorMessage } from '../utils/controllerUtils';
 
 export const uploadFile = async (req: Request, res: Response): Promise<void> => {
     try {
         if (!req.file) {
-            res.status(400).json({ success: false, error: 'No file uploaded' });
+            res.status(400).json({ success: false, error: 'Chưa có tệp nào được tải lên' });
             return;
         }
 
@@ -23,7 +24,7 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
         };
 
         if (!isSafeImage(req.file.buffer)) {
-            res.status(400).json({ success: false, error: 'Invalid file content: not a supported image type' });
+            res.status(400).json({ success: false, error: 'Nội dung tệp không hợp lệ: chỉ hỗ trợ ảnh JPG, PNG hoặc WebP' });
             return;
         }
 
@@ -44,6 +45,6 @@ export const uploadFile = async (req: Request, res: Response): Promise<void> => 
             }
         });
     } catch (error: any) {
-        res.status(500).json({ success: false, error: error.message || 'File upload failed' });
+        res.status(500).json({ success: false, error: getErrorMessage(error, 'Tải tệp lên thất bại') });
     }
 };
